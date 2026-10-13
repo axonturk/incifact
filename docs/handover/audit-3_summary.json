@@ -1,0 +1,517 @@
+{
+  "commandsExitCodes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "acceptance": 0,
+  "counts": {
+    "main": 20,
+    "variants": 56,
+    "identicalInciLanguages": 10,
+    "localizedSamples": 80,
+    "criticalLiveCases": 64
+  },
+  "mismatches": 0,
+  "criticalMismatches": 0,
+  "main": [
+    {
+      "name": "1 LRP Anthelios UVMune 400 Invisible Fluid UK",
+      "score": 89,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {
+        "hamilelik": "true",
+        "hassas_cilt": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "2 The Ordinary Niacinamide 10% + Zinc 1%",
+      "score": 97,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {
+        "hassas_cilt": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "3 CeraVe Moisturizing Cream US current page",
+      "score": 100,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {
+        "hassas_cilt": "true",
+        "akne": "true"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "4 Nutella UK current page",
+      "score": 100,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {
+        "astim_alerji": "false",
+        "cocuk_metabolik": "true"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "5 Haribo gelatin trap",
+      "score": 100,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {},
+      "unresolved": 0
+    },
+    {
+      "name": "6 Oreo original syrup and cross-contact trap",
+      "score": 100,
+      "coverage": 90,
+      "cap": null,
+      "profiles": {
+        "astim_alerji": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "7 UV nail gel TPO",
+      "score": 10,
+      "coverage": 100,
+      "cap": 10,
+      "profiles": {
+        "hamilelik": "false",
+        "hassas_cilt": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "8 Oxidative hair dye restriction trap",
+      "score": 60,
+      "coverage": 100,
+      "cap": 60,
+      "profiles": {
+        "astim_alerji": "false",
+        "hamilelik": "false",
+        "cocuk_metabolik": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "9 MI/MCI rinse-off shampoo vector",
+      "score": 80,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {
+        "hassas_cilt": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "10 Baby diaper cream boric acid",
+      "score": 10,
+      "coverage": 100,
+      "cap": 10,
+      "profiles": {
+        "cocuk_metabolik": "false",
+        "hamilelik": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "11 Nail plasticizer TPHP time trap",
+      "score": 90,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {
+        "hamilelik": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "12 Skin whitening hydroquinone",
+      "score": 10,
+      "coverage": 100,
+      "cap": 10,
+      "profiles": {
+        "hamilelik": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "13 Energy drink caffeine taurine inositol",
+      "score": 100,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {
+        "hamilelik": "false",
+        "cocuk_metabolik": "false"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "14 Japanese sauce Mirin Sake claim conflict",
+      "score": 100,
+      "coverage": 86,
+      "cap": null,
+      "profiles": {},
+      "unresolved": 0
+    },
+    {
+      "name": "15 Bread E471 explicit plant",
+      "score": 100,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {},
+      "unresolved": 0
+    },
+    {
+      "name": "16 25 percent coverage trap",
+      "score": null,
+      "coverage": 25,
+      "cap": null,
+      "profiles": {
+        "hamilelik": "kapsam_yetersiz"
+      },
+      "unresolved": 0
+    },
+    {
+      "name": "17 Arabic four-ingredient label",
+      "score": 100,
+      "coverage": 100,
+      "cap": null,
+      "profiles": {},
+      "unresolved": 0
+    },
+    {
+      "name": "18 OCR CI corruption",
+      "score": null,
+      "coverage": 80,
+      "cap": null,
+      "profiles": {},
+      "unresolved": 1
+    },
+    {
+      "name": "19 BHA ambiguity",
+      "score": null,
+      "coverage": 80,
+      "cap": null,
+      "profiles": {},
+      "unresolved": 1
+    },
+    {
+      "name": "20 Cleaner comparison"
+    }
+  ],
+  "languageSummary": [
+    {
+      "lang": "tr",
+      "count": 8,
+      "coverage100": 7,
+      "minCoverage": 86,
+      "below80": 0
+    },
+    {
+      "lang": "en",
+      "count": 8,
+      "coverage100": 7,
+      "minCoverage": 86,
+      "below80": 0
+    },
+    {
+      "lang": "ar",
+      "count": 8,
+      "coverage100": 5,
+      "minCoverage": 67,
+      "below80": 1
+    },
+    {
+      "lang": "de",
+      "count": 8,
+      "coverage100": 3,
+      "minCoverage": 60,
+      "below80": 2
+    },
+    {
+      "lang": "fr",
+      "count": 8,
+      "coverage100": 3,
+      "minCoverage": 67,
+      "below80": 1
+    },
+    {
+      "lang": "id",
+      "count": 8,
+      "coverage100": 3,
+      "minCoverage": 44,
+      "below80": 2
+    },
+    {
+      "lang": "ms",
+      "count": 8,
+      "coverage100": 3,
+      "minCoverage": 44,
+      "below80": 2
+    },
+    {
+      "lang": "es",
+      "count": 8,
+      "coverage100": 5,
+      "minCoverage": 33,
+      "below80": 1
+    },
+    {
+      "lang": "ru",
+      "count": 8,
+      "coverage100": 6,
+      "minCoverage": 78,
+      "below80": 1
+    },
+    {
+      "lang": "ur",
+      "count": 8,
+      "coverage100": 7,
+      "minCoverage": 86,
+      "below80": 0
+    }
+  ],
+  "localizedAll100": 49,
+  "localizedBelow80": 10,
+  "tpoLanguages": [
+    {
+      "i": 5,
+      "lang": "tr",
+      "input": {
+        "rawText": "Ingredients: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butyl Acetate, Ethyl Acetate, Nitrocellulose",
+        "lang": "tr",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 100,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": []
+    },
+    {
+      "i": 5,
+      "lang": "en",
+      "input": {
+        "rawText": "Ingredients: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butyl Acetate, Ethyl Acetate, Nitrocellulose",
+        "lang": "en",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 100,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": []
+    },
+    {
+      "i": 5,
+      "lang": "ar",
+      "input": {
+        "rawText": "المكونات: بوليمر أكريليت مشترك، HEMA، أكسيد ثلاثي ميثيل بنزويل ثنائي فينيل فوسفين (TPO)، أسيتات البوتيل، أسيتات الإيثيل",
+        "lang": "ar",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 80,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": [
+        "بوليمر أكريليت مشترك"
+      ]
+    },
+    {
+      "i": 5,
+      "lang": "de",
+      "input": {
+        "rawText": "Inhaltsstoffe: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butylacetat, Ethylacetat",
+        "lang": "de",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": null,
+      "coverage": 60,
+      "halal": "kapsam_yetersiz",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": [
+        "Butylacetat",
+        "Ethylacetat"
+      ]
+    },
+    {
+      "i": 5,
+      "lang": "fr",
+      "input": {
+        "rawText": "Ingrédients : Acrylates Copolymer, HEMA, Oxyde de triméthylbenzoyl diphénylphosphine, Acétate de butyle, Acétate d'éthyle",
+        "lang": "fr",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 100,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": []
+    },
+    {
+      "i": 5,
+      "lang": "id",
+      "input": {
+        "rawText": "Komposisi: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butil Asetat, Etil Asetat",
+        "lang": "id",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 100,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": []
+    },
+    {
+      "i": 5,
+      "lang": "ms",
+      "input": {
+        "rawText": "Ramuan: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butil Asetat, Etil Asetat",
+        "lang": "ms",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 100,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": []
+    },
+    {
+      "i": 5,
+      "lang": "es",
+      "input": {
+        "rawText": "Ingredientes: Acrylates Copolymer, HEMA, Óxido de trimetilbenzoil difenilfosfina, Acetato de butilo, Acetato de etilo",
+        "lang": "es",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 100,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": []
+    },
+    {
+      "i": 5,
+      "lang": "ru",
+      "input": {
+        "rawText": "Состав: Акрилатный сополимер, HEMA, Оксид триметилбензоил дифенилфосфина, Бутилацетат, Этилацетат",
+        "lang": "ru",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 100,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": []
+    },
+    {
+      "i": 5,
+      "lang": "ur",
+      "input": {
+        "rawText": "اجزاء: ایکریلیٹس کوپولیمر، HEMA، ٹرائی میتھائل بینزوئیل ڈائی فینائل فاسفین آکسائیڈ، بیوٹائل ایسٹیٹ، ایتھائل ایسٹیٹ",
+        "lang": "ur",
+        "productType": "cosmetic",
+        "halalAuthority": "GIMDES"
+      },
+      "score": 10,
+      "coverage": 100,
+      "halal": "uygun_gorunuyor",
+      "banned": [
+        "tpo_nail_banned_2025"
+      ],
+      "unknown": []
+    }
+  ],
+  "apiRobustness": [
+    {
+      "name": "malformed",
+      "status": 400,
+      "error": "Invalid JSON syntax: Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+    },
+    {
+      "name": "null",
+      "status": 400,
+      "error": "Request body must be a valid JSON object"
+    },
+    {
+      "name": "huge-70k",
+      "status": 413,
+      "error": "Payload Too Large: maximum allowed body size is 64KB"
+    },
+    {
+      "name": "health-after-huge",
+      "status": 200,
+      "score": 100
+    }
+  ],
+  "botanical": {
+    "count": 70,
+    "allScore10": true
+  },
+  "native": {
+    "expo": {
+      "error": "MODULE_NOT_FOUND"
+    },
+    "metro": {
+      "error": "MODULE_NOT_FOUND"
+    },
+    "react-native": {
+      "error": "MODULE_NOT_FOUND"
+    },
+    "typescript": {
+      "error": "MODULE_NOT_FOUND"
+    },
+    "engineImports": [
+      "import fs from 'node:fs';",
+      "import path from 'node:path';",
+      "import { fileURLToPath } from 'node:url';",
+      "import { SUPPORTED_LANGUAGES, getLocaleStrings } from '../i18n/locales.mjs';"
+    ],
+    "packageDependencies": {
+      "@react-native-async-storage/async-storage": "1.23.1",
+      "expo": "~52.0.0",
+      "expo-camera": "~16.0.0",
+      "expo-image-picker": "~16.0.0",
+      "expo-localization": "~16.0.0",
+      "expo-status-bar": "~2.0.0",
+      "react": "18.3.1",
+      "react-native": "0.76.3",
+      "react-native-purchases": "^8.2.0"
+    }
+  }
+}

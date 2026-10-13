@@ -1,0 +1,1375 @@
+[
+  {
+    "id": "mex-spray-text",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mexoryl_400_uv_filter",
+        "name": "Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate 1%",
+        "status": "yasak",
+        "legal": "AB 2020/1684 Ek VI/32: Solunum yoluyla akciğer maruziyetine yol açabilecek sprey/aerosol formülasyonlarında KULLANILAMAZ."
+      }
+    ]
+  },
+  {
+    "id": "mex-spray",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mexoryl_400_uv_filter",
+        "name": "Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate 1%",
+        "status": "yasak",
+        "legal": "AB 2020/1684 Ek VI/32: Solunum yoluyla akciğer maruziyetine yol açabilecek sprey/aerosol formülasyonlarında KULLANILAMAZ."
+      }
+    ]
+  },
+  {
+    "id": "mex-inhalation",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mexoryl_400_uv_filter",
+        "name": "Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate 1%",
+        "status": "yasak",
+        "legal": "AB 2020/1684 Ek VI/32: Solunum yoluyla akciğer maruziyetine yol açabilecek sprey/aerosol formülasyonlarında KULLANILAMAZ."
+      }
+    ]
+  },
+  {
+    "id": "mex-at-limit",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mexoryl_400_uv_filter",
+        "name": "Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate 3%",
+        "status": "kisitli",
+        "legal": "AB 2020/1684 Ek VI/32: Kozmetik ürünlerde azami %3 konsantrasyona kadar izinlidir. Solunum yoluyla akciğer maruziyetine yol açabilecek sprey/aerosol uygulamalarında KULLANILAMAZ."
+      }
+    ]
+  },
+  {
+    "id": "mex-over-limit",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mexoryl_400_uv_filter",
+        "name": "Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate 3.0001%",
+        "status": "yasak",
+        "legal": "AB 2020/1684 Ek VI/32: Kozmetik ürünlerde azami %3 konsantrasyon sınırını aşıyor; bu oranda kullanımı YASAKTIR."
+      }
+    ]
+  },
+  {
+    "id": "mex-under-limit",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mexoryl_400_uv_filter",
+        "name": "Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate 0.3%",
+        "status": "kisitli",
+        "legal": "AB 2020/1684 Ek VI/32: Kozmetik ürünlerde azami %3 konsantrasyona kadar izinlidir. Solunum yoluyla akciğer maruziyetine yol açabilecek sprey/aerosol uygulamalarında KULLANILAMAZ."
+      }
+    ]
+  },
+  {
+    "id": "mex-ar-concentration",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mexoryl_400_uv_filter",
+        "name": "Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate ٤٪",
+        "status": "kisitli",
+        "legal": "AB 2020/1684 Ek VI/32: Kozmetik ürünlerde azami %3 konsantrasyona kadar izinlidir. Solunum yoluyla akciğer maruziyetine yol açabilecek sprey/aerosol uygulamalarında KULLANILAMAZ."
+      }
+    ]
+  },
+  {
+    "id": "mex-ur-concentration",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mexoryl_400_uv_filter",
+        "name": "Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate ۴٪",
+        "status": "kisitli",
+        "legal": "AB 2020/1684 Ek VI/32: Kozmetik ürünlerde azami %3 konsantrasyona kadar izinlidir. Solunum yoluyla akciğer maruziyetine yol açabilecek sprey/aerosol uygulamalarında KULLANILAMAZ."
+      }
+    ]
+  },
+  {
+    "id": "cerave-full",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [
+      {
+        "name": "Gliserin",
+        "status": "sari"
+      },
+      {
+        "name": "Kolesterol (Hayvansal Lipid)",
+        "status": "sari"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "cholesterol",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [
+      {
+        "name": "Kolesterol (Hayvansal Lipid)",
+        "status": "sari"
+      },
+      {
+        "name": "Gliserin",
+        "status": "sari"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "nutella",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Sert Kabuklu Yemişler (Fındık/Badem)",
+        "raw": "Fındık (%13)",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Süt / Süt Ürünleri",
+        "raw": "Yağsız Süt Tozu (%8.7)",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Soya",
+        "raw": "Emülgatör: Lesitin (Soya)",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [
+      {
+        "name": "Yağsız Süt Tozu",
+        "status": "yesil"
+      },
+      {
+        "name": "Lesitin (Soya)",
+        "status": "yesil"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "allergen-gluten",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 80,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Gluten / Buğday",
+        "raw": "Wheat",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-crustaceans",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 80,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Kabuklular",
+        "raw": "Shrimp",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-egg",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Gluten / Buğday",
+        "raw": "Egg",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Yumurta",
+        "raw": "Egg",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [
+      {
+        "name": "Buğday Unu (Egg)",
+        "status": "yesil"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "allergen-fish",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Balık",
+        "raw": "Fish",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-peanut",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Gluten / Buğday",
+        "raw": "Peanut",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Yer Fıstığı",
+        "raw": "Peanut",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-soy",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 80,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Soya",
+        "raw": "Soy",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-milk",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Süt / Süt Ürünleri",
+        "raw": "Milk",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [
+      {
+        "name": "Yağsız Süt Tozu",
+        "status": "yesil"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "allergen-tree-nuts",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Sert Kabuklu Yemişler (Fındık/Badem)",
+        "raw": "Hazelnut",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-celery",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Gluten / Buğday",
+        "raw": "Celery",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Kereviz",
+        "raw": "Celery",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-mustard",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Gluten / Buğday",
+        "raw": "Mustard",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Hardal",
+        "raw": "Mustard",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-sesame",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Gluten / Buğday",
+        "raw": "Sesame",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Susam",
+        "raw": "Sesame",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-sulphites",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Sulfites & Sulphur Dioxide (E220–E228)",
+        "raw": "E220",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Sülfitler",
+        "raw": "E220",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-lupin",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 80,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Acıbakla (Lüpen)",
+        "raw": "Lupin",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-molluscs",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 80,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Yumuşakçalar",
+        "raw": "Mussel",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-ar-milk",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 80,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Süt / Süt Ürünleri",
+        "raw": "حليب",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-ur-milk",
+    "http": 200,
+    "match": true,
+    "score": null,
+    "cap": null,
+    "cov": 75,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Süt / Süt Ürünleri",
+        "raw": "دودھ",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "kapsam_yetersiz",
+    "findings": []
+  },
+  {
+    "id": "allergen-tr-lupin",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 80,
+    "profile": {
+      "astim_alerji": "true"
+    },
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-tr-mustard",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Gluten / Buğday",
+        "raw": "Hardal",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Hardal",
+        "raw": "Hardal",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "allergen-soy-milk",
+    "http": 200,
+    "match": true,
+    "score": null,
+    "cap": null,
+    "cov": 50,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Soya",
+        "raw": "Soy milk",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Süt / Süt Ürünleri",
+        "raw": "Soy milk",
+        "level": "kirmizi"
+      }
+    ],
+    "halal": [],
+    "vegan": "kapsam_yetersiz",
+    "findings": []
+  },
+  {
+    "id": "allergen-milk-free-soy",
+    "http": 200,
+    "match": true,
+    "score": null,
+    "cap": null,
+    "cov": 50,
+    "profile": {
+      "astim_alerji": "kapsam_yetersiz"
+    },
+    "alerts": [],
+    "halal": [],
+    "vegan": "kapsam_yetersiz",
+    "findings": []
+  },
+  {
+    "id": "allergen-milk-free",
+    "http": 200,
+    "match": true,
+    "score": null,
+    "cap": null,
+    "cov": 67,
+    "profile": {
+      "astim_alerji": "kapsam_yetersiz"
+    },
+    "alerts": [],
+    "halal": [],
+    "vegan": "kapsam_yetersiz",
+    "findings": []
+  },
+  {
+    "id": "allergen-sutsuz",
+    "http": 200,
+    "match": true,
+    "score": null,
+    "cap": null,
+    "cov": 67,
+    "profile": {
+      "astim_alerji": "kapsam_yetersiz"
+    },
+    "alerts": [],
+    "halal": [],
+    "vegan": "kapsam_yetersiz",
+    "findings": []
+  },
+  {
+    "id": "oreo",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 83,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Gluten / Buğday",
+        "raw": "Wheat Flour",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Çapraz Bulaşma Uyarısı",
+        "raw": "May contain milk",
+        "level": "sari"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "cross-inline",
+    "http": 200,
+    "match": true,
+    "score": null,
+    "cap": null,
+    "cov": 67,
+    "profile": {
+      "astim_alerji": "false"
+    },
+    "alerts": [
+      {
+        "name": "Süt / Süt Ürünleri",
+        "raw": "Milk",
+        "level": "kirmizi"
+      },
+      {
+        "name": "Çapraz Bulaşma Uyarısı",
+        "raw": "may contain nuts",
+        "level": "sari"
+      }
+    ],
+    "halal": [
+      {
+        "name": "Yağsız Süt Tozu",
+        "status": "yesil"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "pork-free",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [
+      {
+        "name": "Jelatin (Gelatin (pork-free))",
+        "status": "sari"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "domuzsuz",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [
+      {
+        "name": "Jelatin (domuzsuz jelatin)",
+        "status": "sari"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "actual-pork-free-wrapper",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [
+      {
+        "name": "Jelatin (Gelatin (pork-free))",
+        "status": "yesil"
+      },
+      {
+        "name": "Domuz Kaynaklı (Gelatin (pork gelatin))",
+        "status": "conflict"
+      }
+    ],
+    "vegan": "hayvansal_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "mi-leave",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylisothiazolinone 0.0015%",
+        "status": "yasak",
+        "legal": "AB 2016/1198 (Ek V/57 değişikliği) uyarınca durulanmayan (leave-on) kozmetik ürünlerde kesinlikle YASAKTIR. Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) izinlidir."
+      }
+    ]
+  },
+  {
+    "id": "mi-rinse-at-limit",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylisothiazolinone 0.0015%",
+        "status": "kisitli",
+        "legal": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir."
+      }
+    ]
+  },
+  {
+    "id": "mi-rinse-over",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylisothiazolinone 0.0016%",
+        "status": "yasak",
+        "legal": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir; bu sınırın üzerindeki konsantrasyonlar YASAKTIR."
+      }
+    ]
+  },
+  {
+    "id": "mci-leave",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylchloroisothiazolinone 0.0015%",
+        "status": "yasak",
+        "legal": "AB 2016/1198 (Ek V/57 değişikliği) uyarınca durulanmayan (leave-on) kozmetik ürünlerde kesinlikle YASAKTIR. Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) izinlidir."
+      }
+    ]
+  },
+  {
+    "id": "mci-rinse-at-limit",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylchloroisothiazolinone 0.0015%",
+        "status": "kisitli",
+        "legal": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir."
+      }
+    ]
+  },
+  {
+    "id": "mci-rinse-over",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylchloroisothiazolinone 0.0016%",
+        "status": "yasak",
+        "legal": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir; bu sınırın üzerindeki konsantrasyonlar YASAKTIR."
+      }
+    ]
+  },
+  {
+    "id": "mi-ar-over",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylisothiazolinone ٠٫٠٠١٦٪",
+        "status": "kisitli",
+        "legal": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir."
+      }
+    ]
+  },
+  {
+    "id": "mi-ppm-over",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylisothiazolinone (20 ppm)",
+        "status": "kisitli",
+        "legal": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir."
+      }
+    ]
+  },
+  {
+    "id": "mi-conflicting-context",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "mi_mci",
+        "name": "Methylisothiazolinone",
+        "status": "kisitli",
+        "legal": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir."
+      }
+    ]
+  },
+  {
+    "id": "tphp-default",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "tphp_triphenyl_phosphate_banned",
+        "name": "Triphenyl Phosphate",
+        "status": "kisitli",
+        "legal": "Geçiş Dönemi Uyarısı (AB 2026/909): SCCS genotoksisite ve endokrin verisi eksikliği gerekçesiyle Ek II listesine eklenmiştir. 1 Ocak 2027'den itibaren piyasaya arzı yasaktır (Ekim 2026 itibarıyla geçiş dönemindedir)."
+      }
+    ]
+  },
+  {
+    "id": "tphp-invalid",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "tphp_triphenyl_phosphate_banned",
+        "name": "Triphenyl Phosphate",
+        "status": "kisitli",
+        "legal": "Geçiş Dönemi Uyarısı (AB 2026/909): SCCS genotoksisite ve endokrin verisi eksikliği gerekçesiyle Ek II listesine eklenmiştir. 1 Ocak 2027'den itibaren piyasaya arzı yasaktır (Ekim 2026 itibarıyla geçiş dönemindedir)."
+      }
+    ]
+  },
+  {
+    "id": "tphp-2026",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "tphp_triphenyl_phosphate_banned",
+        "name": "Triphenyl Phosphate",
+        "status": "kisitli",
+        "legal": "Geçiş Dönemi Uyarısı (AB 2026/909): SCCS genotoksisite ve endokrin verisi eksikliği gerekçesiyle Ek II listesine eklenmiştir. 1 Ocak 2027'den itibaren piyasaya arzı yasaktır (Ekim 2026 itibarıyla geçiş dönemindedir)."
+      }
+    ]
+  },
+  {
+    "id": "tphp-2027",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "tphp_triphenyl_phosphate_banned",
+        "name": "Triphenyl Phosphate",
+        "status": "yasak",
+        "legal": "(AB) 2026/909 ile Ek II Doğrudan Yasaklılar listesine alınmıştır (1 Ocak 2027 itibarıyla piyasaya arzı yasaktır)."
+      }
+    ]
+  },
+  {
+    "id": "tphp-strict",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "tphp_triphenyl_phosphate_banned",
+        "name": "Triphenyl Phosphate",
+        "status": "yasak",
+        "legal": "(AB) 2026/909 ile Ek II Doğrudan Yasaklılar listesine alınmıştır (1 Ocak 2027 itibarıyla piyasaya arzı yasaktır)."
+      }
+    ]
+  },
+  {
+    "id": "tphp-2028",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "tphp_triphenyl_phosphate_banned",
+        "name": "Triphenyl Phosphate",
+        "status": "yasak",
+        "legal": "(AB) 2026/909 ile Ek II Doğrudan Yasaklılar listesine alınmıştır (1 Ocak 2027 itibarıyla piyasaya arzı yasaktır)."
+      }
+    ]
+  },
+  {
+    "id": "low-coverage",
+    "http": 200,
+    "match": true,
+    "score": null,
+    "cap": null,
+    "cov": 25,
+    "profile": {
+      "hamilelik": "kapsam_yetersiz",
+      "hassas_cilt": "kapsam_yetersiz"
+    },
+    "alerts": [],
+    "halal": [],
+    "vegan": "kapsam_yetersiz",
+    "findings": []
+  },
+  {
+    "id": "ur-ready",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [
+      {
+        "name": "گلیسرین",
+        "status": "sari"
+      }
+    ],
+    "vegan": "cift_kaynakli_bilesen_var",
+    "findings": []
+  },
+  {
+    "id": "ur-tpo",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "hema_dihema_nail",
+        "name": "ایکریلیٹس کوپولیمر",
+        "status": "kisitli",
+        "legal": "یورپی یونین کے ضوابط کے تحت ارتکاز یا استعمال کی پابندیوں سے مشروط جزو۔"
+      },
+      {
+        "id": "hema_dihema_nail",
+        "name": "ایکریلیٹس کوپولیمر (HEMA)",
+        "status": "kisitli",
+        "legal": "یورپی یونین کے ضوابط کے تحت ارتکاز یا استعمال کی پابندیوں سے مشروط جزو۔"
+      },
+      {
+        "id": "tpo_nail_banned_2025",
+        "name": "ٹرائی میتھائل بینزوئیل ڈائی فینائل فاسفین آکسائیڈ",
+        "status": "yasak",
+        "legal": "یورپی یونین ریگولیشن ضمیمہ II کے تحت ممنوعہ جزو (زیادہ سے زیادہ اسکور 10)۔"
+      }
+    ]
+  },
+  {
+    "id": "e171-ar",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "titanium_dioxide_e171_ci77891",
+        "name": "E١٧١",
+        "status": "yasak",
+        "legal": "غذاء (E171): محظور كمضاف غذائي في الاتحاد الأوروبي بموجب اللائحة 2022/63 (تقييم EFSA 2021)."
+      }
+    ]
+  },
+  {
+    "id": "e171-ur",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "titanium_dioxide_e171_ci77891",
+        "name": "E۱۷۱",
+        "status": "yasak",
+        "legal": "خوراک (E171): یورپی یونین ریگولیشن 2022/63 کے تحت فوڈ ایڈیٹیو کے طور پر ممنوع ہے (EFSA 2021)۔"
+      }
+    ]
+  },
+  {
+    "id": "us-ti-at-limit",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  },
+  {
+    "id": "us-ti-over",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "titanium_dioxide_e171_ci77891",
+        "name": "Titanium Dioxide 1.01%",
+        "status": "yasak",
+        "legal": "FDA 21 CFR 73.575: ABD pazarında gıdalarda ağırlıkça azami %1 konsantrasyona kadar izinlidir; %1 üzerindeki konsantrasyonlar YASAKTIR."
+      }
+    ]
+  },
+  {
+    "id": "hq-pro-nail",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "hydroquinone_banned",
+        "name": "Hydroquinone 0.02%",
+        "status": "kisitli",
+        "legal": "AB 1223/2009 Ek III/14: Profesyonel yapay tırnak sistemlerinde son karışımda azami %0.02 izinlidir. Cilt açıcı kremlerde kesinlikle yasaktır."
+      }
+    ]
+  },
+  {
+    "id": "hq-home-nail",
+    "http": 200,
+    "match": true,
+    "score": 90,
+    "cap": null,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "hydroquinone_banned",
+        "name": "Hydroquinone 0.02%",
+        "status": "kisitli",
+        "legal": "AB 1223/2009 Ek III/14: Profesyonel yapay tırnak sistemlerinde son karışımda azami %0.02 izinlidir. Cilt açıcı kremlerde kesinlikle yasaktır."
+      }
+    ]
+  },
+  {
+    "id": "hq-pro-over",
+    "http": 200,
+    "match": true,
+    "score": 10,
+    "cap": 10,
+    "cov": 100,
+    "profile": {},
+    "alerts": [],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": [
+      {
+        "id": "hydroquinone_banned",
+        "name": "Hydroquinone 0.021%",
+        "status": "yasak",
+        "legal": "AB 1223/2009 Ek II/1339: Cilt açıcı kozmetik kremlerde kullanımı kesinlikle YASAKTIR."
+      }
+    ]
+  },
+  {
+    "id": "taurine-no-caffeine",
+    "http": 200,
+    "match": true,
+    "score": 100,
+    "cap": null,
+    "cov": 100,
+    "profile": {
+      "hamilelik": "false",
+      "cocuk_metabolik": "false"
+    },
+    "alerts": [
+      {
+        "name": "Enerji İçeceği Uyarıcısı (Taurin/İnositol)",
+        "raw": "Taurine/Inositol",
+        "level": "sari"
+      },
+      {
+        "name": "Enerji İçeceği Uyarıcısı (Taurin/İnositol)",
+        "raw": "Taurine/Inositol",
+        "level": "sari"
+      }
+    ],
+    "halal": [],
+    "vegan": "vegan_uyumlu_gorunuyor",
+    "findings": []
+  }
+]

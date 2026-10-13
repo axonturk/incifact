@@ -3,15 +3,15 @@
 > **Tarih:** 13 Ekim 2026  
 > **Konum:** `C:\Projeler\clean-halal-scanner`  
 > **Canlı Servis:** `http://localhost:3456`  
-> **Mevcut Durum:** 39/39 kabul testi geçiyor · 0 alias çakışması · Son **bağımsız** denetim puanı: **68/100 NO-GO**. Bu sürümden sonra yapılan düzeltmeler bağımsız denetçi tarafından **henüz yeniden puanlanmadı**. "96+/100 GO" yalnızca geliştirici tarafının tahminidir, resmi sonuç değildir.
+> **Mevcut Durum:** 39/39 kabul testi geçiyor · 0 alias çakışması · Son **bağımsız** denetim puanı: **80/100 NO-GO** (3. denetim, 13 Ekim 2026 gece). Rapor: `docs/handover/audit-3_80-100_nihai-denetim.md`. Önceki puanlar: 56 → 68 → 80. Güncel açık işler **Bölüm 7**'de.
 >
 > **Ek belgeler:** `docs/handover/` klasöründe her iki denetim raporu (56/100 ve 68/100), yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
 
 ## 0. YENİ OTURUMDA İLK YAPILACAKLAR
-1. Bu dosyayı ve `docs/handover/audit-2_68-100_yeniden-denetim.md` dosyasını baştan sona oku.
+1. Bu dosyayı ve `docs/handover/audit-3_80-100_nihai-denetim.md` dosyasını baştan sona oku.
 2. `node tests/verify_engine.mjs` ve `node scripts/audit_collisions.mjs` çalıştır, sonuçların 39/39 ve 0 çakışma olduğunu doğrula.
 3. `node server.mjs` ile servisi başlat (port 3456).
-4. Aşağıdaki **Bölüm 5: Açık Kalan İşler** listesinden devam et.
+4. Aşağıdaki **Bölüm 7: Güncel Açık İşler** listesinden devam et.
 
 ---
 
@@ -124,3 +124,31 @@ Aşağıdakiler 13 Ekim 2026 itibarıyla dürüstçe açık kabul edilmelidir:
 - `index.html`: `document.documentElement.dir` ve `.studio-bar` RTL'ye bağlandı.
 - `ocrService.ts` / `ScannerApp.tsx`: Sabit %94 OCR güveni kaldırıldı.
 - Yardımcı betik: `scripts/update_urdu.mjs`.
+
+---
+
+## 7. GÜNCEL AÇIK İŞLER — 3. BAĞIMSIZ DENETİM (80/100 NO-GO)
+
+Kaynak: `docs/handover/audit-3_80-100_nihai-denetim.md` ve `docs/handover/audit-3-scripts/` (denetçinin `critical.mjs` ve `confirm-gaps.mjs` betikleri; içindeki dosya yolları denetçi klasörünü gösterir, gerekirse uyarlanmalı).
+
+**Kapandığı doğrulananlar:** düşük kapsam/bilinmeyen arayüz rozetleri, Urduca hazır etiketler, ۱–۵ rakamları ve RTL üst çubuk, E١٧١/E۱۷۱, Oreo sahte kırmızı süt alarmı, pork-free/domuzsuz jelatin, kafeinsiz taurin artık "yüksek kafein" demiyor, TPHP geçersiz tarih, 70 bitkisel kayıt, API dayanıklılığı, sabit OCR güveni kaldırıldı.
+
+### P1 — GO için zorunlu (öncelik sırasıyla)
+1. **Konsantrasyon normalizasyonu** (`parseConcentration`, `ruleEngine.mjs` ~69–75): Doğu rakamları (`٤٪`, `۴٪`, `٠٫٠٠١٦٪`), Arapça yüzde `٪`, ondalık `٫` ve **ppm** (`20 ppm` = %0,002) desteklenmiyor. Şu an `Mexoryl ٤٪` → 90 (olmalı 10); `MI ٠٫٠٠١٦٪` rinse-off → 90 (olmalı 10); `MI (20 ppm)` rinse-off → 90 (olmalı 10). Tek bir normalize miktar modeli kur.
+2. **MI/MCI karışım toplamı**: `Methylchloroisothiazolinone 0.0012%, Methylisothiazolinone 0.0004%` rinse-off → 80 (toplam %0,0016, Ek V/39 %0,0015 sınırı aşılıyor; olmalı 10). Gözlemler tek tek değil, MCI+MI toplamı ve 3:1 oranı birlikte değerlendirilmeli.
+3. **Çelişen uygulama bağlamı**: `applicationType='leave_on'` + metin `Shampoo: ...MI` → 90. Açık yapılandırılmış alan, etiket sözcüğüyle (regex) geçersiz kılınmamalı; çelişkide ihtiyatlı (leave-on) değerlendir veya teyit iste. (`isRinseOff` satırındaki OR mantığı.)
+4. **Alerjen negasyonu hedefe bağlı değil** (`ruleEngine.mjs` ~1543): `Milk-free Soy Lecithin` → soya alarmı yok; `Gluten-free Mustard` → hardal alarmı yok. Negasyon yalnız olumsuzlanan alerjeni silmeli.
+5. **Türkçe "Acı Bakla"** (iki kelime) tanınmıyor; yalnız `acıbakla` var. Lupin eşanlamlılarını tamamla.
+
+### P2
+6. **Sahte alerjen**: Egg → yumurta + gluten; Hardal → hardal + gluten. Alerjen taraması yerelleştirilmiş grup adını ("Buğday Unu" vb.) tekrar tarıyor (~1539). Yalnız ham token / gerçek bileşen kimliği taranmalı.
+7. **Hidrokinon tırnak istisnası** `professionalUse=false` olsa da 90 veriyor; istisna profesyonel kullanıma bağlanmalı.
+8. **Yerel hazır etiket sözlük boşlukları** (80 örnekten 10'u <%80): DE TPO %60 (`Butylacetat`, `Ethylacetat`), ES salyangoz %33, ID/MS salyangoz %44, AR `بوليمر أكريليت مشترك` vb.
+9. **CosIng s=1 önceliği**: Ethoxydiglycol/Butoxydiglycol genel grup altında kısıt bulgusu üretmiyor.
+10. **Gizlilik beyanı** (`locales.mjs` `profileScreen.subtitle`, 10 dil) web API davranışıyla çelişiyor.
+11. **Mobil çekirdek** Node `fs/path/url` kullanıyor; RN'de çalışmaz. Native build / cihaz testi yok.
+12. **Petrolatum** istisnası bir varsayım; kullanıcıya "üretici rafinasyon belgesi doğrulanmadı" notu gösterilmeli.
+
+### Her düzeltmeden sonra
+- `tests/verify_engine.mjs` içine yukarıdaki her vaka için yeni regresyon testi ekle (denetçi: "yeni regresyonlar yeşil olmadan GO verilmez").
+- 39/39 + yeni testler, 0 çakışma, `server.mjs` yeniden başlat, canlı/disk eşitliği.

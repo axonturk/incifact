@@ -1,0 +1,1312 @@
+[
+  {
+    "id": "milk-free-soy-coverage80",
+    "input": {
+      "rawText": "Water, Sugar, Salt, Citric Acid, Milk-free Soy Lecithin",
+      "productType": "food",
+      "userProfiles": [
+        "astim_alerji"
+      ]
+    },
+    "status": 200,
+    "body": {
+      "timestamp": "2026-10-13T20:08:03.019Z",
+      "ruleVersion": "2026-10-13-v3-comprehensive-10lang",
+      "brand": "InciFact",
+      "lang": "tr",
+      "dir": "ltr",
+      "locale": {
+        "appTagline": "Kozmetik, Gıda & Helal İçerik Analizi",
+        "tabs": {
+          "profile": "1. Profil",
+          "scan": "2. Tara (OCR)",
+          "result": "3. Sonuç",
+          "halal": "4. Helal",
+          "compare": "5. Karşılaştır"
+        },
+        "profileScreen": {
+          "title": "Kimin için tarıyorsun?",
+          "subtitle": "Seçimin sadece bu telefonda kalır; sunucuya gönderilmez. Aynı ürün herkese aynı sonucu vermez.",
+          "profiles": {
+            "hamilelik": {
+              "name": "Hamilelik & Emzirme",
+              "desc": "Retinoidler, yüksek konsantrasyon salisilik asit ve şüpheli UV filtrelerini işaretler."
+            },
+            "cocuk_metabolik": {
+              "name": "Bebek & Çocuk",
+              "desc": "Southampton 6 sentetik boyaları, nitritleri, boratları ve sert koruyucuları öne çıkarır."
+            },
+            "hassas_cilt": {
+              "name": "Hassas / Atopik Cilt",
+              "desc": "26 parfüm alerjeni, MI/MCI, SLS ve ilk 5 sıradaki kurutucu alkolü yakalar."
+            },
+            "astim_alerji": {
+              "name": "Alerji & Astım",
+              "desc": "Sülfitler (E220-E228), formaldehit salıcılar ve saç boyası duyarlılaştırıcılarını bildirir."
+            },
+            "akne": {
+              "name": "Akneye Meyilli Cilt",
+              "desc": "Genel puanı düşürmeden yalnız komedojenik ester ve ağır yağları uyarır."
+            }
+          },
+          "halalSectionTitle": "Helal & Yaşam Tarzı Filtresi",
+          "authorityLabel": "Helal Fetva / Standart Otoritesi",
+          "claimsLabel": "Ürün Üzerindeki Beyan / Sertifika",
+          "continueBtn": "Devam et — Taramaya geç →",
+          "privacyNote": "Gizlilik: Sağlık ve inanç seçimlerin KVKK md. 6 ve GDPR md. 9 kapsamında özel nitelikli veridir. Hesap açtırmıyoruz, buluta yazmıyoruz."
+        },
+        "scanScreen": {
+          "title": "İçindekiler Kısmını Hizala",
+          "subtitle": "Barkod şart değil. Etiketin \"Ingredients / İçindekiler\" bölümünü kameraya göster veya aşağıya yapıştır.",
+          "cameraBtn": "📷 Kamerayla Etiket Fotoğrafı Çek / Seç",
+          "productTypeCosmetic": "Kozmetik (INCI)",
+          "productTypeFood": "Gıda (E-Kodu)",
+          "presetsLabel": "Hızlı Test Senaryoları (Tek Tıkla Yükle):",
+          "analyzeBtn": "Bileşenleri Analiz Et →"
+        },
+        "resultScreen": {
+          "scoreLabel": "GENEL REGÜLASYON ENDEKSİ",
+          "coverageLabel": "Tanınan Kapsam",
+          "recognizedLabel": "Tanınan Madde",
+          "profileStatusLabel": "Profil Uyumu",
+          "halalSummaryLabel": "Helal Özeti",
+          "ocrWarningTitle": "Okuma Belirsizliği — Onayın Gerekiyor",
+          "ingredientsTitle": "Bileşen Analizi & Resmi Kaynaklar"
+        },
+        "halalScreen": {
+          "title": "Helal & Etanol Bağlam Motoru",
+          "authoritySelectLabel": "Kriter Otoritesini Değiştir:",
+          "shieldTitle": "Yanlış Alarm Koruması (Etil Alkol Değildir)",
+          "findingsTitle": "Tespit Edilen Helal / Kaynak Bulguları",
+          "veganSugarTitle": "Vegan Uyum & Gizli Şeker Sayacı",
+          "freeSugarCountLabel": "Tespit Edilen Serbest Şeker",
+          "rapidCarbLabel": "Hızlı Karbonhidrat (Maltodekstrin)",
+          "legalDisclaimerMicro": "Bu analiz, seçilen kurumların kamuya açık fıkhi standartlarına dayalı bağımsız bir algoritmik ön incelemedir. Kurumların resmi onayı veya tescili niteliğinde değildir. Nihai güvence için ambalajdaki resmi sertifika logosunu ve numarasını teyit ediniz."
+        },
+        "compareScreen": {
+          "title": "Yan Yana Karşılaştırma",
+          "subtitle": "Kararsız kaldığın iki ürünü yan yana koy; farkı yaratan tek maddeyi anında gör.",
+          "productALabel": "1. Ürün (A)",
+          "productBLabel": "2. Ürün (B)",
+          "compareBtn": "⚡ İki Ürünü Yan Yana Karşılaştır",
+          "criteriaCol": "Kriter",
+          "regScoreRow": "Regülasyon Skoru",
+          "euBanRow": "AB Yasaklı Madde",
+          "attentionRow": "Dikkat / Uyarı Sayısı",
+          "profileRow": "Profiline Uyum",
+          "halalRow": "Helal Durumu",
+          "decidingTitle": "Farkı Yaratan Madde"
+        },
+        "badges": {
+          "allowed": "İzinli",
+          "restricted": "Kısıtlı",
+          "banned": "AB Yasaklı",
+          "suitable": "Uygun",
+          "avoid": "Kaçın / Dikkat",
+          "halalOk": "Uygun Görünüyor",
+          "musbooh": "Müşbooh (Kaynak Belirsiz)",
+          "halalRed": "Uygunsuz / Çelişki",
+          "conflict": "Etiket Çelişkisi!",
+          "none": "Yok",
+          "present": "Var!",
+          "lowCoverage": "Kapsam Yetersiz (<%80)"
+        }
+      },
+      "productType": "food",
+      "jurisdiction": "EU",
+      "halalAuthority": "general_cautious",
+      "claims": {
+        "halalCertified": false,
+        "veganStatus": "none",
+        "vegetarianStatus": "none"
+      },
+      "unresolvedConfirmations": [],
+      "observations": [
+        {
+          "raw": "Water",
+          "localizedName": "Su (Aqua)",
+          "position": 1,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "aqua",
+            "name": "Aqua / Water",
+            "aliases": [
+              "aqua",
+              "water",
+              "su",
+              "eau",
+              "wasser",
+              "aqua (water)",
+              "purified water",
+              "deionized water",
+              "ماء",
+              "الماء",
+              "agua",
+              "air",
+              "вода",
+              "پانی",
+              "water (aqua)",
+              "aqua/water/eau",
+              "aqua / water / eau",
+              "thermal spring water",
+              "maris aqua",
+              "sea water"
+            ],
+            "domain": "cosmetic+food",
+            "class": "solvent",
+            "e_code": null,
+            "ci_code": null,
+            "eu_status": "izinli",
+            "eu_detail": "Standart çözücü baz.",
+            "ed_tier": null,
+            "severity": "bilgi",
+            "profiles": {},
+            "sources": [
+              "COSING"
+            ],
+            "verification": "ikincil_kontrol",
+            "note": "Tamamen güvenli temel çözücü."
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        },
+        {
+          "raw": "Sugar",
+          "localizedName": "Şeker (Sükroz)",
+          "position": 2,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": null,
+          "halalRule": null,
+          "sugar": {
+            "id": "sugar",
+            "canonical": "Sucrose / Sugar",
+            "aliases": [
+              "sugar",
+              "şeker",
+              "beyaz şeker",
+              "sucrose",
+              "sakkaroz",
+              "sükroz",
+              "zucker",
+              "sucre",
+              "saccharose",
+              "سكر",
+              "azúcar",
+              "gula",
+              "gula pasir",
+              "сахар",
+              "چینی",
+              "شکر"
+            ]
+          },
+          "rapidCarb": null
+        },
+        {
+          "raw": "Salt",
+          "localizedName": "Sodyum Klorür (Salt)",
+          "position": 3,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "ph_adjusters_salts_bases",
+            "name": "pH Adjusters, Salts & Electrolytes (Sodium Hydroxide E524 / Baking Soda E500 / Salt / Magnesium Sulfate)",
+            "aliases": [
+              "sodium hydroxide",
+              "sodyum hidroksit",
+              "kostik",
+              "e524",
+              "potassium hydroxide",
+              "potasyum hidroksit",
+              "e525",
+              "calcium hydroxide",
+              "e526",
+              "ammonium hydroxide",
+              "e527",
+              "magnesium hydroxide",
+              "e528",
+              "aminomethyl propanol",
+              "tromethamine",
+              "arginine",
+              "arjinin",
+              "lysine",
+              "histidine",
+              "glycine",
+              "e640",
+              "sodium bicarbonate",
+              "sodyum bikarbonat",
+              "karbonat",
+              "kabartma tozu",
+              "sodium carbonate",
+              "e500",
+              "e500i",
+              "e500ii",
+              "potassium carbonate",
+              "e501",
+              "ammonium bicarbonate",
+              "ammonium carbonate",
+              "amonyum karbonat",
+              "e503",
+              "magnesium carbonate",
+              "e504",
+              "sodium chloride",
+              "sodyum klorür",
+              "salt",
+              "tuz",
+              "sea salt",
+              "deniz tuzu",
+              "maris sal",
+              "sel",
+              "salz",
+              "sal",
+              "garam",
+              "соль",
+              "ملح",
+              "نمک",
+              "potassium chloride",
+              "potasyum klorür",
+              "e508",
+              "calcium chloride",
+              "kalsiyum klorür",
+              "e509",
+              "magnesium chloride",
+              "e511",
+              "magnesium sulfate",
+              "magnezyum sülfat",
+              "epsom salt",
+              "calcium sulfate",
+              "e516",
+              "zinc sulfate",
+              "zinc gluconate",
+              "çinko glukonat",
+              "copper gluconate",
+              "manganese gluconate",
+              "calcium carbonate",
+              "kalsiyum karbonat",
+              "e170",
+              "ci 77220",
+              "гидроксид натрия",
+              "хлорид натрия",
+              "هيدروكسيد الصوديوم",
+              "كلوريد الصوديوم",
+              "ارجینین"
+            ],
+            "domain": "cosmetic+food",
+            "class": "pH_adjuster",
+            "e_code": "E500-E528",
+            "ci_code": null,
+            "eu_status": "izinli",
+            "eu_detail": "Formülün pH dengesini cilt/gıda ile uyumlu hale getiren bazlar, tuzlar ve kabartıcı mineraller (Son üründe nötralize haldedir).",
+            "ed_tier": null,
+            "severity": "bilgi",
+            "profiles": {},
+            "sources": [
+              "COSING"
+            ],
+            "verification": "ikincil_kontrol",
+            "note": null
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        },
+        {
+          "raw": "Citric Acid",
+          "localizedName": "Sitrik Asit (Citric Acid)",
+          "position": 4,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "citric_acid_citrates_e330",
+            "name": "Citric Acid & Citrates (E330–E333)",
+            "aliases": [
+              "citric acid",
+              "sitrik asit",
+              "limon tuzu",
+              "e330",
+              "sodium citrate",
+              "sodyum sitrat",
+              "trisodium citrate",
+              "e331",
+              "potassium citrate",
+              "e332",
+              "calcium citrate",
+              "e333",
+              "zitronensäure",
+              "acide citrique",
+              "ácido cítrico",
+              "asam sitrat",
+              "asid sitrik",
+              "лимонная кислота",
+              "حمض الستريك",
+              "سائٹرک ایسڈ",
+              "citronensäure",
+              "zitronensäure"
+            ],
+            "domain": "cosmetic+food",
+            "class": "pH_adjuster",
+            "e_code": "E330",
+            "ci_code": null,
+            "eu_status": "izinli",
+            "eu_detail": "Kozmetikte pH dengeleyici (tampon), gıdada (E330-E333) doğal asitlik düzenleyici.",
+            "ed_tier": null,
+            "severity": "bilgi",
+            "profiles": {},
+            "sources": [
+              "COSING"
+            ],
+            "verification": "ikincil_kontrol",
+            "note": null
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        },
+        {
+          "raw": "Milk-free Soy Lecithin",
+          "localizedName": "Milk-free Soy Lecithin",
+          "position": 5,
+          "status": "unrecognized",
+          "ambiguityNote": null,
+          "substance": null,
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        }
+      ],
+      "cards": {
+        "regulatoryCard": {
+          "cardTitle": "Regülasyon & İçerik Şeffaflık Endeksi",
+          "canShowScore": true,
+          "score": 100,
+          "scoreSuppressionReason": null,
+          "coveragePercent": 80,
+          "recognizedCount": 4,
+          "totalCount": 5,
+          "capApplied": null,
+          "findings": [
+            {
+              "substanceId": "aqua",
+              "name": "Aqua / Water",
+              "localizedName": "Su (Aqua)",
+              "rawToken": "Water",
+              "position": 1,
+              "euStatus": "izinli",
+              "edTier": null,
+              "severity": "bilgi",
+              "jurisdictionNote": null,
+              "legalText": "Standart çözücü baz.",
+              "falsePositiveNote": "Tamamen güvenli temel çözücü.",
+              "verification": "ikincil_kontrol",
+              "sources": [
+                {
+                  "id": "COSING",
+                  "institution": "European Commission",
+                  "title": "CosIng - Cosmetic Ingredient Database (Informational INCI Identifier Dictionary)",
+                  "url": "https://single-market-economy.ec.europa.eu/sectors/cosmetics/cosmetic-ingredient-database_en",
+                  "checked_at": "2026-10-12",
+                  "type": "dictionary"
+                }
+              ]
+            }
+          ],
+          "methodologyDisclaimer": "Bu endeks resmi bir kurumun sağlık puanı değildir; uygulamanın yayımlanmış metodolojisiyle bileşen listesinden hesaplanır."
+        },
+        "profileCard": {
+          "cardTitle": "Kişisel Hassasiyet & Cilt/Beslenme Uyumun",
+          "selectedProfiles": [
+            "astim_alerji"
+          ],
+          "profileStatuses": {
+            "astim_alerji": "true"
+          },
+          "preferenceMatchScore": 100,
+          "alerts": [],
+          "kvkkNotice": "Seçtiğiniz sağlık ve hassasiyet profilleri yerel ve gizlilik odaklı mimariyle (KVKK md. 6 / GDPR md. 9) işlenir; mobil cihazda %100 yerel, web simülatöründe ise yalnızca yerel localhost API ile çalışır, üçüncü taraf bulut/sunuculara asla aktarılmaz."
+        },
+        "halalCard": {
+          "cardTitle": "Helal & Etanol Kontrolü (Bağlam Motoru)",
+          "selectedAuthority": "general_cautious",
+          "overallStatus": "uygun_gorunuyor",
+          "findings": [],
+          "falsePositiveShields": [],
+          "disclaimer": "Bu değerlendirme bir helal sertifikası değildir; seçtiğiniz kurumun (general_cautious) yayımlanmış kriterlerine göre etiket analizi sunar."
+        },
+        "veganSugarCard": {
+          "cardTitle": "Vegan Uyum & Gizli Şeker Sayacı",
+          "veganCompatibility": "vegan_uyumlu_gorunuyor",
+          "nonVeganItems": [],
+          "nonVegetarianItems": [],
+          "uncertainVeganItems": [],
+          "freeSugarCount": 1,
+          "detectedFreeSugars": [
+            {
+              "rawToken": "Sugar",
+              "localizedName": "Şeker (Sükroz)",
+              "canonical": "Sucrose / Sugar",
+              "position": 2
+            }
+          ],
+          "detectedRapidCarbs": [],
+          "sugarSource": {
+            "id": "WHO_SUGAR_2015",
+            "institution": "World Health Organization (WHO)",
+            "title": "WHO Guideline: Sugars Intake for Adults and Children (Free Sugars Definition)",
+            "url": "https://www.who.int/publications/i/item/9789241549028",
+            "checked_at": "2026-10-12",
+            "type": "agency_assessment"
+          }
+        }
+      },
+      "appleGuideline141Disclaimer": "Bu uygulama etiket bilgilerini resmi kaynaklara bağlı kurallarla açıklar; tıbbi teşhis, tedavi önerisi veya resmi helal sertifikası vermez. Sağlığınızla ilgili kararlar öncesinde doktorunuza veya eczacınıza danışın."
+    }
+  },
+  {
+    "id": "gluten-free-mustard-coverage80",
+    "input": {
+      "rawText": "Water, Sugar, Salt, Citric Acid, Gluten-free Mustard",
+      "productType": "food",
+      "userProfiles": [
+        "astim_alerji"
+      ]
+    },
+    "status": 200,
+    "body": {
+      "timestamp": "2026-10-13T20:08:03.030Z",
+      "ruleVersion": "2026-10-13-v3-comprehensive-10lang",
+      "brand": "InciFact",
+      "lang": "tr",
+      "dir": "ltr",
+      "locale": {
+        "appTagline": "Kozmetik, Gıda & Helal İçerik Analizi",
+        "tabs": {
+          "profile": "1. Profil",
+          "scan": "2. Tara (OCR)",
+          "result": "3. Sonuç",
+          "halal": "4. Helal",
+          "compare": "5. Karşılaştır"
+        },
+        "profileScreen": {
+          "title": "Kimin için tarıyorsun?",
+          "subtitle": "Seçimin sadece bu telefonda kalır; sunucuya gönderilmez. Aynı ürün herkese aynı sonucu vermez.",
+          "profiles": {
+            "hamilelik": {
+              "name": "Hamilelik & Emzirme",
+              "desc": "Retinoidler, yüksek konsantrasyon salisilik asit ve şüpheli UV filtrelerini işaretler."
+            },
+            "cocuk_metabolik": {
+              "name": "Bebek & Çocuk",
+              "desc": "Southampton 6 sentetik boyaları, nitritleri, boratları ve sert koruyucuları öne çıkarır."
+            },
+            "hassas_cilt": {
+              "name": "Hassas / Atopik Cilt",
+              "desc": "26 parfüm alerjeni, MI/MCI, SLS ve ilk 5 sıradaki kurutucu alkolü yakalar."
+            },
+            "astim_alerji": {
+              "name": "Alerji & Astım",
+              "desc": "Sülfitler (E220-E228), formaldehit salıcılar ve saç boyası duyarlılaştırıcılarını bildirir."
+            },
+            "akne": {
+              "name": "Akneye Meyilli Cilt",
+              "desc": "Genel puanı düşürmeden yalnız komedojenik ester ve ağır yağları uyarır."
+            }
+          },
+          "halalSectionTitle": "Helal & Yaşam Tarzı Filtresi",
+          "authorityLabel": "Helal Fetva / Standart Otoritesi",
+          "claimsLabel": "Ürün Üzerindeki Beyan / Sertifika",
+          "continueBtn": "Devam et — Taramaya geç →",
+          "privacyNote": "Gizlilik: Sağlık ve inanç seçimlerin KVKK md. 6 ve GDPR md. 9 kapsamında özel nitelikli veridir. Hesap açtırmıyoruz, buluta yazmıyoruz."
+        },
+        "scanScreen": {
+          "title": "İçindekiler Kısmını Hizala",
+          "subtitle": "Barkod şart değil. Etiketin \"Ingredients / İçindekiler\" bölümünü kameraya göster veya aşağıya yapıştır.",
+          "cameraBtn": "📷 Kamerayla Etiket Fotoğrafı Çek / Seç",
+          "productTypeCosmetic": "Kozmetik (INCI)",
+          "productTypeFood": "Gıda (E-Kodu)",
+          "presetsLabel": "Hızlı Test Senaryoları (Tek Tıkla Yükle):",
+          "analyzeBtn": "Bileşenleri Analiz Et →"
+        },
+        "resultScreen": {
+          "scoreLabel": "GENEL REGÜLASYON ENDEKSİ",
+          "coverageLabel": "Tanınan Kapsam",
+          "recognizedLabel": "Tanınan Madde",
+          "profileStatusLabel": "Profil Uyumu",
+          "halalSummaryLabel": "Helal Özeti",
+          "ocrWarningTitle": "Okuma Belirsizliği — Onayın Gerekiyor",
+          "ingredientsTitle": "Bileşen Analizi & Resmi Kaynaklar"
+        },
+        "halalScreen": {
+          "title": "Helal & Etanol Bağlam Motoru",
+          "authoritySelectLabel": "Kriter Otoritesini Değiştir:",
+          "shieldTitle": "Yanlış Alarm Koruması (Etil Alkol Değildir)",
+          "findingsTitle": "Tespit Edilen Helal / Kaynak Bulguları",
+          "veganSugarTitle": "Vegan Uyum & Gizli Şeker Sayacı",
+          "freeSugarCountLabel": "Tespit Edilen Serbest Şeker",
+          "rapidCarbLabel": "Hızlı Karbonhidrat (Maltodekstrin)",
+          "legalDisclaimerMicro": "Bu analiz, seçilen kurumların kamuya açık fıkhi standartlarına dayalı bağımsız bir algoritmik ön incelemedir. Kurumların resmi onayı veya tescili niteliğinde değildir. Nihai güvence için ambalajdaki resmi sertifika logosunu ve numarasını teyit ediniz."
+        },
+        "compareScreen": {
+          "title": "Yan Yana Karşılaştırma",
+          "subtitle": "Kararsız kaldığın iki ürünü yan yana koy; farkı yaratan tek maddeyi anında gör.",
+          "productALabel": "1. Ürün (A)",
+          "productBLabel": "2. Ürün (B)",
+          "compareBtn": "⚡ İki Ürünü Yan Yana Karşılaştır",
+          "criteriaCol": "Kriter",
+          "regScoreRow": "Regülasyon Skoru",
+          "euBanRow": "AB Yasaklı Madde",
+          "attentionRow": "Dikkat / Uyarı Sayısı",
+          "profileRow": "Profiline Uyum",
+          "halalRow": "Helal Durumu",
+          "decidingTitle": "Farkı Yaratan Madde"
+        },
+        "badges": {
+          "allowed": "İzinli",
+          "restricted": "Kısıtlı",
+          "banned": "AB Yasaklı",
+          "suitable": "Uygun",
+          "avoid": "Kaçın / Dikkat",
+          "halalOk": "Uygun Görünüyor",
+          "musbooh": "Müşbooh (Kaynak Belirsiz)",
+          "halalRed": "Uygunsuz / Çelişki",
+          "conflict": "Etiket Çelişkisi!",
+          "none": "Yok",
+          "present": "Var!",
+          "lowCoverage": "Kapsam Yetersiz (<%80)"
+        }
+      },
+      "productType": "food",
+      "jurisdiction": "EU",
+      "halalAuthority": "general_cautious",
+      "claims": {
+        "halalCertified": false,
+        "veganStatus": "none",
+        "vegetarianStatus": "none"
+      },
+      "unresolvedConfirmations": [],
+      "observations": [
+        {
+          "raw": "Water",
+          "localizedName": "Su (Aqua)",
+          "position": 1,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "aqua",
+            "name": "Aqua / Water",
+            "aliases": [
+              "aqua",
+              "water",
+              "su",
+              "eau",
+              "wasser",
+              "aqua (water)",
+              "purified water",
+              "deionized water",
+              "ماء",
+              "الماء",
+              "agua",
+              "air",
+              "вода",
+              "پانی",
+              "water (aqua)",
+              "aqua/water/eau",
+              "aqua / water / eau",
+              "thermal spring water",
+              "maris aqua",
+              "sea water"
+            ],
+            "domain": "cosmetic+food",
+            "class": "solvent",
+            "e_code": null,
+            "ci_code": null,
+            "eu_status": "izinli",
+            "eu_detail": "Standart çözücü baz.",
+            "ed_tier": null,
+            "severity": "bilgi",
+            "profiles": {},
+            "sources": [
+              "COSING"
+            ],
+            "verification": "ikincil_kontrol",
+            "note": "Tamamen güvenli temel çözücü."
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        },
+        {
+          "raw": "Sugar",
+          "localizedName": "Şeker (Sükroz)",
+          "position": 2,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": null,
+          "halalRule": null,
+          "sugar": {
+            "id": "sugar",
+            "canonical": "Sucrose / Sugar",
+            "aliases": [
+              "sugar",
+              "şeker",
+              "beyaz şeker",
+              "sucrose",
+              "sakkaroz",
+              "sükroz",
+              "zucker",
+              "sucre",
+              "saccharose",
+              "سكر",
+              "azúcar",
+              "gula",
+              "gula pasir",
+              "сахар",
+              "چینی",
+              "شکر"
+            ]
+          },
+          "rapidCarb": null
+        },
+        {
+          "raw": "Salt",
+          "localizedName": "Sodyum Klorür (Salt)",
+          "position": 3,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "ph_adjusters_salts_bases",
+            "name": "pH Adjusters, Salts & Electrolytes (Sodium Hydroxide E524 / Baking Soda E500 / Salt / Magnesium Sulfate)",
+            "aliases": [
+              "sodium hydroxide",
+              "sodyum hidroksit",
+              "kostik",
+              "e524",
+              "potassium hydroxide",
+              "potasyum hidroksit",
+              "e525",
+              "calcium hydroxide",
+              "e526",
+              "ammonium hydroxide",
+              "e527",
+              "magnesium hydroxide",
+              "e528",
+              "aminomethyl propanol",
+              "tromethamine",
+              "arginine",
+              "arjinin",
+              "lysine",
+              "histidine",
+              "glycine",
+              "e640",
+              "sodium bicarbonate",
+              "sodyum bikarbonat",
+              "karbonat",
+              "kabartma tozu",
+              "sodium carbonate",
+              "e500",
+              "e500i",
+              "e500ii",
+              "potassium carbonate",
+              "e501",
+              "ammonium bicarbonate",
+              "ammonium carbonate",
+              "amonyum karbonat",
+              "e503",
+              "magnesium carbonate",
+              "e504",
+              "sodium chloride",
+              "sodyum klorür",
+              "salt",
+              "tuz",
+              "sea salt",
+              "deniz tuzu",
+              "maris sal",
+              "sel",
+              "salz",
+              "sal",
+              "garam",
+              "соль",
+              "ملح",
+              "نمک",
+              "potassium chloride",
+              "potasyum klorür",
+              "e508",
+              "calcium chloride",
+              "kalsiyum klorür",
+              "e509",
+              "magnesium chloride",
+              "e511",
+              "magnesium sulfate",
+              "magnezyum sülfat",
+              "epsom salt",
+              "calcium sulfate",
+              "e516",
+              "zinc sulfate",
+              "zinc gluconate",
+              "çinko glukonat",
+              "copper gluconate",
+              "manganese gluconate",
+              "calcium carbonate",
+              "kalsiyum karbonat",
+              "e170",
+              "ci 77220",
+              "гидроксид натрия",
+              "хлорид натрия",
+              "هيدروكسيد الصوديوم",
+              "كلوريد الصوديوم",
+              "ارجینین"
+            ],
+            "domain": "cosmetic+food",
+            "class": "pH_adjuster",
+            "e_code": "E500-E528",
+            "ci_code": null,
+            "eu_status": "izinli",
+            "eu_detail": "Formülün pH dengesini cilt/gıda ile uyumlu hale getiren bazlar, tuzlar ve kabartıcı mineraller (Son üründe nötralize haldedir).",
+            "ed_tier": null,
+            "severity": "bilgi",
+            "profiles": {},
+            "sources": [
+              "COSING"
+            ],
+            "verification": "ikincil_kontrol",
+            "note": null
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        },
+        {
+          "raw": "Citric Acid",
+          "localizedName": "Sitrik Asit (Citric Acid)",
+          "position": 4,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "citric_acid_citrates_e330",
+            "name": "Citric Acid & Citrates (E330–E333)",
+            "aliases": [
+              "citric acid",
+              "sitrik asit",
+              "limon tuzu",
+              "e330",
+              "sodium citrate",
+              "sodyum sitrat",
+              "trisodium citrate",
+              "e331",
+              "potassium citrate",
+              "e332",
+              "calcium citrate",
+              "e333",
+              "zitronensäure",
+              "acide citrique",
+              "ácido cítrico",
+              "asam sitrat",
+              "asid sitrik",
+              "лимонная кислота",
+              "حمض الستريك",
+              "سائٹرک ایسڈ",
+              "citronensäure",
+              "zitronensäure"
+            ],
+            "domain": "cosmetic+food",
+            "class": "pH_adjuster",
+            "e_code": "E330",
+            "ci_code": null,
+            "eu_status": "izinli",
+            "eu_detail": "Kozmetikte pH dengeleyici (tampon), gıdada (E330-E333) doğal asitlik düzenleyici.",
+            "ed_tier": null,
+            "severity": "bilgi",
+            "profiles": {},
+            "sources": [
+              "COSING"
+            ],
+            "verification": "ikincil_kontrol",
+            "note": null
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        },
+        {
+          "raw": "Gluten-free Mustard",
+          "localizedName": "Gluten-free Mustard",
+          "position": 5,
+          "status": "unrecognized",
+          "ambiguityNote": null,
+          "substance": null,
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        }
+      ],
+      "cards": {
+        "regulatoryCard": {
+          "cardTitle": "Regülasyon & İçerik Şeffaflık Endeksi",
+          "canShowScore": true,
+          "score": 100,
+          "scoreSuppressionReason": null,
+          "coveragePercent": 80,
+          "recognizedCount": 4,
+          "totalCount": 5,
+          "capApplied": null,
+          "findings": [
+            {
+              "substanceId": "aqua",
+              "name": "Aqua / Water",
+              "localizedName": "Su (Aqua)",
+              "rawToken": "Water",
+              "position": 1,
+              "euStatus": "izinli",
+              "edTier": null,
+              "severity": "bilgi",
+              "jurisdictionNote": null,
+              "legalText": "Standart çözücü baz.",
+              "falsePositiveNote": "Tamamen güvenli temel çözücü.",
+              "verification": "ikincil_kontrol",
+              "sources": [
+                {
+                  "id": "COSING",
+                  "institution": "European Commission",
+                  "title": "CosIng - Cosmetic Ingredient Database (Informational INCI Identifier Dictionary)",
+                  "url": "https://single-market-economy.ec.europa.eu/sectors/cosmetics/cosmetic-ingredient-database_en",
+                  "checked_at": "2026-10-12",
+                  "type": "dictionary"
+                }
+              ]
+            }
+          ],
+          "methodologyDisclaimer": "Bu endeks resmi bir kurumun sağlık puanı değildir; uygulamanın yayımlanmış metodolojisiyle bileşen listesinden hesaplanır."
+        },
+        "profileCard": {
+          "cardTitle": "Kişisel Hassasiyet & Cilt/Beslenme Uyumun",
+          "selectedProfiles": [
+            "astim_alerji"
+          ],
+          "profileStatuses": {
+            "astim_alerji": "true"
+          },
+          "preferenceMatchScore": 100,
+          "alerts": [],
+          "kvkkNotice": "Seçtiğiniz sağlık ve hassasiyet profilleri yerel ve gizlilik odaklı mimariyle (KVKK md. 6 / GDPR md. 9) işlenir; mobil cihazda %100 yerel, web simülatöründe ise yalnızca yerel localhost API ile çalışır, üçüncü taraf bulut/sunuculara asla aktarılmaz."
+        },
+        "halalCard": {
+          "cardTitle": "Helal & Etanol Kontrolü (Bağlam Motoru)",
+          "selectedAuthority": "general_cautious",
+          "overallStatus": "uygun_gorunuyor",
+          "findings": [],
+          "falsePositiveShields": [],
+          "disclaimer": "Bu değerlendirme bir helal sertifikası değildir; seçtiğiniz kurumun (general_cautious) yayımlanmış kriterlerine göre etiket analizi sunar."
+        },
+        "veganSugarCard": {
+          "cardTitle": "Vegan Uyum & Gizli Şeker Sayacı",
+          "veganCompatibility": "vegan_uyumlu_gorunuyor",
+          "nonVeganItems": [],
+          "nonVegetarianItems": [],
+          "uncertainVeganItems": [],
+          "freeSugarCount": 1,
+          "detectedFreeSugars": [
+            {
+              "rawToken": "Sugar",
+              "localizedName": "Şeker (Sükroz)",
+              "canonical": "Sucrose / Sugar",
+              "position": 2
+            }
+          ],
+          "detectedRapidCarbs": [],
+          "sugarSource": {
+            "id": "WHO_SUGAR_2015",
+            "institution": "World Health Organization (WHO)",
+            "title": "WHO Guideline: Sugars Intake for Adults and Children (Free Sugars Definition)",
+            "url": "https://www.who.int/publications/i/item/9789241549028",
+            "checked_at": "2026-10-12",
+            "type": "agency_assessment"
+          }
+        }
+      },
+      "appleGuideline141Disclaimer": "Bu uygulama etiket bilgilerini resmi kaynaklara bağlı kurallarla açıklar; tıbbi teşhis, tedavi önerisi veya resmi helal sertifikası vermez. Sağlığınızla ilgili kararlar öncesinde doktorunuza veya eczacınıza danışın."
+    }
+  },
+  {
+    "id": "mi-mci-total-over",
+    "input": {
+      "rawText": "Aqua, Methylchloroisothiazolinone 0.0012%, Methylisothiazolinone 0.0004%",
+      "productType": "cosmetic",
+      "applicationType": "rinse_off"
+    },
+    "status": 200,
+    "body": {
+      "timestamp": "2026-10-13T20:08:03.054Z",
+      "ruleVersion": "2026-10-13-v3-comprehensive-10lang",
+      "brand": "InciFact",
+      "lang": "tr",
+      "dir": "ltr",
+      "locale": {
+        "appTagline": "Kozmetik, Gıda & Helal İçerik Analizi",
+        "tabs": {
+          "profile": "1. Profil",
+          "scan": "2. Tara (OCR)",
+          "result": "3. Sonuç",
+          "halal": "4. Helal",
+          "compare": "5. Karşılaştır"
+        },
+        "profileScreen": {
+          "title": "Kimin için tarıyorsun?",
+          "subtitle": "Seçimin sadece bu telefonda kalır; sunucuya gönderilmez. Aynı ürün herkese aynı sonucu vermez.",
+          "profiles": {
+            "hamilelik": {
+              "name": "Hamilelik & Emzirme",
+              "desc": "Retinoidler, yüksek konsantrasyon salisilik asit ve şüpheli UV filtrelerini işaretler."
+            },
+            "cocuk_metabolik": {
+              "name": "Bebek & Çocuk",
+              "desc": "Southampton 6 sentetik boyaları, nitritleri, boratları ve sert koruyucuları öne çıkarır."
+            },
+            "hassas_cilt": {
+              "name": "Hassas / Atopik Cilt",
+              "desc": "26 parfüm alerjeni, MI/MCI, SLS ve ilk 5 sıradaki kurutucu alkolü yakalar."
+            },
+            "astim_alerji": {
+              "name": "Alerji & Astım",
+              "desc": "Sülfitler (E220-E228), formaldehit salıcılar ve saç boyası duyarlılaştırıcılarını bildirir."
+            },
+            "akne": {
+              "name": "Akneye Meyilli Cilt",
+              "desc": "Genel puanı düşürmeden yalnız komedojenik ester ve ağır yağları uyarır."
+            }
+          },
+          "halalSectionTitle": "Helal & Yaşam Tarzı Filtresi",
+          "authorityLabel": "Helal Fetva / Standart Otoritesi",
+          "claimsLabel": "Ürün Üzerindeki Beyan / Sertifika",
+          "continueBtn": "Devam et — Taramaya geç →",
+          "privacyNote": "Gizlilik: Sağlık ve inanç seçimlerin KVKK md. 6 ve GDPR md. 9 kapsamında özel nitelikli veridir. Hesap açtırmıyoruz, buluta yazmıyoruz."
+        },
+        "scanScreen": {
+          "title": "İçindekiler Kısmını Hizala",
+          "subtitle": "Barkod şart değil. Etiketin \"Ingredients / İçindekiler\" bölümünü kameraya göster veya aşağıya yapıştır.",
+          "cameraBtn": "📷 Kamerayla Etiket Fotoğrafı Çek / Seç",
+          "productTypeCosmetic": "Kozmetik (INCI)",
+          "productTypeFood": "Gıda (E-Kodu)",
+          "presetsLabel": "Hızlı Test Senaryoları (Tek Tıkla Yükle):",
+          "analyzeBtn": "Bileşenleri Analiz Et →"
+        },
+        "resultScreen": {
+          "scoreLabel": "GENEL REGÜLASYON ENDEKSİ",
+          "coverageLabel": "Tanınan Kapsam",
+          "recognizedLabel": "Tanınan Madde",
+          "profileStatusLabel": "Profil Uyumu",
+          "halalSummaryLabel": "Helal Özeti",
+          "ocrWarningTitle": "Okuma Belirsizliği — Onayın Gerekiyor",
+          "ingredientsTitle": "Bileşen Analizi & Resmi Kaynaklar"
+        },
+        "halalScreen": {
+          "title": "Helal & Etanol Bağlam Motoru",
+          "authoritySelectLabel": "Kriter Otoritesini Değiştir:",
+          "shieldTitle": "Yanlış Alarm Koruması (Etil Alkol Değildir)",
+          "findingsTitle": "Tespit Edilen Helal / Kaynak Bulguları",
+          "veganSugarTitle": "Vegan Uyum & Gizli Şeker Sayacı",
+          "freeSugarCountLabel": "Tespit Edilen Serbest Şeker",
+          "rapidCarbLabel": "Hızlı Karbonhidrat (Maltodekstrin)",
+          "legalDisclaimerMicro": "Bu analiz, seçilen kurumların kamuya açık fıkhi standartlarına dayalı bağımsız bir algoritmik ön incelemedir. Kurumların resmi onayı veya tescili niteliğinde değildir. Nihai güvence için ambalajdaki resmi sertifika logosunu ve numarasını teyit ediniz."
+        },
+        "compareScreen": {
+          "title": "Yan Yana Karşılaştırma",
+          "subtitle": "Kararsız kaldığın iki ürünü yan yana koy; farkı yaratan tek maddeyi anında gör.",
+          "productALabel": "1. Ürün (A)",
+          "productBLabel": "2. Ürün (B)",
+          "compareBtn": "⚡ İki Ürünü Yan Yana Karşılaştır",
+          "criteriaCol": "Kriter",
+          "regScoreRow": "Regülasyon Skoru",
+          "euBanRow": "AB Yasaklı Madde",
+          "attentionRow": "Dikkat / Uyarı Sayısı",
+          "profileRow": "Profiline Uyum",
+          "halalRow": "Helal Durumu",
+          "decidingTitle": "Farkı Yaratan Madde"
+        },
+        "badges": {
+          "allowed": "İzinli",
+          "restricted": "Kısıtlı",
+          "banned": "AB Yasaklı",
+          "suitable": "Uygun",
+          "avoid": "Kaçın / Dikkat",
+          "halalOk": "Uygun Görünüyor",
+          "musbooh": "Müşbooh (Kaynak Belirsiz)",
+          "halalRed": "Uygunsuz / Çelişki",
+          "conflict": "Etiket Çelişkisi!",
+          "none": "Yok",
+          "present": "Var!",
+          "lowCoverage": "Kapsam Yetersiz (<%80)"
+        }
+      },
+      "productType": "cosmetic",
+      "jurisdiction": "EU",
+      "halalAuthority": "general_cautious",
+      "claims": {
+        "halalCertified": false,
+        "veganStatus": "none",
+        "vegetarianStatus": "none"
+      },
+      "unresolvedConfirmations": [],
+      "observations": [
+        {
+          "raw": "Aqua",
+          "localizedName": "Su (Aqua)",
+          "position": 1,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "aqua",
+            "name": "Aqua / Water",
+            "aliases": [
+              "aqua",
+              "water",
+              "su",
+              "eau",
+              "wasser",
+              "aqua (water)",
+              "purified water",
+              "deionized water",
+              "ماء",
+              "الماء",
+              "agua",
+              "air",
+              "вода",
+              "پانی",
+              "water (aqua)",
+              "aqua/water/eau",
+              "aqua / water / eau",
+              "thermal spring water",
+              "maris aqua",
+              "sea water"
+            ],
+            "domain": "cosmetic+food",
+            "class": "solvent",
+            "e_code": null,
+            "ci_code": null,
+            "eu_status": "izinli",
+            "eu_detail": "Standart çözücü baz.",
+            "ed_tier": null,
+            "severity": "bilgi",
+            "profiles": {},
+            "sources": [
+              "COSING"
+            ],
+            "verification": "ikincil_kontrol",
+            "note": "Tamamen güvenli temel çözücü."
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        },
+        {
+          "raw": "Methylchloroisothiazolinone 0.0012%",
+          "localizedName": "Methylchloroisothiazolinone 0.0012%",
+          "position": 2,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "mi_mci",
+            "name": "Methylisothiazolinone (MI) & MCI/MI",
+            "aliases": [
+              "methylisothiazolinone",
+              "methylchloroisothiazolinone",
+              "mci/mi",
+              "kathon cg",
+              "2-methyl-4-isothiazolin-3-one",
+              "ميثيل أيزوثيازولينون",
+              "метилизотиазолинон",
+              "میتھائل آئسوتھیازولینون",
+              "metilizotiazolinon",
+              "méthylisothiazolinone",
+              "metilisotiazolinona"
+            ],
+            "domain": "cosmetic",
+            "class": "preservative",
+            "e_code": null,
+            "ci_code": null,
+            "eu_status": "kisitli",
+            "eu_detail": "AB Ek V: Durulanmayan (leave-on) ürünlerde YASAKTIR; yalnızca durulanan (rinse-off) ürünlerde maks. %0.0015 (15 ppm) izinlidir.",
+            "ed_tier": null,
+            "severity": "orta",
+            "profiles": {
+              "hassas_cilt": "kirmizi"
+            },
+            "sources": [
+              "EU_1223_2009"
+            ],
+            "verification": "model_bilgisi",
+            "note": "Güçlü temas alerjenidir; durulanmayan bir krem veya ıslak mendilde bulunması AB mevzuatına aykırıdır."
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        },
+        {
+          "raw": "Methylisothiazolinone 0.0004%",
+          "localizedName": "Methylisothiazolinone 0.0004%",
+          "position": 3,
+          "status": "recognized",
+          "ambiguityNote": null,
+          "substance": {
+            "id": "mi_mci",
+            "name": "Methylisothiazolinone (MI) & MCI/MI",
+            "aliases": [
+              "methylisothiazolinone",
+              "methylchloroisothiazolinone",
+              "mci/mi",
+              "kathon cg",
+              "2-methyl-4-isothiazolin-3-one",
+              "ميثيل أيزوثيازولينون",
+              "метилизотиазолинон",
+              "میتھائل آئسوتھیازولینون",
+              "metilizotiazolinon",
+              "méthylisothiazolinone",
+              "metilisotiazolinona"
+            ],
+            "domain": "cosmetic",
+            "class": "preservative",
+            "e_code": null,
+            "ci_code": null,
+            "eu_status": "kisitli",
+            "eu_detail": "AB Ek V: Durulanmayan (leave-on) ürünlerde YASAKTIR; yalnızca durulanan (rinse-off) ürünlerde maks. %0.0015 (15 ppm) izinlidir.",
+            "ed_tier": null,
+            "severity": "orta",
+            "profiles": {
+              "hassas_cilt": "kirmizi"
+            },
+            "sources": [
+              "EU_1223_2009"
+            ],
+            "verification": "model_bilgisi",
+            "note": "Güçlü temas alerjenidir; durulanmayan bir krem veya ıslak mendilde bulunması AB mevzuatına aykırıdır."
+          },
+          "halalRule": null,
+          "sugar": null,
+          "rapidCarb": null
+        }
+      ],
+      "cards": {
+        "regulatoryCard": {
+          "cardTitle": "Regülasyon & İçerik Şeffaflık Endeksi",
+          "canShowScore": true,
+          "score": 80,
+          "scoreSuppressionReason": null,
+          "coveragePercent": 100,
+          "recognizedCount": 3,
+          "totalCount": 3,
+          "capApplied": null,
+          "findings": [
+            {
+              "substanceId": "aqua",
+              "name": "Aqua / Water",
+              "localizedName": "Su (Aqua)",
+              "rawToken": "Aqua",
+              "position": 1,
+              "euStatus": "izinli",
+              "edTier": null,
+              "severity": "bilgi",
+              "jurisdictionNote": null,
+              "legalText": "Standart çözücü baz.",
+              "falsePositiveNote": "Tamamen güvenli temel çözücü.",
+              "verification": "ikincil_kontrol",
+              "sources": [
+                {
+                  "id": "COSING",
+                  "institution": "European Commission",
+                  "title": "CosIng - Cosmetic Ingredient Database (Informational INCI Identifier Dictionary)",
+                  "url": "https://single-market-economy.ec.europa.eu/sectors/cosmetics/cosmetic-ingredient-database_en",
+                  "checked_at": "2026-10-12",
+                  "type": "dictionary"
+                }
+              ]
+            },
+            {
+              "substanceId": "mi_mci",
+              "name": "Methylisothiazolinone (MI) & MCI/MI",
+              "localizedName": "Methylchloroisothiazolinone 0.0012%",
+              "rawToken": "Methylchloroisothiazolinone 0.0012%",
+              "position": 2,
+              "euStatus": "kisitli",
+              "edTier": null,
+              "severity": "orta",
+              "jurisdictionNote": null,
+              "legalText": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir.",
+              "falsePositiveNote": "Güçlü temas alerjenidir; durulanmayan bir krem veya ıslak mendilde bulunması AB mevzuatına aykırıdır.",
+              "verification": "model_bilgisi",
+              "sources": [
+                {
+                  "id": "EU_1223_2009",
+                  "institution": "European Parliament & Council",
+                  "title": "Regulation (EC) No 1223/2009 on Cosmetic Products (Annexes II-VI)",
+                  "url": "https://eur-lex.europa.eu/eli/reg/2009/1223/oj",
+                  "checked_at": "2026-10-12",
+                  "type": "binding_regulation"
+                }
+              ]
+            },
+            {
+              "substanceId": "mi_mci",
+              "name": "Methylisothiazolinone (MI) & MCI/MI",
+              "localizedName": "Methylisothiazolinone 0.0004%",
+              "rawToken": "Methylisothiazolinone 0.0004%",
+              "position": 3,
+              "euStatus": "kisitli",
+              "edTier": null,
+              "severity": "orta",
+              "jurisdictionNote": null,
+              "legalText": "AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir.",
+              "falsePositiveNote": "Güçlü temas alerjenidir; durulanmayan bir krem veya ıslak mendilde bulunması AB mevzuatına aykırıdır.",
+              "verification": "model_bilgisi",
+              "sources": [
+                {
+                  "id": "EU_1223_2009",
+                  "institution": "European Parliament & Council",
+                  "title": "Regulation (EC) No 1223/2009 on Cosmetic Products (Annexes II-VI)",
+                  "url": "https://eur-lex.europa.eu/eli/reg/2009/1223/oj",
+                  "checked_at": "2026-10-12",
+                  "type": "binding_regulation"
+                }
+              ]
+            }
+          ],
+          "methodologyDisclaimer": "Bu endeks resmi bir kurumun sağlık puanı değildir; uygulamanın yayımlanmış metodolojisiyle bileşen listesinden hesaplanır."
+        },
+        "profileCard": {
+          "cardTitle": "Kişisel Hassasiyet & Cilt/Beslenme Uyumun",
+          "selectedProfiles": [],
+          "profileStatuses": {},
+          "preferenceMatchScore": null,
+          "alerts": [],
+          "kvkkNotice": "Seçtiğiniz sağlık ve hassasiyet profilleri yerel ve gizlilik odaklı mimariyle (KVKK md. 6 / GDPR md. 9) işlenir; mobil cihazda %100 yerel, web simülatöründe ise yalnızca yerel localhost API ile çalışır, üçüncü taraf bulut/sunuculara asla aktarılmaz."
+        },
+        "halalCard": {
+          "cardTitle": "Helal & Etanol Kontrolü (Bağlam Motoru)",
+          "selectedAuthority": "general_cautious",
+          "overallStatus": "uygun_gorunuyor",
+          "findings": [],
+          "falsePositiveShields": [],
+          "disclaimer": "Bu değerlendirme bir helal sertifikası değildir; seçtiğiniz kurumun (general_cautious) yayımlanmış kriterlerine göre etiket analizi sunar."
+        },
+        "veganSugarCard": {
+          "cardTitle": "Vegan Uyum & Gizli Şeker Sayacı",
+          "veganCompatibility": "vegan_uyumlu_gorunuyor",
+          "nonVeganItems": [],
+          "nonVegetarianItems": [],
+          "uncertainVeganItems": [],
+          "freeSugarCount": 0,
+          "detectedFreeSugars": [],
+          "detectedRapidCarbs": [],
+          "sugarSource": {
+            "id": "WHO_SUGAR_2015",
+            "institution": "World Health Organization (WHO)",
+            "title": "WHO Guideline: Sugars Intake for Adults and Children (Free Sugars Definition)",
+            "url": "https://www.who.int/publications/i/item/9789241549028",
+            "checked_at": "2026-10-12",
+            "type": "agency_assessment"
+          }
+        }
+      },
+      "appleGuideline141Disclaimer": "Bu uygulama etiket bilgilerini resmi kaynaklara bağlı kurallarla açıklar; tıbbi teşhis, tedavi önerisi veya resmi helal sertifikası vermez. Sağlığınızla ilgili kararlar öncesinde doktorunuza veya eczacınıza danışın."
+    }
+  }
+]
