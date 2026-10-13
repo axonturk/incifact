@@ -2114,6 +2114,8 @@
             </span>
           </div>
 
+          <img src="./assets/banner-ar-scan-landscape.jpg" alt="InciFact AR Scan Preview" style="width:100%; border-radius:14px; border:1px solid rgba(212,175,55,0.35); margin-top:10px; display:block; box-shadow:0 8px 24px rgba(0,0,0,0.4);" />
+
           <div style="position:relative; margin:16px auto; width:100%; background:#EEEBE2; border-radius:12px; padding:16px; color:#2A2A26; font-size:13px; line-height:1.75; transform:rotate(-1deg); box-shadow:0 12px 30px rgba(0,0,0,0.35);">
             <span style="font-weight:800; letter-spacing:0.04em;">${u.ingredientsHeader.toUpperCase()}: </span>
             ${obs
@@ -2563,6 +2565,8 @@
       return `
         <h1 style="margin:0; font-size:24px; font-weight:800; letter-spacing:-0.02em;">${loc.compareScreen.title}</h1>
 
+        <img src="./assets/banner-clean-comparison.jpg" alt="InciFact Clean Comparison" style="width:100%; border-radius:16px; border:1px solid rgba(212,175,55,0.3); display:block; box-shadow:0 4px 14px rgba(11,19,43,0.18);" />
+
         <div style="background:var(--surface); border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:10px;">
           <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
             <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${aBg}; border:1.5px solid ${aBetter ? 'var(--ok)' : a.hasBanned ? 'var(--bad)' : 'transparent'};">
@@ -2663,8 +2667,9 @@
         <button type="button" onclick="closeMethodologyModal()" style="border:none; background:var(--surface2); width:32px; height:32px; border-radius:16px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
       </div>
       <div style="padding:16px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; font-size:12.5px; line-height:1.5; color:var(--ink);">
-        <div style="background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
-          InciFact, bağımsız bir bilimsel ve algoritmik tarama motorudur. Adı geçen kurumlarla herhangi bir organik, resmi veya ticari bağı bulunmamaktadır.
+        <div style="display:flex; align-items:center; gap:12px; background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
+          <img src="./assets/incifact-corporate-seal.jpg" alt="InciFact Corporate Seal" width="54" height="54" style="border-radius:10px; flex:none; border:1px solid rgba(212,175,55,0.4);" />
+          <span>InciFact, bağımsız bir bilimsel ve algoritmik tarama motorudur. Adı geçen kurumlarla herhangi bir organik, resmi veya ticari bağı bulunmamaktadır.</span>
         </div>
         <div>
           <strong style="color:var(--accent);">1. GİMDES (Türkiye):</strong><br>
