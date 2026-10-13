@@ -1288,18 +1288,44 @@ export function evaluateProduct({
         effectiveSeverity = 'yuksek';
         effectiveDetail = 'AB 2016/1198 (Ek V/57 değişikliği) uyarınca durulanmayan (leave-on) kozmetik ürünlerde kesinlikle YASAKTIR. Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) izinlidir.' + conflictNote;
       } else {
+        // Separate MCI and MI amounts (EU 1003/2014 Annex V/39: MCI:MI = 3:1, total max 0.0015 % in rinse-off only)
+        const isMciRaw = (r) => /chloro|klor|chlor/i.test(r);
+        const isCombinedToken = (r) => isMciRaw(r) && /(?:^|[^a-z])(?:methylisothiazolinone|mi)(?:[^a-z]|$)/i.test(r.replace(/methylchloroisothiazolinone/gi, ' '));
+        const sumOf = (list) => {
+          const vals = list.map((o) => parseConcentration(o.raw));
+          return vals.every((v) => typeof v === 'number' && !isNaN(v)) ? vals.reduce((a, b) => a + b, 0) : null;
+        };
+        const mciObs = isoObs.filter((o) => isMciRaw(o.raw) && !isCombinedToken(o.raw));
+        const miObs = isoObs.filter((o) => !isMciRaw(o.raw));
+        const combinedObs = isoObs.filter((o) => isCombinedToken(o.raw));
+        const isMixture = combinedObs.length > 0 || (mciObs.length > 0 && miObs.length > 0);
+        const mciConc = combinedObs.length ? null : sumOf(mciObs);
+        const miConc = combinedObs.length ? null : sumOf(miObs);
+        const ratioKnown = isMixture && mciConc !== null && miConc !== null && miConc > 0;
+        const ratio = ratioKnown ? mciConc / miConc : null;
+        const ratioValid = ratioKnown && ratio >= 2.7 && ratio <= 3.3; // 3:1 ± 10 % rounding tolerance
+        const pct = (v) => `%${+v.toFixed(6)}`;
+
         if (typeof totalIsoConc === 'number' && totalIsoConc > 0.0015) {
           effectiveEuStatus = 'yasak';
           effectiveSeverity = 'yuksek';
           effectiveDetail = hasMci && isoConcs.length > 1
-            ? `AB 1003/2014 Ek V/39: MCI + MI karışımı yalnızca durulanan ürünlerde toplam azami %0.0015 (15 ppm) izinlidir; etiketteki toplam %${+totalIsoConc.toFixed(6)} bu sınırı aşıyor, YASAKTIR.`
+            ? `AB 1003/2014 Ek V/39: MCI + MI karışımı yalnızca durulanan ürünlerde toplam azami %0.0015 (15 ppm) izinlidir; etiketteki toplam ${pct(totalIsoConc)} bu sınırı aşıyor, YASAKTIR.`
             : 'AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir; bu sınırın üzerindeki konsantrasyonlar YASAKTIR.';
+        } else if (ratioKnown && !ratioValid) {
+          effectiveEuStatus = 'yasak';
+          effectiveSeverity = 'yuksek';
+          effectiveDetail = `AB 1003/2014 Ek V/39: MCI/MI karışımına yalnızca 3:1 oranında izin verilir. Etiketteki oran ${+ratio.toFixed(2)}:1 (MCI ${pct(mciConc)}, MI ${pct(miConc)}); izin verilen karışım koşulunu sağlamıyor, bu kullanım YASAKTIR.`;
         } else {
           effectiveEuStatus = 'kisitli';
           effectiveSeverity = 'orta';
-          effectiveDetail = hasMci
-            ? 'AB 1003/2014 Ek V/39: MCI + MI karışımı (3:1) yalnızca durulanan ürünlerde toplam azami %0.0015 (15 ppm) izinlidir.'
-            : 'AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir.';
+          if (isMixture && ratioValid) {
+            effectiveDetail = `AB 1003/2014 Ek V/39: MCI/MI oranı 3:1 olarak doğrulandı (MCI ${pct(mciConc)}, MI ${pct(miConc)}, toplam ${pct(totalIsoConc)}); yalnızca durulanan ürünlerde toplam azami %0.0015 (15 ppm) izinlidir.`;
+          } else if (isMixture) {
+            effectiveDetail = 'AB 1003/2014 Ek V/39: MCI/MI karışımına yalnızca 3:1 oranında ve durulanan ürünlerde toplam azami %0.0015 (15 ppm) ile izin verilir. Bileşen miktarları etikette yazmadığı için oran ve toplam DOĞRULANAMADI; üreticiden teyit edilmelidir.';
+          } else {
+            effectiveDetail = 'AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir.';
+          }
         }
       }
     } else if (sub.id === 'tphp_triphenyl_phosphate_banned') {

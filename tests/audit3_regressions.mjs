@@ -51,5 +51,28 @@ t('HQ nail 0.02% professionalUse=false -> 10', () => assert.equal(reg({ rawText:
 t('HQ nail 0.02% professionalUse=true -> 90', () => assert.equal(reg({ rawText: 'Artificial nail system: Aqua, Hydroquinone 0.02%', professionalUse: true }).score, 90));
 t('HQ home nail 0.02% (no flag, no "professional") -> 10', () => assert.equal(reg({ rawText: 'Home artificial nail kit: Aqua, Hydroquinone 0.02%' }).score, 10));
 
+// --- Audit 4 P1: MCI/MI 3:1 ratio (EU 1003/2014 Annex V/39) ---
+const miFinding = (rawText) => reg({ rawText, applicationType: 'rinse_off' }).findings.find((f) => f.substanceId === 'mi_mci');
+t('MCI 0.0005% + MI 0.0005% (1:1) rinse-off -> 10', () => {
+  const r = reg({ rawText: 'Aqua, Methylchloroisothiazolinone 0.0005%, Methylisothiazolinone 0.0005%', applicationType: 'rinse_off' });
+  assert.equal(r.score, 10); assert.equal(r.capApplied, 10);
+  assert.match(miFinding('Aqua, Methylchloroisothiazolinone 0.0005%, Methylisothiazolinone 0.0005%').legalText, /1:1/);
+});
+t('MCI 0.00075% + MI 0.00025% (3:1) rinse-off -> allowed, ratio verified', () => {
+  const r = reg({ rawText: 'Aqua, Methylchloroisothiazolinone 0.00075%, Methylisothiazolinone 0.00025%', applicationType: 'rinse_off' });
+  assert.notEqual(r.capApplied, 10);
+  assert.match(miFinding('Aqua, Methylchloroisothiazolinone 0.00075%, Methylisothiazolinone 0.00025%').legalText, /doğrulandı/);
+});
+t('MCI 0.001125% + MI 0.000375% (3:1, total exactly 0.0015) -> allowed', () => assert.notEqual(reg({ rawText: 'Aqua, Methylchloroisothiazolinone 0.001125%, Methylisothiazolinone 0.000375%', applicationType: 'rinse_off' }).capApplied, 10));
+t('MCI 0.0006% + MI 0.0004% (1.5:1) rinse-off -> 10', () => assert.equal(reg({ rawText: 'Aqua, Methylchloroisothiazolinone 0.0006%, Methylisothiazolinone 0.0004%', applicationType: 'rinse_off' }).score, 10));
+t('MCI + MI without amounts -> restricted, ratio NOT claimed as verified', () => {
+  const f = miFinding('Aqua, Methylchloroisothiazolinone, Methylisothiazolinone');
+  assert.equal(f.euStatus, 'kisitli'); assert.match(f.legalText, /DOĞRULANAMADI/); assert.doesNotMatch(f.legalText, /doğrulandı/);
+});
+t('MCI amount only, MI amount missing -> ratio unverified, not banned', () => {
+  const f = miFinding('Aqua, Methylchloroisothiazolinone 0.0005%, Methylisothiazolinone');
+  assert.equal(f.euStatus, 'kisitli'); assert.match(f.legalText, /DOĞRULANAMADI/);
+});
+
 console.log(`\n${pass}/${pass + fail} passed`);
 process.exit(fail ? 1 : 0);

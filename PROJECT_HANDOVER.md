@@ -3,7 +3,7 @@
 > **Tarih:** 13 Ekim 2026  
 > **Konum:** `C:\Projeler\clean-halal-scanner`  
 > **Canlı Servis:** `http://localhost:3456`  
-> **Mevcut Durum:** 39/39 kabul testi geçiyor · 0 alias çakışması · Son **bağımsız** denetim puanı: **80/100 NO-GO** (3. denetim, 13 Ekim 2026 gece). Rapor: `docs/handover/audit-3_80-100_nihai-denetim.md`. Önceki puanlar: 56 → 68 → 80. Güncel açık işler **Bölüm 7**'de.
+> **Mevcut Durum:** `npm test` tamamen geçiyor · Son **bağımsız** denetim: **92/100 NO-GO** (4. denetim, commit 7daf9c6; rapor `docs/handover/audit-4_92-100_rapor.md`). Tek P1 (MCI/MI 3:1 oranı) sonradan düzeltildi, yeniden denetim bekliyor. Puan geçmişi: 56 → 68 → 80 → 92.
 >
 > **Ek belgeler:** `docs/handover/` klasöründe her iki denetim raporu (56/100 ve 68/100), yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
 
@@ -39,10 +39,13 @@ InciFact; kozmetik ve gıda ürün içeriklerini (INCI & Gıda etiketleri) 10 di
 
 ## 2. GEÇMİŞ DENETİM SÜRECİ VE ÇÖZÜLEN TÜM KRİTİK TUZAKLAR
 
-Proje bağımsız bir QA / Baş Denetçi tarafından 3 aşamada sınandı:
-1. **İlk Denetim: 56/100 (NO-GO)** — 31 test geçmesine rağmen 7 kritik güvenlik açığı yakalandı.
-2. **Yeniden Denetim: 68/100 (NO-GO)** — Kısmi düzeltmeler yapıldı, ancak sınır koşulları eksikti.
-3. **Mevcut Seviye: 96+/100 (GO - TAM ONAY)** — Aşağıdaki tüm noktalar kökten çözüldü:
+Proje bağımsız bir QA / Baş Denetçi tarafından 4 aşamada sınandı (raporlar `docs/handover/`):
+1. **1. denetim: 56/100 (NO-GO)** — 31 test geçmesine rağmen 7 kritik açık.
+2. **2. denetim: 68/100 (NO-GO)** — kısmi düzeltmeler, sınır koşulları eksik.
+3. **3. denetim: 80/100 (NO-GO)** — konsantrasyon, MCI+MI toplamı, bağlam, alerjen negasyonu P1'leri.
+4. **4. denetim (commit 7daf9c6): 92/100 (NO-GO)** — tek P1: MCI/MI 3:1 oranı denetlenmiyordu. Bu P1 sonraki commit'te düzeltildi; **yeniden denetim bekliyor**. Bağımsız bir GO kararı henüz YOK.
+
+Aşağıdaki liste ilk denetimlerde çözülen konuları anlatır:
 
 ### Çözülmüş 7 Mimari Problem ve Uygulanan Kural Mantığı:
 1. **Mexoryl 400 (Annex VI/32):**
