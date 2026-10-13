@@ -1,25 +1,13 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+// Platform-neutral data loading (no Node fs/path/url): works in Node, browsers and React Native (Metro/Hermes).
+// Generated from src/data/*.json by `npm run build:data` (scripts/build_data_modules.mjs).
 import { SUPPORTED_LANGUAGES, getLocaleStrings } from '../i18n/locales.mjs';
+import sourcesData from '../data/generated/sources.mjs';
+import substancesData from '../data/generated/substances.mjs';
+import halalData from '../data/generated/halal_rules.mjs';
+import sugarsData from '../data/generated/hidden_sugars.mjs';
+import cosingIngredients from '../data/generated/cosing_ingredients.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const sourcesData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/sources.json'), 'utf8'));
-const substancesData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/substances.json'), 'utf8'));
-const halalData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/halal_rules.json'), 'utf8'));
-const sugarsData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/hidden_sugars.json'), 'utf8'));
-
-let cosingData = null;
-try {
-  const cosingPath = path.join(__dirname, '../data/cosing_ingredients.json');
-  if (fs.existsSync(cosingPath)) {
-    cosingData = JSON.parse(fs.readFileSync(cosingPath, 'utf8'));
-  }
-} catch {
-  cosingData = null;
-}
+const cosingData = cosingIngredients || null;
 
 function makeCosingSubstance(cosingEntry) {
   const isBanned = cosingEntry.s === 2;
@@ -432,7 +420,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'AB Yönetmeliği kapsamında konsantrasyon, saflık veya etiketleme kısıtlamasına tabi bileşen.',
     permittedGeneric: 'Uluslararası INCI / Gıda kodeksinde izinli standart bileşen.',
     methodDisclaimer: 'Bu endeks resmi bir kurumun sağlık puanı değildir; uygulamanın yayımlanmış metodolojisiyle bileşen listesinden hesaplanır.',
-    kvkkNotice: 'Seçtiğiniz sağlık ve hassasiyet profilleri yerel ve gizlilik odaklı mimariyle (KVKK md. 6 / GDPR md. 9) işlenir; mobil cihazda %100 yerel, web simülatöründe ise yalnızca yerel localhost API ile çalışır, üçüncü taraf bulut/sunuculara asla aktarılmaz.',
+    kvkkNotice: 'Mobil uygulamada seçimin yalnızca bu cihazda işlenir. Web önizlemesinde yalnızca bu bilgisayardaki yerel sunucuya analiz için gönderilir; kaydedilmez, üçüncü taraflarla paylaşılmaz.',
     veriYokMsg: (name, prof) => `${name} için bu profilde (${prof}) yeterli doğrulanmış bilimsel veri bulunamadı (veri_yok). Otomatik güvenli veya riskli sayılmaz.`,
     profileAlertGeneric: (name) => `${name}: Seçili hassasiyet profiliniz için dikkat edilmesi önerilen bileşen.`,
     halalDisclaimer: (auth) => `Bu değerlendirme bir helal sertifikası değildir; seçtiğiniz kurumun (${auth}) yayımlanmış kriterlerine göre etiket analizi sunar.`,
@@ -466,7 +454,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'Regulated substance subject to concentration, purity, or labeling restrictions under EU Regulation.',
     permittedGeneric: 'Permitted standard ingredient under international INCI / Food Codex regulations.',
     methodDisclaimer: 'This index is not an official government health score; it is calculated deterministically from the ingredient list using published methodology.',
-    kvkkNotice: 'Your selected sensitivity profiles are processed with privacy-by-design (GDPR Art. 9 compliant); 100% on-device in mobile, or local localhost API in the web simulator, never transmitted to external third-party servers.',
+    kvkkNotice: 'In the mobile app your choices are processed only on this device. In the web preview they are sent only to the local server on this computer for analysis, never stored or shared with third parties.',
     veriYokMsg: (name, prof) => `Insufficient verified clinical data for ${name} under profile (${prof}). Not automatically marked safe or unsafe.`,
     profileAlertGeneric: (name) => `${name}: Flagged for caution under your selected sensitivity profile.`,
     halalDisclaimer: (auth) => `This assessment is not an official Halal certificate; it analyzes the label according to published ${auth} criteria.`,
@@ -500,7 +488,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'مادة خاضعة لقيود التركيز أو الاستخدام بموجب لائحة الاتحاد الأوروبي.',
     permittedGeneric: 'مكون قياسي مسموح به في دستور مستحضرات التجميل (INCI) والأغذية الدولي.',
     methodDisclaimer: 'هذا المؤشر ليس تقييماً طبياً رسمياً؛ بل يُحسب آلياً من قائمة المكونات وفق المنهجية المنشورة.',
-    kvkkNotice: 'تتم معالجة ملفات الحساسية الخاصة بك محلياً على جهازك فقط ولا يتم إرسالها إلى أي خادم.',
+    kvkkNotice: 'في تطبيق الهاتف تُعالَج اختياراتك على هذا الجهاز فقط. في معاينة الويب تُرسَل فقط إلى الخادم المحلي على هذا الحاسوب للتحليل، ولا تُخزَّن ولا تُشارَك مع أي طرف ثالث.',
     veriYokMsg: (name, prof) => `لا تتوفر بيانات علمية كافية للمركب ${name} ضمن ملف (${prof}).`,
     profileAlertGeneric: (name) => `${name}: مكون يتطلب الانتباه وفقاً لملف الحساسية المختار.`,
     halalDisclaimer: (auth) => `هذا التقييم ليس شهادة حلال رسمية؛ بل يقدم تحليلاً للملصق وفق معايير (${auth}) المنشورة.`,
@@ -534,7 +522,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'Geregelter Inhaltsstoff mit Konzentrations- oder Verwendungsbeschränkungen gemäß EU-Verordnung.',
     permittedGeneric: 'Zugelassener Standard-Inhaltsstoff gemäß INCI / Lebensmittelkodex.',
     methodDisclaimer: 'Dieser Index ist kein amtlicher Gesundheitswert, sondern wird deterministisch aus der Zutatenliste berechnet.',
-    kvkkNotice: 'Ihre gewählten Empfindlichkeitsprofile werden DSGVO-konform ausschließlich lokal auf Ihrem Gerät verarbeitet.',
+    kvkkNotice: 'In der mobilen App werden deine Angaben nur auf diesem Gerät verarbeitet. In der Web-Vorschau gehen sie nur zur Analyse an den lokalen Server auf diesem Computer, ohne Speicherung und ohne Weitergabe an Dritte.',
     veriYokMsg: (name, prof) => `Für ${name} liegen im Profil (${prof}) keine ausreichenden klinischen Daten vor.`,
     profileAlertGeneric: (name) => `${name}: Hinweis für Ihr ausgewähltes Empfindlichkeitsprofil.`,
     halalDisclaimer: (auth) => `Diese Bewertung ist kein offizielles Halal-Zertifikat, sondern prüft das Etikett nach ${auth}-Kriterien.`,
@@ -568,7 +556,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'Substance soumise à des restrictions de concentration ou d\'usage selon le règlement UE.',
     permittedGeneric: 'Ingrédient standard autorisé selon la nomenclature internationale INCI / Codex alimentaire.',
     methodDisclaimer: 'Cet indice n\'est pas un score médical officiel ; il est calculé selon notre méthodologie publiée.',
-    kvkkNotice: 'Vos profils de sensibilité sont traités uniquement sur votre appareil (conforme RGPD Art. 9).',
+    kvkkNotice: 'Dans l\'application mobile, vos choix sont traités uniquement sur cet appareil. Dans l\'aperçu web, ils sont envoyés uniquement au serveur local de cet ordinateur pour l\'analyse, sans stockage ni partage avec des tiers.',
     veriYokMsg: (name, prof) => `Données scientifiques insuffisantes pour ${name} dans le profil (${prof}).`,
     profileAlertGeneric: (name) => `${name} : Ingrédient signalé pour votre profil de sensibilité.`,
     halalDisclaimer: (auth) => `Cette évaluation n'est pas un certificat halal officiel ; elle analyse l'étiquette selon les critères ${auth}.`,
@@ -602,7 +590,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'Bahan yang diatur dengan batasan konsentrasi atau penggunaan berdasarkan Regulasi UE.',
     permittedGeneric: 'Bahan standar yang diizinkan dalam kodeks INCI / Pangan internasional.',
     methodDisclaimer: 'Indeks ini bukan skor kesehatan resmi pemerintah; dihitung secara deterministik dari daftar bahan.',
-    kvkkNotice: 'Profil sensitivitas Anda diproses 100% secara lokal di perangkat Anda dan tidak pernah dikirim ke server.',
+    kvkkNotice: 'Di aplikasi seluler, pilihan Anda hanya diproses di perangkat ini. Di pratinjau web, pilihan hanya dikirim ke server lokal di komputer ini untuk analisis, tidak disimpan dan tidak dibagikan kepada pihak ketiga.',
     veriYokMsg: (name, prof) => `Data ilmiah terverifikasi belum cukup untuk ${name} pada profil (${prof}).`,
     profileAlertGeneric: (name) => `${name}: Bahan yang perlu diperhatikan untuk profil sensitivitas Anda.`,
     halalDisclaimer: (auth) => `Penilaian ini bukan sertifikat halal resmi; menganalisis label berdasarkan kriteria ${auth}.`,
@@ -636,7 +624,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'Bahan terkawal yang tertakluk kepada had kepekatan atau penggunaan di bawah Peraturan EU.',
     permittedGeneric: 'Ramuan standard yang dibenarkan di bawah peraturan INCI / Kod Makanan antarabangsa.',
     methodDisclaimer: 'Indeks ini bukan skor kesihatan rasmi kerajaan; ia dikira secara deterministik daripada senarai ramuan.',
-    kvkkNotice: 'Profil sensitiviti anda diproses sepenuhnya di dalam peranti anda sahaja dan tidak dihantar ke pelayan.',
+    kvkkNotice: 'Dalam aplikasi mudah alih, pilihan anda hanya diproses di peranti ini. Dalam pratonton web, ia hanya dihantar ke pelayan tempatan di komputer ini untuk analisis, tidak disimpan dan tidak dikongsi dengan pihak ketiga.',
     veriYokMsg: (name, prof) => `Data saintifik yang disahkan tidak mencukupi untuk ${name} bagi profil (${prof}).`,
     profileAlertGeneric: (name) => `${name}: Ramuan yang perlu diberi perhatian untuk profil sensitiviti pilihan anda.`,
     halalDisclaimer: (auth) => `Penilaian ini bukan sijil halal rasmi; ia menganalisis label mengikut kriteria ${auth}.`,
@@ -670,7 +658,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'Sustancia sujeta a restricciones de concentración o uso según el Reglamento de la UE.',
     permittedGeneric: 'Ingrediente estándar permitido bajo las normas internacionales INCI / Códice Alimentario.',
     methodDisclaimer: 'Este índice no es una puntuación médica oficial; se calcula de forma determinista a partir de los ingredientes.',
-    kvkkNotice: 'Tus perfiles de sensibilidad se procesan únicamente en tu dispositivo (cumple RGPD Art. 9) y nunca se envían a servidores.',
+    kvkkNotice: 'En la app móvil tus preferencias se procesan solo en este dispositivo. En la vista previa web se envían solo al servidor local de este ordenador para el análisis, sin guardarse ni compartirse con terceros.',
     veriYokMsg: (name, prof) => `Datos científicos insuficientes para ${name} en el perfil (${prof}).`,
     profileAlertGeneric: (name) => `${name}: Ingrediente señalado para tu perfil de sensibilidad seleccionado.`,
     halalDisclaimer: (auth) => `Esta evaluación no es un certificado halal oficial; analiza la etiqueta según los criterios de ${auth}.`,
@@ -704,7 +692,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'Вещество подлежит ограничениям по концентрации или применению согласно Регламенту ЕС.',
     permittedGeneric: 'Стандартный разрешенный компонент согласно международному кодексу INCI / пищевых добавок.',
     methodDisclaimer: 'Этот индекс не является официальной медицинской оценкой; он рассчитывается по опубликованной методологии из списка состава.',
-    kvkkNotice: 'Выбранные вами профили чувствительности обрабатываются исключительно на вашем устройстве и не передаются на сервер.',
+    kvkkNotice: 'В мобильном приложении ваш выбор обрабатывается только на этом устройстве. В веб-версии он передаётся только на локальный сервер этого компьютера для анализа, не сохраняется и не передаётся третьим лицам.',
     veriYokMsg: (name, prof) => `Недостаточно подтвержденных научных данных для ${name} в профиле (${prof}).`,
     profileAlertGeneric: (name) => `${name}: Компонент требует внимания для выбранного вами профиля чувствительности.`,
     halalDisclaimer: (auth) => `Эта оценка не является официальным сертификатом Халяль; анализ выполнен по критериям ${auth}.`,
@@ -738,7 +726,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'یورپی یونین کے ضوابط کے تحت ارتکاز یا استعمال کی پابندیوں سے مشروط جزو۔',
     permittedGeneric: 'بین الاقوامی INCI / فوڈ کوڈیکس کے تحت منظور شدہ معیاری جزو۔',
     methodDisclaimer: 'یہ اشاریہ کسی سرکاری ادارے کا طبی اسکور نہیں ہے؛ اسے شائع شدہ طریقہ کار کے مطابق اجزاء کی فہرست سے شمار کیا جاتا ہے۔',
-    kvkkNotice: 'آپ کے منتخب کردہ حساسیت کے پروفائلز صرف آپ کے فون پر پراسیس ہوتے ہیں اور کسی سرور پر نہیں بھیجے جاتے۔',
+    kvkkNotice: 'موبائل ایپ میں آپ کا انتخاب صرف اسی ڈیوائس پر پراسیس ہوتا ہے۔ ویب پیش نظارہ میں یہ صرف تجزیے کے لیے اسی کمپیوٹر کے مقامی سرور کو بھیجا جاتا ہے، محفوظ نہیں کیا جاتا اور کسی تیسرے فریق کے ساتھ شیئر نہیں ہوتا۔',
     veriYokMsg: (name, prof) => `${name} کے لیے پروفائل (${prof}) میں کافی سائنسی ڈیٹا دستیاب نہیں ہے۔`,
     profileAlertGeneric: (name) => `${name}: آپ کے منتخب کردہ حساسیت پروفائل کے لیے احتیاطی جزو۔`,
     halalDisclaimer: (auth) => `یہ تجزیہ کوئی سرکاری حلال سرٹیفکیٹ نہیں ہے؛ یہ منتخب ادارے (${auth}) کے معیارات کے مطابق لیبل کا جائزہ پیش کرتا ہے۔`,
@@ -1110,6 +1098,24 @@ export function evaluateProduct({
             effectiveCandSub = cosSub;
           } else if (found.s === 2 && effectiveCandSub.eu_status !== 'yasak' && !ANNEX_II_REFINING_EXEMPTIONS.has(effectiveCandSub.id)) {
             effectiveCandSub = cosSub;
+          } else if (found.s === 2 && ANNEX_II_REFINING_EXEMPTIONS.has(effectiveCandSub.id)) {
+            // Annex II/904 exemption depends on the manufacturer's refining history — state the assumption openly.
+            const assumption = 'VARSAYIM: Tam rafine (farmasötik saflıkta) olduğu kabul edilmiştir. AB 1223/2009 Ek II/904 istisnası, üreticinin tam rafinasyon geçmişini ve kanserojen olmadığını belgelemesine bağlıdır; bu belge etiketten doğrulanamaz.';
+            effectiveCandSub = {
+              ...effectiveCandSub,
+              eu_detail: `${effectiveCandSub.eu_detail ? effectiveCandSub.eu_detail + ' ' : ''}${assumption}`,
+              note: assumption
+            };
+          } else if (found.s === 1 && effectiveCandSub.eu_status === 'izinli') {
+            // Annex III restriction must not disappear behind a generic "permitted" family profile.
+            // Keep the family's personal-profile data, but surface the CosIng restriction as a finding.
+            effectiveCandSub = {
+              ...effectiveCandSub,
+              eu_status: 'kisitli',
+              verification: effectiveCandSub.verification === 'dogrulanmadi' ? 'ikincil_kontrol' : effectiveCandSub.verification,
+              eu_detail: `${found.inci}: AB 1223/2009 Ek ${found.a || 'III'} kapsamında kısıtlı (CosIng Ref ${found.ref}). Konsantrasyon / kullanım koşulları uygulanır; etiketten doğrulanamaz.`,
+              sources: Array.from(new Set([...(effectiveCandSub.sources || []), 'COSING']))
+            };
           }
         }
       }
@@ -1379,7 +1385,7 @@ export function evaluateProduct({
     const penaltyMap = { bilgi: 0, dusuk: 3, orta: 10, yuksek: 25 };
     const basePenalty = penaltyMap[effectiveSeverity] || 0;
 
-    if (basePenalty > 0 || effectiveEuStatus === 'yasak' || sub.ed_tier || sub.note) {
+    if (basePenalty > 0 || effectiveEuStatus === 'yasak' || effectiveEuStatus === 'kisitli' || sub.ed_tier || sub.note) {
       const alwaysFullWeightClasses = new Set([
         'preservative',
         'uv_filter',

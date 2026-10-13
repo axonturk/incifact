@@ -136,7 +136,9 @@ Kaynak: `docs/handover/audit-3_80-100_nihai-denetim.md` ve `docs/handover/audit-
 ### ✅ 13 Ekim 2026 23:25 itibarıyla DÜZELTİLDİ (yeniden denetim bekliyor)
 P1-1 konsantrasyon normalizasyonu, P1-2 MCI+MI toplamı, P1-3 açık uygulama türü önceliği (+ÇELİŞKİ notu), P1-4 hedefe bağlı negasyon, P1-5 "Acı Bakla"; ayrıca P2-6 sahte gluten (yalnız ham token taranıyor) ve P2-7 hidrokinon profesyonel kullanım şartı (`professionalUse` varsayılanı artık `null`; açık `false` istisnayı kapatır).
 Kanıt: `node tests/audit3_regressions.mjs` (24/24) ve `node tests/audit3_live_parity.mjs` (9/9 canlı = disk). 20 ana senaryonun skorları denetim-3 ile birebir aynı.
-**Kalan:** P2-8 … P2-12.
+**Ek düzeltmeler (23:40):** P2-8 yerel hazır etiket sözlük boşlukları (80 örnekte tanınmayan bileşen kalmadı; 70/80 %100, kalan 10 örnek kasıtlı SLS/OCR teyit örneği), P2-9 CosIng Ek III (s=1) kısıtı artık "kısıtlı" bulgu olarak görünüyor (puan değişmez), P2-10 gizlilik metinleri 10 dilde gerçek veri akışına göre yeniden yazıldı, P2-11 motor artık Node `fs/path/url` kullanmıyor (veri `src/data/generated/*.mjs` ES modüllerinden geliyor; `metro.config.cjs` .mjs desteği ekliyor), P2-12 vazelin istisnası "VARSAYIM" notuyla açıkça gösteriliyor.
+**ÖNEMLİ:** `src/data/*.json` düzenlendikten sonra mutlaka `npm run build:data` çalıştır; `node tests/data_modules_sync.mjs` eski kalan modülü yakalar. Tüm testler: `npm test`.
+**Hâlâ yapılmadı:** `npm install` + Expo/EAS derlemesi ve gerçek iOS/Android cihaz testi (bu bilgisayarda node_modules yok).
 
 ### P1 — GO için zorunlu (öncelik sırasıyla)
 1. **Konsantrasyon normalizasyonu** (`parseConcentration`, `ruleEngine.mjs` ~69–75): Doğu rakamları (`٤٪`, `۴٪`, `٠٫٠٠١٦٪`), Arapça yüzde `٪`, ondalık `٫` ve **ppm** (`20 ppm` = %0,002) desteklenmiyor. Şu an `Mexoryl ٤٪` → 90 (olmalı 10); `MI ٠٫٠٠١٦٪` rinse-off → 90 (olmalı 10); `MI (20 ppm)` rinse-off → 90 (olmalı 10). Tek bir normalize miktar modeli kur.

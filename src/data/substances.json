@@ -308,7 +308,11 @@
         "гиалуронат натрия",
         "гиалуроновая кислота",
         "ہائیلورونک ایسڈ",
-        "سوڈیم ہائیلورونیٹ"
+        "سوڈیم ہائیلورونیٹ",
+        "natriumhyaluronat",
+        "hyaluronate de sodium",
+        "natrium hialuronat",
+        "sodium hialuronat"
       ],
       "domain": "cosmetic",
       "class": "humectant",
@@ -402,7 +406,9 @@
         "سیرامائیڈ",
         "سیرامائیڈ np",
         "سیرامائیڈ این پی",
-        "سیرامائڈ np"
+        "سیرامائڈ np",
+        "seramida np",
+        "seramida"
       ],
       "domain": "cosmetic",
       "class": "emollient",
@@ -1601,7 +1607,11 @@
         "butylenglykol",
         "бутиленгликоль",
         "بوتيلين جلايكول",
-        "بیوٹائلین گلائکول"
+        "بیوٹائلین گلائکول",
+        "بوتيلين جليكول",
+        "butilena glikol",
+        "butilenglicol",
+        "butylène glycol"
       ],
       "domain": "cosmetic",
       "class": "humectant",
@@ -1728,7 +1738,11 @@
         "1,2-heksandiol",
         "1,2-гександиол",
         "1,2-ہیکسانڈیول",
-        "1،2-ہیکسانڈیول"
+        "1،2-ہیکسانڈیول",
+        "1،2-هيكسانديول",
+        "1,2-hexandiol",
+        "1,2-heksanadiol",
+        "1,2-hexanodiol"
       ],
       "domain": "cosmetic",
       "class": "humectant",
@@ -1860,7 +1874,10 @@
         "trimethylglycine",
         "бетаин",
         "بيتايين",
-        "بیٹین"
+        "بیٹین",
+        "بيتين",
+        "betaina",
+        "betaína"
       ],
       "domain": "cosmetic+food",
       "class": "humectant",
@@ -1909,7 +1926,11 @@
         "alantoin",
         "аллантоин",
         "آلانتوين",
-        "الانٹوئن"
+        "الانٹوئن",
+        "allantoïne",
+        "allantoine",
+        "alantoína",
+        "alantoina"
       ],
       "domain": "cosmetic",
       "class": "active",
@@ -3037,7 +3058,9 @@
         "vp/va copolymer",
         "polyvinyl alcohol",
         "карбомер",
-        "كاربومير"
+        "كاربومير",
+        "بوليمر أكريليت مشترك",
+        "كوبوليمر الأكريلات"
       ],
       "domain": "cosmetic",
       "class": "thickener",
@@ -3336,7 +3359,10 @@
         "хлорид натрия",
         "هيدروكسيد الصوديوم",
         "كلوريد الصوديوم",
-        "ارجینین"
+        "ارجینین",
+        "arginin",
+        "arginina",
+        "аргинин"
       ],
       "domain": "cosmetic+food",
       "class": "pH_adjuster",
@@ -4728,7 +4754,9 @@
         "etil vanilin",
         "ванилин",
         "فانيلين",
-        "ونیلن"
+        "ونیلن",
+        "vanilline",
+        "vainillina"
       ],
       "domain": "cosmetic+food",
       "class": "e_additive",
@@ -4783,7 +4811,12 @@
         "salyangoz özütü",
         "муцин улитки",
         "خلاصة الحلزون",
-        "سنیل رطوبت فلٹریٹ"
+        "سنیل رطوبت فلٹریٹ",
+        "filtrate de sécrétion d'escargot",
+        "filtrat de sécrétion d'escargot",
+        "filtrado de secreción de caracol",
+        "фильтрат секрета улитки",
+        "filtrat lendir siput"
       ],
       "domain": "cosmetic",
       "class": "active",
@@ -5021,7 +5054,9 @@
         "acetato de etilo",
         "butil asetat",
         "بیوٹائل ایسٹیٹ",
-        "ایتھائل ایسٹیٹ"
+        "ایتھائل ایسٹیٹ",
+        "butylacetat",
+        "ethylacetat"
       ],
       "domain": "cosmetic+food",
       "class": "solvent",

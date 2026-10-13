@@ -128,7 +128,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Kimin için tarıyorsun?',
-      subtitle: 'Seçimin sadece bu telefonda kalır; sunucuya gönderilmez. Aynı ürün herkese aynı sonucu vermez.',
+      subtitle: 'Mobil uygulamada seçimin yalnızca bu cihazda işlenir. Web önizlemesinde yalnızca bu bilgisayardaki yerel sunucuya analiz için gönderilir; kaydedilmez, üçüncü taraflarla paylaşılmaz. Aynı ürün herkese aynı sonucu vermez.',
       profiles: {
         hamilelik: { name: 'Hamilelik & Emzirme', desc: 'Retinoidler, yüksek konsantrasyon salisilik asit ve şüpheli UV filtrelerini işaretler.' },
         cocuk_metabolik: { name: 'Bebek & Çocuk', desc: 'Southampton 6 sentetik boyaları, nitritleri, boratları ve sert koruyucuları öne çıkarır.' },
@@ -140,7 +140,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Helal Fetva / Standart Otoritesi',
       claimsLabel: 'Ürün Üzerindeki Beyan / Sertifika',
       continueBtn: 'Devam et — Taramaya geç →',
-      privacyNote: 'Gizlilik: Sağlık ve inanç seçimlerin KVKK md. 6 ve GDPR md. 9 kapsamında özel nitelikli veridir. Hesap açtırmıyoruz, buluta yazmıyoruz.'
+      privacyNote: 'Gizlilik: Sağlık ve inanç seçimlerin KVKK md. 6 ve GDPR md. 9 kapsamında özel nitelikli veridir. Hesap açtırmıyoruz, kaydetmiyoruz, buluta veya üçüncü taraflara göndermiyoruz.'
     },
     scanScreen: {
       title: 'İçindekiler Kısmını Hizala',
@@ -210,7 +210,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Who are you scanning for?',
-      subtitle: 'Your choices stay 100% on this device and are never uploaded. The same product affects different people differently.',
+      subtitle: 'In the mobile app your choices are processed only on this device. In the web preview they are sent only to the local server on this computer for analysis, never stored or shared with third parties. The same product affects different people differently.',
       profiles: {
         hamilelik: { name: 'Pregnancy & Nursing', desc: 'Flags retinoids, high-concentration salicylic acid, and suspected endocrine UV filters.' },
         cocuk_metabolik: { name: 'Baby & Child', desc: 'Highlights Southampton 6 synthetic dyes, nitrites, borates, and harsh preservatives.' },
@@ -222,7 +222,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Halal Standard Authority',
       claimsLabel: 'Product Label Claims / Certificates',
       continueBtn: 'Continue — Go to Scanner →',
-      privacyNote: 'Privacy First: Health & faith preferences are sensitive data under GDPR Art. 9. No account required, zero cloud tracking.'
+      privacyNote: 'Privacy: Health & faith preferences are special-category data under GDPR Art. 9. No account, no storage, nothing sent to the cloud or third parties.'
     },
     scanScreen: {
       title: 'Align the Ingredients List',
@@ -292,7 +292,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'لمن تقوم بفحص المنتج؟',
-      subtitle: 'تبقى اختياراتك محلياً على هاتفك فقط ولا تُرسل لأي خادم. نفس المنتج قد لا يناسب الجميع.',
+      subtitle: 'في تطبيق الهاتف تُعالَج اختياراتك على هذا الجهاز فقط. في معاينة الويب تُرسَل فقط إلى الخادم المحلي على هذا الحاسوب للتحليل، ولا تُخزَّن ولا تُشارَك مع أي طرف ثالث. المنتج نفسه لا يؤثر على الجميع بالطريقة نفسها.',
       profiles: {
         hamilelik: { name: 'الحمل والرضاعة', desc: 'ينبهك من الريتينويدات وحمض الساليسيليك بتركيز عالٍ وفلاتر الشمس المشتبه بها.' },
         cocuk_metabolik: { name: 'الأطفال والرضع', desc: 'يكشف ألوان ساوثهامبتون الستة والنيتريت والبورات والمواد الحافظة القوية.' },
@@ -304,7 +304,7 @@ export const UI_STRINGS = {
       authorityLabel: 'هيئة معايير الحلال المعتمدة',
       claimsLabel: 'شهادات المنتج على العبوة',
       continueBtn: 'متابعة — انتقل إلى الماسح ←',
-      privacyNote: 'الخصوصية أولاً: بياناتك الصحية والدينية تُعالج داخل جهازك فقط وفق معايير GDPR و KVKK بدون إنشاء حساب.'
+      privacyNote: 'الخصوصية: تفضيلات الصحة والعقيدة بيانات حساسة وفق المادة 9 من GDPR. لا حساب، ولا تخزين، ولا إرسال إلى السحابة أو أي طرف ثالث.'
     },
     scanScreen: {
       title: 'وجّه الكاميرا نحو قائمة المكونات',
@@ -374,7 +374,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Für wen scannst du?',
-      subtitle: 'Deine Auswahl bleibt 100 % lokal auf deinem Gerät (DSGVO Art. 9 konform).',
+      subtitle: 'In der mobilen App werden deine Angaben nur auf diesem Gerät verarbeitet. In der Web-Vorschau gehen sie nur zur Analyse an den lokalen Server auf diesem Computer, ohne Speicherung und ohne Weitergabe an Dritte.',
       profiles: {
         hamilelik: { name: 'Schwangerschaft & Stillzeit', desc: 'Markiert Retinoide, hochdosierte Salicylsäure und bedenkliche UV-Filter.' },
         cocuk_metabolik: { name: 'Baby & Kinder', desc: 'Warnt vor Southampton-Azofarbstoffen, Nitriten, Boraten und starken Konservierern.' },
@@ -386,7 +386,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Halal-Zertifizierungsstandard',
       claimsLabel: 'Etikettenangaben (Halal / Vegan)',
       continueBtn: 'Weiter — Zum Scanner →',
-      privacyNote: 'Datenschutz: Gesundheits- und Glaubensdaten werden ausschließlich lokal auf deinem Smartphone verarbeitet.'
+      privacyNote: 'Datenschutz: Gesundheits- und Glaubensangaben sind besondere Daten nach DSGVO Art. 9. Kein Konto, keine Speicherung, keine Übermittlung an Cloud oder Dritte.'
     },
     scanScreen: {
       title: 'Inhaltsstoffliste ausrichten',
@@ -456,7 +456,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Pour qui scannez-vous ?',
-      subtitle: 'Vos choix restent 100 % sur cet appareil (conforme RGPD Art. 9).',
+      subtitle: 'Dans l\'application mobile, vos choix sont traités uniquement sur cet appareil. Dans l\'aperçu web, ils sont envoyés uniquement au serveur local de cet ordinateur pour l\'analyse, sans stockage ni partage avec des tiers.',
       profiles: {
         hamilelik: { name: 'Grossesse & Allaitement', desc: 'Signale les rétinoïdes, l\'acide salicylique concentré et les filtres UV préoccupants.' },
         cocuk_metabolik: { name: 'Bébé & Enfant', desc: 'Met en évidence les 6 colorants de Southampton, nitrites, borates et conservateurs irritants.' },
@@ -468,7 +468,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Autorité de Référence Halal',
       claimsLabel: 'Mentions sur l\'Étiquette',
       continueBtn: 'Continuer — Ouvrir le Scanner →',
-      privacyNote: 'Confidentialité : Vos données de santé et convictions restent stockées uniquement sur votre téléphone.'
+      privacyNote: 'Confidentialité : vos données de santé et de convictions sont des données sensibles (RGPD art. 9). Aucun compte, aucun stockage, aucun envoi vers le cloud ou des tiers.'
     },
     scanScreen: {
       title: 'Alignez la Liste des Ingrédients',
@@ -538,7 +538,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Untuk siapa Anda memindai?',
-      subtitle: 'Pilihan Anda tersimpan 100% di ponsel ini dan tidak pernah dikirim ke server.',
+      subtitle: 'Di aplikasi seluler, pilihan Anda hanya diproses di perangkat ini. Di pratinjau web, pilihan hanya dikirim ke server lokal di komputer ini untuk analisis, tidak disimpan dan tidak dibagikan kepada pihak ketiga.',
       profiles: {
         hamilelik: { name: 'Ibu Hamil & Menyusui', desc: 'Menandai retinoid, asam salisilat dosis tinggi, dan filter UV yang dicurigai.' },
         cocuk_metabolik: { name: 'Bayi & Anak-Anak', desc: 'Menyoroti 6 pewarna sintetis Southampton, nitrit, borat, dan pengawet keras.' },
@@ -550,7 +550,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Otoritas Standar Halal (MUI / JAKIM / GİMDES)',
       claimsLabel: 'Klaim / Sertifikat pada Kemasan',
       continueBtn: 'Lanjutkan — Buka Pemindai →',
-      privacyNote: 'Privasi Utama: Data kesehatan dan preferensi halal Anda hanya diproses secara lokal di perangkat Anda.'
+      privacyNote: 'Privasi: Data kesehatan dan keyakinan adalah data sensitif (GDPR Pasal 9). Tanpa akun, tanpa penyimpanan, tidak dikirim ke cloud atau pihak ketiga.'
     },
     scanScreen: {
       title: 'Arahkan ke Daftar Komposisi',
@@ -620,7 +620,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Untuk siapa anda mengimbas?',
-      subtitle: 'Pilihan anda kekal 100% di dalam telefon ini dan tidak dihantar ke pelayan.',
+      subtitle: 'Dalam aplikasi mudah alih, pilihan anda hanya diproses di peranti ini. Dalam pratonton web, ia hanya dihantar ke pelayan tempatan di komputer ini untuk analisis, tidak disimpan dan tidak dikongsi dengan pihak ketiga.',
       profiles: {
         hamilelik: { name: 'Kehamilan & Penyusuan', desc: 'Menandakan retinoid, asid salisilik kepekatan tinggi dan penapis UV yang dicurigai.' },
         cocuk_metabolik: { name: 'Bayi & Kanak-kanak', desc: 'Menyerlahkan 6 pewarna tiruan Southampton, nitrit, borat dan pengawet keras.' },
@@ -632,7 +632,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Pihak Berkuasa Standard Halal (JAKIM / MUI / GİMDES)',
       claimsLabel: 'Akuan / Sijil pada Bungkusan',
       continueBtn: 'Teruskan — Ke Pengimbas →',
-      privacyNote: 'Privasi Diutamakan: Data kesihatan dan pilihan halal anda diproses sepenuhnya di dalam peranti anda.'
+      privacyNote: 'Privasi: Data kesihatan dan kepercayaan ialah data sensitif (GDPR Perkara 9). Tiada akaun, tiada storan, tidak dihantar ke awan atau pihak ketiga.'
     },
     scanScreen: {
       title: 'Jajarkan Senarai Ramuan',
@@ -702,7 +702,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: '¿Para quién escaneas?',
-      subtitle: 'Tus preferencias se guardan 100 % en este teléfono y nunca se suben a la nube.',
+      subtitle: 'En la app móvil tus preferencias se procesan solo en este dispositivo. En la vista previa web se envían solo al servidor local de este ordenador para el análisis, sin guardarse ni compartirse con terceros.',
       profiles: {
         hamilelik: { name: 'Embarazo y Lactancia', desc: 'Señala retinoides, ácido salicílico concentrado y filtros UV sospechosos.' },
         cocuk_metabolik: { name: 'Bebés y Niños', desc: 'Destaca los 6 colorantes de Southampton, nitritos, boratos y conservantes fuertes.' },
@@ -714,7 +714,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Autoridad de Estándar Halal',
       claimsLabel: 'Certificados en el Envase',
       continueBtn: 'Continuar — Ir al Escáner →',
-      privacyNote: 'Privacidad: Tus datos de salud y creencias se procesan exclusivamente en tu dispositivo (RGPD Art. 9).'
+      privacyNote: 'Privacidad: tus datos de salud y creencias son datos sensibles (RGPD art. 9). Sin cuenta, sin almacenamiento y sin envío a la nube ni a terceros.'
     },
     scanScreen: {
       title: 'Alinea la Lista de Ingredientes',
@@ -784,7 +784,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Для кого вы проверяете состав?',
-      subtitle: 'Ваш выбор хранится только на этом устройстве и никогда не отправляется на сервер.',
+      subtitle: 'В мобильном приложении ваш выбор обрабатывается только на этом устройстве. В веб-версии он передаётся только на локальный сервер этого компьютера для анализа, не сохраняется и не передаётся третьим лицам.',
       profiles: {
         hamilelik: { name: 'Беременность и ГВ', desc: 'Отмечает ретиноиды, высокую концентрацию салициловой кислоты и спорные УФ-фильтры.' },
         cocuk_metabolik: { name: 'Дети и малыши', desc: 'Выявляет 6 красителей Саутгемптона, нитриты, бораты и жесткие консерванты.' },
@@ -796,7 +796,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Стандарт Халяль (GİMDES / JAKIM / MUI)',
       claimsLabel: 'Маркировка на упаковке',
       continueBtn: 'Далее — Перейти к сканеру →',
-      privacyNote: 'Конфиденциальность: Данные о здоровье и религии обрабатываются локально на вашем смартфоне.'
+      privacyNote: 'Конфиденциальность: данные о здоровье и убеждениях относятся к особой категории (GDPR, ст. 9). Без аккаунта, без хранения, без передачи в облако или третьим лицам.'
     },
     scanScreen: {
       title: 'Наведите на список ингредиентов',
@@ -866,7 +866,7 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'آپ کس کے لیے اسکین کر رہے ہیں؟',
-      subtitle: 'آپ کا انتخاب صرف آپ کے فون میں محفوظ رہتا ہے اور کسی سرور پر نہیں بھیجا جاتا۔',
+      subtitle: 'موبائل ایپ میں آپ کا انتخاب صرف اسی ڈیوائس پر پراسیس ہوتا ہے۔ ویب پیش نظارہ میں یہ صرف تجزیے کے لیے اسی کمپیوٹر کے مقامی سرور کو بھیجا جاتا ہے، محفوظ نہیں کیا جاتا اور کسی تیسرے فریق کے ساتھ شیئر نہیں ہوتا۔',
       profiles: {
         hamilelik: { name: 'حمل اور دودھ پلانے والی مائیں', desc: 'ریٹینوئڈز، تیز سیلیسیلک ایسڈ اور مشتبہ یو وی فلٹرز کی نشاندہی کرتا ہے۔' },
         cocuk_metabolik: { name: 'بچے اور شیر خوار', desc: 'ساؤتھمپٹن کے 6 مصنوعی رنگوں، نائٹرائٹس، بوریٹس اور تیز پریزرویٹوز سے آگاہ کرتا ہے۔' },
@@ -878,7 +878,7 @@ export const UI_STRINGS = {
       authorityLabel: 'حلال اسٹینڈرڈ اتھارٹی',
       claimsLabel: 'پیکنگ پر موجود سرٹیفکیٹ',
       continueBtn: 'جاری رکھیں — اسکینر پر جائیں ←',
-      privacyNote: 'رازداری مقدم: آپ کی صحت اور حلال ترجیحات صرف آپ کے فون میں پراسیس ہوتی ہیں۔'
+      privacyNote: 'رازداری: صحت اور عقیدے سے متعلق انتخاب GDPR آرٹیکل 9 کے تحت حساس ڈیٹا ہیں۔ نہ اکاؤنٹ، نہ محفوظ کرنا، نہ کلاؤڈ یا کسی تیسرے فریق کو بھیجنا۔'
     },
     scanScreen: {
       title: 'اجزاء کی فہرست کو سیدھ میں رکھیں',
