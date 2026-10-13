@@ -812,6 +812,79 @@
       }
     };
 
+    const REGIONAL_NOTICE_I18N = {
+      tr: {
+        activeBar: (flag, country, auth, jur) => `${flag} Aktif Ülke Yapısı: ${country} · Mevzuat: ${jur} · Helal Kriteri: ${auth}`,
+        whyTitle: '🌍 Ülke, Dil ve Kriter Değişikliği Bilgilendirmesi',
+        whyBody: (flag, country, auth, jur) =>
+          `Seçilen bölgeye göre <b>${flag} ${country}</b> profili, <b>${jur}</b> mevzuatı ve <b>${auth}</b> helal kriteri aktif edildi. Ülke veya kurum değiştirdiğinizde aynı ürünün sonucu değişebilir (ör. <b>E120 Karmin</b> veya <b>Salyangoz Müsini</b> GİMDES'te "Uygunsuz" iken diğer ülke standartlarında farklı değerlendirilir; <b>E171</b> AB/Türkiye'de yasakken ABD FDA'da %1'e kadar izinlidir). İsterseniz kurumu ve mevzuatı aşağıdan manuel değiştirebilirsiniz.`,
+        legalNote: 'Not: Kurum adları (GİMDES, JAKIM, MUI, IFANCA, TİTCK, AB, FDA) yalnızca kamuya açık resmi standartlarına göre bilgi amaçlı referans gösterilmiştir; resmi onay veya sponsorluk anlamına gelmez.'
+      },
+      en: {
+        activeBar: (flag, country, auth, jur) => `${flag} Active Region: ${country} · Regulation: ${jur} · Halal Standard: ${auth}`,
+        whyTitle: '🌍 Country, Language & Standard Adaptation Notice',
+        whyBody: (flag, country, auth, jur) =>
+          `Based on your selection, <b>${flag} ${country}</b>, <b>${jur}</b> regulation, and the <b>${auth}</b> Halal standard are active. Switching country or authority can change a product's verdict (e.g., <b>Carmine E120</b> or <b>Snail Mucin</b> is rejected under GİMDES but evaluated differently by other authorities; <b>E171</b> is banned in EU/TR food but permitted up to 1% under US FDA). You can manually override the authority or regulation below.`,
+        legalNote: 'Note: Institution names (GİMDES, JAKIM, MUI, IFANCA, EU, FDA) are referenced strictly for informational comparison against their published criteria and do not imply official endorsement.'
+      },
+      ar: {
+        activeBar: (flag, country, auth, jur) => `${flag} المنطقة النشطة: ${country} · اللوائح: ${jur} · معيار الحلال: ${auth}`,
+        whyTitle: '🌍 تنبيه التكيف حسب الدولة واللغة والمعيار الرقابي',
+        whyBody: (flag, country, auth, jur) =>
+          `تم تفعيل إعدادات <b>${flag} ${country}</b> ولوائح <b>${jur}</b> ومعيار الحلال <b>${auth}</b>. قد تتغير نتيجة نفس المنتج عند تغيير الدولة أو الهيئة (مثلاً: <b>الكارمين E120</b> أو <b>مستخلص الحلزون</b> يُعد غير متوافق لدى GİMDES بينما يُصنف بشكل مختلف لدى هيئات أخرى؛ ومادة <b>E171</b> محظورة أوروبياً ومسموحة في أمريكا حتى 1%). يمكنك تغيير الهيئة أو المعيار يدوياً أدناه.`,
+        legalNote: 'ملاحظة: تُذكر أسماء الهيئات (GİMDES, JAKIM, MUI, IFANCA, EU, FDA) كمرجع معلوماتي وفق معاييرها المنشورة فقط ولا تعني اعتماداً رسمياً.'
+      },
+      de: {
+        activeBar: (flag, country, auth, jur) => `${flag} Aktive Region: ${country} · Recht: ${jur} · Halal-Standard: ${auth}`,
+        whyTitle: '🌍 Hinweis zur Länder-, Sprach- & Standardanpassung',
+        whyBody: (flag, country, auth, jur) =>
+          `Für Ihre Auswahl sind <b>${flag} ${country}</b>, die <b>${jur}</b>-Verordnung und der Halal-Standard <b>${auth}</b> aktiv. Ein Wechsel des Landes oder der Behörde kann das Ergebnis verändern (z. B. wird <b>Karmin E120</b> bei GİMDES abgelehnt, bei anderen Stellen anders eingestuft; <b>E171</b> ist in der EU/TR verboten, in den USA bis 1 % erlaubt). Sie können Behörde und Recht unten manuell anpassen.`,
+        legalNote: 'Hinweis: Institutionen (GİMDES, JAKIM, MUI, IFANCA, EU, FDA) werden nur zum informativen Abgleich ihrer öffentlichen Kriterien genannt.'
+      },
+      fr: {
+        activeBar: (flag, country, auth, jur) => `${flag} Région active : ${country} · Règlement : ${jur} · Norme Halal : ${auth}`,
+        whyTitle: '🌍 Information sur l\'adaptation par pays, langue et norme',
+        whyBody: (flag, country, auth, jur) =>
+          `Le profil <b>${flag} ${country}</b>, la réglementation <b>${jur}</b> et la norme Halal <b>${auth}</b> sont actifs. Changer de pays ou d'autorité peut modifier le résultat d'un même produit (ex. le <b>Carmin E120</b> ou la <b>Mucine d'escargot</b> est refusé par GİMDES mais évalué différemment ailleurs ; le <b>E171</b> est interdit dans l'UE/TR mais autorisé jusqu'à 1 % aux USA). Modifiable manuellement ci-dessous.`,
+        legalNote: 'Note : Les noms d\'institutions sont cités uniquement à titre de référence informative selon leurs normes publiques.'
+      },
+      id: {
+        activeBar: (flag, country, auth, jur) => `${flag} Wilayah Aktif: ${country} · Regulasi: ${jur} · Standar Halal: ${auth}`,
+        whyTitle: '🌍 Info Penyesuaian Negara, Bahasa & Standar',
+        whyBody: (flag, country, auth, jur) =>
+          `Profil <b>${flag} ${country}</b>, regulasi <b>${jur}</b>, dan standar Halal <b>${auth}</b> kini aktif. Mengubah negara atau lembaga dapat mengubah hasil produk yang sama (mis. <b>Karmin E120</b> atau <b>Lendir Siput</b> ditolak oleh GİMDES namun dinilai berbeda oleh MUI/JAKIM; <b>E171</b> dilarang di UE/TR tetapi diizinkan hingga 1% oleh FDA AS). Anda dapat mengubahnya secara manual di bawah.`,
+        legalNote: 'Catatan: Nama lembaga (MUI, JAKIM, GİMDES, IFANCA) disebut hanya sebagai rujukan informasi standar publik, bukan pengesahan resmi.'
+      },
+      ms: {
+        activeBar: (flag, country, auth, jur) => `${flag} Wilayah Aktif: ${country} · Peraturan: ${jur} · Piawaian Halal: ${auth}`,
+        whyTitle: '🌍 Makluman Penyesuaian Negara, Bahasa & Piawaian',
+        whyBody: (flag, country, auth, jur) =>
+          `Profil <b>${flag} ${country}</b>, peraturan <b>${jur}</b>, dan piawaian Halal <b>${auth}</b> kini aktif. Menukar negara atau badan pensijilan boleh mengubah keputusan produk yang sama (cth. <b>Karmin E120</b> atau <b>Mucin Siput</b> ditolak oleh GİMDES tetapi dinilai berbeza mengikut piawaian lain; <b>E171</b> diharamkan di EU/TR tetapi dibenarkan sehingga 1% di AS). Anda boleh menukarnya secara manual di bawah.`,
+        legalNote: 'Nota: Nama institusi (JAKIM, MUI, GİMDES, IFANCA) dirujuk semata-mata untuk perbandingan maklumat berdasarkan piawaian awam.'
+      },
+      es: {
+        activeBar: (flag, country, auth, jur) => `${flag} Región activa: ${country} · Normativa: ${jur} · Estándar Halal: ${auth}`,
+        whyTitle: '🌍 Aviso de adaptación por país, idioma y normativa',
+        whyBody: (flag, country, auth, jur) =>
+          `Se ha activado el perfil <b>${flag} ${country}</b>, la normativa <b>${jur}</b> y el estándar Halal <b>${auth}</b>. Cambiar de país o entidad puede modificar el resultado del mismo producto (p. ej., el <b>Carmín E120</b> es rechazado por GİMDES pero evaluado distinto en otras entidades; el <b>E171</b> está prohibido en UE/TR pero permitido hasta 1% en EE. UU.). Puede cambiarlo manualmente abajo.`,
+        legalNote: 'Nota: Los nombres de instituciones se citan únicamente como referencia informativa de sus criterios públicos.'
+      },
+      ru: {
+        activeBar: (flag, country, auth, jur) => `${flag} Активный регион: ${country} · Регламент: ${jur} · Стандарт Халяль: ${auth}`,
+        whyTitle: '🌍 Уведомление об адаптации страны, языка и стандарта',
+        whyBody: (flag, country, auth, jur) =>
+          `Активен профиль <b>${flag} ${country}</b>, регламент <b>${jur}</b> и стандарт Халяль <b>${auth}</b>. При смене страны или органа результат одного и того же продукта может измениться (например, <b>Кармин E120</b> отклоняется GİMDES, но иначе оценивается другими органами; <b>E171</b> запрещён в ЕС/Турции, но разрешён в США до 1%). Вы можете изменить стандарт вручную ниже.`,
+        legalNote: 'Примечание: Названия организаций указаны исключительно для информационного сравнения по их открытым стандартам.'
+      },
+      ur: {
+        activeBar: (flag, country, auth, jur) => `${flag} فعال علاقہ: ${country} · قوانین: ${jur} · حلال معیار: ${auth}`,
+        whyTitle: '🌍 ملک، زبان اور معیار کی تبدیلی کی وضاحت',
+        whyBody: (flag, country, auth, jur) =>
+          `منتخب علاقے کے مطابق <b>${flag} ${country}</b>، <b>${jur}</b> قوانین اور <b>${auth}</b> حلال معیار فعال ہے۔ ملک یا ادارہ تبدیل کرنے سے ایک ہی پروڈکٹ کا نتیجہ بدل سکتا ہے (مثلاً <b>کارمین E120</b> یا <b>اسنیل میوسن</b> GİMDES میں نامناسب ہے جبکہ دیگر اداروں میں مختلف حکم ہے؛ <b>E171</b> یورپ/ترکی میں ممنوع ہے مگر امریکی FDA میں 1% تک جائز ہے)۔ آپ نیچے دستی طور پر ادارہ تبدیل کر سکتے ہیں۔`,
+        legalNote: 'نوٹ: اداروں کے نام (GİMDES, JAKIM, MUI, IFANCA) صرف عوامی معیارات کے معلوماتی موازنے کے لیے ذکر کیے گئے ہیں، سرکاری تصدیق کے لیے نہیں۔'
+      }
+    };
+
     function switchLang(langOrAuto) {
       if (langOrAuto === 'auto') {
         state.autoDetected = true;
@@ -822,6 +895,7 @@
       }
       const struct = MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr;
       state.jurisdiction = struct.jurisdiction;
+      state.regionNoticeHighlight = true;
       if (state.activeSampleIdx !== null) {
         state.productTitle = getSampleTitle(state.activeSampleIdx, state.lang);
       }
@@ -839,6 +913,7 @@
 
     function changeAuthorityFromSettings(newAuth) {
       state.autoDetected = false;
+      state.regionNoticeHighlight = true;
       const authSelect = document.getElementById('halalAuth');
       if (authSelect) authSelect.value = newAuth;
       refreshAll();
@@ -846,6 +921,7 @@
 
     function changeJurisdictionFromSettings(newJur) {
       state.autoDetected = false;
+      state.regionNoticeHighlight = true;
       state.jurisdiction = newJur;
       refreshAll();
     }
@@ -1997,8 +2073,20 @@
                 <select onchange="changeJurisdictionFromSettings(this.value)" style="width:100%; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
                   <option value="TR" ${state.jurisdiction === 'TR' ? 'selected' : ''}>TR (TİTCK/TGK + AB)</option>
                   <option value="EU" ${state.jurisdiction === 'EU' ? 'selected' : ''}>EU (EC 1223/2009)</option>
+                  <option value="US" ${state.jurisdiction === 'US' ? 'selected' : ''}>US (FDA 21 CFR)</option>
                 </select>
               </div>
+            </div>
+
+            <!-- Ülke ve Dil Değişikliği Açıklama Kutusu -->
+            <div style="background:var(--soft); border:1px solid var(--accent); border-radius:12px; padding:10px 12px; display:flex; flex-direction:column; gap:5px; margin-top:2px;">
+              <span style="font-size:12px; font-weight:800; color:var(--accent);">${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyTitle}</span>
+              <span style="font-size:11.5px; line-height:1.42; color:var(--ink);">
+                ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyBody(struct.flag, struct.name, currentAuth, state.jurisdiction === 'US' ? 'US FDA 21 CFR' : struct.regLabel)}
+              </span>
+              <span style="font-size:10.5px; line-height:1.35; color:var(--muted);">
+                ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).legalNote}
+              </span>
             </div>
           </div>
         </div>
@@ -2169,6 +2257,23 @@
           <span style="font-size:13px; color:var(--muted);">
             ${state.evalData.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${formatDigits(reg.totalCount, state.lang)} ${u.ingredientWord} · ${state.lang === 'ar' || state.lang === 'ur' ? '٪' + formatDigits(reg.coveragePercent, state.lang) : '%' + reg.coveragePercent} ${u.recognizedWord}
           </span>
+        </div>
+
+        <!-- Aktif Ülke / Mevzuat / Helal Kriteri Bilgilendirme Çubuğu -->
+        <div onclick="state.regionNoticeHighlight = !state.regionNoticeHighlight; renderScreen();" style="cursor:pointer; background:${state.regionNoticeHighlight ? 'var(--soft)' : 'var(--surface)'}; border:1px solid ${state.regionNoticeHighlight ? 'var(--accent)' : 'var(--line)'}; border-radius:14px; padding:9px 12px; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+            <span style="font-size:11.5px; font-weight:700; color:var(--ink);">
+              ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).activeBar((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).flag, (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).name.split('·')[0].trim(), halal.selectedAuthority, state.jurisdiction === 'US' ? 'US FDA' : state.jurisdiction)}
+            </span>
+            <span style="font-size:11px; font-weight:800; color:var(--accent); flex:none;">ⓘ</span>
+          </div>
+          ${
+            state.regionNoticeHighlight
+              ? `<span style="font-size:11px; line-height:1.4; color:var(--ink); border-top:1px solid var(--line); padding-top:5px;">
+                   ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyBody((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).flag, (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).name, halal.selectedAuthority, state.jurisdiction === 'US' ? 'US FDA 21 CFR' : (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).regLabel)}
+                 </span>`
+              : ''
+          }
         </div>
 
         <!-- Score Ring & Penalty Breakdown Card -->

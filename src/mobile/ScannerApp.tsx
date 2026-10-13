@@ -407,6 +407,19 @@ export default function InciFactMobileApp() {
                   );
                 })}
               </ScrollView>
+              <Text
+                style={{
+                  fontSize: 11,
+                  lineHeight: 15,
+                  color: theme.muted,
+                  marginTop: 8,
+                  textAlign: isRtl ? 'right' : 'left'
+                }}
+              >
+                {lang === 'tr'
+                  ? `🌍 Seçilen ülkeye göre (${langMeta.flag} ${langMeta.nativeName}) dil ve ${halalAuthority} helal kriteri otomatik eşleşir. Ülke veya kurum değiştirdiğinizde aynı ürünün sonucu değişebilir (ör. E120 Karmin veya Salyangoz Müsini GİMDES'te uygunsuzken diğer ülke standartlarında farklı değerlendirilir). Kurum adları yalnızca kamuya açık standartlarıyla bilgi amaçlı karşılaştırma içindir.`
+                  : `🌍 Language and the ${halalAuthority} Halal standard are automatically matched to the selected region (${langMeta.flag} ${langMeta.nativeName}). Switching country or authority can change a product's verdict. Institution names are referenced strictly for informational comparison against their public standards.`}
+              </Text>
             </View>
 
             <TouchableOpacity
