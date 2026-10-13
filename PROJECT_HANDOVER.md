@@ -133,6 +133,11 @@ Kaynak: `docs/handover/audit-3_80-100_nihai-denetim.md` ve `docs/handover/audit-
 
 **Kapandığı doğrulananlar:** düşük kapsam/bilinmeyen arayüz rozetleri, Urduca hazır etiketler, ۱–۵ rakamları ve RTL üst çubuk, E١٧١/E۱۷۱, Oreo sahte kırmızı süt alarmı, pork-free/domuzsuz jelatin, kafeinsiz taurin artık "yüksek kafein" demiyor, TPHP geçersiz tarih, 70 bitkisel kayıt, API dayanıklılığı, sabit OCR güveni kaldırıldı.
 
+### ✅ 13 Ekim 2026 23:25 itibarıyla DÜZELTİLDİ (yeniden denetim bekliyor)
+P1-1 konsantrasyon normalizasyonu, P1-2 MCI+MI toplamı, P1-3 açık uygulama türü önceliği (+ÇELİŞKİ notu), P1-4 hedefe bağlı negasyon, P1-5 "Acı Bakla"; ayrıca P2-6 sahte gluten (yalnız ham token taranıyor) ve P2-7 hidrokinon profesyonel kullanım şartı (`professionalUse` varsayılanı artık `null`; açık `false` istisnayı kapatır).
+Kanıt: `node tests/audit3_regressions.mjs` (24/24) ve `node tests/audit3_live_parity.mjs` (9/9 canlı = disk). 20 ana senaryonun skorları denetim-3 ile birebir aynı.
+**Kalan:** P2-8 … P2-12.
+
 ### P1 — GO için zorunlu (öncelik sırasıyla)
 1. **Konsantrasyon normalizasyonu** (`parseConcentration`, `ruleEngine.mjs` ~69–75): Doğu rakamları (`٤٪`, `۴٪`, `٠٫٠٠١٦٪`), Arapça yüzde `٪`, ondalık `٫` ve **ppm** (`20 ppm` = %0,002) desteklenmiyor. Şu an `Mexoryl ٤٪` → 90 (olmalı 10); `MI ٠٫٠٠١٦٪` rinse-off → 90 (olmalı 10); `MI (20 ppm)` rinse-off → 90 (olmalı 10). Tek bir normalize miktar modeli kur.
 2. **MI/MCI karışım toplamı**: `Methylchloroisothiazolinone 0.0012%, Methylisothiazolinone 0.0004%` rinse-off → 80 (toplam %0,0016, Ek V/39 %0,0015 sınırı aşılıyor; olmalı 10). Gözlemler tek tek değil, MCI+MI toplamı ve 3:1 oranı birlikte değerlendirilmeli.

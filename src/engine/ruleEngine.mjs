@@ -68,10 +68,16 @@ export function normalizeDigitsToAscii(str) {
 
 export function parseConcentration(str) {
   if (!str || typeof str !== 'string') return null;
-  const m1 = str.match(/%\s*(\d+(?:[.,]\d+)?)/);
-  if (m1) return parseFloat(m1[1].replace(',', '.'));
-  const m2 = str.match(/(\d+(?:[.,]\d+)?)\s*%/);
-  if (m2) return parseFloat(m2[1].replace(',', '.'));
+  // Normalize Eastern Arabic / Persian digits, Arabic percent sign and Arabic decimal separator
+  const s = normalizeDigitsToAscii(str).replace(/[٪﹪％]/g, '%').replace(/٫/g, '.');
+  const num = (v) => parseFloat(v.replace(',', '.'));
+  // ppm → percent (1 ppm = 0.0001 %)
+  const ppm = s.match(/(\d+(?:[.,]\d+)?)\s*ppm\b/i);
+  if (ppm) return num(ppm[1]) / 10000;
+  const m1 = s.match(/%\s*(\d+(?:[.,]\d+)?)/);
+  if (m1) return num(m1[1]);
+  const m2 = s.match(/(\d+(?:[.,]\d+)?)\s*%/);
+  if (m2) return num(m2[1]);
   return null;
 }
 
@@ -968,7 +974,7 @@ export function evaluateProduct({
   asOf = null,
   allergenStatement = null,
   servingMl = null,
-  professionalUse = false,
+  professionalUse = null,
   strictFutureRules = false
 }) {
   productType = (productType || 'cosmetic').toLowerCase();
@@ -980,7 +986,8 @@ export function evaluateProduct({
     userProfiles = [];
   }
 
-  const effectiveAppType = (productForm || applicationType || detectApplicationType(rawText, productType) || '').toLowerCase().replace(/-/g, '_').trim();
+  const explicitAppType = (productForm || applicationType || '').toString().toLowerCase().replace(/-/g, '_').trim();
+  const effectiveAppType = (explicitAppType || detectApplicationType(rawText, productType) || '').toLowerCase().replace(/-/g, '_').trim();
   const isValidDate = (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d) && !isNaN(Date.parse(d));
   const rawDate = asOf || targetDate;
   const effectiveTargetDate = isValidDate(rawDate) ? rawDate : new Date().toISOString().slice(0, 10);
@@ -1260,20 +1267,33 @@ export function evaluateProduct({
       }
     } else if (sub.id === 'mi_mci' || sub.id === 'methylisothiazolinone' || sub.id === 'cosing_77797' || /methylisothiazolinone/i.test(sub.id)) {
       const conc = parseConcentration(obs.raw);
-      const isRinseOff = appType === 'rinse_off' || /\b(rinse[_\s-]?off|shampoo|cleanser|wash[_\s-]?off|soap|sabun|şampuan)\b/i.test(rawText);
+      // Total isothiazolinone load across ALL MI / MCI tokens (EU 1003/2014 Annex V/39: MCI+MI mixture max 0.0015 % total)
+      const isoObs = observations.filter((o) => o.substance && o.substance.id === sub.id);
+      const isoConcs = isoObs.map((o) => parseConcentration(o.raw)).filter((c) => typeof c === 'number' && !isNaN(c));
+      const totalIsoConc = isoConcs.length > 0 ? isoConcs.reduce((a, b) => a + b, 0) : conc;
+      const hasMci = isoObs.some((o) => /chloro|klor|chlor/i.test(o.raw));
+      const labelSaysRinseOff = /\b(rinse[_\s-]?off|shampoo|cleanser|wash[_\s-]?off|soap|sabun|şampuan)\b/i.test(rawText);
+      // Explicit structured field wins over free label words; on conflict apply the stricter (leave-on) rule
+      const isRinseOff = explicitAppType ? explicitAppType === 'rinse_off' : (appType === 'rinse_off' || labelSaysRinseOff);
+      const contextConflict = explicitAppType === 'leave_on' && labelSaysRinseOff;
+      const conflictNote = contextConflict ? ' ÇELİŞKİ: Ürün türü "durulanmayan" seçildi ancak etikette durulanan ürün ifadesi var; ihtiyatlı olarak durulanmayan kuralı uygulandı, lütfen ürün türünü teyit edin.' : '';
       if (!isRinseOff) {
         effectiveEuStatus = 'yasak';
         effectiveSeverity = 'yuksek';
-        effectiveDetail = 'AB 2016/1198 (Ek V/57 değişikliği) uyarınca durulanmayan (leave-on) kozmetik ürünlerde kesinlikle YASAKTIR. Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) izinlidir.';
+        effectiveDetail = 'AB 2016/1198 (Ek V/57 değişikliği) uyarınca durulanmayan (leave-on) kozmetik ürünlerde kesinlikle YASAKTIR. Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) izinlidir.' + conflictNote;
       } else {
-        if (conc && conc > 0.0015) {
+        if (typeof totalIsoConc === 'number' && totalIsoConc > 0.0015) {
           effectiveEuStatus = 'yasak';
           effectiveSeverity = 'yuksek';
-          effectiveDetail = 'AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir; bu sınırın üzerindeki konsantrasyonlar YASAKTIR.';
+          effectiveDetail = hasMci && isoConcs.length > 1
+            ? `AB 1003/2014 Ek V/39: MCI + MI karışımı yalnızca durulanan ürünlerde toplam azami %0.0015 (15 ppm) izinlidir; etiketteki toplam %${+totalIsoConc.toFixed(6)} bu sınırı aşıyor, YASAKTIR.`
+            : 'AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir; bu sınırın üzerindeki konsantrasyonlar YASAKTIR.';
         } else {
           effectiveEuStatus = 'kisitli';
           effectiveSeverity = 'orta';
-          effectiveDetail = 'AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir.';
+          effectiveDetail = hasMci
+            ? 'AB 1003/2014 Ek V/39: MCI + MI karışımı (3:1) yalnızca durulanan ürünlerde toplam azami %0.0015 (15 ppm) izinlidir.'
+            : 'AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir.';
         }
       }
     } else if (sub.id === 'tphp_triphenyl_phosphate_banned') {
@@ -1291,15 +1311,20 @@ export function evaluateProduct({
     } else if (sub.id === 'hydroquinone_banned') {
       const isNailContext = /\b(nail|artificial_nails|artificial\s+nail|tırnak|yapay\s+tırnak)\b/i.test(rawText) ||
                             /\b(nail|artificial_nails|artificial\s+nail|tırnak)\b/i.test(appType);
+      // Annex III/14 exception is limited to PROFESSIONAL use; explicit professionalUse=false always disables it
+      const isProfessional = professionalUse === true || professionalUse === 'true' ||
+        (professionalUse == null && /\b(professional|profesyonel)\b/i.test(rawText));
       const conc = parseConcentration(obs.raw);
-      if (isNailContext && (conc === null || conc <= 0.02)) {
+      if (isNailContext && isProfessional && (conc === null || conc <= 0.02)) {
         effectiveEuStatus = 'kisitli';
         effectiveSeverity = 'orta';
-        effectiveDetail = 'AB 1223/2009 Ek III/14: Profesyonel yapay tırnak sistemlerinde son karışımda azami %0.02 izinlidir. Cilt açıcı kremlerde kesinlikle yasaktır.';
+        effectiveDetail = 'AB 1223/2009 Ek III/14: Yalnızca profesyonel kullanıma yönelik yapay tırnak sistemlerinde son karışımda azami %0.02 izinlidir. Cilt açıcı kremlerde kesinlikle yasaktır.';
       } else {
         effectiveEuStatus = 'yasak';
         effectiveSeverity = 'yuksek';
-        effectiveDetail = 'AB 1223/2009 Ek II/1339: Cilt açıcı kozmetik kremlerde kullanımı kesinlikle YASAKTIR.';
+        effectiveDetail = isNailContext && !isProfessional
+          ? 'AB 1223/2009 Ek III/14: Hidrokinon istisnası yalnızca profesyonel yapay tırnak sistemleri içindir; ev tipi / tüketici kullanımında YASAKTIR.'
+          : 'AB 1223/2009 Ek II/1339: Cilt açıcı kozmetik kremlerde kullanımı kesinlikle YASAKTIR.';
       }
     } else if (sub.id === 'mexoryl_400_uv_filter' || sub.id === 'cosing_89733' || /mexoryl\s*400|methoxypropylamino\s+cyclohexenylidene/i.test(sub.id) || /methoxypropylamino\s+cyclohexenylidene/i.test(sub.name)) {
       const isSprayOrInhalation = appType === 'spray' || appType === 'aerosol' || appType === 'inhalation' || /\b(spray|sprey|aerosol|inhalation|solunum)\b/i.test(rawText);
@@ -1528,7 +1553,7 @@ export function evaluateProduct({
       { id: 'mustard', names: /(?:^|[^\p{L}\p{N}])(mustard|hardal|senf|moutarde|mostaza|senape|горчиц[а-я]*|خردل|رائی)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Hardal' },
       { id: 'sesame', names: /(?:^|[^\p{L}\p{N}])(sesame|susam|tahin|tahini|sésame|sesam|sésamo|кунжут|سمسم|تل)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Susam' },
       { id: 'sulphites', names: /(?:^|[^\p{L}\p{N}])(sulphite[s]?|sulfite[s]?|sülfit|sulfit|schwefeldioxid|dioxyde\s+de\s+soufre|dióxido\s+de\s+azufre|диоксид\s+серы|كبريتيت|سلفائٹ|e220|e221|e222|e223|e224|e226|e227|e228)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Sülfitler' },
-      { id: 'lupin', names: /(?:^|[^\p{L}\p{N}])(lupin[e]?|acıbakla|acibakla|lüpen|lupini|altramuz|люпин|ترمس|لوپن)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Acıbakla (Lüpen)' },
+      { id: 'lupin', names: /(?:^|[^\p{L}\p{N}])(lupin[e]?|ac[ıi]\s*bakla|lüpen|lupini|altramuz|люпин|ترمس|لوپن)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Acıbakla (Lüpen)' },
       { id: 'molluscs', names: /(?:^|[^\p{L}\p{N}])(mollusc[s]?|mollusk[s]?|yumuşakça[lar]*|weichtier[e]?|mollusque[s]?|molusco[s]?|istiridye|midye|kalamar|ahtapot|mussel[s]?|oyster[s]?|squid|octopus|moule[s]?|pulpo|calamar|миди[ия]|кальмар|осьминог|رخويات|صدف)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Yumuşakçalar' }
     ];
 
@@ -1536,13 +1561,22 @@ export function evaluateProduct({
       const isCrossContactToken = /(?:may\s+contain|traces?\s+of|eser\s+miktarda|kann\s+spuren|peut\s+contenir|puede\s+contener|قد\s+يحتوي|может\s+содержать|میں\s+شامل)/iu.test(obs.raw);
       if (isCrossContactToken) continue;
 
-      const allText = `${obs.raw} ${obs.localizedName || ''}`;
+      // Scan ONLY the label's own wording. The localized display name comes from a broader data group
+      // (e.g. "Buğday Unu") and must never create an allergen that is not on the label.
+      // Negation is target-bound: only the negated word is removed ("Milk-free Soy Lecithin" still contains soy).
+      const scanText = obs.raw
+        .replace(/[\p{L}]+[\s\-]*(?:free|frei)(?=[^\p{L}]|$)/giu, ' ')
+        .replace(/(?:free\s+(?:of|from)|without|ohne|sans|sin|senza|tanpa|bebas)\s+[\p{L}]+/giu, ' ')
+        .replace(/[\p{L}]+(?:siz|sız|suz|süz)(?=[^\p{L}]|$)/giu, ' ')
+        .replace(/[\p{L}]+\s+(?:içermez|icermez|yoktur|bulunmaz)(?=[^\p{L}]|$)/giu, ' ');
       const matchedAllergens = MAJOR_FOOD_ALLERGENS.filter((a) => {
-        if (!a.names.test(allText)) return false;
-        // Check negation: e.g. "milk-free", "gluten-free", "sütsüz", "glutensiz"
-        const isNegated = new RegExp(`(?:${a.id}|${a.tr.split(' ')[0]}|milk|gluten|soy|nut|dairy|süt|fındık|soya)[\\s\\-]*(?:free|frei|sans|sin|senza|siz|sız|suz|süz)\\b`, 'i').test(allText) ||
-                          /\b(?:free\s+of|ohne|sans|sin)\s+(?:milk|gluten|soy|nuts|süt|fındık|soya)\b/i.test(allText);
-        return !isNegated;
+        if (!a.names.test(scanText)) return false;
+        // "Glutensiz un" / "gluten-free flour": a generic flour word alone is not a gluten source once gluten is negated.
+        // Explicitly named gluten cereals (wheat, barley, rye, spelt…) still require the EU 1169/2011 declaration.
+        if (a.id === 'gluten' && /gluten[\s\-]*(?:free|frei|siz|sız)|(?:free\s+(?:of|from)|without|ohne|sans|sin)\s+gluten/iu.test(obs.raw)) {
+          return /(?:^|[^\p{L}])(wheat|buğday|bugday|weizen|blé|ble|trigo|пшениц[а-я]*|قمح|barley|arpa|rye|çavdar|cavdar|spelt|kamut|oats|yulaf)(?=[^\p{L}]|$)/iu.test(scanText);
+        }
+        return true;
       });
 
       for (const matchedAllergen of matchedAllergens) {
