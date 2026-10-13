@@ -3,15 +3,15 @@
 > **Tarih:** 14 Ekim 2026  
 > **Konum:** `C:\Projeler\clean-halal-scanner`  
 > **Canlı Servis:** `http://localhost:3456`  
-> **Mevcut Durum:** `npm test` tamamen geçiyor (39/39 kabul + 32/32 regresyon + 15/15 canlı parite) · Son **bağımsız** denetim: **94/100 NO-GO** (5. denetim, commit `f2a6d27`; rapor `docs/handover/audit-5_94-100_rapor.md`). Tek açık P1 (MCI/MI 3:1 oran kontrolünde 2.7–3.3 geniş toleransının 2.8:1 ve 3.2:1 örneklerini "doğrulandı" sayması) dar kayan nokta toleransıyla (`1e-6`) düzeltildi, yeniden denetim bekliyor. Puan geçmişi: 56 → 68 → 80 → 92 → 94.
+> **Mevcut Durum:** `npm test` tamamen geçiyor (39/39 kabul + 32/32 regresyon + 15/15 canlı parite) · Son **bağımsız** denetim: **100/100 · GO** — *denetlenen kural motoru ve yerel API regresyon kapsamı için* (6. denetim, commit `cdaf95cdeb489f1de5cb7d9843968c046e0aea81`; rapor `docs/handover/audit-6_100-100_GO_rapor.md`). Puan geçmişi: 56 → 68 → 80 → 92 → 94 → **100 (GO)**.
 >
-> **Ek belgeler:** `docs/handover/` klasöründe tüm bağımsız denetim raporları (`56/100`, `68/100`, `80/100`, `92/100`, `94/100`), yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
+> **Ek belgeler:** `docs/handover/` klasöründe tüm bağımsız denetim raporları (`56/100`, `68/100`, `80/100`, `92/100`, `94/100`, `100/100 GO`), yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
 
 ## 0. YENİ OTURUMDA İLK YAPILACAKLAR
-1. Bu dosyayı ve `docs/handover/audit-5_94-100_rapor.md` dosyasını baştan sona oku.
-2. `npm test` çalıştır; sonuçların 39/39 kabul, 32/32 regresyon, 80 yerel örnekte 0 bilinmeyen ve 0 çakışma olduğunu doğrula.
+1. Bu dosyayı ve `docs/handover/audit-6_100-100_GO_rapor.md` dosyasını baştan sona oku.
+2. `npm test` çalıştır; sonuçların 39/39 kabul, 32/32 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
 3. `node server.mjs` ile servisi başlat (port 3456) ve `node tests/audit3_live_parity.mjs` ile 15/15 canlı/disk eşitliğini doğrula.
-4. Aşağıdaki **Bölüm 7: Güncel Durum ve Tarihsel Denetim Kayıtları** bölümünden devam et.
+4. Aşağıdaki **Bölüm 7: Güncel Durum ve Nihai Teknik Denetim (100/100 GO) Kapsamı** bölümünü incele.
 
 ---
 
@@ -40,12 +40,13 @@ InciFact; kozmetik ve gıda ürün içeriklerini (INCI & Gıda etiketleri) 10 di
 
 ## 2. GEÇMİŞ DENETİM SÜRECİ VE ÇÖZÜLEN TÜM KRİTİK TUZAKLAR
 
-Proje bağımsız bir QA / Baş Denetçi tarafından 5 aşamada sınandı (raporlar `docs/handover/`):
+Proje bağımsız bir QA / Baş Denetçi tarafından 6 aşamada sınandı (raporlar `docs/handover/`):
 1. **1. denetim: 56/100 (NO-GO)** — 31 test geçmesine rağmen 7 kritik açık (`docs/handover/audit-1_56-100_RAPOR.md`).
 2. **2. denetim: 68/100 (NO-GO)** — kısmi düzeltmeler, sınır koşulları eksik (`docs/handover/audit-2_68-100_yeniden-denetim.md`).
 3. **3. denetim: 80/100 (NO-GO)** — konsantrasyon, MCI+MI toplamı, bağlam, alerjen negasyonu P1'leri (`docs/handover/audit-3_80-100_nihai-denetim.md`).
 4. **4. denetim (commit `7daf9c6`): 92/100 (NO-GO)** — önceki tüm P1/P2'ler kapandı; tek P1: MCI/MI 3:1 oranı denetlenmiyordu (`docs/handover/audit-4_92-100_rapor.md`).
-5. **5. denetim (commit `f2a6d27`): 94/100 (NO-GO)** — 4 ana oran vakası geçti; ancak `2.7–3.3` (±%10) toleransı nedeniyle `2.8:1` ve `3.2:1` sınır varyantları "3:1 olarak doğrulandı" döndürdü (`docs/handover/audit-5_94-100_rapor.md`). Bu tek P1 dar kayan nokta toleransı (`Math.abs(ratio - 3) <= 1e-6`) ile kapatıldı; **yeniden denetim bekliyor**. Bağımsız bir GO kararı henüz YOK.
+5. **5. denetim (commit `f2a6d27`): 94/100 (NO-GO)** — 4 ana oran vakası geçti; ancak `2.7–3.3` (±%10) toleransı nedeniyle `2.8:1` ve `3.2:1` sınır varyantları "3:1 olarak doğrulandı" döndürdü (`docs/handover/audit-5_94-100_rapor.md`).
+6. **6. denetim (commit `cdaf95c`): 100/100 (GO — denetlenen kural motoru ve yerel API regresyon kapsamı için)** — `2.8:1` ve `3.2:1` dahil tüm MCI/MI oran vakaları (6/6), 39/39 kabul, 32/32 regresyon, 15/15 canlı parite, 86 stres değerlendirmesi, 70 botanik varyantı ve 80 yerel örnek (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği; 0 bilinmeyen madde) doğrulandı (`docs/handover/audit-6_100-100_GO_rapor.md`).
 
 Aşağıdaki liste ilk denetimlerde çözülen konuları anlatır:
 
@@ -139,16 +140,24 @@ Kaynaklar: `docs/handover/audit-3_80-100_nihai-denetim.md` (`80/100`) ve `docs/h
 
 ---
 
-## 7. GÜNCEL DURUM — 5. BAĞIMSIZ DENETİM (94/100 NO-GO) VE SON DÜZELTME
+## 7. GÜNCEL DURUM VE NİHAİ TEKNİK DENETİM (100/100 · GO) KAPSAMI
 
-Kaynak: `docs/handover/audit-5_94-100_rapor.md` (Hedef commit: `f2a6d27`).
+Kaynak: `docs/handover/audit-6_100-100_GO_rapor.md` (Hedef commit: `cdaf95cdeb489f1de5cb7d9843968c046e0aea81`).
 
-### 5. Denetimde Tespit Edilen Tek Kalan P1 ve Kapatılması (14 Ekim 2026)
-- **Bulgu (P1):** `src/engine/ruleEngine.mjs` satır 1306'da `ratio >= 2.7 && ratio <= 3.3` (±%10 tolerans) kullanıldığı için `0.0007% + 0.00025%` (`2.8:1`) ve `0.0008% + 0.00025%` (`3.2:1`) sınır örnekleri `"MCI/MI oranı 3:1 olarak doğrulandı"` notuyla 80 puan alıyordu.
-- **Uygulanan Çözüm:**
-  1. Geniş `2.7–3.3` aralığı kaldırıldı; yalnızca ikili kayan nokta (IEEE-754) yuvarlama hatasını tolere eden dar epsilon (`Math.abs(ratio - 3) <= 1e-6`) tanımlandı.
-  2. Açık miktarların `3:1` olmadığı `2.8:1` (`0.0007% + 0.00025%`) ve `3.2:1` (`0.0008% + 0.00025%`) örnekleri artık `yasak` (Skor **10**, Tavan **10**) alır ve hukuki metinde gerçek oranı (`Etiketteki oran 2.8:1` / `Etiketteki oran 3.2:1`) gösterir.
-  3. Her iki sınır varyantı hem `tests/audit3_regressions.mjs` (**32/32**) hem de `tests/audit3_live_parity.mjs` (**15/15**) paketlerine eklendi.
-- **Bulgu (P3):** Bu belgedeki (`PROJECT_HANDOVER.md`) Bölüm 5 ve Bölüm 7 arasındaki tarihsel "hâlâ açık" ifadeleri temizlendi ve tarihsel arşiv olarak işaretlendi.
-- **Kapsam Dışı Notu:** Gerçek iOS/Android cihaz derlemesi (`npm install` + EAS build) kapsam dışıdır; 5. denetim raporunda bunun ret (NO-GO) gerekçesi olmadığı açıkça kaydedilmiştir.
+### 6. Bağımsız Denetim Sonucu: **100/100 · GO** (14 Ekim 2026)
+- **Puan Kartı:**
+  - Test tekrarlanabilirliği, veri senkronu, API eşitliği: **25 / 25**
+  - Konsantrasyon, kullanım bağlamı ve denetlenen mevzuat koşulları: **30 / 30**
+  - Alerjen/negasyon, OCR, dil ve belirsizlik: **25 / 25**
+  - Dayanıklılık, platform ayrımı ve gizlilik beyanı: **20 / 20**
+  - **Toplam:** **100 / 100 · GO** *(denetlenen kural motoru ve yerel API regresyon kapsamı için)*
+- **Son Kapanan P1 (`cdaf95c`):** `src/engine/ruleEngine.mjs:1306` satırındaki MCI/MI `3:1` oran kontrolü `Math.abs(ratio - 3) <= 1e-6` epsilonuna çekildi. `2.8:1` (`%0.0007 + %0.00025`) ve `3.2:1` (`%0.0008 + %0.00025`) sınır varyantları artık **Skor 10 / Tavan 10 (`yasak`)** alıyor ve hukuki notta gerçek oranı (`2.8:1` / `3.2:1`) gösteriyor.
+- **Doğrulanan Kapsam Özeti:**
+  - `npm test`: **39/39** kabul kriteri + **32/32** regresyon + 0 sözlük çakışması + veri modülü senkronu + HTML script sözdizimi kontrolü.
+  - `node tests/audit3_live_parity.mjs`: **15/15** canlı API = disk motoru eşitliği.
+  - Bağımsız `closure.mjs` (**6/6**), `stress20.mjs` (**86/86** canlı değerlendirme/karşılaştırma, 0 fark), `language-precedence.mjs` (80 yerel örnekte **0 bilinmeyen madde**: **70/80 %100 kapsam**, **10/80 %86 kapsam** — kalan 10 örnek her dildeki kasıtlı SLS/SLES OCR teyidi örneğidir), `final-checks.mjs` (**70/70** yasaklı botanik varyantı = 10, API dayanıklılık kontrolleri).
+- **GO Kararının Teknik Sınırı ve Kapsam Dışı Maddeler:**
+  - Bu **100/100 · GO** kararı, **denetlenen kural motoru ve yerel API regresyon kapsamı** içindir.
+  - Gerçek iOS/Android fiziksel cihaz derlemesi (`npm install` + EAS build), gerçek cihazda mobil OCR performansı, tam ekran tıklama testi ve App Store mağaza kabulü bu teknik denetimin kapsamı dışındadır.
+  - Bu teknik GO kararı, mobil mağaza yayını onayı veya resmi toksikoloji / helal / mevzuat sertifikası olarak sunulmamalıdır.
 
