@@ -1,0 +1,31 @@
+{
+  "name": "incifact",
+  "version": "1.0.0",
+  "description": "InciFact — Zero-Hallucination Cosmetic, Food & Halal Ingredient Scanner (10 Languages, 5-Screen UI & Side-by-Side Comparison)",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node tests/verify_engine.mjs",
+    "expand-db": "node scripts/expand_database.mjs",
+    "expo:start": "npx expo start",
+    "expo:ios": "npx expo run:ios",
+    "expo:android": "npx expo run:android"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "expo": "~52.0.0",
+    "expo-camera": "~16.0.0",
+    "expo-image-picker": "~16.0.0",
+    "expo-localization": "~16.0.0",
+    "expo-status-bar": "~2.0.0",
+    "react": "18.3.1",
+    "react-native": "0.76.3",
+    "react-native-purchases": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "~18.3.12",
+    "typescript": "~5.3.3"
+  },
+  "private": true
+}

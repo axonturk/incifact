@@ -1,0 +1,63 @@
+{
+  "aciklama": "Bu parametreler bilimsel sabit degil, urun tasarimi kararidir. Hicbir resmi kurum urun puani tanimlamaz. Metodoloji sayfasinda acikca yayinlanmali.",
+  "tehlike_seviyeleri": {
+    "0_bilinen_sorun_yok": 0,
+    "1_bilgi": 0,
+    "2_dusuk": 3,
+    "3_orta": 10,
+    "4_yuksek": 25
+  },
+  "seviye_eslemesi": {
+    "yasak (AB Ek II, gida_yasak)": "tavan uygula, ayrica regulasyon_uyumsuz bayragi",
+    "kisitli + EC_grup_A veya SVHC_57f": "3_orta",
+    "kisitli + EC_grup_B": "2_dusuk",
+    "alerjen_etiket": "2_dusuk",
+    "izinli_uyari (Southampton)": "3_orta",
+    "izinli_ADI": "2_dusuk",
+    "izinli_alerjen": "1_bilgi (genel), kullanici profilinde kirmizi",
+    "komedojenik": "1_bilgi (genel skora girmez)",
+    "dogrulanmadi": "skora girmez"
+  },
+  "pozisyon_agirligi": {
+    "kozmetik": {
+      "1-5": 1.0,
+      "6-10": 0.7,
+      "11+": 0.5,
+      "not": "1223/2009 md.19(1)(g): %1 alti bilesenler herhangi sirada yazilabilir; bu yuzden sira yalnizca kaba gostergedir."
+    },
+    "gida": {
+      "1-3": 1.0,
+      "4-8": 0.7,
+      "9+": 0.5,
+      "not": "1169/2011 md.18: agirlik sirasina gore azalan."
+    },
+    "pozisyondan_bagimsiz_siniflar": [
+      "koruyucu",
+      "UV filtre",
+      "parfum alerjeni",
+      "renklendirici",
+      "E-kodlu katki"
+    ],
+    "gerekce": "Bu siniflar dusuk konsantrasyonda etkilidir ve tehlike degerlendirmesi zaten kullanim sinirinda yapilmistir."
+  },
+  "formul": "ham = 100 - min(80, SUM(ceza_i * agirlik_i)); azalan_getiri: ayni siniftan 3. ve sonraki maddeler 0.5 carpani",
+  "tavanlar": {
+    "AB_yasakli_madde_var": 10,
+    "4_yuksek seviyesi var": 40,
+    "3_orta seviyesinden 3+ madde": 60
+  },
+  "kapsam_kurali": {
+    "esik": 0.8,
+    "aciklama": "Taninan bilesen orani %80 altindaysa puan gosterme; 'Yetersiz veri' goster. Taninmayan bilesen guvenli sayilmaz."
+  },
+  "profil_ayrimi": "Hamilelik/akne/hassas cilt/helal uyarilari genel skoru DEGISTIRMEZ; ayri rozet olarak gosterilir. Helal ve saglik skoru asla tek puanda birlestirilmez.",
+  "ornek": {
+    "urun": "25 bilesenli nemlendirici: 2. sirada Isopropyl Myristate, 14. sirada Propylparaben, 18. sirada Linalool",
+    "hesap": [
+      "Isopropyl Myristate: komedojenik -> genel skora 0 (akne profilinde sari rozet)",
+      "Propylparaben: kisitli+EC_grup_A -> 10 * 1.0 (koruyucu, pozisyondan bagimsiz) = 10",
+      "Linalool: alerjen_etiket -> 3 * 1.0 = 3"
+    ],
+    "sonuc": "100 - 13 = 87; tavan yok"
+  }
+}

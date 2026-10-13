@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="168" height="40" viewBox="0 0 168 40" role="img" aria-labelledby="dark-title">
+  <title id="dark-title">InciFact koyu tema logosu</title>
+
+  <g transform="translate(0 4)">
+    <rect width="32" height="32" rx="9" fill="#0B132B" stroke="#D4AF37" stroke-width="1.5"></rect>
+
+    <path d="M11 6H8a2 2 0 0 0-2 2v3
+         M21 6h3a2 2 0 0 1 2 2v3
+         M26 21v3a2 2 0 0 1-2 2h-3
+         M11 26H8a2 2 0 0 1-2-2v-3" fill="none" stroke="#D4AF37" stroke-width="1.6" stroke-linecap="round"></path>
+
+    <g fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="15" cy="15" r="6"></circle>
+      <path d="m19.5 19.5 4 4" stroke="#D4AF37"></path>
+    </g>
+
+    <path d="M13 18c-2-3-.7-5.5 4-6.3
+             .6 3.8-.5 6-4 6.3Z" fill="#10B981"></path>
+  </g>
+
+  <text x="44" y="29" font-family="Figtree, sans-serif" font-size="28" font-weight="800" font-kerning="none" letter-spacing="-.6"><tspan fill="#F1F5F9">Inci</tspan><tspan fill="#D4AF37">Fact</tspan></text>
+</svg>

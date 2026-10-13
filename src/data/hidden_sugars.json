@@ -1,0 +1,372 @@
+{
+  "version": "2026-10-13-v3-comprehensive-10lang",
+  "source_id": "WHO_SUGAR_2015",
+  "note": "Etiket bazlı serbest şeker/şurup sözlüğüdür. Maltodekstrin kimyasal olarak şeker değil hızlı sindirilen karbonhidrattır ve ayrı sınıflandırılır. Sütteki doğal laktoz veya bütün meyve eklenmiş serbest şeker sayılmaz.",
+  "free_sugars": [
+    {
+      "id": "sugar",
+      "canonical": "Sucrose / Sugar",
+      "aliases": [
+        "sugar",
+        "şeker",
+        "beyaz şeker",
+        "sucrose",
+        "sakkaroz",
+        "sükroz",
+        "zucker",
+        "sucre",
+        "saccharose",
+        "سكر",
+        "azúcar",
+        "gula",
+        "gula pasir",
+        "сахар",
+        "چینی",
+        "شکر"
+      ]
+    },
+    {
+      "id": "glucose",
+      "canonical": "Glucose",
+      "aliases": [
+        "glucose",
+        "glikoz",
+        "glukoz",
+        "glukose",
+        "dekstroz",
+        "dextrose",
+        "جلوكوز",
+        "دكستروز",
+        "glucosa",
+        "glukosa",
+        "глюкоза",
+        "декстроза",
+        "گلوکوز"
+      ]
+    },
+    {
+      "id": "fructose",
+      "canonical": "Fructose",
+      "aliases": [
+        "fructose",
+        "fruktoz",
+        "meyve şekeri",
+        "fruchtzucker",
+        "فركتوز",
+        "fructosa",
+        "fruktosa",
+        "фруктоза",
+        "فرکٹوز"
+      ]
+    },
+    {
+      "id": "invert_sugar",
+      "canonical": "Invert Sugar / Syrup",
+      "aliases": [
+        "invert sugar",
+        "invert şeker",
+        "invert şeker şurubu",
+        "invert sugar syrup",
+        "invertzuckersirup",
+        "sirop de sucre inverti",
+        "инвертный сироп",
+        "инвертный сахар",
+        "شراب السكر المحول",
+        "sirup gula invert"
+      ]
+    },
+    {
+      "id": "glucose_syrup",
+      "canonical": "Glucose Syrup",
+      "aliases": [
+        "glucose syrup",
+        "glikoz şurubu",
+        "glukoz şurubu",
+        "glukosesirup",
+        "sirop de glucose",
+        "شراب الجلوكوز",
+        "jarabe de glucosa",
+        "sirup glukosa",
+        "сироп глюкозы",
+        "патока"
+      ]
+    },
+    {
+      "id": "glucose_fructose_syrup",
+      "canonical": "Glucose-Fructose Syrup (HFCS)",
+      "aliases": [
+        "glucose-fructose syrup",
+        "fructose-glucose syrup",
+        "glikoz-fruktoz şurubu",
+        "fruktoz-glikoz şurubu",
+        "high-fructose corn syrup",
+        "hfcs",
+        "yüksek fruktozlu mısır şurubu",
+        "glukose-fruktose-sirup",
+        "isoglucose",
+        "شراب الجلوكوز والفركتوز",
+        "jarabe de glucosa y fructosa",
+        "jarabe de maíz de alta fructosa",
+        "сироп глюкозы-фруктозы"
+      ]
+    },
+    {
+      "id": "corn_syrup",
+      "canonical": "Corn Syrup / Solids",
+      "aliases": [
+        "corn syrup",
+        "corn syrup solids",
+        "mısır şurubu",
+        "mısır şurubu katıları",
+        "maissirup",
+        "кукурузный сироп",
+        "شراب الذرة",
+        "jarabe de maíz",
+        "sirup jagung",
+        "sirop de maïs"
+      ]
+    },
+    {
+      "id": "cane_sugar",
+      "canonical": "Cane Sugar / Syrup",
+      "aliases": [
+        "cane sugar",
+        "kamış şekeri",
+        "cane syrup",
+        "şeker kamışı şurubu",
+        "rohrzucker",
+        "sucre de canne",
+        "тростниковый сахар",
+        "سكر القصب",
+        "azúcar de caña",
+        "gula tebu",
+        "گنے کی چینی"
+      ]
+    },
+    {
+      "id": "beet_sugar",
+      "canonical": "Beet Sugar",
+      "aliases": [
+        "beet sugar",
+        "pancar şekeri",
+        "rübenzucker",
+        "sucre de betterave",
+        "свекловичный сахар",
+        "سكر البنجر",
+        "azúcar de remolacha"
+      ]
+    },
+    {
+      "id": "brown_sugar",
+      "canonical": "Brown / Raw Sugar",
+      "aliases": [
+        "brown sugar",
+        "esmer şeker",
+        "raw sugar",
+        "ham şeker",
+        "brauner zucker",
+        "sucre roux",
+        "turbinado sugar",
+        "demerara",
+        "muscovado",
+        "коричневый сахар",
+        "سكر بني",
+        "azúcar moreno",
+        "gula merah",
+        "gula aren",
+        "براؤن شوگر"
+      ]
+    },
+    {
+      "id": "powdered_sugar",
+      "canonical": "Powdered / Icing Sugar",
+      "aliases": [
+        "powdered sugar",
+        "icing sugar",
+        "pudra şekeri",
+        "puderzucker",
+        "sucre glace",
+        "сахарная пудра",
+        "سكر بودرة",
+        "azúcar glas",
+        "gula halus"
+      ]
+    },
+    {
+      "id": "rice_syrup",
+      "canonical": "Rice Syrup",
+      "aliases": [
+        "rice syrup",
+        "brown rice syrup",
+        "pirinç şurubu",
+        "esmer pirinç şurubu",
+        "reissirup",
+        "рисовый сироп",
+        "شراب الأرز",
+        "jarabe de arroz",
+        "sirup beras",
+        "sirop de riz"
+      ]
+    },
+    {
+      "id": "malt_syrup",
+      "canonical": "Barley Malt Syrup",
+      "aliases": [
+        "malt syrup",
+        "barley malt syrup",
+        "malt şurubu",
+        "arpa maltı şurubu",
+        "gerstenmalzsirup",
+        "barley malt extract",
+        "malt extract",
+        "arpa maltı ekstraktı",
+        "malt ekstraktı",
+        "ekstrak malt",
+        "extrait de malt d'orge",
+        "gerstenmalzextrakt",
+        "extracto de malta",
+        "солодовый экстракт",
+        "خلاصة الشعير"
+      ]
+    },
+    {
+      "id": "maple_syrup",
+      "canonical": "Maple Syrup",
+      "aliases": [
+        "maple syrup",
+        "akçaağaç şurubu",
+        "ahornsirup",
+        "sirop d'érable",
+        "кленовый сироп",
+        "شراب القيقب",
+        "jarabe de arce",
+        "sirup maple"
+      ]
+    },
+    {
+      "id": "agave_syrup",
+      "canonical": "Agave Syrup",
+      "aliases": [
+        "agave syrup",
+        "agave nectar",
+        "agave şurubu",
+        "agavendicksaft",
+        "sirop d'agave",
+        "сироп агавы",
+        "شراب الأغاف",
+        "jarabe de agave",
+        "sirup agave"
+      ]
+    },
+    {
+      "id": "honey",
+      "canonical": "Honey",
+      "aliases": [
+        "honey",
+        "bal",
+        "honig",
+        "miel",
+        "عسل",
+        "madu",
+        "мед",
+        "شہد"
+      ]
+    },
+    {
+      "id": "molasses",
+      "canonical": "Molasses",
+      "aliases": [
+        "molasses",
+        "melas",
+        "pekmez",
+        "melasse",
+        "mélasse",
+        "دبس",
+        "عسل أسود",
+        "melaza",
+        "molase",
+        "меласса",
+        "патока"
+      ]
+    },
+    {
+      "id": "fruit_juice_concentrate",
+      "canonical": "Fruit Juice Concentrate",
+      "aliases": [
+        "fruit juice concentrate",
+        "meyve suyu konsantresi",
+        "elma suyu konsantresi",
+        "hurma suyu konsantresi",
+        "fruchtsaftkonzentrat",
+        "jus de fruits à base de concentré",
+        "üzüm suyu konsantresi",
+        "grape juice concentrate",
+        "deiyonize elma suyu konsantresi",
+        "meyve suyu konsantreleri",
+        "apple juice concentrate",
+        "концентрат фруктового сока",
+        "مركز عصير الفاكهة",
+        "concentrado de jugo de frutas",
+        "konsentrat sari buah"
+      ]
+    },
+    {
+      "id": "maltose",
+      "canonical": "Maltose",
+      "aliases": [
+        "maltose",
+        "maltoz",
+        "мальтоза",
+        "مالتوز",
+        "maltosa"
+      ]
+    },
+    {
+      "id": "coconut_palm_sugar",
+      "canonical": "Coconut / Palm Sugar",
+      "aliases": [
+        "coconut sugar",
+        "hindistan cevizi şekeri",
+        "palm sugar",
+        "gula aren",
+        "gula kelapa",
+        "gula melaka",
+        "kokosblütenzucker",
+        "sucre de coco",
+        "azúcar de coco",
+        "кокосовый сахар",
+        "سكر جوز الهند"
+      ]
+    },
+    {
+      "id": "date_carob_syrup",
+      "canonical": "Date Syrup / Carob Syrup",
+      "aliases": [
+        "date syrup",
+        "hurma şurubu",
+        "hurma özü",
+        "keçiboynuzu özü",
+        "carob syrup",
+        "dattelnsirup",
+        "sirop de dattes",
+        "دبس التمر"
+      ]
+    }
+  ],
+  "rapid_carbohydrates_non_sugar": [
+    {
+      "id": "maltodextrin",
+      "canonical": "Maltodextrin",
+      "aliases": [
+        "maltodextrin",
+        "maltodekstrin",
+        "maltodextrine",
+        "maltodekstrina",
+        "мальтодекстрин",
+        "مالتوديكسترين",
+        "مالٹوڈیکسٹرین"
+      ],
+      "explanation": "Kimyasal olarak şeker sınıfında değildir ancak yüksek glisemik indeksli, hızlı sindirilen bir polisakkarittir. İnsülin direnci / metabolik sağlık profilinde bilgi olarak gösterilir."
+    }
+  ]
+}

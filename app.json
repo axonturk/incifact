@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "InciFact",
+    "slug": "incifact",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B132B"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.incifact.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "InciFact uses your camera to scan cosmetic (INCI) and food ingredient labels directly on your device.",
+        "NSPhotoLibraryUsageDescription": "InciFact lets you select photos of product ingredient labels from your library to analyze them."
+      }
+    },
+    "android": {
+      "package": "com.incifact.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B132B"
+      },
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow InciFact to scan ingredient labels on cosmetic and food packages."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow InciFact to read ingredient label photos from your gallery."
+        }
+      ],
+      "expo-localization"
+    ]
+  }
+}

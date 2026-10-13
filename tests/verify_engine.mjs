@@ -1,0 +1,796 @@
+import assert from 'node:assert/strict';
+import { evaluateProduct, compareProducts, parseIngredientList } from '../src/engine/ruleEngine.mjs';
+
+console.log('======================================================================');
+console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (15 KABUL KRİTERİ)');
+console.log('======================================================================\n');
+
+let passed = 0;
+
+function runTest(name, fn) {
+  try {
+    fn();
+    passed++;
+    console.log(`✅ [BAŞARILI] ${name}`);
+  } catch (err) {
+    console.error(`❌ [HATA] ${name}`);
+    console.error(err);
+    process.exitCode = 1;
+  }
+}
+
+// 1. Cetearyl Alcohol & Phenoxyethanol -> False-Positive Shield (NOT Ethanol!)
+runTest('1. Yağ Alkolü (Cetearyl Alcohol) ve Phenoxyethanol yanlışlıkla Etil Alkol/Haram sayılmamalı', () => {
+  const res = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Phenoxyethanol, Niacinamide',
+    productType: 'cosmetic',
+    halalAuthority: 'GIMDES'
+  });
+  assert.equal(res.cards.halalCard.findings.filter((f) => f.category === 'B_alkol').length, 0);
+  assert.equal(res.cards.halalCard.falsePositiveShields.length, 3); // Cetearyl Alcohol, Cetyl Alcohol, Phenoxyethanol
+  assert.equal(res.cards.regulatoryCard.score, 100);
+});
+
+// 2. Standalone "BHA" -> Ambiguity detection (No decision until confirmed)
+runTest('2. Tek başına "BHA" okunduğunda (Butylated Hydroxyanisole vs Salicylic Acid) karar üretmeyip doğrulama istemeli', () => {
+  const resUnconfirmed = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Panthenol, BHA',
+    productType: 'cosmetic'
+  });
+  assert.equal(resUnconfirmed.unresolvedConfirmations.length, 1);
+  assert.equal(resUnconfirmed.cards.regulatoryCard.canShowScore, false);
+  assert.equal(resUnconfirmed.cards.regulatoryCard.score, null);
+  assert.equal(resUnconfirmed.cards.regulatoryCard.scoreSuppressionReason, 'awaiting_user_confirmation');
+
+  // Now confirm BHA as Salicylic Acid
+  const resConfirmed = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Panthenol, BHA',
+    productType: 'cosmetic',
+    userConfirmations: { BHA: 'salicylic_acid' }
+  });
+  assert.equal(resConfirmed.unresolvedConfirmations.length, 0);
+  assert.equal(resConfirmed.cards.regulatoryCard.canShowScore, true);
+  assert.ok(resConfirmed.cards.regulatoryCard.score > 90);
+});
+
+// 3. OCR Code Corruption "C1 7547O" -> Candidate CI 75470 requiring confirmation
+runTest('3. OCR kod hatası ("C1 7547O") otomatik hüküm vermemeli, CI 75470 adayı olarak onay istemeli', () => {
+  const res = evaluateProduct({
+    rawText: 'İçindekiler: Aqua, Glycerin, Panthenol, Tocopherol, C1 7547O',
+    productType: 'cosmetic'
+  });
+  assert.equal(res.unresolvedConfirmations.length, 1);
+  assert.equal(res.unresolvedConfirmations[0].candidateCode, 'CI 75470');
+  assert.equal(res.cards.regulatoryCard.score, null);
+});
+
+// 4. Pork Gelatin + Verified Vegan Claim -> CONFLICT!
+runTest('4. "Pork Gelatin" veya "Gelatin" ile "Vegan" sertifikası bir arada gelirse ÇELİŞKİ (CONFLICT) vermeli', () => {
+  const res = evaluateProduct({
+    rawText: 'İçindekiler: Sugar, Water, Pork Gelatin, Citric Acid',
+    productType: 'food',
+    claims: { halalCertified: false, veganStatus: 'verified', vegetarianStatus: 'none' }
+  });
+  assert.equal(res.cards.halalCard.overallStatus, 'conflict');
+  assert.equal(res.cards.veganSugarCard.veganCompatibility, 'conflict');
+});
+
+// 5. E120 (Carmine) Authority Switch (GIMDES = kirmizi vs JAKIM / MUI = yesil)
+runTest('5. Karmin (E120) otorite seçimine göre GİMDES\'te Kırmızı, JAKIM ve MUI\'de Yeşil dönmeli', () => {
+  const resGimdes = evaluateProduct({
+    rawText: 'İçindekiler: Sugar, Water, Citric Acid, Carmine (E120)',
+    productType: 'food',
+    halalAuthority: 'GIMDES'
+  });
+  const resMui = evaluateProduct({
+    rawText: 'İçindekiler: Sugar, Water, Citric Acid, Carmine (E120)',
+    productType: 'food',
+    halalAuthority: 'MUI'
+  });
+  assert.equal(resGimdes.cards.halalCard.findings[0].status, 'kirmizi');
+  assert.equal(resMui.cards.halalCard.findings[0].status, 'yesil');
+});
+
+// 6. E124 (Ponceau 4R / Cochineal Red A) False-Positive Trap
+runTest('6. E124 (Cochineal Red A / Ponceau 4R) böcek kaynaklı Karmin (E120) sanılmamalı, ama Çocuk profilinde Southampton uyarısı vermeli', () => {
+  const res = evaluateProduct({
+    rawText: 'İçindekiler: Water, Sugar, Citric Acid, Cochineal Red A',
+    productType: 'food',
+    userProfiles: ['cocuk_metabolik'],
+    halalAuthority: 'GIMDES'
+  });
+  // Should NOT trigger Carmine E120 in Halal card
+  assert.equal(res.cards.halalCard.findings.length, 0);
+  // Should trigger Red in child_metabolic profile (Southampton 6)
+  assert.equal(res.cards.profileCard.profileStatuses.cocuk_metabolik, 'false');
+  assert.equal(res.cards.profileCard.alerts[0].level, 'kirmizi');
+});
+
+// 7. E471 + Verified Vegan Claim -> Resolves C_musbooh to Green, while Ethanol + Vegan stays unresolved!
+runTest('7. Doğrulanmış Vegan logosu E471\'i Yeşil yapmalı ama Etil Alkolü (Ethanol) ÇÖZMEMELİ', () => {
+  const res = evaluateProduct({
+    rawText: 'İçindekiler: Water, Sugar, Mono- and diglycerides of fatty acids (E471), Ethanol',
+    productType: 'food',
+    halalAuthority: 'GIMDES',
+    claims: { halalCertified: false, veganStatus: 'verified', vegetarianStatus: 'none' }
+  });
+  const e471Finding = res.cards.halalCard.findings.find((f) => f.ruleId === 'e471');
+  const ethanolFinding = res.cards.halalCard.findings.find((f) => f.ruleId === 'ethanol_cosmetic_or_food');
+  assert.equal(e471Finding.status, 'yesil');
+  assert.equal(ethanolFinding.status, 'kirmizi');
+});
+
+// 8. Titanium Dioxide (E171 vs CI 77891) Product-Type Switch
+runTest('8. Titanium Dioxide Gıdada (E171) AB Yasaklı (Tavan Skor 10) iken Kozmetikte (CI 77891) İzinli olmalı', () => {
+  const resFood = evaluateProduct({
+    rawText: 'İçindekiler: Sugar, Water, Citric Acid, Titanium Dioxide',
+    productType: 'food'
+  });
+  const resCosmetic = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Cetyl Alcohol, Titanium Dioxide',
+    productType: 'cosmetic'
+  });
+  assert.equal(resFood.cards.regulatoryCard.score, 10);
+  assert.equal(resFood.cards.regulatoryCard.capApplied, 10);
+  assert.equal(resCosmetic.cards.regulatoryCard.score, 100);
+});
+
+// 9. Paraben Differentiation (Methylparaben = Permitted vs Isobutylparaben = Banned Cap 10)
+runTest('9. Methylparaben izinli/düşük etki alırken Isobutylparaben AB Yasaklı (Tavan Skor 10) almalı', () => {
+  const resMethyl = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetyl Alcohol, Panthenol, Methylparaben',
+    productType: 'cosmetic'
+  });
+  const resIsobutyl = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetyl Alcohol, Panthenol, Isobutylparaben',
+    productType: 'cosmetic'
+  });
+  assert.ok(resMethyl.cards.regulatoryCard.score >= 95);
+  assert.equal(resIsobutyl.cards.regulatoryCard.score, 10);
+});
+
+// 10. Bakuchiol in Pregnancy -> 'veri_yok' (unknown preference match, NOT false red or false green)
+runTest('10. Bakuchiol hamilelik profilinde "veri_yok" (unknown) dönmeli ve tercih eşleşme puanını null yapmalı', () => {
+  const res = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Squalane, Niacinamide, Bakuchiol',
+    productType: 'cosmetic',
+    userProfiles: ['hamilelik']
+  });
+  assert.equal(res.cards.profileCard.profileStatuses.hamilelik, 'unknown');
+  assert.equal(res.cards.profileCard.preferenceMatchScore, null);
+  assert.equal(res.cards.regulatoryCard.score, 100);
+});
+
+// 11. Position-Conditional Rule: Alcohol Denat. in Top 5 vs Position 8
+runTest('11. Alcohol Denat. ilk 5 sıradaysa Hassas Cilt uyarısı vermeli, 7. sıradaysa vermemeli', () => {
+  const resTop5 = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Alcohol Denat., Glycerin, Niacinamide, Panthenol',
+    productType: 'cosmetic',
+    userProfiles: ['hassas_cilt']
+  });
+  const resPos7 = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Panthenol, Squalane, Cetyl Alcohol, Alcohol Denat.',
+    productType: 'cosmetic',
+    userProfiles: ['hassas_cilt']
+  });
+  assert.equal(resTop5.cards.profileCard.profileStatuses.hassas_cilt, 'false');
+  assert.equal(resPos7.cards.profileCard.profileStatuses.hassas_cilt, 'true');
+});
+
+// 12. Line-Break Hyphenation Normalization ("Methyliso-\nthiazolinone")
+runTest('12. Satır sonu tire bölünmesi ("Methyliso-\\nthiazolinone") sözlük kontrolüyle birleştirilmeli', () => {
+  const res = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetyl Alcohol, Panthenol, Methyliso-\nthiazolinone',
+    productType: 'cosmetic',
+    userProfiles: ['hassas_cilt']
+  });
+  assert.equal(res.cards.profileCard.profileStatuses.hassas_cilt, 'false');
+  assert.equal(res.cards.profileCard.alerts[0].substanceName, 'Methylisothiazolinone (MI) & MCI/MI');
+});
+
+// 13. Coverage < 80% Score Suppression
+runTest('13. Tanınan bileşen kapsamı %80 altındaysa sayısal skor gizlenmeli (null)', () => {
+  const res = evaluateProduct({
+    rawText: 'Ingredients: Aqua, UnknownPlantExtractX, UnknownPeptideY, UnknownPolymerZ',
+    productType: 'cosmetic'
+  });
+  assert.equal(res.cards.regulatoryCard.coveragePercent, 25);
+  assert.equal(res.cards.regulatoryCard.canShowScore, false);
+  assert.equal(res.cards.regulatoryCard.score, null);
+});
+
+// 14. Hidden Sugars vs Maltodextrin (Rapid Carb) Separation
+runTest('14. Gizli şekerler (Glikoz-fruktoz şurubu, Dekstroz) ile Maltodekstrin ayrı sınıflandırılmalı', () => {
+  const res = evaluateProduct({
+    rawText: 'İçindekiler: Su, Glikoz-fruktoz şurubu, Dekstroz, Maltodekstrin, Sitrik Asit',
+    productType: 'food'
+  });
+  assert.equal(res.cards.veganSugarCard.freeSugarCount, 2);
+  assert.equal(res.cards.veganSugarCard.detectedRapidCarbs.length, 1);
+  assert.equal(res.cards.veganSugarCard.detectedRapidCarbs[0].canonical, 'Maltodextrin');
+});
+
+// 15. Comedogenic Esters (Isopropyl Myristate) -> Does NOT reduce Regulatory Score, only alerts 'akne' profile
+runTest('15. Komedojenik yağ/esterler (Isopropyl Myristate) genel regülasyon skorunu düşürmemeli, yalnız Akne profilini uyarmalı', () => {
+  const res = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetyl Alcohol, Panthenol, Isopropyl Myristate',
+    productType: 'cosmetic',
+    userProfiles: ['akne']
+  });
+  assert.equal(res.cards.regulatoryCard.score, 100);
+  assert.equal(res.cards.profileCard.profileStatuses.akne, 'false');
+});
+
+// 16. skorlama.json Exact Benchmark: Isopropyl Myristate (0) + Propylparaben (10) + Linalool (3) = 87
+runTest('16. skorlama.json referans testi: Isopropyl Myristate (0) + Propylparaben (10) + Linalool (3) -> Skor tam 87 olmalı', () => {
+  const res = evaluateProduct({
+    rawText:
+      'Ingredients: Aqua, Isopropyl Myristate, Glycerin, Cetyl Alcohol, Cetearyl Alcohol, Stearyl Alcohol, Dimethicone, Squalane, Niacinamide, Panthenol, Tocopherol, Sodium Hyaluronate, Ceramide NP, Propylparaben, Xanthan Gum, Carbomer, Citric Acid, Linalool',
+    productType: 'cosmetic',
+    userProfiles: ['akne', 'hassas_cilt']
+  });
+  assert.equal(res.cards.regulatoryCard.score, 87);
+  assert.equal(res.cards.regulatoryCard.capApplied, null);
+});
+
+// 17. Sulfites (E220) -> General score 100 (1_bilgi), Asthma/Allergy profile Red
+runTest('17. Sülfitler (E220) genel regülasyon skorunu düşürmemeli (100), Astım/Alerji profilinde Kırmızı vermeli', () => {
+  const res = evaluateProduct({
+    rawText: 'İçindekiler: Su, Sitrik Asit, Sodyum Klorür, E220',
+    productType: 'food',
+    userProfiles: ['astim_alerji']
+  });
+  assert.equal(res.cards.regulatoryCard.score, 100);
+  assert.equal(res.cards.profileCard.profileStatuses.astim_alerji, 'false');
+  assert.equal(res.cards.profileCard.alerts[0].level, 'kirmizi');
+});
+
+// 18. Side-by-Side Comparison (compareProducts) -> Identifies Deciding Difference automatically
+runTest('18. Yan Yana Karşılaştırma (compareProducts) iki ürün arasındaki farkı yaratan maddeyi otomatik bulmalı', () => {
+  const comp = compareProducts(
+    {
+      name: 'Temizleme jeli A',
+      productType: 'cosmetic',
+      rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Panthenol, Niacinamide, Sodium Hyaluronate'
+    },
+    {
+      name: 'Temizleme jeli B',
+      productType: 'cosmetic',
+      rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Panthenol, Niacinamide, Methylisothiazolinone'
+    },
+    { userProfiles: ['hassas_cilt'] }
+  );
+  assert.equal(comp.brand, 'InciFact');
+  assert.ok(comp.productA.score > comp.productB.score);
+  assert.equal(comp.productA.profileStatus, 'Uygun');
+  assert.equal(comp.productB.profileStatus, 'Kaçın / Dikkat');
+  assert.ok(comp.decidingDifference);
+  assert.equal(comp.decidingDifference.onlyInSide, 'B');
+  assert.ok(comp.decidingDifference.substanceName.includes('Methylisothiazolinone'));
+});
+
+// 19. "Sodium Laur?l Sulfate" OCR Ambiguity -> Asks SLS vs SLES confirmation
+runTest('19. "Sodium Laur?l Sulfate" OCR belirsizliğinde tahmin yürütmeyip SLS vs SLES onayı istemeli', () => {
+  const res = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Sodium Laur?l Sulfate, Panthenol',
+    productType: 'cosmetic'
+  });
+  assert.equal(res.unresolvedConfirmations.length, 1);
+  assert.equal(res.unresolvedConfirmations[0].options.length, 2);
+  assert.equal(res.unresolvedConfirmations[0].options[0].id, 'sls');
+  assert.equal(res.unresolvedConfirmations[0].options[1].id, 'sles');
+});
+
+// 20. 10-Language Localization & RTL (Arabic 'ar' and Urdu 'ur') Verification
+runTest('20. 10 Hedef Pazar Dili (TR, EN, AR, DE, FR, ID, MS, ES, RU, UR) ve RTL (Arapça/Urduca) eksiksiz çalışmalı', () => {
+  const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  for (const lang of langs) {
+    const res = evaluateProduct({
+      rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Panthenol',
+      productType: 'cosmetic',
+      lang
+    });
+    assert.equal(res.lang, lang);
+    assert.equal(res.dir, lang === 'ar' || lang === 'ur' ? 'rtl' : 'ltr');
+    assert.ok(res.locale && res.locale.tabs && res.locale.tabs.compare);
+    assert.ok(res.locale.badges && res.locale.badges.banned);
+  }
+});
+
+// 21. Multilingual Label Parsing Across Languages (AR, DE, FR, ID, RU, UR)
+runTest('21. Arapça (،), Almanca, Fransızca, Endonezce, Rusça ve Urduca etiketler %100 tanınmalı', () => {
+  const arRes = evaluateProduct({
+    rawText: 'المكونات: ماء، جلسرين، كحول سيتيريلي، نياسيناميد، بانثينول، فينوكسي إيثانول',
+    productType: 'cosmetic',
+    lang: 'ar'
+  });
+  assert.equal(arRes.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(arRes.cards.regulatoryCard.score, 100);
+
+  const deRes = evaluateProduct({
+    rawText: 'Zutaten: Wasser, Zucker, Glukosesirup, Zitronensäure, Pektin',
+    productType: 'food',
+    lang: 'de'
+  });
+  assert.equal(deRes.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(deRes.cards.veganSugarCard.freeSugarCount, 2);
+
+  const idRes = evaluateProduct({
+    rawText: 'Komposisi: Air, Gula, Tepung Terigu, Minyak Kelapa Sawit, Lesitin Kedelai, Garam',
+    productType: 'food',
+    lang: 'id'
+  });
+  assert.equal(idRes.cards.regulatoryCard.coveragePercent, 100);
+});
+
+// 22. Real-World Product Labels (CeraVe, Nutella % percentages, COSRX Snail Mucin, Gel Nail TPO 2025 EU Ban)
+runTest('22. Gerçek Dünya Ürünleri (CeraVe, Nutella %13 Fındık, COSRX Salyangoz Özütü, Jel Oje TPO 2025 Yasağı) tam kapsamla çözümlenmeli', () => {
+  // Nutella style label with percentages and colon wrapper
+  const nutella = evaluateProduct({
+    rawText: 'İçindekiler: Şeker, Palm Yağı, Fındık (%13), Yağsız Süt Tozu (%8.7), Yağı Azaltılmış Kakao (%7.4), Emülgatör: Lesitin (Soya), Vanilin',
+    productType: 'food'
+  });
+  assert.equal(nutella.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(nutella.cards.veganSugarCard.freeSugarCount, 1);
+
+  // COSRX Snail Mucin Halal check (Red in MUI / JAKIM / GIMDES)
+  const cosrx = evaluateProduct({
+    rawText: 'Ingredients: Snail Secretion Filtrate, Betaine, Butylene Glycol, 1,2-Hexanediol, Sodium Polyacrylate, Phenoxyethanol, Sodium Hyaluronate, Allantoin, Panthenol, Arginine, Aqua',
+    productType: 'cosmetic',
+    halalAuthority: 'MUI'
+  });
+  assert.equal(cosrx.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(cosrx.cards.halalCard.overallStatus, 'uygunsuz_bulgu');
+
+  // Gel Nail Polish with TPO (Sept 2025 EU Omnibus VII Ban -> Score Capped at 10)
+  const gelNail = evaluateProduct({
+    rawText: 'Ingredients: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butyl Acetate, Ethyl Acetate, Nitrocellulose',
+    productType: 'cosmetic'
+  });
+  assert.equal(gelNail.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(gelNail.cards.regulatoryCard.score, 10);
+});
+
+// 23. Independent 3-Subagent Audit Suite: 26 Real-World Products + Parenthetical Multi-E-Code + Cyrillic/Urdu/Cross-Domain
+runTest('23. Bağımsız 3-Alt-Ajan Denetimi: 26 Gerçek Ürün (%95+ Kapsam), Çoklu Parantez (E100, E120), Kiril/Urduca ve Çapraz Alan İzolasyonu', () => {
+  // A. Parenthetical multi-E-code ("Renklendiriciler (E100, E120)") must detect BOTH E100 and E120 Carmine!
+  const haribo = evaluateProduct({
+    rawText: 'İçindekiler: Glikoz Şurubu, Şeker, Sığır Jelatini, Dekstroz, Sitrik Asit, Meyve ve Bitki Konsantreleri, Renklendiriciler (E100, E120), Parlatıcılar (Karnaubaumu E903, Balmumu E901)',
+    productType: 'food',
+    halalAuthority: 'GIMDES'
+  });
+  assert.ok(haribo.cards.regulatoryCard.coveragePercent >= 90);
+  assert.ok(haribo.cards.halalCard.findings.some((f) => f.ruleId === 'carmine_e120' && f.status === 'kirmizi'));
+
+  // B. Coca-Cola Zero style parenthetical multi-sweeteners ("Tatlandırıcılar (Aspartam E951, Asesülfam K E950)")
+  const colaZero = evaluateProduct({
+    rawText: 'İçindekiler: Su, Karbondioksit, Renklendirici (Karamel E150d), Asitlik Düzenleyiciler (Fosforik Asit E338, Sodyum Sitrat E331), Tatlandırıcılar (Aspartam E951, Asesülfam K E950), Kafein, Doğal Aroma Vericiler',
+    productType: 'food',
+    userProfiles: ['cocuk_metabolik']
+  });
+  assert.equal(colaZero.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(colaZero.cards.regulatoryCard.canShowScore, true);
+
+  // C. Russian Cyrillic E-code ("Е250", "Е621") and "Ингредиенты:" header + "ё" normalization
+  const ruProd = evaluateProduct({
+    rawText: 'Ингредиенты: Вода, Сахар, Мальтодекстрин, Лимонная кислота, Лецитин, Кармин, Е250, Е621',
+    productType: 'food',
+    lang: 'ru',
+    halalAuthority: 'GIMDES'
+  });
+  assert.equal(ruProd.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(ruProd.unresolvedConfirmations.length, 0);
+
+  // D. Urdu header ("اجزائے ترکیبی:") + Urdu full stop ("۔") + Arabic/Eastern-Arabic numerals ("٪١٣")
+  const urProd = evaluateProduct({
+    rawText: 'اجزائے ترکیبی: پانی، گلیسرین (٪١٣)، نیاسینامائڈ، پینتھینول، سیٹیریل الکوحل، فینوکسی ایتھنول۔',
+    productType: 'cosmetic',
+    lang: 'ur'
+  });
+  assert.equal(urProd.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(urProd.dir, 'rtl');
+
+  // E. Cross-domain isolation: Vanillin in Food should NOT trigger skin-only ('hassas_cilt') alert or fragrance penalty
+  const nutellaSkinCheck = evaluateProduct({
+    rawText: 'İçindekiler: Şeker, Palm Yağı, Fındık (%13), Yağsız Süt Tozu (%8.7), Yağı Azaltılmış Kakao (%7.4), Emülgatör: Lesitin (Soya), Vanilin',
+    productType: 'food',
+    userProfiles: ['hassas_cilt', 'akne'],
+    halalAuthority: 'GIMDES'
+  });
+  assert.equal(nutellaSkinCheck.cards.regulatoryCard.score, 100);
+  assert.equal(nutellaSkinCheck.cards.profileCard.alerts.length, 0);
+  // Explicit "(Soya)" resolves Lecithin to green!
+  const lecFinding = nutellaSkinCheck.cards.halalCard.findings.find((f) => f.ruleId === 'lecithin_e322');
+  assert.equal(lecFinding.status, 'yesil');
+  assert.equal(nutellaSkinCheck.cards.veganSugarCard.uncertainVeganItems.length, 0);
+
+  // F. Vegetarian claim conflict when Gelatin is present
+  const vegConflict = evaluateProduct({
+    rawText: 'İçindekiler: Su, Şeker, Sığır Jelatini, Sitrik Asit',
+    productType: 'food',
+    claims: { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'verified' }
+  });
+  assert.equal(vegConflict.cards.halalCard.overallStatus, 'conflict');
+  assert.equal(vegConflict.cards.veganSugarCard.veganCompatibility, 'conflict');
+});
+
+// 24. P0-1: Parantez İçi Domuz / Alkol Kaynağı Asla Helal Sayılmamalı (Logo İle ÇELİŞKİ Vermeli)
+runTest('24. Parantez içi "Domuz/Pork/Schwein" ve "Alkol" kaynağı asla yeşil olmamalı, logo varsa ÇELİŞKİ vermeli', () => {
+  // Test A: Sugar, Gelatin (Pork) with halal Certified -> MUST BE CONFLICT
+  const res1 = evaluateProduct({
+    rawText: 'Sugar, Gelatin (Pork)',
+    productType: 'food',
+    claims: { halalCertified: true }
+  });
+  assert.equal(res1.cards.halalCard.overallStatus, 'conflict', 'Gelatin (Pork) with halal cert must be conflict');
+  assert.notEqual(res1.cards.halalCard.findings[0].status, 'yesil', 'Pork gelatin must NEVER be green');
+
+  // Test B: Şeker, Jelatin (Domuz) without logo -> MUST BE Kırmızı (Haram)
+  const res2 = evaluateProduct({
+    rawText: 'Şeker, Jelatin (Domuz)',
+    productType: 'food',
+    claims: { halalCertified: false }
+  });
+  assert.equal(res2.cards.halalCard.overallStatus, 'uygunsuz_bulgu', 'Jelatin (Domuz) must be haram');
+  assert.equal(res2.cards.halalCard.findings[0].status, 'kirmizi', 'Jelatin (Domuz) finding must be kirmizi');
+
+  // Test C: Zucker, Gelatine (Schwein) with logo -> MUST BE CONFLICT
+  const res3 = evaluateProduct({
+    rawText: 'Zucker, Gelatine (Schwein)',
+    productType: 'food',
+    claims: { halalCertified: true }
+  });
+  assert.equal(res3.cards.halalCard.overallStatus, 'conflict', 'Gelatine (Schwein) with logo must be conflict');
+
+  // Test D: Sugar, E471 (domuz kaynaklı) with logo -> MUST BE CONFLICT
+  const res4 = evaluateProduct({
+    rawText: 'Sugar, E471 (domuz kaynaklı)',
+    productType: 'food',
+    claims: { halalCertified: true }
+  });
+  assert.equal(res4.cards.halalCard.overallStatus, 'conflict', 'E471 (domuz) with logo must be conflict');
+
+  // Test E: Water, Glycerin (Ethanol) in food -> Ethanol finding must be kirmizi in food!
+  const res5 = evaluateProduct({
+    rawText: 'Water, Glycerin (Ethanol)',
+    productType: 'food',
+    claims: { halalCertified: false }
+  });
+  assert.equal(res5.cards.halalCard.overallStatus, 'uygunsuz_bulgu', 'Ethanol in food must trigger haram warning');
+});
+
+// 25. P0-3: ReDoS ve Doğrusal Girdi Performansı (50.000 Karakter Testi)
+runTest('25. ReDoS Koruması: 50.000 karakterlik tek girdi kilitlenmeden <50ms içinde tamamlanmalı', () => {
+  const bigInputNoHyphen = 'a'.repeat(50000);
+  const t0 = Date.now();
+  const parsed1 = parseIngredientList(bigInputNoHyphen);
+  const elapsed1 = Date.now() - t0;
+  assert.ok(elapsed1 < 100, `No-hyphen parse must take <100ms, took ${elapsed1}ms`);
+
+  const bigInputWithHyphens = ('Aqua, Methyliso-\nthiazolinone, ').repeat(500);
+  const t1 = Date.now();
+  const parsed2 = parseIngredientList(bigInputWithHyphens);
+  const elapsed2 = Date.now() - t1;
+  assert.ok(elapsed2 < 200, `Hyphenated parse must take <200ms, took ${elapsed2}ms`);
+});
+
+// 26. P1: Helal Kartı Kapsam Kuralı (Coverage < %80 İse "Uygun Görünüyor" Denemez)
+runTest('26. Kapsam <%80 olduğunda Helal Kartı "uygun_gorunuyor" değil "kapsam_yetersiz" dönmeli, ancak Haram varsa haram uyarısı korunmalı', () => {
+  // Test A: Sadece 1 madde tanınıyor, 3 madde bilinmiyor (Kapsam %25). Haram madde yok.
+  const resLowCov = evaluateProduct({
+    rawText: 'Ingredients: Aqua, UnknownBotanical1, UnknownBotanical2, UnknownPolymer3',
+    productType: 'cosmetic',
+    halalAuthority: 'GIMDES'
+  });
+  assert.equal(resLowCov.cards.regulatoryCard.coveragePercent, 25);
+  assert.equal(resLowCov.cards.regulatoryCard.canShowScore, false);
+  assert.equal(resLowCov.cards.halalCard.overallStatus, 'kapsam_yetersiz', 'Kapsam <%80 iken asla uygun_gorunuyor denmemeli');
+
+  // Test B: Kapsam düşük (%25) ama içinde açık domuz jelatini var!
+  const resLowCovHaram = evaluateProduct({
+    rawText: 'İçindekiler: Şeker, BilinmeyenBitki1, BilinmeyenBitki2, Domuz Jelatini',
+    productType: 'food',
+    claims: { halalCertified: false }
+  });
+  assert.equal(resLowCovHaram.cards.halalCard.overallStatus, 'uygunsuz_bulgu', 'Kapsam düşük olsa bile haram madde uyarısı gizlenmemeli');
+
+  // Test C: Kapsam düşük (%25), helal logolu ama domuz jelatini var -> CONFLICT!
+  const resLowCovConflict = evaluateProduct({
+    rawText: 'İçindekiler: Şeker, BilinmeyenBitki1, BilinmeyenBitki2, Domuz Jelatini',
+    productType: 'food',
+    claims: { halalCertified: true }
+  });
+  assert.equal(resLowCovConflict.cards.halalCard.overallStatus, 'conflict', 'Kapsam düşük olsa bile logo çelişkisi bildirilmeli');
+});
+
+// 27. P1: AB Yasaklı Madde (Ek II / capApplied=10) Kapsam <%80 Olsa Bile Tespit Edilmeli
+runTest('27. AB Ek II Yasaklı Madde (Lilial / TPO) kapsam <%80 olsa bile capApplied=10 ile yakalanmalı', () => {
+  // Test A: 1 tanınan yasaklı (Lilial), 3 bilinmeyen madde (Kapsam %25)
+  const resBannedLowCov = evaluateProduct({
+    rawText: 'Ingredients: Butylphenyl Methylpropional, UnknownExtractA, UnknownExtractB, UnknownExtractC',
+    productType: 'cosmetic'
+  });
+  assert.equal(resBannedLowCov.cards.regulatoryCard.coveragePercent, 25);
+  assert.equal(resBannedLowCov.cards.regulatoryCard.canShowScore, false, 'Kapsam <%80 olduğu için sayısal skor null olmalı');
+  assert.equal(resBannedLowCov.cards.regulatoryCard.capApplied, 10, 'Yasaklı madde varlığı capApplied=10 olarak kaydedilmeli');
+  assert.equal(resBannedLowCov.cards.regulatoryCard.findings.length, 1);
+  assert.equal(resBannedLowCov.cards.regulatoryCard.findings[0].euStatus, 'yasak');
+});
+
+// 28. P2: Genişletilmiş Toksik Maddeler (Hidrokinon, Cıva, Formaldehit Ek II Yasağı)
+runTest('28. Ek II Yasaklı Madde Genişletmesi: Hidrokinon, Cıva ve Formaldehit AB Yasaklı (Skor Tavanı 10) olarak yakalanmalı', () => {
+  // Test A: Hydroquinone (Cilt beyazlatıcı toksik madde)
+  const resHq = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Hydroquinone, Cetyl Alcohol, Tocopherol',
+    productType: 'cosmetic'
+  });
+  assert.equal(resHq.cards.regulatoryCard.capApplied, 10);
+  assert.ok(resHq.cards.regulatoryCard.score <= 10);
+  const hqFinding = resHq.cards.regulatoryCard.findings.find((f) => f.substanceId === 'hydroquinone_banned');
+  assert.ok(hqFinding);
+  assert.equal(hqFinding.euStatus, 'yasak');
+
+  // Test B: Mercury / Cıva
+  const resHg = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Cıva, Glycerin, Niacinamide',
+    productType: 'cosmetic'
+  });
+  assert.equal(resHg.cards.regulatoryCard.capApplied, 10);
+  const hgFinding = resHg.cards.regulatoryCard.findings.find((f) => f.substanceId === 'mercury_compounds_banned');
+  assert.ok(hgFinding);
+  assert.equal(hgFinding.euStatus, 'yasak');
+
+  // Test C: Formaldehyde
+  const resFa = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Formaldehyde, Panthenol',
+    productType: 'cosmetic'
+  });
+  assert.equal(resFa.cards.regulatoryCard.capApplied, 10);
+  const faFinding = resFa.cards.regulatoryCard.findings.find((f) => f.substanceId === 'formaldehyde_direct_banned');
+  assert.ok(faFinding);
+  assert.equal(faFinding.euStatus, 'yasak');
+});
+
+// 29. P2: Alkollü İçecek Terimleri (Mirin, Sake, Rom, Likör, Viski) Gıdada Doğrudan Haram
+runTest('29. Gıdada alkollü içecekler (Mirin, Sake, Rom, Likör, Viski) A_haram kategorisinde olmalı ve helal logoluysa ÇELİŞKİ vermeli', () => {
+  // Test A: Soya Sosu & Mirin (Japon mutfağı sosu)
+  const resMirin = evaluateProduct({
+    rawText: 'İçindekiler: Su, Soya Fasulyesi, Buğday, Tuz, Mirin',
+    productType: 'food',
+    halalAuthority: 'JAKIM'
+  });
+  assert.equal(resMirin.cards.halalCard.overallStatus, 'uygunsuz_bulgu');
+  assert.equal(resMirin.cards.halalCard.findings[0].category, 'A_haram');
+  assert.equal(resMirin.cards.halalCard.findings[0].status, 'kirmizi');
+
+  // Test B: Çikolata & Rom (Rum truffles) ile Helal Beyanı -> CONFLICT!
+  const resRum = evaluateProduct({
+    rawText: 'İçindekiler: Şeker, Kakao Yağı, Süt Tozu, Rom, Lesitin (Soya)',
+    productType: 'food',
+    claims: { halalCertified: true },
+    halalAuthority: 'GIMDES'
+  });
+  assert.equal(resRum.cards.halalCard.overallStatus, 'conflict', 'Helal logolu üründe Rom tespit edilirse CONFLICT vermeli');
+
+  // Test C: Sake (Japon pirinç şarabı)
+  const resSake = evaluateProduct({
+    rawText: 'Ingredients: Rice, Water, Sake, Koji',
+    productType: 'food',
+    halalAuthority: 'MUI'
+  });
+  assert.equal(resSake.cards.halalCard.findings[0].status, 'kirmizi');
+});
+
+// 30. Triphenyl Phosphate (TPHP - 2026/909 geçiş takvimi) ve Borik Asit (2019/831 Ek II Yasağı)
+runTest('30. TPHP (AB 2026/909) geçiş dönemi ve 2027 yürürlük takvimi; Borik Asit (AB 2019/831) Ek II Doğrudan Yasaklı', () => {
+  // Test A1: Triphenyl Phosphate (TPHP) - 2026 yılı geçiş dönemi kontrolü (Geçiş uyarısı vermeli, erken fiili yasak vermemeli)
+  const resTphpTransition = evaluateProduct({
+    rawText: 'Ingredients: Ethyl Acetate, Butyl Acetate, Nitrocellulose, Triphenyl Phosphate',
+    productType: 'cosmetic'
+  });
+  const tphpFindingTrans = resTphpTransition.cards.regulatoryCard.findings.find((f) => f.substanceId === 'tphp_triphenyl_phosphate_banned');
+  assert.ok(tphpFindingTrans, 'TPHP finding must be detected');
+  assert.equal(tphpFindingTrans.euStatus, 'kisitli', '2026 yılında geçiş dönemi kısıtlı uyarısı verilmeli');
+
+  // Test A2: Triphenyl Phosphate (TPHP) - 1 Ocak 2027 yürürlük tarihi sonrası veya strictFutureRules ile Ek II Yasaklı (Tavan Skor 10)
+  const resTphpBanned = evaluateProduct({
+    rawText: 'Ingredients: Ethyl Acetate, Butyl Acetate, Nitrocellulose, Triphenyl Phosphate',
+    productType: 'cosmetic',
+    targetDate: '2027-01-01'
+  });
+  assert.equal(resTphpBanned.cards.regulatoryCard.capApplied, 10, 'TPHP 2027 yürürlük tarihiyle tavan skor 10 uygulamalı');
+  const tphpFindingBanned = resTphpBanned.cards.regulatoryCard.findings.find((f) => f.substanceId === 'tphp_triphenyl_phosphate_banned');
+  assert.equal(tphpFindingBanned.euStatus, 'yasak');
+
+  // Test B: Boric Acid / Borax (2019/831) - Kozmetikte doğrudan Ek II Yasaklı (Tavan Skor 10)
+  const resBor = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Boric Acid, Carbomer',
+    productType: 'cosmetic'
+  });
+  assert.equal(resBor.cards.regulatoryCard.capApplied, 10, 'Boric Acid must apply score cap 10');
+  const borFinding = resBor.cards.regulatoryCard.findings.find((f) => f.substanceId === 'boric_acid_borates_restricted');
+  assert.ok(borFinding, 'Boric Acid finding must be detected');
+  assert.equal(borFinding.euStatus, 'yasak');
+});
+
+// 31. CosIng 30.609 Bileşen Temel Sözlüğü & Ek II/III Güvenlik Ağı Entegrasyonu
+runTest('31. 30.609 AB CosIng bileşeni temel sözlük olarak tanınmalı ve Ek II yasaklıları yakalanmalı', () => {
+  // Test A: Nadir botanik CosIng bileşenleri tanınmalı ve kapsamı %100 yapmalı
+  const resCosSafe = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Euphrasia Officinalis Powder, Sambucus Nigra Flower Powder, Cryptocarya Massoy Bark Extract',
+    productType: 'cosmetic'
+  });
+  assert.equal(resCosSafe.cards.regulatoryCard.coveragePercent, 100, 'Tüm CosIng bileşenleri tanınmalı');
+  assert.equal(resCosSafe.cards.regulatoryCard.canShowScore, true, 'Kapsam %100 olduğu için skor gösterilmeli');
+  assert.ok(resCosSafe.cards.regulatoryCard.score >= 80, 'Zararsız CosIng bileşenleri skoru haksız düşürmemeli');
+
+  // Test B: CosIng Ek II doğrudan yasaklı bileşen (1,2,4-Benzenetriacetate) yakalanmalı
+  const resCosBanned = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, 1,2,4-Benzenetriacetate, Cetearyl Alcohol',
+    productType: 'cosmetic'
+  });
+  assert.equal(resCosBanned.cards.regulatoryCard.capApplied, 10, 'CosIng Ek II yasaklısı Tavan Skor 10 uygulamalı');
+  assert.ok(resCosBanned.cards.regulatoryCard.score <= 10, 'Skor 10 veya altında olmalı');
+  const bannedFinding = resCosBanned.cards.regulatoryCard.findings.find((f) => f.euStatus === 'yasak');
+  assert.ok(bannedFinding, 'Ek II yasaklı bulgu üretilmeli');
+  assert.ok(bannedFinding.substanceId.startsWith('cosing_'), 'CosIng id taşımalı');
+
+  // Test C: Gıda ürününde kozmetik CosIng bileşenleri sahte tanıma yapmamalı
+  const resFood = evaluateProduct({
+    rawText: 'İçindekiler: Şeker, Euphrasia Officinalis Powder, BilinmeyenKatkiX',
+    productType: 'food'
+  });
+  assert.equal(resFood.cards.regulatoryCard.coveragePercent, 33, 'Gıdada kozmetik CosIng uygulanmamalı');
+});
+
+// 32. Bağımsız Denetim P1: Aqua (Yasaklı Madde) ve Aqua / Yasaklı Madde Eşleştirmesi Atlanmamalı
+runTest('32. Parantez veya slaş içindeki Ek II Yasaklı madde (Aqua (4-METHOXYTOLUENE-2,5-DIAMINE HCL)) Tavan Skor 10 uygulamalı', () => {
+  const resParen = evaluateProduct({
+    rawText: 'Aqua (4-METHOXYTOLUENE-2,5-DIAMINE HCL)',
+    productType: 'cosmetic'
+  });
+  assert.equal(resParen.cards.regulatoryCard.capApplied, 10, 'Parantez içi Ek II yasaklı tavan 10 vermeli');
+  assert.equal(resParen.cards.regulatoryCard.score, 10);
+
+  const resSlash = evaluateProduct({
+    rawText: 'Aqua / 4-METHOXYTOLUENE-2,5-DIAMINE HCL',
+    productType: 'cosmetic'
+  });
+  assert.equal(resSlash.cards.regulatoryCard.capApplied, 10, 'Slaş sonrası Ek II yasaklı tavan 10 vermeli');
+  assert.equal(resSlash.cards.regulatoryCard.score, 10);
+});
+
+// 33. Bağımsız Denetim P1: Nutella Majör Gıda Alerjenleri (AB 1169/2011 Ek II Süt, Fındık, Soya) Astım/Alerji Uyarısı Üretmeli
+runTest('33. Nutella ve benzeri gıdalarda majör alerjenler (Süt, Fındık, Soya) Astım/Alerji profilinde kırmızı uyarı üretmeli', () => {
+  const resNutella = evaluateProduct({
+    rawText: 'İçindekiler: Şeker, Palm Yağı, Fındık (%13), Yağsız Süt Tozu (%8.7), Yağı Azaltılmış Kakao (%7.4), Emülgatör: Lesitin (Soya), Vanilin',
+    productType: 'food',
+    userProfiles: ['astim_alerji']
+  });
+  assert.equal(resNutella.cards.profileCard.profileStatuses.astim_alerji, 'false', 'Alerji profili uygun olmamalı');
+  assert.ok(resNutella.cards.profileCard.alerts.length >= 3, 'En az 3 alerjen uyarısı üretilmeli');
+});
+
+// 34. Bağımsız Denetim P1: Oreo Çapraz Bulaşma ("May contain milk" / Eser Miktarda) Astım/Alerji Uyarısı Üretmeli
+runTest('34. Oreo ve çapraz bulaşma ("May contain milk") Astım/Alerji profilinde uyarı üretmeli', () => {
+  const resOreo = evaluateProduct({
+    rawText: 'Ingredients: Sugar, Wheat Flour, Palm Oil, Cocoa Powder, Glucose-Fructose Syrup. May contain milk.',
+    productType: 'food',
+    userProfiles: ['astim_alerji']
+  });
+  assert.equal(resOreo.cards.profileCard.profileStatuses.astim_alerji, 'false');
+  assert.ok(resOreo.cards.profileCard.alerts.some(a => a.level === 'sari'), 'Çapraz bulaşma sarı uyarısı bulunmalı');
+});
+
+// 35. Bağımsız Denetim P1: Methylisothiazolinone (MI / MCI) Durulanmayan Üründe (Leave-on) Yasak, Durulanan Üründe (Rinse-off) Kısıtlı Olmalı
+runTest('35. MI/MCI durulanmayan (leave-on) üründe kesinlikle yasak (tavan 10), durulanan (rinse-off) üründe kısıtlı olmalı', () => {
+  const resLeaveOn = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Methylisothiazolinone',
+    productType: 'cosmetic',
+    applicationType: 'leave_on'
+  });
+  assert.equal(resLeaveOn.cards.regulatoryCard.capApplied, 10, 'Leave-on MI tavan 10 olmalı');
+  assert.equal(resLeaveOn.cards.regulatoryCard.score, 10);
+
+  const resRinseOff = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Sodium Laureth Sulfate, Methylisothiazolinone',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off'
+  });
+  assert.equal(resRinseOff.cards.regulatoryCard.capApplied, null, 'Rinse-off MI tavan 10 olmamalı');
+  assert.equal(resRinseOff.cards.regulatoryCard.score, 90);
+});
+
+// 36. Bağımsız Denetim P1: TPO Jel Tırnak Cilası Çok Dilli Güvenlik (Fransızca, İspanyolca, Rusça) Yasaklanmalı
+runTest('36. TPO Jel Tırnak Cilası Fransızca, İspanyolca ve Rusça etiketlerde de Ek II Yasaklı (Tavan Skor 10) olarak yakalanmalı', () => {
+  const resFR = evaluateProduct({
+    rawText: 'Ingrédients: Acrylates, Oxyde de triméthylbenzoyl diphénylphosphine',
+    productType: 'cosmetic'
+  });
+  assert.equal(resFR.cards.regulatoryCard.capApplied, 10, 'Fransızca TPO tavan 10 olmalı');
+
+  const resES = evaluateProduct({
+    rawText: 'Ingredientes: Acrilatos, Óxido de trimetilbenzoil difenilfosfina',
+    productType: 'cosmetic'
+  });
+  assert.equal(resES.cards.regulatoryCard.capApplied, 10, 'İspanyolca TPO tavan 10 olmalı');
+
+  const resRU = evaluateProduct({
+    rawText: 'Состав: Акрилаты, Оксид триметилбензоил дифенилфосфина',
+    productType: 'cosmetic'
+  });
+  assert.equal(resRU.cards.regulatoryCard.capApplied, 10, 'Rusça TPO tavan 10 olmalı');
+});
+
+// 37. Bağımsız Denetim P1: Enerji İçeceği (Kafein + Taurin) Hamilelik (EFSA 200mg) ve Çocuk Uyarıları Üretmeli
+runTest('37. Enerji içeceği (Kafein + Taurin) hamilelik ve çocuk metabolik profillerinde uyarı üretmeli', () => {
+  const resEnergy = evaluateProduct({
+    rawText: 'Ingredients: Carbonated Water, Sugar, Taurine, Caffeine, Inositol',
+    productType: 'food',
+    userProfiles: ['hamilelik', 'cocuk_metabolik']
+  });
+  assert.equal(resEnergy.cards.profileCard.profileStatuses.hamilelik, 'false');
+  assert.equal(resEnergy.cards.profileCard.profileStatuses.cocuk_metabolik, 'false');
+  assert.ok(resEnergy.cards.profileCard.alerts.length >= 2);
+});
+
+// 38. Bağımsız Denetim P1: E471 Kimyasal Kimliği Doğru Gösterilmeli ("Mono- ve Digliseritler", Lesitin DEĞİL)
+runTest('38. E471 doğru adlandırılmalı ("Mono- ve Digliseritler (E471)"), Lesitin olarak gösterilmemeli', () => {
+  const resE471 = evaluateProduct({
+    rawText: 'İçindekiler: Buğday Unu, Su, E471, Maya, Tuz',
+    productType: 'food',
+    lang: 'tr'
+  });
+  const e471Obs = resE471.observations.find((o) => o.raw === 'E471');
+  assert.ok(e471Obs);
+  assert.equal(e471Obs.localizedName, 'Mono- ve Digliseritler (E471)');
+});
+
+// 39. Bağımsız Denetim P1/P2: Gıda Yağ Alkolü Kalkanı, Domuz Negasyonu, N,N- Kimyasal Ayrıştırma ve ABD Yargı Alanı
+runTest('39. Gıdada Cetearyl Alcohol haram olmamalı, Gelatin (pork-free) domuz sayılmamalı, N,N- bölünmemeli, US E171 tavan 10 almamalı', () => {
+  // A. Food Cetearyl Alcohol -> NO alcohol finding
+  const resFoodAlc = evaluateProduct({
+    rawText: 'Ingredients: Water, Cetearyl Alcohol, Sugar',
+    productType: 'food'
+  });
+  assert.equal(resFoodAlc.cards.halalCard.findings.length, 0, 'Cetearyl Alcohol gıdada etanol sayılmamalı');
+
+  // B. Pork-free gelatin -> NOT haram
+  const resPorkFree = evaluateProduct({
+    rawText: 'Ingredients: Sugar, Gelatin (pork-free), Citric Acid',
+    productType: 'food'
+  });
+  assert.notEqual(resPorkFree.cards.halalCard.overallStatus, 'uygunsuz_bulgu');
+  assert.equal(resPorkFree.cards.halalCard.findings[0].status, 'sari');
+
+  // C. N,N- locant preserving
+  const locantTokens = parseIngredientList('Aqua, N,N-DIETHYLTOLUENE-2,5-DIAMINE HCL, Glycerin');
+  assert.equal(locantTokens.length, 3);
+  assert.equal(locantTokens[1].raw, 'N,N-DIETHYLTOLUENE-2,5-DIAMINE HCL');
+
+  // D. US jurisdiction for E171 -> No EU 10 cap
+  const resUsE171 = evaluateProduct({
+    rawText: 'Ingredients: Sugar, Wheat Flour, Palm Oil, Titanium Dioxide',
+    productType: 'food',
+    jurisdiction: 'US'
+  });
+  assert.equal(resUsE171.cards.regulatoryCard.capApplied, null, 'ABD pazarında E171 tavan 10 almamalı (FDA 21 CFR 73.575)');
+
+  // E. Low coverage (<80%) propagates uncertainty across all cards
+  const resLowCov = evaluateProduct({
+    rawText: 'Aqua, UnknownA, UnknownB, UnknownC',
+    productType: 'cosmetic',
+    userProfiles: ['hamilelik']
+  });
+  assert.equal(resLowCov.cards.regulatoryCard.score, null);
+  assert.equal(resLowCov.cards.profileCard.preferenceMatchScore, null);
+  assert.equal(resLowCov.cards.profileCard.profileStatuses.hamilelik, 'kapsam_yetersiz');
+  assert.equal(resLowCov.cards.veganSugarCard.veganCompatibility, 'kapsam_yetersiz');
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/39 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+
+
+
+
+

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" role="img" aria-labelledby="scan-title">
+  <title id="scan-title">Etiket tarama</title>
+
+  <rect x="49" y="15" width="22" height="10" rx="4" fill="#0F5D4E"></rect>
+
+  <rect x="37" y="24" width="46" height="77" rx="12" fill="#F4F5F2" stroke="#0F5D4E" stroke-width="4"></rect>
+
+  <g fill="none" stroke="#0F5D4E" stroke-width="4" stroke-linecap="round">
+    <path d="M48 44h24M48 56h24M48 68h18M48 80h24"></path>
+  </g>
+
+  <g fill="none" stroke="#5CC9AE" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 47V34h12M90 34h12v13
+             M102 80v13H90M30 93H18V80"></path>
+    <path d="M26 63h68"></path>
+  </g>
+</svg>

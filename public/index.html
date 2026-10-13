@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InciFact — Göz Yormayan 5 Ekranlı Mobil Deneyim & Karşılaştırma Motoru</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" />
+  <style>
+    :root {
+      --bg: #F8F9FA;
+      --surface: #FFFFFF;
+      --surface2: #EEF2F6;
+      --ink: #0B132B;
+      --muted: #4A5568;
+      --line: #E2E8F0;
+      --accent: #0B132B;
+      --accent-gold: #D4AF37;
+      --on-accent: #FFFFFF;
+      --soft: #E9ECEF;
+      --ok: #1B6E3F;
+      --ok-bg: #E6F4EA;
+      --warn: #B45309;
+      --warn-bg: #FEF3C7;
+      --bad: #DC2626;
+      --bad-bg: #FEE2E2;
+      --info: #1E40AF;
+      --info-bg: #EFF6FF;
+    }
+    body.dark {
+      --bg: #070C18;
+      --surface: #0B132B;
+      --surface2: #131F3F;
+      --ink: #F1F5F9;
+      --muted: #94A3B8;
+      --line: #1F2E52;
+      --accent: #D4AF37;
+      --accent-gold: #F3E5AB;
+      --on-accent: #070C18;
+      --soft: #162447;
+      --ok: #10B981;
+      --ok-bg: #064E3B;
+      --warn: #F59E0B;
+      --warn-bg: #451A03;
+      --bad: #EF4444;
+      --bad-bg: #450A0A;
+      --info: #60A5FA;
+      --info-bg: #172554;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+      background: #E8ECF2;
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 40px;
+      transition: background 0.2s;
+    }
+    body.dark { background: #050811; }
+    button { font: inherit; cursor: pointer; }
+    .studio-bar {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 12px 18px;
+      border-radius: 20px;
+    }
+    .brand-mark { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 36px; height: 36px; border-radius: 11px;
+      background: var(--accent); color: var(--on-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 16px;
+    }
+    .screen-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .screen-pill {
+      height: 36px; padding: 0 14px; border-radius: 18px;
+      border: 1px solid var(--line); background: transparent;
+      color: var(--muted); font-size: 13.5px; font-weight: 700;
+    }
+    .screen-pill.active {
+      background: var(--accent); color: var(--on-accent); border-color: var(--accent);
+    }
+    .workspace {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 960px;
+      width: 100%;
+    }
+    /* 390x844 iPhone Frame */
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      color: var(--ink);
+      border-radius: 44px;
+      box-shadow: 0 20px 50px rgba(10, 24, 18, 0.16), 0 0 0 8px var(--surface2);
+      position: relative;
+      overflow: hidden;
+      flex: none;
+    }
+    .phone-scroll {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 84px;
+      overflow-y: auto;
+      padding: 48px 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .phone-nav {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 84px;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-around;
+      padding-top: 8px;
+    }
+    .nav-btn {
+      width: 68px; border: none; background: transparent;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-size: 11.5px; font-weight: 600; color: var(--muted);
+    }
+    .nav-btn.active { color: var(--accent); font-weight: 800; }
+    .nav-scan-fab {
+      width: 58px; height: 58px; margin-top: -22px;
+      border-radius: 29px; border: none;
+      background: var(--accent); color: var(--on-accent);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 18px rgba(15, 93, 78, 0.3);
+    }
+    .side-inspector {
+      flex: 1;
+      min-width: 310px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+    .preset-chip {
+      text-align: left; padding: 10px 12px; border-radius: 14px;
+      border: 1px solid var(--line); background: var(--bg);
+      color: var(--ink); font-size: 13px; font-weight: 600;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .preset-chip:hover { border-color: var(--accent); }
+    textarea.ocr-box {
+      width: 100%; min-height: 92px; border-radius: 14px;
+      border: 1.5px solid var(--line); background: var(--bg);
+      color: var(--ink); padding: 10px 12px; font: inherit; font-size: 13px;
+      line-height: 1.45; resize: vertical;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Studio Controls -->
+  <div class="studio-bar">
+    <div class="brand-mark">
+      <img src="./assets/incifact-app-icon.png" width="38" height="38" style="border-radius:10px; display:block; flex:none; box-shadow: 0 2px 8px rgba(11, 19, 43, 0.25);" alt="InciFact Logo" />
+      <div>
+        <div style="font-weight: 800; font-size: 17px; letter-spacing: -0.01em; display:flex; align-items:center; gap:8px;">
+          <span>InciFact</span>
+          <span style="font-size:10px; font-weight:800; color:#D4AF37; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.35); border-radius:6px; padding:1px 6px; letter-spacing:0.02em;">30K+ COSING</span>
+        </div>
+        <div id="brandTagline" style="font-size: 12px; color: var(--muted);">Kozmetik, Gıda & Helal İçerik Analizi · 10 Dil & Yan Yana Karşılaştırma</div>
+      </div>
+    </div>
+    <div class="screen-pills">
+      <button class="screen-pill" id="topTab-main" onclick="switchScreen('main')">1. Profil & Ayarlar</button>
+      <button class="screen-pill" id="topTab-scan" onclick="switchScreen('scan')">2. Tara (OCR)</button>
+      <button class="screen-pill active" id="topTab-result" onclick="switchScreen('result')">3. Sonuç</button>
+      <button class="screen-pill" id="topTab-halal" onclick="switchScreen('halal')">4. Helal</button>
+      <button class="screen-pill" id="topTab-compare" onclick="switchScreen('compare')">5. Karşılaştır</button>
+    </div>
+    <button class="screen-pill" onclick="toggleDark()" id="darkBtn">🌙 Koyu Tema</button>
+  </div>
+
+  <div class="workspace">
+    <!-- 390x844 Phone Frame -->
+    <div class="phone-frame" id="phoneFrame">
+      <div class="phone-scroll" id="screenContent"></div>
+
+      <!-- 5-Item Bottom Navigation -->
+      <nav class="phone-nav" aria-label="Ana menü">
+        <button class="nav-btn" id="nav-compare" onclick="switchScreen('compare')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 4v16M16 4v16M4 8h4M16 16h4"/></svg>
+          <span id="navLbl-compare">Karşılaştır</span>
+        </button>
+        <button class="nav-btn active" id="nav-result" onclick="switchScreen('result')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6"/></svg>
+          <span id="navLbl-result">Sonuç</span>
+        </button>
+        <button class="nav-scan-fab" id="nav-scan" onclick="switchScreen('scan')" aria-label="Tara">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5h3M17 5h3v3M20 16v3h-3M7 19H4v-3M8 12h8"/></svg>
+        </button>
+        <button class="nav-btn" id="nav-halal" onclick="switchScreen('halal')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+          <span id="navLbl-halal">Helal</span>
+        </button>
+        <button class="nav-btn" id="nav-main" onclick="switchScreen('main')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+          <span id="navLbl-main">Profil</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Right Control & Live Scenario Panel -->
+    <div class="side-inspector" id="sideInspector">
+      <img src="./assets/hero-shield-crest.jpg" style="width:100%; border-radius:14px; margin-bottom:14px; border:1px solid rgba(212,175,55,0.3); display:block; box-shadow: 0 4px 16px rgba(11, 19, 43, 0.2);" alt="InciFact 3D Shield Hero Crest" />
+      <div id="sideTitle" style="font-size: 16px; font-weight: 800;">Canlı Kural Motoru & 10 Dil Test Paneli</div>
+      <div id="sideDesc" style="font-size: 13px; color: var(--muted); line-height: 1.4;">
+        Sol taraftaki <b>InciFact</b> telefon ekranı <b>30.600+ AB CosIng resmi bileşen sözlüğüne</b> ve deterministik kural motoruna (<span class="mono">ruleEngine.mjs</span>) bağlıdır.
+      </div>
+
+      <div id="presetsHeader" style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase;">Hazır Gerçek Dünya Ürünleri & Senaryolar</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <button class="preset-chip" onclick="loadSample(0)">
+          <span id="presetLbl-0">🧴 Günlük Nemlendirici Krem (Referans 87 Puan)</span>
+          <span id="presetBadge-0" class="mono" dir="ltr" style="font-size:11px; color:var(--ok);">87/100</span>
+        </button>
+        <button class="preset-chip" onclick="loadSample(1)">
+          <span id="presetLbl-1">🍬 Meyveli Jöle Şekerleme (Jelatin & E120)</span>
+          <span id="presetBadge-1" class="mono" style="font-size:11px; color:var(--warn);">Müşbooh</span>
+        </button>
+        <button class="preset-chip" onclick="loadSample(2)">
+          <span id="presetLbl-2">🔍 OCR Belirsizliği: "Sodium Laur?l Sulfate"</span>
+          <span id="presetBadge-2" class="mono" dir="ltr" style="font-size:11px; color:var(--warn);">SLS / SLES</span>
+        </button>
+        <button class="preset-chip" onclick="loadSample(3)">
+          <span id="presetLbl-3">⚖️ Yan Yana Karşılaştır: Jel A (95) vs Jel B (58)</span>
+          <span id="presetBadge-3" class="mono" dir="ltr" style="font-size:11px; color:var(--accent);">A vs B</span>
+        </button>
+        <button class="preset-chip" onclick="loadSample(4)">
+          <span id="presetLbl-4">🐌 K-Beauty Salyangoz Özütü (COSRX Snail Mucin)</span>
+          <span id="presetBadge-4" class="mono" style="font-size:11px; color:var(--bad);">Helal</span>
+        </button>
+        <button class="preset-chip" onclick="loadSample(5)">
+          <span id="presetLbl-5">💅 Jel Oje (TPO — Eylül 2025 AB Yasağı!)</span>
+          <span id="presetBadge-5" class="mono" dir="ltr" style="font-size:11px; color:var(--bad);">10/100</span>
+        </button>
+        <button class="preset-chip" onclick="loadSample(6)">
+          <span id="presetLbl-6">🍫 Kakaolu Fındık Kreması (%13 Fındık & Şeker)</span>
+          <span id="presetBadge-6" class="mono" dir="ltr" style="font-size:11px; color:var(--ok);">100%</span>
+        </button>
+        <button class="preset-chip" onclick="loadSample(7)">
+          <span id="presetLbl-7">🇸🇦 Arapça Etiket (المكونات: ماء، جلسرين، نياسيناميد)</span>
+          <span id="presetBadge-7" class="mono" dir="ltr" style="font-size:11px; color:var(--ok);">AR RTL</span>
+        </button>
+      </div>
+
+      <div id="liveEditHeader" style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase;">Etiket İçeriğini Canlı Düzenle (10 Dil Destekli)</div>
+      <textarea class="ocr-box" id="liveInput" oninput="onInputChanged()">Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Niacinamide, Panthenol, Ceramide NP, Tocopherol, Citric Acid</textarea>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div>
+          <div id="prodTypeLbl" style="font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">ÜRÜN TÜRÜ</div>
+          <select id="prodType" onchange="refreshAll()" style="width:100%; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
+            <option value="cosmetic" id="optCosmetic">Kozmetik (INCI)</option>
+            <option value="food" id="optFood">Gıda (E-Kodu)</option>
+          </select>
+        </div>
+        <div>
+          <div id="halalAuthLbl" style="font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">HELAL KURUMU</div>
+          <select id="halalAuth" onchange="refreshAll()" style="width:100%; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
+            <option value="GIMDES" id="optAuth-GIMDES">GİMDES (Türkiye)</option>
+            <option value="MUI" id="optAuth-MUI">MUI (Indonesia)</option>
+            <option value="JAKIM" id="optAuth-JAKIM">JAKIM (Malaysia)</option>
+            <option value="IFANCA" id="optAuth-IFANCA">IFANCA (Global)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SAMPLES = [
+      {
+        title: 'Nemlendirici krem',
+        titles: {
+          tr: 'Nemlendirici krem', en: 'Daily Moisturizing Cream', ar: 'كريم مرطب يومي',
+          de: 'Feuchtigkeitscreme', fr: 'Crème hydratante', id: 'Krim Pelembap Harian',
+          ms: 'Krim Pelembap Harian', es: 'Crema hidratante diaria', ru: 'Увлажняющий крем', ur: 'ڈیلی موئسچرائزنگ کریم'
+        },
+        type: 'cosmetic',
+        text: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Niacinamide, Panthenol, Ceramide NP, Tocopherol, Citric Acid',
+        texts: {
+          tr: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Niacinamide, Panthenol, Ceramide NP, Tocopherol, Citric Acid',
+          en: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Niacinamide, Panthenol, Ceramide NP, Tocopherol, Citric Acid',
+          ar: 'المكونات: ماء، جلسرين، كحول سيتيريلي، كحول سيتيلي، نياسيناميد، بانثينول، سيراميد NP، توكوفيرول، حمض الستريك',
+          de: 'Inhaltsstoffe: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Niacinamid, Panthenol, Ceramid NP, Tocopherol, Citronensäure',
+          fr: 'Ingrédients : Aqua, Glycérine, Alcool cétéarylique, Alcool cétylique, Niacinamide, Panthénol, Céramide NP, Tocophérol, Acide citrique',
+          id: 'Komposisi: Air, Gliserin, Setearil Alkohol, Setil Alkohol, Niasinamida, Pantenol, Seramida NP, Tokoferol, Asam Sitrat',
+          ms: 'Ramuan: Air, Gliserin, Setearil Alkohol, Setil Alkohol, Niasinamida, Pantenol, Seramida NP, Tokoferol, Asid Sitrik',
+          es: 'Ingredientes: Aqua, Glicerina, Alcohol cetearílico, Alcohol cetílico, Niacinamida, Pantenol, Ceramida NP, Tocoferol, Ácido cítrico',
+          ru: 'Состав: Вода, Глицерин, Цетеариловый спирт, Цетиловый спирт, Ниацинамид, Пантенол, Керамид NP, Токоферол, Лимонная кислота',
+          ur: 'اجزاء: پانی، گلیسرین، سیٹیرائل الکوحل، سیٹائل الکوحل، نیاسینامائیڈ، پینتھینول، سیرامائیڈ NP، ٹوکوفیرول، سائٹرک ایسڈ'
+        },
+        screen: 'result'
+      },
+      {
+        title: 'Meyveli jöle şekerleme',
+        titles: {
+          tr: 'Meyveli jöle şekerleme', en: 'Fruit Gummy Candy', ar: 'حلوى جيلي الفواكه',
+          de: 'Fruchtgummi', fr: 'Bonbons gélifiés aux fruits', id: 'Permen Jeli Buah',
+          ms: 'Gula-gula Jeli Buah', es: 'Gominolas de frutas', ru: 'Жевательный мармелад', ur: 'فروٹ جیلی کینڈی'
+        },
+        type: 'food',
+        text: 'İçindekiler: Su, Şeker, Sitrik Asit, Gelatin, Carmine (E120), Lecithin (E322)',
+        texts: {
+          tr: 'İçindekiler: Su, Şeker, Sitrik Asit, Gelatin, Carmine (E120), Lecithin (E322)',
+          en: 'Ingredients: Water, Sugar, Citric Acid, Gelatin, Carmine (E120), Lecithin (E322)',
+          ar: 'المكونات: ماء، سكر، حمض الستريك، جيلاتين، كارمين (E120)، ليسيثين (E322)',
+          de: 'Zutaten: Wasser, Zucker, Citronensäure, Gelatine, Karmin (E120), Lecithin (E322)',
+          fr: 'Ingrédients : Eau, Sucre, Acide citrique, Gélatine, Carmin (E120), Lécithine (E322)',
+          id: 'Komposisi: Air, Gula, Asam Sitrat, Gelatin, Karmin (E120), Lesitin (E322)',
+          ms: 'Ramuan: Air, Gula, Asid Sitrik, Gelatin, Karmin (E120), Lesitin (E322)',
+          es: 'Ingredientes: Agua, Azúcar, Ácido cítrico, Gelatina, Carmín (E120), Lecitina (E322)',
+          ru: 'Состав: Вода, Сахар, Лимонная кислота, Желатин, Кармин (E120), Лецитин (E322)',
+          ur: 'اجزاء: پانی، چینی، سائٹرک ایسڈ، جیلیٹن، کارمائن (E120)، لیسیتھین (E322)'
+        },
+        screen: 'halal'
+      },
+      {
+        title: 'Yüz temizleme köpüğü',
+        titles: {
+          tr: 'Yüz temizleme köpüğü', en: 'Facial Cleansing Foam', ar: 'رغوة تنظيف الوجه',
+          de: 'Gesichtsreinigungsschaum', fr: 'Mousse nettoyante visage', id: 'Busa Pembersih Wajah',
+          ms: 'Buih Pembersih Wajah', es: 'Espuma limpiadora facial', ru: 'Пенка для умывания', ur: 'فیشل کلینزنگ فوم'
+        },
+        type: 'cosmetic',
+        text: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Sodium Laur?l Sulfate, Niacinamide, Panthenol, Citric Acid',
+        texts: {
+          tr: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Sodium Laur?l Sulfate, Niacinamide, Panthenol, Citric Acid',
+          en: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Sodium Laur?l Sulfate, Niacinamide, Panthenol, Citric Acid',
+          ar: 'المكونات: ماء، جلسرين، كحول سيتيريلي، Sodium Laur?l Sulfate، نياسيناميد، بانثينول، حمض الستريك',
+          de: 'Inhaltsstoffe: Aqua, Glycerin, Cetearyl Alcohol, Sodium Laur?l Sulfate, Niacinamid, Panthenol, Citronensäure',
+          fr: 'Ingrédients : Aqua, Glycérine, Alcool cétéarylique, Sodium Laur?l Sulfate, Niacinamide, Panthénol, Acide citrique',
+          id: 'Komposisi: Air, Gliserin, Setearil Alkohol, Sodium Laur?l Sulfate, Niasinamida, Pantenol, Asam Sitrat',
+          ms: 'Ramuan: Air, Gliserin, Setearil Alkohol, Sodium Laur?l Sulfate, Niasinamida, Pantenol, Asid Sitrik',
+          es: 'Ingredientes: Aqua, Glicerina, Alcohol cetearílico, Sodium Laur?l Sulfate, Niacinamida, Pantenol, Ácido cítrico',
+          ru: 'Состав: Вода, Глицерин, Цетеариловый спирт, Sodium Laur?l Sulfate, Ниацинамид, Пантенол, Лимонная кислота',
+          ur: 'اجزاء: پانی، گلیسرین، سیٹیرائل الکوحل، Sodium Laur?l Sulfate، نیاسینامائیڈ، پینتھینول، سائٹرک ایسڈ'
+        },
+        screen: 'scan'
+      },
+      {
+        title: 'Temizleme jeli (A vs B)',
+        titles: {
+          tr: 'Temizleme Jeli (A vs B)', en: 'Cleansing Gel (A vs B)', ar: 'مقارنة جل منظف (أ مقابل ب)',
+          de: 'Reinigungsgel (A vs. B)', fr: 'Gel nettoyant (A vs B)', id: 'Gel Pembersih (A vs B)',
+          ms: 'Gel Pembersih (A vs B)', es: 'Gel limpiador (A vs B)', ru: 'Очищающий гель (A vs B)', ur: 'کلینزنگ جیل (الف بمقابلہ ب)'
+        },
+        type: 'cosmetic',
+        text: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Panthenol, Niacinamide, Sodium Hyaluronate, Ceramide NP, Tocopherol, Citric Acid, Limonene',
+        texts: {
+          tr: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Panthenol, Niacinamide, Sodium Hyaluronate, Ceramide NP, Tocopherol, Citric Acid, Limonene',
+          en: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Panthenol, Niacinamide, Sodium Hyaluronate, Ceramide NP, Tocopherol, Citric Acid, Limonene',
+          ar: 'المكونات: ماء، جلسرين، كحول سيتيريلي، بانثينول، نياسيناميد، هيالورونات الصوديوم، سيراميد NP، توكوفيرول، حمض الستريك',
+          de: 'Inhaltsstoffe: Aqua, Glycerin, Cetearyl Alcohol, Panthenol, Niacinamid, Natriumhyaluronat, Ceramid NP, Tocopherol, Citronensäure',
+          fr: 'Ingrédients : Aqua, Glycérine, Alcool cétéarylique, Panthénol, Niacinamide, Hyaluronate de sodium, Céramide NP, Tocophérol, Acide citrique',
+          id: 'Komposisi: Air, Gliserin, Setearil Alkohol, Pantenol, Niasinamida, Natrium Hialuronat, Seramida NP, Tokoferol, Asam Sitrat',
+          ms: 'Ramuan: Air, Gliserin, Setearil Alkohol, Pantenol, Niasinamida, Natrium Hialuronat, Seramida NP, Tokoferol, Asid Sitrik',
+          es: 'Ingredientes: Aqua, Glicerina, Alcohol cetearílico, Pantenol, Niacinamida, Hialuronato de sodio, Ceramida NP, Tocoferol, Ácido cítrico',
+          ru: 'Состав: Вода, Глицерин, Цетеариловый спирт, Пантенол, Ниацинамид, Гиалуронат натрия, Керамид NP, Токоферол, Лимонная кислота',
+          ur: 'اجزاء: پانی، گلیسرین، سیٹیرائل الکوحل، پینتھینول، نیاسینامائیڈ، سوڈیم ہائیلورونیٹ، سیرامائیڈ NP، ٹوکوفیرول، سائٹرک ایسڈ'
+        },
+        screen: 'compare'
+      },
+      {
+        title: 'COSRX Snail Mucin Essence',
+        titles: {
+          tr: 'COSRX Salyangoz Özütü', en: 'COSRX Snail Mucin Essence', ar: 'خلاصة حلزون كوسركس (COSRX)',
+          de: 'COSRX Schneckenschleim-Essenz', fr: 'Essence Mucine d\'Escargot COSRX', id: 'COSRX Snail Mucin Essence',
+          ms: 'COSRX Snail Mucin Essence', es: 'Esencia de Baba de Caracol COSRX', ru: 'Эссенция с муцином улитки COSRX', ur: 'کوسركس سنیل میوسن ایسنس'
+        },
+        type: 'cosmetic',
+        text: 'Ingredients: Snail Secretion Filtrate, Betaine, Butylene Glycol, 1,2-Hexanediol, Sodium Hyaluronate, Panthenol, Allantoin, Arginine, Aqua',
+        texts: {
+          tr: 'Ingredients: Snail Secretion Filtrate, Betaine, Butylene Glycol, 1,2-Hexanediol, Sodium Hyaluronate, Panthenol, Allantoin, Arginine, Aqua',
+          en: 'Ingredients: Snail Secretion Filtrate, Betaine, Butylene Glycol, 1,2-Hexanediol, Sodium Hyaluronate, Panthenol, Allantoin, Arginine, Aqua',
+          ar: 'المكونات: رشاحة إفراز الحلزون (Snail Secretion Filtrate)، بيتين، بوتيلين جليكول، 1،2-هيكسانديول، هيالورونات الصوديوم، بانثينول، ألانتوين، أرجينين، ماء',
+          de: 'Inhaltsstoffe: Snail Secretion Filtrate, Betain, Butylenglykol, 1,2-Hexandiol, Natriumhyaluronat, Panthenol, Allantoin, Arginin, Aqua',
+          fr: 'Ingrédients : Filtrate de sécrétion d\'escargot, Bétaïne, Butylène glycol, 1,2-Hexanediol, Hyaluronate de sodium, Panthénol, Allantoïne, Arginine, Aqua',
+          id: 'Komposisi: Snail Secretion Filtrate, Betaina, Butilena Glikol, 1,2-Heksanadiol, Natrium Hialuronat, Pantenol, Alantoin, Arginina, Air',
+          ms: 'Ramuan: Snail Secretion Filtrate, Betaina, Butilena Glikol, 1,2-Heksanadiol, Natrium Hialuronat, Pantenol, Alantoin, Arginina, Air',
+          es: 'Ingredientes: Filtrado de secreción de caracol, Betaína, Butilenglicol, 1,2-Hexanodiol, Hialuronato de sodio, Pantenol, Alantoína, Arginina, Aqua',
+          ru: 'Состав: Фильтрат секрета улитки, Бетаин, Бутиленгликоль, 1,2-Гександиол, Гиалуронат натрия, Пантенол, Аллантоин, Аргинин, Вода',
+          ur: 'اجزاء: سنیل رطوبت فلٹریٹ، بیٹین، بیوٹائلین گلائکول، 1،2-ہیکسانڈیول، سوڈیم ہائیلورونیٹ، پینتھینول، الانٹوئن، ارجینین، پانی'
+        },
+        screen: 'halal'
+      },
+      {
+        title: 'UV Jel Oje (TPO 2025 Yasağı)',
+        titles: {
+          tr: 'UV Jel Oje (TPO 2025 Yasağı)', en: 'UV Gel Nail Polish (TPO Ban)', ar: 'طلاء أظافر جل UV (حظر TPO)',
+          de: 'UV-Gellack (TPO-Verbot 2025)', fr: 'Vernis Gel UV (Interdiction TPO)', id: 'Kuteks Gel UV (Larangan TPO)',
+          ms: 'Pengilat Kuku Gel UV (TPO)', es: 'Esmalte Gel UV (Prohibición TPO)', ru: 'УФ гель-лак (Запрет TPO)', ur: 'یو وی جیل نیل پالش (TPO پابندی)'
+        },
+        type: 'cosmetic',
+        text: 'Ingredients: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butyl Acetate, Ethyl Acetate, Nitrocellulose',
+        texts: {
+          tr: 'Ingredients: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butyl Acetate, Ethyl Acetate, Nitrocellulose',
+          en: 'Ingredients: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butyl Acetate, Ethyl Acetate, Nitrocellulose',
+          ar: 'المكونات: بوليمر أكريليت مشترك، HEMA، أكسيد ثلاثي ميثيل بنزويل ثنائي فينيل فوسفين (TPO)، أسيتات البوتيل، أسيتات الإيثيل',
+          de: 'Inhaltsstoffe: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butylacetat, Ethylacetat',
+          fr: 'Ingrédients : Acrylates Copolymer, HEMA, Oxyde de triméthylbenzoyl diphénylphosphine, Acétate de butyle, Acétate d\'éthyle',
+          id: 'Komposisi: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butil Asetat, Etil Asetat',
+          ms: 'Ramuan: Acrylates Copolymer, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Butil Asetat, Etil Asetat',
+          es: 'Ingredientes: Acrylates Copolymer, HEMA, Óxido de trimetilbenzoil difenilfosfina, Acetato de butilo, Acetato de etilo',
+          ru: 'Состав: Акрилатный сополимер, HEMA, Оксид триметилбензоил дифенилфосфина, Бутилацетат, Этилацетат',
+          ur: 'اجزاء: ایکریلیٹس کوپولیمر، HEMA، ٹرائی میتھائل بینزوئیل ڈائی فینائل فاسفین آکسائیڈ، بیوٹائل ایسٹیٹ، ایتھائل ایسٹیٹ'
+        },
+        screen: 'result'
+      },
+      {
+        title: 'Kakaolu Fındık Kreması',
+        titles: {
+          tr: 'Kakaolu Fındık Kreması', en: 'Cocoa Hazelnut Spread', ar: 'كريمة البندق والكاكاو',
+          de: 'Nuss-Nougat-Creme', fr: 'Pâte à tartiner noisettes-cacao', id: 'Selai Cokelat Hazelnut',
+          ms: 'Sapuan Coklat Hazelnut', es: 'Crema de cacao y avellanas', ru: 'Шоколадно-ореховая паста', ur: 'کوکو ہیزلنٹ اسپریڈ'
+        },
+        type: 'food',
+        text: 'İçindekiler: Şeker, Palm Yağı, Fındık (%13), Yağsız Süt Tozu (%8.7), Yağı Azaltılmış Kakao (%7.4), Emülgatör: Lesitin (Soya), Vanilin',
+        texts: {
+          tr: 'İçindekiler: Şeker, Palm Yağı, Fındık (%13), Yağsız Süt Tozu (%8.7), Yağı Azaltılmış Kakao (%7.4), Emülgatör: Lesitin (Soya), Vanilin',
+          en: 'Ingredients: Sugar, Palm Oil, Hazelnuts (13%), Skimmed Milk Powder (8.7%), Fat-Reduced Cocoa (7.4%), Emulsifier: Lecithins (Soya), Vanillin',
+          ar: 'المكونات: سكر، زيت النخيل، بندق (١٣٪)، حليب مجفف منزوع الدسم (٨.٧٪)، مسحوق كاكاو قليل الدسم (٧.٤٪)، مستحلب: ليسيثين (صويا)، فانيلين',
+          de: 'Zutaten: Zucker, Palmöl, Haselnüsse (13%), Magermilchpulver (8,7%), fettarmer Kakao (7,4%), Emulgator: Lecithine (Soja), Vanillin',
+          fr: 'Ingrédients : Sucre, Huile de palme, Noisettes (13%), Lait écrémé en poudre (8,7%), Cacao maigre (7,4%), Émulsifiant : Lécithines (soja), Vanilline',
+          id: 'Komposisi: Gula, Minyak Kelapa Sawit, Kacang Hazel (13%), Susu Skim Bubuk (8.7%), Kakao Rendah Lemak (7.4%), Pengemulsi: Lesitin (Kedelai), Vanilin',
+          ms: 'Ramuan: Gula, Minyak Sawit, Kacang Hazel (13%), Susu Tepung Skim (8.7%), Serbuk Koko Kurang Lemak (7.4%), Pengemulsi: Lesitin (Soya), Vanilin',
+          es: 'Ingredientes: Azúcar, Aceite de palma, Avellanas (13%), Leche desnatada en polvo (8,7%), Cacao desgrasado (7,4%), Emulgente: Lecitinas (soja), Vainillina',
+          ru: 'Состав: Сахар, Пальмовое масло, Фундук (13%), Сухое обезжиренное молоко (8,7%), Обезжиренный какао-порошок (7,4%), Эмульгатор: Лецитин (соевый), Ванилин',
+          ur: 'اجزاء: چینی، پام آئل، ہیزل نٹ (13%)، سکمڈ دودھ کا پاؤڈر (8.7%)، کم چکنائی والا کوکو پاؤڈر (7.4%)، ایملسیفائر: لیسیتھین (سویا)، ونیلن'
+        },
+        screen: 'result'
+      },
+      {
+        title: 'كريم مرطب للوجه (AR)',
+        titles: {
+          tr: 'Yüz Nemlendirici Krem (AR)', en: 'Facial Moisturizer (AR)', ar: 'كريم مرطب للوجه',
+          de: 'Gesichtscreme (AR)', fr: 'Crème visage (AR)', id: 'Krim Pelembap Wajah (AR)',
+          ms: 'Krim Pelembap Wajah (AR)', es: 'Crema hidratante facial (AR)', ru: 'Крем для лица (AR)', ur: 'چہرے کی موئسچرائزنگ کریم'
+        },
+        type: 'cosmetic',
+        text: 'المكونات: ماء، جلسرين، كحول سيتيريلي، كحول سيتيلي، نياسيناميد، بانثينول، حمض الهيالورونيك، فينوكسي إيثانول، توكوفيرول',
+        texts: {
+          tr: 'İçindekiler: Aqua, Gliserin, Setearil Alkol, Setil Alkol, Niasinamid, Pantenol, Sodyum Hyaluronat, Fenoksietanol, Tokoferol',
+          en: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Niacinamide, Panthenol, Sodium Hyaluronate, Phenoxyethanol, Tocopherol',
+          ar: 'المكونات: ماء، جلسرين، كحول سيتيريلي، كحول سيتيلي، نياسيناميد، بانثينول، حمض الهيالورونيك، فينوكسي إيثانول، توكوفيرول',
+          de: 'Inhaltsstoffe: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Niacinamid, Panthenol, Natriumhyaluronat, Phenoxyethanol, Tocopherol',
+          fr: 'Ingrédients : Aqua, Glycérine, Alcool cétéarylique, Alcool cétylique, Niacinamide, Panthénol, Hyaluronate de sodium, Phénoxyéthanol, Tocophérol',
+          id: 'Komposisi: Air, Gliserin, Setearil Alkohol, Setil Alkohol, Niasinamida, Pantenol, Natrium Hialuronat, Fenoksietanol, Tokoferol',
+          ms: 'Ramuan: Air, Gliserin, Setearil Alkohol, Setil Alkohol, Niasinamida, Pantenol, Natrium Hialuronat, Fenoksietanol, Tokoferol',
+          es: 'Ingredientes: Aqua, Glicerina, Alcohol cetearílico, Alcohol cetílico, Niacinamida, Pantenol, Hialuronato de sodio, Fenoxietanol, Tocoferol',
+          ru: 'Состав: Вода, Глицерин, Цетеариловый спирт, Цетиловый спирт, Ниацинамид, Пантенол, Гиалуронат натрия, Феноксиэтанол, Токоферол',
+          ur: 'اجزاء: پانی، گلیسرین، سیٹیرائل الکوحل، سیٹائل الکوحل، نیاسینامائیڈ، پینتھینول، سوڈیم ہائیلورونیٹ، فینوکسی ایتھانول، ٹوکوفیرول'
+        },
+        screen: 'result'
+      }
+    ];
+
+    const COMPARE_NAMES = {
+      tr: ['Temizleme jeli A', 'Temizleme jeli B'],
+      en: ['Cleansing Gel A', 'Cleansing Gel B'],
+      ar: ['جل منظف (أ)', 'جل منظف (ب)'],
+      de: ['Reinigungsgel A', 'Reinigungsgel B'],
+      fr: ['Gel nettoyant A', 'Gel nettoyant B'],
+      id: ['Gel Pembersih A', 'Gel Pembersih B'],
+      ms: ['Gel Pembersih A', 'Gel Pembersih B'],
+      es: ['Gel limpiador A', 'Gel limpiador B'],
+      ru: ['Очищающий гель A', 'Очищающий гель B'],
+      ur: ['کلینزنگ جیل (الف)', 'کلینزنگ جیل (ب)']
+    };
+
+    const COMPARE_PAIR = {
+      productA: {
+        name: 'Temizleme jeli A',
+        productType: 'cosmetic',
+        rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Panthenol, Niacinamide, Sodium Hyaluronate, Ceramide NP, Tocopherol, Citric Acid, Limonene'
+      },
+      productB: {
+        name: 'Temizleme jeli B',
+        productType: 'cosmetic',
+        rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Sodium Lauryl Sulfate, Propylparaben, Methylisothiazolinone, Parfum, Linalool, Limonene, Citric Acid'
+      }
+    };
+
+    const MARKET_STRUCTURES = {
+      tr: { flag: '🇹🇷', name: 'Türkiye · Türkçe', auth: 'GIMDES', jurisdiction: 'TR', regLabel: 'TİTCK / TGK & AB 1223/2009' },
+      en: { flag: '🇬🇧', name: 'Global / UK / US · English', auth: 'IFANCA', jurisdiction: 'EU', regLabel: 'EU EC 1223/2009 & EFSA' },
+      ar: { flag: '🇸🇦', name: 'الخليج والشرق الأوسط · العربية', auth: 'IFANCA', jurisdiction: 'EU', regLabel: 'SFDA / GSO & EU 1223/2009' },
+      de: { flag: '🇩🇪', name: 'DACH (DE/AT/CH) · Deutsch', auth: 'IFANCA', jurisdiction: 'EU', regLabel: 'EU-VO 1223/2009 & EFSA' },
+      fr: { flag: '🇫🇷', name: 'France / Europe · Français', auth: 'IFANCA', jurisdiction: 'EU', regLabel: 'Règlement UE 1223/2009' },
+      id: { flag: '🇮🇩', name: 'Indonesia · Bahasa Indonesia', auth: 'MUI', jurisdiction: 'EU', regLabel: 'BPJPH / MUI & BPOM / EU' },
+      ms: { flag: '🇲🇾', name: 'Malaysia · Bahasa Melayu', auth: 'JAKIM', jurisdiction: 'EU', regLabel: 'JAKIM & NPRA / EU' },
+      es: { flag: '🇪🇸', name: 'España / LATAM · Español', auth: 'IFANCA', jurisdiction: 'EU', regLabel: 'Reglamento UE 1223/2009' },
+      ru: { flag: '🇰🇿', name: 'СНГ / Казахстан · Русский', auth: 'IFANCA', jurisdiction: 'EU', regLabel: 'ТР ТС & Регламент ЕС' },
+      ur: { flag: '🇵🇰', name: 'پاکستان · اردو', auth: 'IFANCA', jurisdiction: 'EU', regLabel: 'PSQCA & EU 1223/2009' }
+    };
+
+    function detectDeviceLang() {
+      try {
+        const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
+        if (tz.includes('istanbul')) return 'tr';
+        if (tz.includes('jakarta') || tz.includes('makassar') || tz.includes('jayapura')) return 'id';
+        if (tz.includes('kuala_lumpur') || tz.includes('kuching')) return 'ms';
+        if (tz.includes('karachi')) return 'ur';
+        if (tz.includes('riyadh') || tz.includes('dubai') || tz.includes('cairo') || tz.includes('kuwait') || tz.includes('doha')) return 'ar';
+        const nav = ((navigator.languages && navigator.languages[0]) || navigator.language || 'tr').toLowerCase();
+        const code = nav.split(/[-_]/)[0];
+        if (MARKET_STRUCTURES[code]) return code;
+      } catch (_) {}
+      return 'tr';
+    }
+
+    const initialDeviceLang = detectDeviceLang();
+    const initialStruct = MARKET_STRUCTURES[initialDeviceLang] || MARKET_STRUCTURES.tr;
+
+    let state = {
+      screen: 'result',
+      lang: initialDeviceLang,
+      autoDetected: true,
+      jurisdiction: initialStruct.jurisdiction,
+      settingsExpanded: false,
+      dark: false,
+      activeSampleIdx: 0,
+      productTitle: 'Nemlendirici krem',
+      showAllIngredients: false,
+      profiles: {
+        hamilelik: false,
+        akne: true,
+        hassas_cilt: true,
+        cocuk_metabolik: false,
+        astim_alerji: false,
+        vegan: false,
+        halal: true
+      },
+      claims: { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'none' },
+      userConfirmations: {},
+      evalData: null,
+      compareData: null,
+      copiedToast: false,
+      lastCopiedMsg: null
+    };
+
+    function getSampleTitle(idx, lang) {
+      const s = SAMPLES[idx] || SAMPLES[0];
+      return (s.titles && s.titles[lang]) || s.title;
+    }
+
+    function getSampleText(idx, lang) {
+      const s = SAMPLES[idx] || SAMPLES[0];
+      if (s.texts && s.texts[lang]) return s.texts[lang];
+      return s.text;
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    window.handleResolveClick = function(btn) {
+      const token = btn.getAttribute('data-token');
+      const opt = btn.getAttribute('data-opt');
+      if (token && opt) {
+        resolveAmbiguity(token, opt);
+      }
+    };
+
+    function formatDigits(val, lang) {
+      if (val === null || val === undefined) return '';
+      const s = String(val);
+      if (lang === 'ar') {
+        return s.replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]).replace(/%/g, '٪');
+      }
+      if (lang === 'ur') {
+        return s.replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]).replace(/%/g, '٪');
+      }
+      return s;
+    }
+
+    const PRESET_BADGES_I18N = {
+      tr: ['87/100', 'Müşbooh', 'SLS / SLES', 'A vs B', 'Helal', '10/100', '%100', 'Arapça RTL'],
+      en: ['87/100', 'Mushbooh', 'SLS Check', 'A vs B', 'Halal', '10/100', '100%', 'Arabic (RTL)'],
+      ar: ['٨٧/١٠٠', 'مشبوه', 'فحص SLS', 'أ مقابل ب', 'حلال', '١٠/١٠٠', '٪١٠٠', 'عربي RTL'],
+      de: ['87/100', 'Zweifelhaft', 'SLS-Prüfung', 'A vs. B', 'Halal', '10/100', '100%', 'Arabisch (RTL)'],
+      fr: ['87/100', 'Douteux', 'Test SLS', 'A vs B', 'Halal', '10/100', '100%', 'Arabe (RTL)'],
+      id: ['87/100', 'Syubhat', 'Uji SLS', 'A vs B', 'Halal', '10/100', '100%', 'Arab (RTL)'],
+      ms: ['87/100', 'Syubhah', 'Ujian SLS', 'A vs B', 'Halal', '10/100', '100%', 'Arab (RTL)'],
+      es: ['87/100', 'Dudoso', 'Test SLS', 'A vs B', 'Halal', '10/100', '100%', 'Árabe (RTL)'],
+      ru: ['87/100', 'Мушбух', 'Проверка SLS', 'A против B', 'Халяль', '10/100', '100%', 'Арабский (RTL)'],
+      ur: ['۸۷/۱۰۰', 'مشتبہ', 'SLS چیک', 'الف بمقابلہ ب', 'حلال', '۱۰/۱۰۰', '٪۱۰۰', 'عربی RTL']
+    };
+
+    const PROD_TYPE_I18N = {
+      tr: { cosmetic: 'Kozmetik (INCI)', food: 'Gıda (E-Kodu)' },
+      en: { cosmetic: 'Cosmetics (INCI)', food: 'Food (E-Codes)' },
+      ar: { cosmetic: 'مستحضرات تجميل (INCI)', food: 'أغذية (رموز E)' },
+      de: { cosmetic: 'Kosmetik (INCI)', food: 'Lebensmittel (E-Code)' },
+      fr: { cosmetic: 'Cosmétiques (INCI)', food: 'Alimentaire (Codes E)' },
+      id: { cosmetic: 'Kosmetik (INCI)', food: 'Makanan (Kode E)' },
+      ms: { cosmetic: 'Kosmetik (INCI)', food: 'Makanan (Kod E)' },
+      es: { cosmetic: 'Cosméticos (INCI)', food: 'Alimentos (Códigos E)' },
+      ru: { cosmetic: 'Косметика (INCI)', food: 'Продукты питания (E-коды)' },
+      ur: { cosmetic: 'کاسمیٹکس (INCI)', food: 'خوراک (ای کوڈز)' }
+    };
+
+    const AUTH_OPTIONS_I18N = {
+      tr: { GIMDES: 'GİMDES (Türkiye)', MUI: 'MUI (Endonezya)', JAKIM: 'JAKIM (Malezya)', IFANCA: 'IFANCA (Küresel)' },
+      en: { GIMDES: 'GIMDES (Turkey)', MUI: 'MUI (Indonesia)', JAKIM: 'JAKIM (Malaysia)', IFANCA: 'IFANCA (Global)' },
+      ar: { GIMDES: 'GİMDES (تركيا)', MUI: 'MUI (إندونيسيا)', JAKIM: 'JAKIM (ماليزيا)', IFANCA: 'IFANCA (عالمي)' },
+      de: { GIMDES: 'GİMDES (Türkei)', MUI: 'MUI (Indonesien)', JAKIM: 'JAKIM (Malaysia)', IFANCA: 'IFANCA (Global)' },
+      fr: { GIMDES: 'GİMDES (Turquie)', MUI: 'MUI (Indonésie)', JAKIM: 'JAKIM (Malaisie)', IFANCA: 'IFANCA (Mondial)' },
+      id: { GIMDES: 'GİMDES (Turki)', MUI: 'MUI (Indonesia)', JAKIM: 'JAKIM (Malaysia)', IFANCA: 'IFANCA (Global)' },
+      ms: { GIMDES: 'GİMDES (Turki)', MUI: 'MUI (Indonesia)', JAKIM: 'JAKIM (Malaysia)', IFANCA: 'IFANCA (Global)' },
+      es: { GIMDES: 'GİMDES (Turquía)', MUI: 'MUI (Indonesia)', JAKIM: 'JAKIM (Malasia)', IFANCA: 'IFANCA (Global)' },
+      ru: { GIMDES: 'GİMDES (Турция)', MUI: 'MUI (Индонезия)', JAKIM: 'JAKIM (Малайзия)', IFANCA: 'IFANCA (Международный)' },
+      ur: { GIMDES: 'GİMDES (ترکی)', MUI: 'MUI (انڈونیشیا)', JAKIM: 'JAKIM (ملائیشیا)', IFANCA: 'IFANCA (عالمی)' }
+    };
+
+    const DEFAULT_AUTH_BY_LANG = {
+      tr: 'GIMDES',
+      id: 'MUI',
+      ms: 'JAKIM',
+      en: 'IFANCA',
+      ar: 'IFANCA',
+      de: 'IFANCA',
+      fr: 'IFANCA',
+      es: 'IFANCA',
+      ru: 'IFANCA',
+      ur: 'IFANCA'
+    };
+
+    const STUDIO_I18N = {
+      tr: {
+        sideTitle: 'Canlı Kural Motoru & Senaryo Test Paneli',
+        sideDesc: 'Uygulama indirildiği ülkenin dil ve denetim yapısıyla (<b>Otomatik: Türkiye · GİMDES · TİTCK/AB</b>) başlar. Dil, ülke ve denetim kurumu telefon içindeki <b>Profil & Ayarlar (⚙)</b> ekranından değiştirilir.',
+        presetsHeader: 'Hazır Gerçek Dünya Ürünleri & Senaryolar',
+        liveEditHeader: 'Etiket İçeriğini Canlı Düzenle (10 Dil Destekli)',
+        prodTypeLbl: 'ÜRÜN TÜRÜ',
+        halalAuthLbl: 'HELAL KURUMU',
+        settingsTitle: '⚙️ Bölge, Dil ve Ülke Yapısı Ayarları',
+        autoBadge: '📍 İndirilen Ülke (Otomatik)',
+        manualBadge: '⚙️ Özel Yapı Seçildi',
+        countryStructureLbl: 'Ülke Dili & Denetim Yapısı',
+        autoOptionLbl: '📍 Otomatik (Cihaz Ülkesi & Dili)',
+        halalAuthSettingLbl: 'Helal Denetim Kurumu',
+        regStructureLbl: 'Mevzuat & Regülasyon Yapısı'
+      },
+      en: {
+        sideTitle: 'Live Rule Engine & Scenario Studio',
+        sideDesc: 'The app activates automatically with the downloaded country\'s language and regulatory structure. Language, region, and Halal authority can be customized in <b>Profile & Settings (⚙)</b>.',
+        presetsHeader: 'Real-World Product Presets & Scenarios',
+        liveEditHeader: 'Live Edit Label Ingredients (10 Languages Supported)',
+        prodTypeLbl: 'PRODUCT TYPE',
+        halalAuthLbl: 'HALAL AUTHORITY',
+        settingsTitle: '⚙️ Region, Language & Structure Settings',
+        autoBadge: '📍 Device Country (Auto)',
+        manualBadge: '⚙️ Custom Structure',
+        countryStructureLbl: 'Country Language & Regional Structure',
+        autoOptionLbl: '📍 Automatic (Device Country & Language)',
+        halalAuthSettingLbl: 'Halal Certification Authority',
+        regStructureLbl: 'Regulatory Standard'
+      },
+      ar: {
+        sideTitle: 'محرك القواعد المباشر ولوحة السيناريوهات',
+        sideDesc: 'يعمل التطبيق تلقائياً بلغة وهيكلية البلد الذي تم تنزيله فيه. يمكنك تغيير اللغة والبلد وهيئة الحلال من قسم <b>الملف والإعدادات (⚙)</b> داخل الهاتف.',
+        presetsHeader: 'منتجات وسيناريوهات واقعية جاهزة للاختبار',
+        liveEditHeader: 'تعديل نص الملصق مباشرة (يدعم 10 لغات)',
+        prodTypeLbl: 'نوع المنتج',
+        halalAuthLbl: 'هيئة الحلال',
+        settingsTitle: '⚙️ إعدادات المنطقة واللغة والهيئة الرقابية',
+        autoBadge: '📍 بلد الجهاز (تلقائي)',
+        manualBadge: '⚙️ إعداد مخصص',
+        countryStructureLbl: 'لغة البلد والهيكل التنظيمي',
+        autoOptionLbl: '📍 تلقائي (حسب بلد ولغة الجهاز)',
+        halalAuthSettingLbl: 'هيئة اعتماد الحلال',
+        regStructureLbl: 'المعيار التنظيمي والرقابي'
+      },
+      de: {
+        sideTitle: 'Live-Regel-Engine & Szenario-Panel',
+        sideDesc: 'Die App startet automatisch mit der Sprache und Prüfstruktur des Download-Landes. Sprache, Region und Halal-Behörde können im Telefon unter <b>Profil & Einstellungen (⚙)</b> angepasst werden.',
+        presetsHeader: 'Reale Produkt-Szenarien & Vorlagen',
+        liveEditHeader: 'Etikettentext live bearbeiten (10 Sprachen)',
+        prodTypeLbl: 'PRODUKTTYP',
+        halalAuthLbl: 'HALAL-BEHÖRDE',
+        settingsTitle: '⚙️ Region, Sprache & Prüfstruktur (Einstellungen)',
+        autoBadge: '📍 Geräteland (Automatisch)',
+        manualBadge: '⚙️ Benutzerdefiniert',
+        countryStructureLbl: 'Landessprache & Regionale Struktur',
+        autoOptionLbl: '📍 Automatisch (Geräteland & Sprache)',
+        halalAuthSettingLbl: 'Halal-Zertifizierungsstelle',
+        regStructureLbl: 'Regulierungsstandard'
+      },
+      fr: {
+        sideTitle: 'Moteur de Règles en Direct & Scénarios',
+        sideDesc: 'L\'application s\'active par défaut avec la langue et la structure du pays de téléchargement. Modifiez la langue ou l\'autorité dans <b>Profil & Paramètres (⚙)</b>.',
+        presetsHeader: 'Produits Réels & Scénarios Prédéfinis',
+        liveEditHeader: 'Modifier l\'Étiquette en Direct (10 Langues)',
+        prodTypeLbl: 'TYPE DE PRODUIT',
+        halalAuthLbl: 'AUTORITÉ HALAL',
+        settingsTitle: '⚙️ Paramètres de Région, Langue et Structure',
+        autoBadge: '📍 Pays de l\'appareil (Auto)',
+        manualBadge: '⚙️ Structure personnalisée',
+        countryStructureLbl: 'Langue du pays & Structure régionale',
+        autoOptionLbl: '📍 Automatique (Pays et langue de l\'appareil)',
+        halalAuthSettingLbl: 'Autorité de certification Halal',
+        regStructureLbl: 'Norme réglementaire'
+      },
+      id: {
+        sideTitle: 'Mesin Aturan Langsung & Panel Skenario',
+        sideDesc: 'Aplikasi aktif otomatis mengikuti bahasa & struktur negara tempat diunduh. Ubah bahasa, wilayah, dan otoritas Halal di menu <b>Profil & Pengaturan (⚙)</b>.',
+        presetsHeader: 'Skenario & Produk Dunia Nyata Siap Pakai',
+        liveEditHeader: 'Edit Komposisi Label Langsung (10 Bahasa)',
+        prodTypeLbl: 'JENIS PRODUK',
+        halalAuthLbl: 'OTORITAS HALAL',
+        settingsTitle: '⚙️ Pengaturan Wilayah, Bahasa & Struktur',
+        autoBadge: '📍 Negara Perangkat (Otomatis)',
+        manualBadge: '⚙️ Struktur Kustom',
+        countryStructureLbl: 'Bahasa Negara & Struktur Regulasi',
+        autoOptionLbl: '📍 Otomatis (Negara & Bahasa Perangkat)',
+        halalAuthSettingLbl: 'Lembaga Sertifikasi Halal',
+        regStructureLbl: 'Standar Regulasi'
+      },
+      ms: {
+        sideTitle: 'Enjin Peraturan Langsung & Panel Senario',
+        sideDesc: 'Aplikasi aktif secara automatik mengikut bahasa & struktur negara muat turun. Tukar bahasa dan autoriti Halal di skrin <b>Profil & Tetapan (⚙)</b>.',
+        presetsHeader: 'Senario & Produk Dunia Sebenar',
+        liveEditHeader: 'Sunting Ramuan Label Secara Langsung (10 Bahasa)',
+        prodTypeLbl: 'JENIS PRODUK',
+        halalAuthLbl: 'AUTORITI HALAL',
+        settingsTitle: '⚙️ Tetapan Wilayah, Bahasa & Struktur',
+        autoBadge: '📍 Negara Peranti (Auto)',
+        manualBadge: '⚙️ Struktur Tersuai',
+        countryStructureLbl: 'Bahasa Negara & Struktur Serantau',
+        autoOptionLbl: '📍 Automatik (Negara & Bahasa Peranti)',
+        halalAuthSettingLbl: 'Badan Pensijilan Halal',
+        regStructureLbl: 'Piawaian Peraturan'
+      },
+      es: {
+        sideTitle: 'Motor de Reglas en Vivo y Escenarios',
+        sideDesc: 'La app se activa por defecto con el idioma y estructura del país de descarga. Puedes cambiarlos en <b>Perfil y Ajustes (⚙)</b>.',
+        presetsHeader: 'Productos Reales y Escenarios de Prueba',
+        liveEditHeader: 'Editar Ingredientes de la Etiqueta en Vivo (10 Idiomas)',
+        prodTypeLbl: 'TIPO DE PRODUCTO',
+        halalAuthLbl: 'AUTORIDAD HALAL',
+        settingsTitle: '⚙️ Ajustes de Región, Idioma y Estructura',
+        autoBadge: '📍 País del dispositivo (Auto)',
+        manualBadge: '⚙️ Estructura personalizada',
+        countryStructureLbl: 'Idioma del país y estructura regional',
+        autoOptionLbl: '📍 Automático (País e idioma del dispositivo)',
+        halalAuthSettingLbl: 'Autoridad de certificación Halal',
+        regStructureLbl: 'Normativa regulatoria'
+      },
+      ru: {
+        sideTitle: 'Живой движок правил и панель сценариев',
+        sideDesc: 'Приложение автоматически запускается с языком и стандартами страны загрузки. Изменить язык и орган Халяль можно в разделе <b>Профиль и Настройки (⚙)</b>.',
+        presetsHeader: 'Готовые реальные продукты и сценарии',
+        liveEditHeader: 'Редактировать состав на этикетке (10 языков)',
+        prodTypeLbl: 'ТИП ПРОДУКТА',
+        halalAuthLbl: 'ОРГАН ХАЛЯЛЬ',
+        settingsTitle: '⚙️ Настройки региона, языка и стандартов',
+        autoBadge: '📍 Страна устройства (Авто)',
+        manualBadge: '⚙️ Выбранный стандарт',
+        countryStructureLbl: 'Язык страны и региональная структура',
+        autoOptionLbl: '📍 Автоматически (Страна и язык устройства)',
+        halalAuthSettingLbl: 'Орган сертификации Халяль',
+        regStructureLbl: 'Регуляторный стандарт'
+      },
+      ur: {
+        sideTitle: 'لائیو رول انجن اور منظرنامہ پینل',
+        sideDesc: 'ایپ خودکار طور پر ڈاؤن لوڈ کیے گئے ملک کی زبان اور حلال اتھارٹی کے ساتھ فعال ہوتی ہے۔ زبان اور اتھارٹی فون کے اندر <b>پروفائل اور ترتیبات (⚙)</b> سے تبدیل کریں۔',
+        presetsHeader: 'حقیقی مصنوعات اور تیار منظرنامے',
+        liveEditHeader: 'لیبل کے اجزاء میں لائیو ترمیم کریں (10 زبانیں)',
+        prodTypeLbl: 'پروڈکٹ کی قسم',
+        halalAuthLbl: 'حلال اتھارٹی',
+        settingsTitle: '⚙️ علاقہ، زبان اور اتھارٹی کی ترتیبات',
+        autoBadge: '📍 ڈیوائس کا ملک (خودکار)',
+        manualBadge: '⚙️ مخصوص ترتیب',
+        countryStructureLbl: 'ملک کی زبان اور علاقائی ڈھانچہ',
+        autoOptionLbl: '📍 خودکار (فون کا ملک اور زبان)',
+        halalAuthSettingLbl: 'حلال سرٹیفکیشن اتھارٹی',
+        regStructureLbl: 'ریگولیٹری معیار'
+      }
+    };
+
+    function switchLang(langOrAuto) {
+      if (langOrAuto === 'auto') {
+        state.autoDetected = true;
+        state.lang = detectDeviceLang();
+      } else {
+        state.autoDetected = false;
+        state.lang = langOrAuto;
+      }
+      const struct = MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr;
+      state.jurisdiction = struct.jurisdiction;
+      if (state.activeSampleIdx !== null) {
+        state.productTitle = getSampleTitle(state.activeSampleIdx, state.lang);
+      }
+      const authSelect = document.getElementById('halalAuth');
+      if (authSelect) {
+        authSelect.value = struct.auth;
+      }
+      // UPDATE LABEL TEXTAREA ON LANGUAGE SWITCH!
+      const liveInput = document.getElementById('liveInput');
+      if (liveInput && state.activeSampleIdx !== null) {
+        liveInput.value = getSampleText(state.activeSampleIdx, state.lang);
+      }
+      refreshAll();
+    }
+
+    function changeAuthorityFromSettings(newAuth) {
+      state.autoDetected = false;
+      const authSelect = document.getElementById('halalAuth');
+      if (authSelect) authSelect.value = newAuth;
+      refreshAll();
+    }
+
+    function changeJurisdictionFromSettings(newJur) {
+      state.autoDetected = false;
+      state.jurisdiction = newJur;
+      refreshAll();
+    }
+
+    function toggleDark() {
+      state.dark = !state.dark;
+      document.body.classList.toggle('dark', state.dark);
+      const u = getUiText(state.lang);
+      document.getElementById('darkBtn').textContent = state.dark ? u.lightThemeBtn : u.darkThemeBtn;
+      renderScreen();
+    }
+
+    function switchScreen(scr) {
+      state.screen = scr;
+      ['main', 'scan', 'result', 'halal', 'compare'].forEach((k) => {
+        const top = document.getElementById('topTab-' + k);
+        if (top) top.classList.toggle('active', k === scr);
+        const nav = document.getElementById('nav-' + k);
+        if (nav && k !== 'scan') nav.classList.toggle('active', k === scr);
+      });
+      renderScreen();
+    }
+
+    function loadSample(idx) {
+      const s = SAMPLES[idx];
+      state.activeSampleIdx = idx;
+      if (idx === 7 && state.lang === 'tr') {
+        state.autoDetected = false;
+        state.lang = 'ar';
+        const authSelect = document.getElementById('halalAuth');
+        if (authSelect) authSelect.value = 'IFANCA';
+      }
+      state.productTitle = getSampleTitle(idx, state.lang);
+      state.userConfirmations = {};
+      state.claims = { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'none' };
+      state.copiedToast = false;
+      state.lastCopiedMsg = null;
+      document.getElementById('prodType').value = s.type;
+      document.getElementById('liveInput').value = getSampleText(idx, state.lang);
+      state.screen = s.screen;
+      switchScreen(s.screen);
+      refreshAll();
+    }
+
+    function onInputChanged() {
+      state.activeSampleIdx = null;
+      state.userConfirmations = {};
+      refreshAll();
+    }
+
+    function toggleProfile(key) {
+      state.profiles[key] = !state.profiles[key];
+      refreshAll();
+    }
+
+    function resolveAmbiguity(token, chosenId) {
+      state.userConfirmations[token] = chosenId;
+      state.screen = 'result';
+      switchScreen('result');
+      refreshAll();
+    }
+
+    function generateManufacturerMessage(lang) {
+      const pTitle = state.productTitle || (lang === 'tr' ? 'Ürününüz' : 'Your Product');
+      const findings = (state.evalData && state.evalData.cards && state.evalData.cards.halalCard && state.evalData.cards.halalCard.findings) || [];
+      const flagged = findings.filter(f => f.status === 'sari' || f.status === 'sari_yesil' || f.status === 'kirmizi' || f.status === 'conflict');
+      const ingredientNames = flagged.map(f => f.localizedName || f.canonical).slice(0, 4).join(', ') || (lang === 'tr' ? 'çift kaynaklı bileşenler' : 'ingredients');
+
+      const templates = {
+        tr: `Merhaba Sayın Yetkili,\n"${pTitle}" ürününüz hakkında bilgi almak istiyorum. Etikette yer alan şu bileşenlerin (${ingredientNames}) kaynağının (bitkisel mi yoksa hayvansal mı olduğu) ve ürünün geçerli bir helal sertifikası bulunup bulunmadığı konusunda teyit rica ediyorum.\nİlginiz için teşekkürler.`,
+        en: `Dear Customer Service,\nI would like to inquire about your product "${pTitle}". Could you please clarify the exact source (plant or animal origin) of the following ingredient(s): (${ingredientNames}), and whether this product carries a verified Halal certification?\nThank you for your assistance.`,
+        ar: `السادة خدمة العملاء المحترمين،\nأود الاستفسار عن منتجكم "${pTitle}". هل يمكنكم توضيح مصدر المكونات التالية: (${ingredientNames})، وهل هي من أصل نباتي أم حيواني، وما إذا كان المنتج حاصلاً على شهادة حلال معتمدة؟\nشاكراً لكم حسن تعاونكم.`,
+        de: `Sehr geehrte Damen und Herren,\nich möchte mich bezüglich Ihres Produkts "${pTitle}" erkundigen. Könnten Sie mir bitte mitteilen, ob folgende Inhaltsstoffe (${ingredientNames}) pflanzlichen oder tierischen Ursprungs sind und ob für das Produkt ein anerkanntes Halal-Zertifikat vorliegt?\nVielen Dank für Ihre Unterstützung.`,
+        fr: `Bonjour,\nJe souhaite obtenir des informations concernant votre produit « ${pTitle} ». Pourriez-vous me préciser l'origine exacte (végétale ou animale) des ingrédients suivants : (${ingredientNames}), et si le produit bénéficie d'une certification Halal reconnue ?\nMerci par avance pour votre retour.`,
+        id: `Halo Tim Layanan Pelanggan,\nSaya ingin menanyakan tentang produk "${pTitle}". Bisakah Anda mengonfirmasi sumber dari bahan berikut: (${ingredientNames}) (apakah bersumber dari nabati atau hewani) dan apakah produk ini memiliki sertifikat halal resmi?\nTerima kasih atas bantuannya.`,
+        ms: `Salam Sejahtera,\nSaya ingin bertanyakan tentang produk "${pTitle}". Bolehkah pihak tuan/puan mengesahkan sumber bagi ramuan berikut: (${ingredientNames}) (sama ada daripada sumber tumbuhan atau haiwan) dan adakah produk ini mempunyai pensijilan Halal yang sah?\nTerima kasih.`,
+        es: `Estimado servicio de atención al cliente,\nQuisiera consultar sobre su producto "${pTitle}". ¿Podrían aclararme el origen exacto (vegetal o animal) de los siguientes ingredientes: (${ingredientNames}), y si el producto cuenta con una certificación Halal oficial?\nMuchas gracias por su atención.`,
+        ru: `Здравствуйте!\nЯ хотел бы уточнить информацию о вашем продукте "${pTitle}". Не могли бы вы подсказать точное происхождение следующих компонентов: (${ingredientNames}) (растительное или животное) и имеет ли продукт официальный сертификат халяль?\nЗаранее спасибо за ответ!`,
+        ur: `محترم کسٹمر سروس،\nمیں آپ کے پروڈکٹ "${pTitle}" کے بارے میں معلومات حاصل کرنا چاہتا ہوں۔ کیا آپ وضاحت کر سکتے ہیں کہ درج ذیل اجزاء: (${ingredientNames}) نباتاتی ہیں یا حیوانی، اور کیا پروڈکٹ کے پاس مستند حلال سرٹیفکیٹ موجود ہے؟\nآپ کے تعاون کا بہت شکریہ۔`
+      };
+
+      return templates[lang] || templates.en;
+    }
+
+    function copyManufacturerMessage() {
+      const msg = generateManufacturerMessage(state.lang);
+      state.lastCopiedMsg = msg;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).catch(() => fallbackCopy(msg));
+      } else {
+        fallbackCopy(msg);
+      }
+      state.copiedToast = true;
+      renderScreen();
+      if (window._copyTimer) clearTimeout(window._copyTimer);
+      window._copyTimer = setTimeout(() => {
+        state.copiedToast = false;
+        renderScreen();
+      }, 3000);
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand('copy'); } catch (_) {}
+      document.body.removeChild(ta);
+    }
+
+    function toggleHalalCertified() {
+      state.claims.halalCertified = !state.claims.halalCertified;
+      refreshAll();
+    }
+
+    async function refreshAll() {
+      const activeProfiles = Object.entries(state.profiles)
+        .filter(([k, v]) => v && k !== 'vegan' && k !== 'halal')
+        .map(([k]) => k);
+
+      const rawText = document.getElementById('liveInput').value;
+      const productType = document.getElementById('prodType').value;
+      const halalAuthority = document.getElementById('halalAuth').value;
+      state.productTitle = getSampleTitle(state.activeSampleIdx, state.lang);
+
+      const evalRes = await fetch('/api/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rawText,
+          productType,
+          jurisdiction: state.jurisdiction || 'EU',
+          userProfiles: activeProfiles,
+          halalAuthority,
+          claims: state.claims,
+          userConfirmations: state.userConfirmations,
+          lang: state.lang
+        })
+      });
+      state.evalData = await evalRes.json();
+
+      const cNames = COMPARE_NAMES[state.lang] || COMPARE_NAMES.en;
+      const compRes = await fetch('/api/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productA: { ...COMPARE_PAIR.productA, name: cNames[0] },
+          productB: { ...COMPARE_PAIR.productB, name: cNames[1] },
+          sharedOptions: { userProfiles: activeProfiles, halalAuthority, lang: state.lang }
+        })
+      });
+      state.compareData = await compRes.json();
+
+      // Update top tabs, bottom nav, right studio panel & phone frame direction for RTL (Arabic / Urdu)
+      if (state.evalData && state.evalData.locale) {
+        const loc = state.evalData.locale;
+        const u = getUiText(state.lang);
+        const st = STUDIO_I18N[state.lang] || STUDIO_I18N.en;
+        const dir = state.evalData.dir || 'ltr';
+        document.documentElement.lang = state.lang;
+        document.documentElement.dir = dir;
+        const phoneEl = document.getElementById('phoneFrame');
+        if (phoneEl) phoneEl.setAttribute('dir', dir);
+        const sideEl = document.getElementById('sideInspector');
+        if (sideEl) sideEl.setAttribute('dir', dir);
+        const studioBar = document.querySelector('.studio-bar');
+        if (studioBar) studioBar.setAttribute('dir', dir);
+        document.getElementById('brandTagline').textContent = loc.appTagline;
+        document.getElementById('topTab-main').textContent = loc.tabs.profile;
+        document.getElementById('topTab-scan').textContent = loc.tabs.scan;
+        document.getElementById('topTab-result').textContent = loc.tabs.result;
+        document.getElementById('topTab-halal').textContent = loc.tabs.halal;
+        document.getElementById('topTab-compare').textContent = loc.tabs.compare;
+        document.getElementById('navLbl-compare').textContent = u.navCompare;
+        document.getElementById('navLbl-result').textContent = u.navResult;
+        document.getElementById('navLbl-halal').textContent = u.navHalal;
+        document.getElementById('navLbl-main').textContent = u.navProfile;
+        document.getElementById('darkBtn').textContent = state.dark ? u.lightThemeBtn : u.darkThemeBtn;
+        document.getElementById('sideTitle').textContent = st.sideTitle;
+        document.getElementById('sideDesc').innerHTML = st.sideDesc;
+        document.getElementById('presetsHeader').textContent = st.presetsHeader;
+        document.getElementById('liveEditHeader').textContent = st.liveEditHeader;
+        document.getElementById('prodTypeLbl').textContent = st.prodTypeLbl;
+        document.getElementById('halalAuthLbl').textContent = st.halalAuthLbl;
+        const icons = ['🧴', '🍬', '🔍', '⚖️', '🐌', '💅', '🍫', '🇸🇦'];
+        const badgeList = PRESET_BADGES_I18N[state.lang] || PRESET_BADGES_I18N.en;
+        SAMPLES.forEach((_, idx) => {
+          const pl = document.getElementById('presetLbl-' + idx);
+          if (pl) pl.textContent = `${icons[idx]} ${getSampleTitle(idx, state.lang)}`;
+          const pb = document.getElementById('presetBadge-' + idx);
+          if (pb) pb.textContent = badgeList[idx] || '';
+        });
+        const optC = document.getElementById('optCosmetic');
+        const optF = document.getElementById('optFood');
+        const ptTexts = PROD_TYPE_I18N[state.lang] || PROD_TYPE_I18N.en;
+        if (optC) optC.textContent = ptTexts.cosmetic;
+        if (optF) optF.textContent = ptTexts.food;
+
+        const authOpts = AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en;
+        const aG = document.getElementById('optAuth-GIMDES');
+        const aM = document.getElementById('optAuth-MUI');
+        const aJ = document.getElementById('optAuth-JAKIM');
+        const aI = document.getElementById('optAuth-IFANCA');
+        if (aG) aG.textContent = authOpts.GIMDES;
+        if (aM) aM.textContent = authOpts.MUI;
+        if (aJ) aJ.textContent = authOpts.JAKIM;
+        if (aI) aI.textContent = authOpts.IFANCA;
+      }
+
+      renderScreen();
+    }
+
+    const I18N_PHONE = {
+      tr: {
+        navCompare: 'Karşılaştır', navResult: 'Sonuç', navHalal: 'Helal', navProfile: 'Profil',
+        darkThemeBtn: '🌙 Koyu Tema', lightThemeBtn: '☀️ Açık Tema',
+        prefsHeader: 'InciFact · Kişisel Tercihler',
+        veganTitle: 'Vegan', veganDesc: 'Hayvansal kaynak ve tutarsız logolar',
+        halalToggleTitle: 'Helal kontrolü',
+        halalToggleDesc: 'Ayrı bir eksen. Sağlık puanıyla asla birleşmez, şüpheliyi gerekçesiyle açıklar.',
+        seeResultBtn: 'Sonucu Gör', selectedWord: 'seçili',
+        cameraTitle: 'InciFact Kamera',
+        cosmeticShort: 'Kozmetik', foodShort: 'Gıda',
+        ingredientWord: 'bileşen', recognizedWord: 'tanındı',
+        recognizedCountFmt: (r, t) => `${r} / ${t} madde tanındı`,
+        ambiguousTitle: 'Bu satırı tam okuyamadık',
+        confirmCodeBtn: (c) => `Evet, "${c}" Olarak Onayla`,
+        allClearTitle: 'Tüm satırlar net okundu',
+        allClearSub: 'Belirsiz veya çakışan kod bulunmadı.',
+        goResultBtn: 'Sonuca Git →',
+        compareBtnTop: '⇄ Karşılaştır',
+        myPrefsBtnTop: '⚙ Tercihlerim',
+        uncertainWord: 'Belirsiz',
+        awaitingConfirm: 'Onay Bekleniyor (Tara sekmesine bak)',
+        lowCoverage: 'Yetersiz Veri (<%80 Kapsam)',
+        euNonCompliant: 'AB Mevzuat Uyumsuzluğu',
+        goodNoBanned: 'İyi · AB\'de yasaklı madde yok',
+        scoreReducers: 'Puanı düşürenler',
+        noRestrictedFound: 'Puan düşüren kısıtlı madde saptanmadı.',
+        forYouCaps: 'SENİN İÇİN',
+        itemsAttentionFmt: (n) => `${n} madde dikkat`,
+        fitsPrefs: 'Tercihlerine uygun',
+        compatibleWithFilters: 'Seçili filtrelerle uyumlu',
+        halalCaps: 'HELAL',
+        noIssueSeen: 'Sorun görülmedi',
+        musboohInspect: 'Müşbooh / İncele',
+        halalRedShort: 'Uygunsuz / Çelişki',
+        tapForDetail: 'Detay için dokun →',
+        ethanolLabel: '💧 Etil Alkol (Etanol)',
+        ethanolPresent: 'Etil alkol içerir',
+        ethanolOnlyFatty: 'Yok (Yalnız yağ alkolü var)',
+        ethanolNotListed: 'Etikette listelenmedi',
+        ingredientsHeader: 'Bileşenler',
+        attentionTab: 'Dikkat',
+        allTab: 'Tümü',
+        noProblemBadge: 'Sorun yok',
+        notEthanolBadge: 'Etil Alkol Değil',
+        infoBadge: 'Bilgi',
+        stdIngredientDesc: 'Uluslararası INCI / Gıda kodeksinde izinli standart bileşen.',
+        restrictedDesc: 'AB Yönetmeliği kapsamında konsantrasyon veya kullanım kısıtlamasına tabi bileşen.',
+        bannedDesc: 'AB Yönetmeliği Ek II kapsamında yasaklı bileşen.',
+        shieldDesc: 'Kimyasal yapısında -OH grubu bulunan yağ alkolü / koruyucu; sarhoş edici etil alkol (etanol) değildir.',
+        musboohDesc: 'Bitkisel veya hayvansal kaynaklı olabilir; kesin hüküm için Helal veya Vegan sertifikası doğrulanmalıdır.',
+        haramDesc: 'Seçilen helal otoritesi kriterlerine göre uygunsuz / haram kaynaklı bileşen.',
+        disclaimer: 'Bilgilendirme amaçlıdır, tıbbi tavsiye değildir. Sağlıkla ilgili kararlar için doktoruna veya eczacına danış.',
+        halalEvalTitle: 'Helal değerlendirmesi',
+        authorityWord: 'Kurum',
+        halalSubOk: 'Şüpheli veya haram kaynak tespit edilmedi',
+        halalSubBad: 'Seçilen kritere göre uygunsuz bileşen veya logo çelişkisi',
+        halalSubWarn: 'Şüpheli (çift kaynaklı), kesin hüküm için kaynak doğrulaması gerekir',
+        scaleHalal: 'Helal', scaleMusbooh: 'Müşbooh', scaleHaram: 'Haram / Çelişki',
+        whyThisResult: 'Neden bu sonuç?',
+        howToClarify: 'Nasıl netleşir?',
+        verifyHalalLogoBtn: 'Paketteki helal logosunu doğrula',
+        activeWord: '✓ Aktif', simulateWord: 'Simüle Et',
+        copyAskManufacturer: 'Üreticiye sormak için hazır mesajı kopyala',
+        copiedWord: '✓ Kopyalandı',
+        recentScans: 'Geçmiş Taramalar',
+        tapToInspect: 'Dokun ve incele'
+      },
+      en: {
+        navCompare: 'Compare', navResult: 'Result', navHalal: 'Halal', navProfile: 'Profile',
+        darkThemeBtn: '🌙 Dark Theme', lightThemeBtn: '☀️ Light Theme',
+        prefsHeader: 'InciFact · Personal Preferences',
+        veganTitle: 'Vegan', veganDesc: 'Animal origin & inconsistent label claims',
+        halalToggleTitle: 'Halal check',
+        halalToggleDesc: 'A separate axis. Never merged with health score; explains doubtful sources clearly.',
+        seeResultBtn: 'View Result', selectedWord: 'selected',
+        cameraTitle: 'InciFact Camera',
+        cosmeticShort: 'Cosmetic', foodShort: 'Food',
+        ingredientWord: 'ingredients', recognizedWord: 'recognized',
+        recognizedCountFmt: (r, t) => `${r} / ${t} items recognized`,
+        ambiguousTitle: 'Ambiguous label text detected',
+        confirmCodeBtn: (c) => `Confirm as "${c}"`,
+        allClearTitle: 'All lines read clearly',
+        allClearSub: 'No ambiguous or corrupted codes found.',
+        goResultBtn: 'Go to Result →',
+        compareBtnTop: '⇄ Compare',
+        myPrefsBtnTop: '⚙ Preferences',
+        uncertainWord: 'Uncertain',
+        awaitingConfirm: 'Awaiting Confirmation (See Scan tab)',
+        lowCoverage: 'Insufficient Data (<80% Coverage)',
+        euNonCompliant: 'EU Regulatory Non-Compliance',
+        goodNoBanned: 'Good · No EU-banned substances',
+        scoreReducers: 'Score reducing items',
+        noRestrictedFound: 'No score-reducing restricted substances detected.',
+        forYouCaps: 'FOR YOU',
+        itemsAttentionFmt: (n) => `${n} item(s) flagged`,
+        fitsPrefs: 'Matches your preferences',
+        compatibleWithFilters: 'Compatible with selected filters',
+        halalCaps: 'HALAL',
+        noIssueSeen: 'No issues found',
+        musboohInspect: 'Mushbooh / Review',
+        halalRedShort: 'Non-Compliant / Conflict',
+        tapForDetail: 'Tap for details →',
+        ethanolLabel: '💧 Ethyl Alcohol (Ethanol)',
+        ethanolPresent: 'Contains ethyl alcohol',
+        ethanolOnlyFatty: 'None (Fatty alcohol only)',
+        ethanolNotListed: 'Not listed on label',
+        ingredientsHeader: 'Ingredients',
+        attentionTab: 'Attention',
+        allTab: 'All',
+        noProblemBadge: 'No issue',
+        notEthanolBadge: 'Not Ethyl Alcohol',
+        infoBadge: 'Info',
+        stdIngredientDesc: 'Permitted standard ingredient under EU INCI / Food Codex regulations.',
+        restrictedDesc: 'Regulated substance subject to concentration or usage restrictions under EU regulations.',
+        bannedDesc: 'Prohibited substance under EU Regulation Annex II.',
+        shieldDesc: 'Non-intoxicating fatty alcohol / emollient or preservative; NOT intoxicating ethyl alcohol (ethanol).',
+        musboohDesc: 'Can be plant- or animal-derived; verify Halal or Vegan certification on packaging.',
+        haramDesc: 'Non-halal ingredient according to the selected Halal authority standard.',
+        disclaimer: 'For informational purposes only; not medical advice. Consult your doctor or pharmacist for health decisions.',
+        halalEvalTitle: 'Halal Assessment',
+        authorityWord: 'Authority',
+        halalSubOk: 'No doubtful or haram source detected',
+        halalSubBad: 'Non-compliant ingredient or certification conflict detected',
+        halalSubWarn: 'Doubtful (dual-source); origin verification required',
+        scaleHalal: 'Halal', scaleMusbooh: 'Mushbooh', scaleHaram: 'Haram / Conflict',
+        whyThisResult: 'Why this result?',
+        howToClarify: 'How to clarify?',
+        verifyHalalLogoBtn: 'Verify Halal logo on packaging',
+        activeWord: '✓ Active', simulateWord: 'Simulate',
+        copyAskManufacturer: 'Copy message to ask manufacturer',
+        copiedWord: '✓ Copied',
+        recentScans: 'Recent Scans',
+        tapToInspect: 'Tap to inspect'
+      },
+      ar: {
+        navCompare: 'مقارنة', navResult: 'النتيجة', navHalal: 'حلال', navProfile: 'ملفي',
+        darkThemeBtn: '🌙 الوضع الداكن', lightThemeBtn: '☀️ الوضع الفاتح',
+        prefsHeader: 'InciFact · التفضيلات الشخصية',
+        veganTitle: 'نباتي (Vegan)', veganDesc: 'المصادر الحيوانية وتعارض الشعارات',
+        halalToggleTitle: 'فحص الحلال',
+        halalToggleDesc: 'محور مستقل تماماً؛ لا يُدمج مع النقاط الصحية ويوضح المواد المشبوهة بدقة.',
+        seeResultBtn: 'عرض النتيجة', selectedWord: 'محدد',
+        cameraTitle: 'كاميرا InciFact',
+        cosmeticShort: 'تجميل', foodShort: 'غذاء',
+        ingredientWord: 'مكونات', recognizedWord: 'تم التعرف عليها',
+        recognizedCountFmt: (r, t) => `تم التعرف على ${formatDigits(r, 'ar')} من ${formatDigits(t, 'ar')} مادة`,
+        ambiguousTitle: 'يرجى تأكيد قراءة هذا السطر',
+        confirmCodeBtn: (c) => `تأكيد كـ "${c}"`,
+        allClearTitle: 'تمت قراءة جميع المكونات بوضوح',
+        allClearSub: 'لا توجد رموز غامضة أو غير واضحة.',
+        goResultBtn: 'عرض النتيجة ←',
+        compareBtnTop: '⇄ مقارنة',
+        myPrefsBtnTop: '⚙ تفضيلاتي',
+        uncertainWord: 'غير مؤكد',
+        awaitingConfirm: 'بانتظار التأكيد (راجع تبويب المسح)',
+        lowCoverage: 'بيانات غير كافية (<٪٨٠)',
+        euNonCompliant: 'مخالف للوائح الاتحاد الأوروبي',
+        goodNoBanned: 'جيد · خالٍ من المواد المحظورة أوروبياً',
+        scoreReducers: 'مواد تخفض التقييم',
+        noRestrictedFound: 'لم يتم رصد مواد مقيدة تخفض التقييم.',
+        forYouCaps: 'مخصص لك',
+        itemsAttentionFmt: (n) => `${formatDigits(n, 'ar')} مادة تتطلب انتباهاً`,
+        fitsPrefs: 'مناسب لتفضيلاتك',
+        compatibleWithFilters: 'متوافق مع الفلاتر المختارة',
+        halalCaps: 'حلال',
+        noIssueSeen: 'لا توجد شبهة',
+        musboohInspect: 'مشبوه / راجع المصدر',
+        halalRedShort: 'غير متوافق / تعارض',
+        tapForDetail: 'اضغط للتفاصيل ←',
+        ethanolLabel: '💧 الكحول الإيثيلي (الإيثانول)',
+        ethanolPresent: 'يحتوي على كحول إيثيلي',
+        ethanolOnlyFatty: 'خالٍ (يحتوي على كحول دهني آمن فقط)',
+        ethanolNotListed: 'غير مدرج في الملصق',
+        ingredientsHeader: 'المكونات',
+        attentionTab: 'انتباه',
+        allTab: 'الكل',
+        noProblemBadge: 'آمن / مسموح',
+        notEthanolBadge: 'ليس كحولاً إيثيلياً',
+        infoBadge: 'معلومة',
+        stdIngredientDesc: 'مكون قياسي مسموح به بموجب لوائح الاتحاد الأوروبي (INCI / الدستور الغذائي).',
+        restrictedDesc: 'مكون خاضع لقيود التركيز أو الاستخدام بموجب لوائح الاتحاد الأوروبي.',
+        bannedDesc: 'مادة محظورة بموجب الملحق الثاني للوائح الاتحاد الأوروبي.',
+        shieldDesc: 'كحول دهني مرطب أو مادة حافظة آمنة؛ وليس كحولاً إيثيلياً مسكراً (حلال).',
+        musboohDesc: 'مكون ثنائي المصدر (نباتي أو حيواني)؛ يُرجى التحقق من شهادة الحلال أو النباتي على العبوة.',
+        haramDesc: 'مكون غير متوافق مع معايير الحلال للجهة المختارة.',
+        disclaimer: 'لأغراض إعلامية فقط وليس استشارة طبية. استشر طبيبك أو الصيدلي قبل اتخاذ القرارات الصحية.',
+        halalEvalTitle: 'تقييم الحلال والمصدر',
+        authorityWord: 'الجهة',
+        halalSubOk: 'لم يتم رصد أي مصدر محرم أو مشبوه',
+        halalSubBad: 'تم رصد مكون غير متوافق أو تعارض مع الشعار',
+        halalSubWarn: 'مشبوه (ثنائي المصدر: قد يكون نباتياً أو حيوانياً)',
+        scaleHalal: 'حلال', scaleMusbooh: 'مشبوه', scaleHaram: 'حرام / تعارض',
+        whyThisResult: 'لماذا هذه النتيجة؟',
+        howToClarify: 'كيف نتأكد؟',
+        verifyHalalLogoBtn: 'تأكيد وجود شعار الحلال على العبوة',
+        activeWord: '✓ مفعّل', simulateWord: 'محاكاة',
+        copyAskManufacturer: 'نسخ رسالة جاهزة لمراسلة الشركة المصنعة',
+        copiedWord: '✓ تم النسخ',
+        recentScans: 'عمليات المسح الأخيرة',
+        tapToInspect: 'اضغط للفحص'
+      },
+      de: {
+        navCompare: 'Vergleich', navResult: 'Ergebnis', navHalal: 'Halal', navProfile: 'Profil',
+        darkThemeBtn: '🌙 Dunkel', lightThemeBtn: '☀️ Hell',
+        prefsHeader: 'InciFact · Persönliches Profil',
+        veganTitle: 'Vegan', veganDesc: 'Tierische Quellen & Logo-Widersprüche',
+        halalToggleTitle: 'Halal-Prüfung',
+        halalToggleDesc: 'Separate Achse. Wird nie mit dem Gesundheitswert vermischt.',
+        seeResultBtn: 'Ergebnis ansehen', selectedWord: 'aktiv',
+        cameraTitle: 'InciFact Kamera',
+        cosmeticShort: 'Kosmetik', foodShort: 'Lebensmittel',
+        ingredientWord: 'Inhaltsstoffe', recognizedWord: 'erkannt',
+        recognizedCountFmt: (r, t) => `${r} / ${t} Stoffe erkannt`,
+        ambiguousTitle: 'Unklare Textstelle erkannt',
+        confirmCodeBtn: (c) => `Als "${c}" bestätigen`,
+        allClearTitle: 'Alle Zeilen klar erkannt',
+        allClearSub: 'Keine unklaren Codes gefunden.',
+        goResultBtn: 'Zum Ergebnis →',
+        compareBtnTop: '⇄ Vergleich',
+        myPrefsBtnTop: '⚙ Profil',
+        uncertainWord: 'Unklar',
+        awaitingConfirm: 'Bestätigung erforderlich (siehe Scan)',
+        lowCoverage: 'Unzureichende Abdeckung (<80%)',
+        euNonCompliant: 'EU-Rechtswidrig (Verboten)',
+        goodNoBanned: 'Gut · Keine EU-verbotenen Stoffe',
+        scoreReducers: 'Abzüge durch',
+        noRestrictedFound: 'Keine abzugsrelevanten Stoffe gefunden.',
+        forYouCaps: 'FÜR DICH',
+        itemsAttentionFmt: (n) => `${n} Hinweis(e)`,
+        fitsPrefs: 'Passt zu deinem Profil',
+        compatibleWithFilters: 'Mit gewählten Filtern kompatibel',
+        halalCaps: 'HALAL',
+        noIssueSeen: 'Unbedenklich',
+        musboohInspect: 'Muschbooh / Prüfen',
+        halalRedShort: 'Unzulässig / Konflikt',
+        tapForDetail: 'Für Details tippen →',
+        ethanolLabel: '💧 Ethylalkohol (Ethanol)',
+        ethanolPresent: 'Enthält Ethylalkohol',
+        ethanolOnlyFatty: 'Frei (Nur Fettalkohol enthalten)',
+        ethanolNotListed: 'Nicht deklariert',
+        ingredientsHeader: 'Inhaltsstoffe',
+        attentionTab: 'Hinweis',
+        allTab: 'Alle',
+        noProblemBadge: 'Unbedenklich',
+        notEthanolBadge: 'Kein Ethanol',
+        infoBadge: 'Info',
+        stdIngredientDesc: 'Zugelassener Standard-Inhaltsstoff gemäß EU-Kosmetik-/Lebensmittelverordnung.',
+        restrictedDesc: 'Eingeschränkter Stoff gemäß EU-Verordnung (Höchstkonzentration beachten).',
+        bannedDesc: 'Verbotener Stoff gemäß EU-Verordnung Anhang II.',
+        shieldDesc: 'Pflegender Fettalkohol / Konservierungsstoff; KEIN berauschender Ethylalkohol (Ethanol).',
+        musboohDesc: 'Kann pflanzlichen oder tierischen Ursprungs sein; Halal-/Vegan-Siegel prüfen.',
+        haramDesc: 'Nicht konform nach dem gewählten Halal-Standard.',
+        disclaimer: 'Nur zu Informationszwecken; keine medizinische Beratung. Fragen Sie Ihren Arzt oder Apotheker.',
+        halalEvalTitle: 'Halal-Bewertung',
+        authorityWord: 'Standard',
+        halalSubOk: 'Keine bedenklichen oder Haram-Quellen erkannt',
+        halalSubBad: 'Unzulässiger Stoff oder Siegel-Widerspruch',
+        halalSubWarn: 'Zweifelhaft (pflanzlich oder tierisch möglich)',
+        scaleHalal: 'Halal', scaleMusbooh: 'Muschbooh', scaleHaram: 'Haram / Konflikt',
+        whyThisResult: 'Warum dieses Ergebnis?',
+        howToClarify: 'Wie klären?',
+        verifyHalalLogoBtn: 'Halal-Siegel auf der Packung bestätigen',
+        activeWord: '✓ Aktiv', simulateWord: 'Simulieren',
+        copyAskManufacturer: 'Anfrage-Text für Hersteller kopieren',
+        copiedWord: '✓ Kopiert',
+        recentScans: 'Letzte Scans',
+        tapToInspect: 'Tippen zum Prüfen'
+      },
+      fr: {
+        navCompare: 'Comparer', navResult: 'Résultat', navHalal: 'Halal', navProfile: 'Profil',
+        darkThemeBtn: '🌙 Mode Sombre', lightThemeBtn: '☀️ Mode Clair',
+        prefsHeader: 'InciFact · Préférences',
+        veganTitle: 'Végan', veganDesc: 'Origine animale et logos contradictoires',
+        halalToggleTitle: 'Contrôle Halal',
+        halalToggleDesc: 'Axe indépendant du score santé; explique chaque ingrédient douteux.',
+        seeResultBtn: 'Voir le résultat', selectedWord: 'sélectionné(s)',
+        cameraTitle: 'Caméra InciFact',
+        cosmeticShort: 'Cosmétique', foodShort: 'Alimentaire',
+        ingredientWord: 'ingrédients', recognizedWord: 'reconnus',
+        recognizedCountFmt: (r, t) => `${r} / ${t} ingrédients reconnus`,
+        ambiguousTitle: 'Ligne ambiguë détectée',
+        confirmCodeBtn: (c) => `Confirmer "${c}"`,
+        allClearTitle: 'Lecture OCR nette',
+        allClearSub: ' aucune ambiguïté détectée.',
+        goResultBtn: 'Voir le résultat →',
+        compareBtnTop: '⇄ Comparer',
+        myPrefsBtnTop: '⚙ Préférences',
+        uncertainWord: 'Incertain',
+        awaitingConfirm: 'Confirmation requise (voir Scanner)',
+        lowCoverage: 'Données insuffisantes (<80%)',
+        euNonCompliant: 'Non conforme UE (Interdit)',
+        goodNoBanned: 'Bon · Aucune substance interdite UE',
+        scoreReducers: 'Substances pénalisantes',
+        noRestrictedFound: 'Aucune substance restreinte pénalisante détectée.',
+        forYouCaps: 'POUR VOUS',
+        itemsAttentionFmt: (n) => `${n} ingrédient(s) à surveiller`,
+        fitsPrefs: 'Adapté à vos préférences',
+        compatibleWithFilters: 'Compatible avec vos filtres',
+        halalCaps: 'HALAL',
+        noIssueSeen: 'Aucun problème détecté',
+        musboohInspect: 'Mushbooh / À vérifier',
+        halalRedShort: 'Non conforme / Conflit',
+        tapForDetail: 'Toucher pour les détails →',
+        ethanolLabel: '💧 Alcool Éthylique (Éthanol)',
+        ethanolPresent: 'Contient de l\'éthanol',
+        ethanolOnlyFatty: 'Absent (Alcool gras uniquement)',
+        ethanolNotListed: 'Non mentionné sur l\'étiquette',
+        ingredientsHeader: 'Ingrédients',
+        attentionTab: 'Attention',
+        allTab: 'Tous',
+        noProblemBadge: 'Aucun souci',
+        notEthanolBadge: 'Pas d\'éthanol',
+        infoBadge: 'Info',
+        stdIngredientDesc: 'Ingrédient standard autorisé par le règlement européen INCI / Codex.',
+        restrictedDesc: 'Ingrédient soumis à restriction de concentration selon le règlement UE.',
+        bannedDesc: 'Substance interdite selon l\'Annexe II du règlement UE.',
+        shieldDesc: 'Alcool gras émollient ou conservateur; ce n\'est PAS de l\'alcool éthylique (éthanol).',
+        musboohDesc: 'Origine végétale ou animale possible; vérifier la certification Halal ou Végan.',
+        haramDesc: 'Ingrédient non conforme selon le référentiel Halal sélectionné.',
+        disclaimer: 'À titre informatif uniquement; ne remplace pas un avis médical ou pharmaceutique.',
+        halalEvalTitle: 'Évaluation Halal',
+        authorityWord: 'Référentiel',
+        halalSubOk: 'Aucune source illicite ou douteuse détectée',
+        halalSubBad: 'Ingrédient non conforme ou contradiction de logo',
+        halalSubWarn: 'Douteux (double origine végétale/animale possible)',
+        scaleHalal: 'Halal', scaleMusbooh: 'Mushbooh', scaleHaram: 'Haram / Conflit',
+        whyThisResult: 'Pourquoi ce résultat ?',
+        howToClarify: 'Comment clarifier ?',
+        verifyHalalLogoBtn: 'Valider le logo Halal sur l\'emballage',
+        activeWord: '✓ Actif', simulateWord: 'Simuler',
+        copyAskManufacturer: 'Copier un message pour le fabricant',
+        copiedWord: '✓ Copié',
+        recentScans: 'Scans récents',
+        tapToInspect: 'Toucher pour inspecter'
+      },
+      id: {
+        navCompare: 'Bandingkan', navResult: 'Hasil', navHalal: 'Halal', navProfile: 'Profil',
+        darkThemeBtn: '🌙 Mode Gelap', lightThemeBtn: '☀️ Mode Terang',
+        prefsHeader: 'InciFact · Preferensi Pribadi',
+        veganTitle: 'Vegan', veganDesc: 'Bahan hewani & klaim label',
+        halalToggleTitle: 'Pemeriksaan Halal',
+        halalToggleDesc: 'Sumbu terpisah dari skor kesehatan; menjelaskan bahan syubhat secara transparan.',
+        seeResultBtn: 'Lihat Hasil', selectedWord: 'dipilih',
+        cameraTitle: 'Kamera InciFact',
+        cosmeticShort: 'Kosmetik', foodShort: 'Pangan',
+        ingredientWord: 'komposisi', recognizedWord: 'dikenali',
+        recognizedCountFmt: (r, t) => `${r} / ${t} bahan dikenali`,
+        ambiguousTitle: 'Teks label perlu konfirmasi',
+        confirmCodeBtn: (c) => `Konfirmasi sebagai "${c}"`,
+        allClearTitle: 'Semua baris terbaca jelas',
+        allClearSub: 'Tidak ada kode ambigu.',
+        goResultBtn: 'Lihat Hasil →',
+        compareBtnTop: '⇄ Bandingkan',
+        myPrefsBtnTop: '⚙ Preferensi',
+        uncertainWord: 'Belum pasti',
+        awaitingConfirm: 'Menunggu Konfirmasi (Lihat tab Pindai)',
+        lowCoverage: 'Data Kurang (<80% Cakupan)',
+        euNonCompliant: 'Dilarang Regulasi UE',
+        goodNoBanned: 'Baik · Tanpa bahan terlarang UE',
+        scoreReducers: 'Bahan pengurang skor',
+        noRestrictedFound: 'Tidak ditemukan bahan terbatas pengurang skor.',
+        forYouCaps: 'UNTUK ANDA',
+        itemsAttentionFmt: (n) => `${n} bahan perlu perhatian`,
+        fitsPrefs: 'Sesuai preferensi Anda',
+        compatibleWithFilters: 'Cocok dengan filter yang dipilih',
+        halalCaps: 'HALAL',
+        noIssueSeen: 'Aman / Tidak ada masalah',
+        musboohInspect: 'Syubhat / Periksa',
+        halalRedShort: 'Tidak Sesuai / Konflik',
+        tapForDetail: 'Ketuk untuk detail →',
+        ethanolLabel: '💧 Etil Alkohol (Etanol)',
+        ethanolPresent: 'Mengandung etil alkohol',
+        ethanolOnlyFatty: 'Tidak ada (Hanya alkohol lemak aman)',
+        ethanolNotListed: 'Tidak tercantum pada label',
+        ingredientsHeader: 'Komposisi Bahan',
+        attentionTab: 'Perhatian',
+        allTab: 'Semua',
+        noProblemBadge: 'Aman',
+        notEthanolBadge: 'Bukan Etanol',
+        infoBadge: 'Info',
+        stdIngredientDesc: 'Bahan standar yang diizinkan dalam regulasi INCI / Pangan.',
+        restrictedDesc: 'Bahan dengan batas konsentrasi/penggunaan menurut regulasi UE.',
+        bannedDesc: 'Bahan terlarang menurut Lampiran II regulasi UE.',
+        shieldDesc: 'Alkohol lemak pelembap / pengawet aman; BUKAN etil alkohol (etanol) yang memabukkan.',
+        musboohDesc: 'Dapat berasal dari tumbuhan atau hewan (syubhat); pastikan logo Halal MUI/BPJPH atau Vegan.',
+        haramDesc: 'Bahan tidak sesuai standar otoritas Halal yang dipilih.',
+        disclaimer: 'Hanya untuk informasi, bukan saran medis. Konsultasikan dengan dokter atau apoteker Anda.',
+        halalEvalTitle: 'Penilaian Halal',
+        authorityWord: 'Otoritas',
+        halalSubOk: 'Tidak ditemukan sumber haram atau syubhat',
+        halalSubBad: 'Ditemukan bahan tidak sesuai atau konflik klaim logo',
+        halalSubWarn: 'Syubhat (sumber ganda nabati/hewani); perlu verifikasi sertifikat',
+        scaleHalal: 'Halal', scaleMusbooh: 'Syubhat', scaleHaram: 'Haram / Konflik',
+        whyThisResult: 'Mengapa hasil ini?',
+        howToClarify: 'Cara memastikan?',
+        verifyHalalLogoBtn: 'Verifikasi logo Halal pada kemasan',
+        activeWord: '✓ Aktif', simulateWord: 'Simulasikan',
+        copyAskManufacturer: 'Salin pesan untuk tanya produsen',
+        copiedWord: '✓ Tersalin',
+        recentScans: 'Pindaian Terakhir',
+        tapToInspect: 'Ketuk untuk periksa'
+      },
+      ms: {
+        navCompare: 'Banding', navResult: 'Keputusan', navHalal: 'Halal', navProfile: 'Profil',
+        darkThemeBtn: '🌙 Mod Gelap', lightThemeBtn: '☀️ Mod Cerah',
+        prefsHeader: 'InciFact · Pilihan Peribadi',
+        veganTitle: 'Vegan', veganDesc: 'Sumber haiwan & percanggahan logo',
+        halalToggleTitle: 'Semakan Halal',
+        halalToggleDesc: 'Paksi berasingan daripada skor kesihatan; menjelaskan ramuan syubhah dengan jelas.',
+        seeResultBtn: 'Lihat Keputusan', selectedWord: 'dipilih',
+        cameraTitle: 'Kamera InciFact',
+        cosmeticShort: 'Kosmetik', foodShort: 'Makanan',
+        ingredientWord: 'ramuan', recognizedWord: 'dikenal pasti',
+        recognizedCountFmt: (r, t) => `${r} / ${t} ramuan dikenal pasti`,
+        ambiguousTitle: 'Teks label memerlukan pengesahan',
+        confirmCodeBtn: (c) => `Sahkan sebagai "${c}"`,
+        allClearTitle: 'Semua baris dibaca jelas',
+        allClearSub: 'Tiada kod kabur ditemui.',
+        goResultBtn: 'Ke Keputusan →',
+        compareBtnTop: '⇄ Banding',
+        myPrefsBtnTop: '⚙ Pilihan',
+        uncertainWord: 'Tidak pasti',
+        awaitingConfirm: 'Menunggu Pengesahan (Lihat tab Imbas)',
+        lowCoverage: 'Data Tidak Mencukupi (<80%)',
+        euNonCompliant: 'Tidak Patuh Peraturan EU',
+        goodNoBanned: 'Baik · Tiada bahan terlarang EU',
+        scoreReducers: 'Bahan pengurang skor',
+        noRestrictedFound: 'Tiada bahan terhad pengurang skor dikesan.',
+        forYouCaps: 'UNTUK ANDA',
+        itemsAttentionFmt: (n) => `${n} ramuan perlu perhatian`,
+        fitsPrefs: 'Sesuai dengan pilihan anda',
+        compatibleWithFilters: 'Serasi dengan penapis dipilih',
+        halalCaps: 'HALAL',
+        noIssueSeen: 'Tiada isu dikesan',
+        musboohInspect: 'Syubhah / Semak',
+        halalRedShort: 'Tidak Patuh / Konflik',
+        tapForDetail: 'Ketik untuk butiran →',
+        ethanolLabel: '💧 Etil Alkohol (Etanol)',
+        ethanolPresent: 'Mengandungi etil alkohol',
+        ethanolOnlyFatty: 'Tiada (Alkohol lemak sahaja)',
+        ethanolNotListed: 'Tidak disenaraikan pada label',
+        ingredientsHeader: 'Senarai Ramuan',
+        attentionTab: 'Perhatian',
+        allTab: 'Semua',
+        noProblemBadge: 'Tiada isu',
+        notEthanolBadge: 'Bukan Etanol',
+        infoBadge: 'Info',
+        stdIngredientDesc: 'Ramuan piawai yang dibenarkan di bawah peraturan INCI / Makanan.',
+        restrictedDesc: 'Ramuan terhad mengikut peraturan EU.',
+        bannedDesc: 'Bahan terlarang di bawah Lampiran II peraturan EU.',
+        shieldDesc: 'Alkohol lemak pelembap / pengawet; BUKAN etil alkohol (etanol).',
+        musboohDesc: 'Boleh berasal daripada tumbuhan atau haiwan (syubhah); semak logo Halal JAKIM atau Vegan.',
+        haramDesc: 'Ramuan tidak patuh mengikut piawaian Halal dipilih.',
+        disclaimer: 'Untuk tujuan maklumat sahaja, bukan nasihat perubatan. Rujuk doktor atau ahli farmasi anda.',
+        halalEvalTitle: 'Penilaian Halal',
+        authorityWord: 'Pihak Berkuasa',
+        halalSubOk: 'Tiada sumber haram atau syubhah dikesan',
+        halalSubBad: 'Ramuan tidak patuh atau konflik logo dikesan',
+        halalSubWarn: 'Syubhah (sumber tumbuhan/haiwan); perlu pengesahan sijil',
+        scaleHalal: 'Halal', scaleMusbooh: 'Syubhah', scaleHaram: 'Haram / Konflik',
+        whyThisResult: 'Mengapa keputusan ini?',
+        howToClarify: 'Bagaimana untuk pastikan?',
+        verifyHalalLogoBtn: 'Sahkan logo Halal pada bungkusan',
+        activeWord: '✓ Aktif', simulateWord: 'Simulasi',
+        copyAskManufacturer: 'Salin mesej untuk tanya pengilang',
+        copiedWord: '✓ Disalin',
+        recentScans: 'Imbasan Terkini',
+        tapToInspect: 'Ketik untuk semak'
+      },
+      es: {
+        navCompare: 'Comparar', navResult: 'Resultado', navHalal: 'Halal', navProfile: 'Perfil',
+        darkThemeBtn: '🌙 Modo Oscuro', lightThemeBtn: '☀️ Modo Claro',
+        prefsHeader: 'InciFact · Preferencias Personales',
+        veganTitle: 'Vegano', veganDesc: 'Origen animal y sellos contradictorios',
+        halalToggleTitle: 'Control Halal',
+        halalToggleDesc: 'Eje independiente de la puntuación de salud; explica orígenes dudosos.',
+        seeResultBtn: 'Ver Resultado', selectedWord: 'seleccionado(s)',
+        cameraTitle: 'Cámara InciFact',
+        cosmeticShort: 'Cosmética', foodShort: 'Alimentación',
+        ingredientWord: 'ingredientes', recognizedWord: 'reconocidos',
+        recognizedCountFmt: (r, t) => `${r} / ${t} ingredientes reconocidos`,
+        ambiguousTitle: 'Texto ambiguo en la etiqueta',
+        confirmCodeBtn: (c) => `Confirmar como "${c}"`,
+        allClearTitle: 'Lectura OCR clara',
+        allClearSub: 'No se encontraron códigos ambiguos.',
+        goResultBtn: 'Ir al Resultado →',
+        compareBtnTop: '⇄ Comparar',
+        myPrefsBtnTop: '⚙ Preferencias',
+        uncertainWord: 'Incierto',
+        awaitingConfirm: 'Esperando confirmación (ver Escaneo)',
+        lowCoverage: 'Datos insuficientes (<80%)',
+        euNonCompliant: 'No conforme con la UE (Prohibido)',
+        goodNoBanned: 'Bueno · Sin sustancias prohibidas en la UE',
+        scoreReducers: 'Sustancias que restan puntos',
+        noRestrictedFound: 'No se detectaron sustancias restringidas que resten puntos.',
+        forYouCaps: 'PARA TI',
+        itemsAttentionFmt: (n) => `${n} ingrediente(s) de atención`,
+        fitsPrefs: 'Apto para tus preferencias',
+        compatibleWithFilters: 'Compatible con los filtros elegidos',
+        halalCaps: 'HALAL',
+        noIssueSeen: 'Sin problemas detectados',
+        musboohInspect: 'Mushbooh / Revisar',
+        halalRedShort: 'No apto / Conflicto',
+        tapForDetail: 'Toca para ver detalles →',
+        ethanolLabel: '💧 Alcohol Etílico (Etanol)',
+        ethanolPresent: 'Contiene alcohol etílico',
+        ethanolOnlyFatty: 'No contiene (Solo alcohol graso)',
+        ethanolNotListed: 'No figura en la etiqueta',
+        ingredientsHeader: 'Ingredientes',
+        attentionTab: 'Atención',
+        allTab: 'Todos',
+        noProblemBadge: 'Sin problema',
+        notEthanolBadge: 'No es Etanol',
+        infoBadge: 'Info',
+        stdIngredientDesc: 'Ingrediente estándar permitido bajo la normativa europea INCI / Alimentaria.',
+        restrictedDesc: 'Ingrediente sujeto a límites de concentración según normativa de la UE.',
+        bannedDesc: 'Sustancia prohibida según el Anexo II del reglamento de la UE.',
+        shieldDesc: 'Alcohol graso emoliente o conservante seguro; NO es alcohol etílico (etanol).',
+        musboohDesc: 'Puede ser de origen vegetal o animal; verifique el sello Halal o Vegano.',
+        haramDesc: 'Ingrediente no conforme según la autoridad Halal seleccionada.',
+        disclaimer: 'Solo con fines informativos; no constituye consejo médico. Consulte a su médico o farmacéutico.',
+        halalEvalTitle: 'Evaluación Halal',
+        authorityWord: 'Autoridad',
+        halalSubOk: 'No se detectaron fuentes ilícitas o dudosas',
+        halalSubBad: 'Ingrediente no apto o conflicto con el sello',
+        halalSubWarn: 'Dudoso (doble origen vegetal/animal posible)',
+        scaleHalal: 'Halal', scaleMusbooh: 'Mushbooh', scaleHaram: 'Haram / Conflicto',
+        whyThisResult: '¿Por qué este resultado?',
+        howToClarify: '¿Cómo aclarar?',
+        verifyHalalLogoBtn: 'Verificar sello Halal en el envase',
+        activeWord: '✓ Activo', simulateWord: 'Simular',
+        copyAskManufacturer: 'Copiar mensaje para consultar al fabricante',
+        copiedWord: '✓ Copiado',
+        recentScans: 'Escaneos recientes',
+        tapToInspect: 'Toca para inspeccionar'
+      },
+      ru: {
+        navCompare: 'Сравнить', navResult: 'Итог', navHalal: 'Халяль', navProfile: 'Профиль',
+        darkThemeBtn: '🌙 Тёмная тема', lightThemeBtn: '☀️ Светлая тема',
+        prefsHeader: 'InciFact · Личный профиль',
+        veganTitle: 'Веган', veganDesc: 'Животное происхождение и эко-маркировка',
+        halalToggleTitle: 'Проверка Халяль',
+        halalToggleDesc: 'Отдельная ось анализа; не смешивается с индексом безопасности.',
+        seeResultBtn: 'Показать результат', selectedWord: 'выбрано',
+        cameraTitle: 'Камера InciFact',
+        cosmeticShort: 'Косметика', foodShort: 'Продукты',
+        ingredientWord: 'компонентов', recognizedWord: 'распознано',
+        recognizedCountFmt: (r, t) => `Распознано ${r} из ${t} компонентов`,
+        ambiguousTitle: 'Требуется подтверждение строки',
+        confirmCodeBtn: (c) => `Подтвердить как "${c}"`,
+        allClearTitle: 'Все строки успешно распознаны',
+        allClearSub: 'Неоднозначных кодов не обнаружено.',
+        goResultBtn: 'К результату →',
+        compareBtnTop: '⇄ Сравнить',
+        myPrefsBtnTop: '⚙ Профиль',
+        uncertainWord: 'Неясно',
+        awaitingConfirm: 'Ожидает подтверждения (см. Скан)',
+        lowCoverage: 'Недостаточно данных (<80%)',
+        euNonCompliant: 'Запрещено регламентом ЕС',
+        goodNoBanned: 'Хорошо · Нет запрещённых в ЕС веществ',
+        scoreReducers: 'Снижают оценку',
+        noRestrictedFound: 'Ограниченных веществ, снижающих индекс, не обнаружено.',
+        forYouCaps: 'ДЛЯ ВАС',
+        itemsAttentionFmt: (n) => `Внимание: ${n} комп.`,
+        fitsPrefs: 'Подходит вашему профилю',
+        compatibleWithFilters: 'Совместимо с выбранными фильтрами',
+        halalCaps: 'ХАЛЯЛЬ',
+        noIssueSeen: 'Проблем не обнаружено',
+        musboohInspect: 'Мушбух / Проверить',
+        halalRedShort: 'Недопустимо / Конфликт',
+        tapForDetail: 'Нажмите для деталей →',
+        ethanolLabel: '💧 Этиловый спирт (Этанол)',
+        ethanolPresent: 'Содержит этиловый спирт',
+        ethanolOnlyFatty: 'Нет (Только жирный спирт)',
+        ethanolNotListed: 'Не указан в составе',
+        ingredientsHeader: 'Состав (Ингредиенты)',
+        attentionTab: 'Внимание',
+        allTab: 'Все',
+        noProblemBadge: 'Безопасно',
+        notEthanolBadge: 'Не этанол',
+        infoBadge: 'Инфо',
+        stdIngredientDesc: 'Разрешённый стандартный компонент согласно регламенту ЕС (INCI / Кодекс).',
+        restrictedDesc: 'Компонент с ограничением концентрации по регламенту ЕС.',
+        bannedDesc: 'Вещество запрещено Приложением II регламента ЕС.',
+        shieldDesc: 'Смягчающий жирный спирт или консервант; НЕ является этиловым спиртом (этанолом).',
+        musboohDesc: 'Может иметь растительное или животное происхождение (Мушбух); проверьте сертификат Халяль/Веган.',
+        haramDesc: 'Компонент не соответствует выбранному стандарту Халяль.',
+        disclaimer: 'Только в ознакомительных целях; не является медицинской рекомендацией. Проконсультируйтесь с врачом.',
+        halalEvalTitle: 'Оценка Халяль',
+        authorityWord: 'Стандарт',
+        halalSubOk: 'Запрещённых или сомнительных источников не выявлено',
+        halalSubBad: 'Обнаружен недопустимый компонент или конфликт маркировки',
+        halalSubWarn: 'Сомнительно (двойное происхождение: растительное/животное)',
+        scaleHalal: 'Халяль', scaleMusbooh: 'Мушбух', scaleHaram: 'Харам / Конфликт',
+        whyThisResult: 'Почему такой результат?',
+        howToClarify: 'Как уточнить?',
+        verifyHalalLogoBtn: 'Подтвердить знак Халяль на упаковке',
+        activeWord: '✓ Активно', simulateWord: 'Симуляция',
+        copyAskManufacturer: 'Скопировать запрос производителю',
+        copiedWord: '✓ Скопировано',
+        recentScans: 'Недавние сканы',
+        tapToInspect: 'Нажмите для просмотра'
+      },
+      ur: {
+        navCompare: 'موازنہ', navResult: 'نتیجہ', navHalal: 'حلال', navProfile: 'پروفائل',
+        darkThemeBtn: '🌙 ڈارک تھیم', lightThemeBtn: '☀️ لائٹ تھیم',
+        prefsHeader: 'InciFact · ذاتی ترجیحات',
+        veganTitle: 'ویگن (Vegan)', veganDesc: 'حیوانی ذرائع اور لوگو کا تضاد',
+        halalToggleTitle: 'حلال چیک',
+        halalToggleDesc: 'صحت کے اسکور سے الگ محور؛ مشکوک اجزاء کی مکمل وضاحت کرتا ہے۔',
+        seeResultBtn: 'نتیجہ دیکھیں', selectedWord: 'منتخب',
+        cameraTitle: 'InciFact کیمرہ',
+        cosmeticShort: 'کاسمیٹک', foodShort: 'خوراک',
+        ingredientWord: 'اجزاء', recognizedWord: 'شناخت شدہ',
+        recognizedCountFmt: (r, t) => `${formatDigits(t, 'ur')} میں سے ${formatDigits(r, 'ur')} اجزاء شناخت ہوئے`,
+        ambiguousTitle: 'اس سطر کی تصدیق کریں',
+        confirmCodeBtn: (c) => `"${c}" کے طور پر تصدیق کریں`,
+        allClearTitle: 'تمام اجزاء واضح طور پر پڑھے گئے',
+        allClearSub: 'کوئی مبہم کوڈ نہیں ملا۔',
+        goResultBtn: 'نتیجہ دیکھیں ←',
+        compareBtnTop: '⇄ موازنہ',
+        myPrefsBtnTop: '⚙ ترجیحات',
+        uncertainWord: 'غیر یقینی',
+        awaitingConfirm: 'تصدیق کا انتظار ہے (اسکین ٹیب دیکھیں)',
+        lowCoverage: 'ناکافی ڈیٹا (<٪۸۰)',
+        euNonCompliant: 'یورپی یونین قوانین کے خلاف',
+        goodNoBanned: 'بہترین · کوئی ممنوعہ مادہ نہیں',
+        scoreReducers: 'اسکور کم کرنے والے اجزاء',
+        noRestrictedFound: 'اسکور کم کرنے والا کوئی محدود مادہ نہیں ملا۔',
+        forYouCaps: 'آپ کے لیے',
+        itemsAttentionFmt: (n) => `${formatDigits(n, 'ur')} اجزاء توجہ طلب`,
+        fitsPrefs: 'آپ کی ترجیحات کے مطابق',
+        compatibleWithFilters: 'منتخب فلٹرز کے ساتھ مطابقت رکھتا ہے',
+        halalCaps: 'حلال',
+        noIssueSeen: 'کوئی مسئلہ نہیں ملا',
+        musboohInspect: 'مشبوہ / جائزہ لیں',
+        halalRedShort: 'غیر موزوں / تضاد',
+        tapForDetail: 'تفصیل کے لیے ٹیپ کریں ←',
+        ethanolLabel: '💧 ایتھائل الکوحل (ایتھنول)',
+        ethanolPresent: 'ایتھائل الکوحل شامل ہے',
+        ethanolOnlyFatty: 'نہیں ہے (صرف محفوظ فیٹی الکوحل ہے)',
+        ethanolNotListed: 'لیبل پر درج نہیں',
+        ingredientsHeader: 'اجزاء کی فہرست',
+        attentionTab: 'توجہ',
+        allTab: 'تمام',
+        noProblemBadge: 'محفوظ',
+        notEthanolBadge: 'ایتھنول نہیں ہے',
+        infoBadge: 'معلومات',
+        stdIngredientDesc: 'یورپی یونین INCI / فوڈ کوڈیکس کے تحت منظور شدہ معیاری جزو۔',
+        restrictedDesc: 'یورپی یونین قوانین کے تحت مخصوص مقدار تک محدود جزو۔',
+        bannedDesc: 'یورپی یونین ریگولیشن ضمیمہ II کے تحت ممنوعہ مادہ۔',
+        shieldDesc: 'یہ جلد کو نرم رکھنے والا فیٹی الکوحل یا محفوظ پرزرویٹو ہے؛ نشہ آور ایتھائل الکوحل (ایتھنول) نہیں ہے۔',
+        musboohDesc: 'نباتاتی یا حیوانی دونوں ذرائع سے ہو سکتا ہے (مشبوہ)؛ پیکنگ پر حلال یا ویگن سرٹیفکیٹ چیک کریں۔',
+        haramDesc: 'منتخب حلال اتھارٹی کے معیار کے مطابق غیر موزوں جزو۔',
+        disclaimer: 'صرف معلوماتی مقاصد کے لیے ہے، طبی مشورہ نہیں۔ صحت کے فیصلوں کے لیے ڈاکٹر یا فارماسسٹ سے رجوع کریں۔',
+        halalEvalTitle: 'حلال تشخیص',
+        authorityWord: 'ادارہ',
+        halalSubOk: 'کوئی حرام یا مشکوک ذریعہ نہیں ملا',
+        halalSubBad: 'غیر موزوں جزو یا سرٹیفکیٹ کا تضاد ملا',
+        halalSubWarn: 'مشبوہ (دوہرا ذریعہ: نباتاتی یا حیوانی تصدیق درکار ہے)',
+        scaleHalal: 'حلال', scaleMusbooh: 'مشبوہ', scaleHaram: 'حرام / تضاد',
+        whyThisResult: 'یہ نتیجہ کیوں؟',
+        howToClarify: 'کیسے واضح کریں؟',
+        verifyHalalLogoBtn: 'پیکنگ پر حلال لوگو کی تصدیق کریں',
+        activeWord: '✓ فعال', simulateWord: 'سمولیشن',
+        copyAskManufacturer: 'مینوفیکچرر سے پوچھنے کے لیے پیغام کاپی کریں',
+        copiedWord: '✓ کاپی ہو گیا',
+        recentScans: 'حالیہ اسکینز',
+        tapToInspect: 'معائنہ کے لیے ٹیپ کریں'
+      }
+    };
+
+    const TOAST_I18N = {
+      tr: { badge: 'Panoya Kopyalandı', ready: 'WhatsApp / E-posta için hazır' },
+      en: { badge: 'Copied to Clipboard', ready: 'Ready for WhatsApp / Email' },
+      ar: { badge: 'تم النسخ إلى الحافظة', ready: 'جاهز للإرسال عبر واتساب أو البريد' },
+      de: { badge: 'In die Zwischenablage kopiert', ready: 'Bereit für WhatsApp / E-Mail' },
+      fr: { badge: 'Copié dans le presse-papiers', ready: 'Prêt pour WhatsApp / E-mail' },
+      id: { badge: 'Tersalin ke Papan Klip', ready: 'Siap untuk WhatsApp / Email' },
+      ms: { badge: 'Disalin ke Papan Keratan', ready: 'Sedia untuk WhatsApp / E-mel' },
+      es: { badge: 'Copiado al Portapapeles', ready: 'Listo para WhatsApp / Correo' },
+      ru: { badge: 'Скопировано в буфер обмена', ready: 'Готово для WhatsApp / Email' },
+      ur: { badge: 'کلپ بورڈ پر کاپی ہو گیا', ready: 'واٹس ایپ یا ای میل کے لیے تیار' }
+    };
+
+    const LEGAL_I18N = {
+      tr: {
+        disclaimer: 'Bu analiz, seçilen kurumların kamuya açık fıkhi standartlarına dayalı bağımsız bir algoritmik ön incelemedir. Kurumların resmi onayı veya tescili niteliğinde değildir. Nihai güvence için ambalajdaki resmi sertifika logosunu ve numarasını teyit ediniz.',
+        link: 'Fıkhi Metodoloji & Resmi Fetva Kaynakları',
+        title: 'Fıkhi Metodoloji ve Kaynak Beyanı',
+        close: 'Kapat'
+      },
+      en: {
+        disclaimer: 'This assessment is an independent algorithmic screening based on publicly available standards of the selected authorities. It is not an official endorsement or certification. Please verify the official certification logo and number on packaging.',
+        link: 'Methodology & Official Fatwa Sources',
+        title: 'Jurisprudential Methodology & Source Disclosure',
+        close: 'Close'
+      },
+      ar: {
+        disclaimer: 'هذا التقييم هو فحص خوارزمي مستقل يستند إلى المعايير الفقهية المعلنة للجهات المختارة، ولا يُعد اعتماداً أو ترخيصاً رسمياً. يُرجى التحقق من شعار ورقم الشهادة المعتمدة على العبوة.',
+        link: 'المنهجية الفقهية ومصادر الفتاوى الرسمية',
+        title: 'المنهجية الفقهية ومصادر الأحكام',
+        close: 'إغلاق'
+      },
+      de: {
+        disclaimer: 'Diese Analyse ist eine unabhängige algorithmische Vorprüfung auf Grundlage öffentlich zugänglicher Standards der ausgewählten Institutionen. Sie stellt keine offizielle Zertifizierung dar. Bitte prüfen Sie das offizielle Siegel auf der Packung.',
+        link: 'Methodik & Offizielle Fatwa-Quellen',
+        title: 'Fıqh-Methodik & Quellennachweis',
+        close: 'Schließen'
+      },
+      fr: {
+        disclaimer: 'Cette évaluation est un examen algorithmique indépendant basé sur les normes publiques des autorités sélectionnées. Elle ne constitue pas une certification officielle. Veuillez vérifier le logo et le numéro de certification sur l\'emballage.',
+        link: 'Méthodologie & Sources Officielles des Fatwas',
+        title: 'Méthodologie Juridique & Divulgation des Sources',
+        close: 'Fermer'
+      },
+      id: {
+        disclaimer: 'Analisis ini merupakan penyaringan algoritmik independen berdasarkan standar publik lembaga terkait. Bukan merupakan sertifikasi resmi. Silakan verifikasi nomor dan logo sertifikasi halal resmi pada kemasan.',
+        link: 'Metodologi & Sumber Fatwa Resmi',
+        title: 'Metodologi Fikih & Sumber Rujukan',
+        close: 'Tutup'
+      },
+      ms: {
+        disclaimer: 'Penilaian ini adalah saringan algoritma bebas berdasarkan piawaian awam pihak berkuasa yang dipilih. Ia bukan perakuan rasmi. Sila sahkan logo dan nombor sijil rasmi pada bungkusan produk.',
+        link: 'Metodologi & Sumber Fatwa Rasmi',
+        title: 'Metodologi Fiqh & Rujukan Rasmi',
+        close: 'Tutup'
+      },
+      es: {
+        disclaimer: 'Esta evaluación es un análisis algorítmico independiente basado en estándares públicos de las entidades seleccionadas. No constituye una certificación oficial. Verifique el sello y código oficial en el empaque.',
+        link: 'Metodología & Fuentes Oficiales de Fatwas',
+        title: 'Metodología & Divulgación de Fuentes',
+        close: 'Cerrar'
+      },
+      ru: {
+        disclaimer: 'Данный анализ представляет собой независимую алгоритмическую проверку на основе публичных стандартов выбранных организаций. Он не является официальным сертификатом. Проверяйте официальный знак на упаковке.',
+        link: 'Методология и официальные источники фетв',
+        title: 'Методология и источники стандартов',
+        close: 'Закрыть'
+      },
+      ur: {
+        disclaimer: 'یہ تجزیہ منتخب اداروں کے عوامی معیارات پر مبنی ایک خود مختار الگورتھمک جانچ ہے۔ یہ کوئی سرکاری تصدیق یا سرٹیفکیٹ نہیں ہے۔ پیکیجنگ پر سرکاری سرٹیفکیٹ لوگو اور نمبر کی تصدیق کریں۔',
+        link: 'فقہی طریقہ کار اور سرکاری فتاویٰ کے ذرائع',
+        title: 'فقہی طریقہ کار اور ماخذ کا بیان',
+        close: 'بند کریں'
+      }
+    };
+
+    function getUiText(lang) {
+      const base = I18N_PHONE[lang] || I18N_PHONE.en;
+      const toast = TOAST_I18N[lang] || TOAST_I18N.en;
+      const legal = LEGAL_I18N[lang] || LEGAL_I18N.en;
+      return {
+        ...base,
+        copiedToastBadge: toast.badge,
+        readyForSharing: toast.ready,
+        legalDisclaimerMicro: legal.disclaimer,
+        methodologyLink: legal.link,
+        methodologyTitle: legal.title,
+        methodologyClose: legal.close
+      };
+    }
+
+    function localizeItemExplanation(kind, euStatus, rawText, lang) {
+      if (lang === 'tr') return rawText;
+      const u = getUiText(lang);
+      if (euStatus === 'yasak') return u.bannedDesc;
+      if (kind === 'warn') return u.restrictedDesc;
+      return u.stdIngredientDesc;
+    }
+
+    function renderScreen() {
+      const el = document.getElementById('screenContent');
+      if (!state.evalData) return;
+
+      if (state.screen === 'main') {
+        el.innerHTML = renderMainScreen();
+      } else if (state.screen === 'scan') {
+        el.innerHTML = renderScanScreen();
+      } else if (state.screen === 'result') {
+        el.innerHTML = renderResultScreen();
+      } else if (state.screen === 'halal') {
+        el.innerHTML = renderHalalScreen();
+      } else if (state.screen === 'compare') {
+        el.innerHTML = renderCompareScreen();
+      }
+    }
+
+    // 1. PROFIL & AYARLAR EKRANI (Main.dc.html) - 10 LANGUAGE LOCALIZED + REGIONAL STRUCTURE SETTINGS
+    function renderMainScreen() {
+      const loc = state.evalData.locale;
+      const u = getUiText(state.lang);
+      const st = STUDIO_I18N[state.lang] || STUDIO_I18N.en;
+      const struct = MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr;
+      const currentAuth = document.getElementById('halalAuth').value;
+      const pLoc = loc.profileScreen.profiles;
+      const cards = [
+        { k: 'hamilelik', title: pLoc.hamilelik.name, desc: pLoc.hamilelik.desc },
+        { k: 'akne', title: pLoc.akne.name, desc: pLoc.akne.desc },
+        { k: 'hassas_cilt', title: pLoc.hassas_cilt.name, desc: pLoc.hassas_cilt.desc },
+        { k: 'cocuk_metabolik', title: pLoc.cocuk_metabolik.name, desc: pLoc.cocuk_metabolik.desc },
+        { k: 'astim_alerji', title: pLoc.astim_alerji.name, desc: pLoc.astim_alerji.desc },
+        { k: 'vegan', title: u.veganTitle, desc: u.veganDesc }
+      ];
+      const selectedCount = Object.values(state.profiles).filter(Boolean).length;
+
+      return `
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; gap:6px;">
+            <div style="width:22px; height:4px; border-radius:2px; background:var(--accent)"></div>
+            <div style="width:22px; height:4px; border-radius:2px; background:var(--accent)"></div>
+            <div style="width:22px; height:4px; border-radius:2px; background:var(--line)"></div>
+          </div>
+          <span style="font-size:13px; color:var(--muted); font-weight:600;">${u.prefsHeader}</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <h1 style="margin:0; font-size:24px; line-height:1.18; font-weight:800; letter-spacing:-0.02em;">${loc.profileScreen.title}</h1>
+          <p style="margin:0; font-size:13.5px; line-height:1.45; color:var(--muted);">${loc.profileScreen.subtitle}</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px;">
+          ${cards
+            .map((c) => {
+              const on = !!state.profiles[c.k];
+              return `
+              <button type="button" onclick="toggleProfile('${c.k}')" style="position:relative; text-align:start; display:flex; flex-direction:column; gap:6px; padding:14px; min-height:94px; border-radius:18px; border:1.5px solid ${on ? 'var(--accent)' : 'var(--line)'}; background:${on ? 'var(--soft)' : 'var(--surface)'}; color:var(--ink);">
+                <span style="font-size:14px; font-weight:700;">${c.title}</span>
+                <span style="font-size:11.5px; line-height:1.35; color:var(--muted);">${c.desc}</span>
+                ${
+                  on
+                    ? `<span style="position:absolute; top:10px; inset-inline-end:10px; width:20px; height:20px; border-radius:10px; background:var(--accent); color:var(--on-accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">✓</span>`
+                    : ''
+                }
+              </button>`;
+            })
+            .join('')}
+        </div>
+
+        <button type="button" onclick="toggleProfile('halal')" style="position:relative; text-align:start; display:flex; align-items:center; gap:12px; padding:14px; border-radius:18px; border:1.5px solid ${state.profiles.halal ? 'var(--accent)' : 'var(--line)'}; background:${state.profiles.halal ? 'var(--soft)' : 'var(--surface)'}; color:var(--ink);">
+          <div style="display:flex; flex-direction:column; gap:3px; flex:1;">
+            <span style="font-size:14.5px; font-weight:700;">${u.halalToggleTitle} (${currentAuth})</span>
+            <span style="font-size:12px; line-height:1.35; color:var(--muted);">${u.halalToggleDesc}</span>
+          </div>
+          ${
+            state.profiles.halal
+              ? `<span style="width:22px; height:22px; border-radius:11px; background:var(--accent); color:var(--on-accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; flex:none;">✓</span>`
+              : ''
+          }
+        </button>
+
+        <!-- AYARLAR: Bölge, Dil ve Ülke Yapısı Seçimi (Varsayılan: İndirilen Ülke / Cihaz Dili) -->
+        <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:10px;">
+          <div onclick="state.settingsExpanded = !state.settingsExpanded; renderScreen();" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:13.5px; font-weight:800;">${st.settingsTitle}</span>
+              <span style="font-size:11.5px; color:var(--muted);">${struct.flag} ${struct.name} · ${currentAuth}</span>
+            </div>
+            <span style="font-size:11px; font-weight:700; padding:4px 8px; border-radius:10px; background:var(--soft); color:var(--accent); flex:none;">
+              ${state.autoDetected ? st.autoBadge : st.manualBadge} ▾
+            </span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:8px; padding-top:8px; border-top:1px solid var(--line);">
+            <div>
+              <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.countryStructureLbl}</label>
+              <select onchange="switchLang(this.value)" style="width:100%; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12.5px; font-weight:700;">
+                <option value="auto" ${state.autoDetected ? 'selected' : ''}>${st.autoOptionLbl} (${MARKET_STRUCTURES[detectDeviceLang()].flag} ${MARKET_STRUCTURES[detectDeviceLang()].name})</option>
+                ${Object.entries(MARKET_STRUCTURES)
+                  .map(
+                    ([code, m]) =>
+                      `<option value="${code}" ${!state.autoDetected && state.lang === code ? 'selected' : ''}>${m.flag} ${m.name} (${m.auth})</option>`
+                  )
+                  .join('')}
+              </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div>
+                <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.halalAuthSettingLbl}</label>
+                <select onchange="changeAuthorityFromSettings(this.value)" style="width:100%; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
+                  <option value="GIMDES" ${currentAuth === 'GIMDES' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).GIMDES}</option>
+                  <option value="MUI" ${currentAuth === 'MUI' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).MUI}</option>
+                  <option value="JAKIM" ${currentAuth === 'JAKIM' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).JAKIM}</option>
+                  <option value="IFANCA" ${currentAuth === 'IFANCA' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).IFANCA}</option>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.regStructureLbl}</label>
+                <select onchange="changeJurisdictionFromSettings(this.value)" style="width:100%; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
+                  <option value="TR" ${state.jurisdiction === 'TR' ? 'selected' : ''}>TR (TİTCK/TGK + AB)</option>
+                  <option value="EU" ${state.jurisdiction === 'EU' ? 'selected' : ''}>EU (EC 1223/2009)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" onclick="switchScreen('result')" style="margin-top:auto; height:52px; border-radius:26px; border:none; background:var(--accent); color:var(--on-accent); font-size:15.5px; font-weight:700;">
+          ${u.seeResultBtn} · ${formatDigits(selectedCount, state.lang)} ${u.selectedWord}
+        </button>
+      `;
+    }
+
+    // 2. TARA / OCR DOĞRULAMA EKRANI (Scan.dc.html) - 10 LANGUAGE LOCALIZED
+    function renderScanScreen() {
+      const loc = state.evalData.locale;
+      const u = getUiText(state.lang);
+      const obs = state.evalData.observations || [];
+      const confirmations = state.evalData.unresolvedConfirmations || [];
+      const recCount = obs.filter((o) => o.status === 'recognized').length;
+
+      return `
+        <div style="background:#111613; color:#F3F5F2; margin:-48px -18px -24px; min-height:760px; padding:48px 18px 24px; display:flex; flex-direction:column; justify-content:space-between; position:relative;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-weight:800; font-size:16px;">${u.cameraTitle}</span>
+            <span style="font-size:12px; padding:6px 12px; border-radius:16px; background:rgba(255,255,255,0.14); font-weight:700;">
+              ${state.evalData.productType === 'cosmetic' ? loc.scanScreen.productTypeCosmetic : loc.scanScreen.productTypeFood}
+            </span>
+          </div>
+
+          <div style="position:relative; margin:16px auto; width:100%; background:#EEEBE2; border-radius:12px; padding:16px; color:#2A2A26; font-size:13px; line-height:1.75; transform:rotate(-1deg); box-shadow:0 12px 30px rgba(0,0,0,0.35);">
+            <span style="font-weight:800; letter-spacing:0.04em;">${u.ingredientsHeader.toUpperCase()}: </span>
+            ${obs
+              .map((o) => {
+                const disp = escapeHtml(o.localizedName || o.raw);
+                if (o.status === 'recognized') {
+                  return `<span style="background:rgba(30,122,69,0.22); border-radius:4px; padding:1px 4px;">${disp}</span>`;
+                }
+                return `<span style="outline:2px dashed #D9901A; background:rgba(242,177,52,0.32); border-radius:4px; padding:1px 4px; font-weight:700;">${disp}</span>`;
+              })
+              .join(', ')}
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:8px;">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 14px; border-radius:20px; background:rgba(0,0,0,0.6);">
+              <span style="font-size:14px; font-weight:700;">${u.recognizedCountFmt(recCount, obs.length)}</span>
+            </div>
+          </div>
+
+          <div style="background:var(--surface); color:var(--ink); border-radius:26px; padding:18px; display:flex; flex-direction:column; gap:10px;">
+            ${
+              confirmations.length > 0
+                ? confirmations
+                    .map(
+                      (c) => `
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="width:28px; height:28px; border-radius:14px; background:var(--warn-bg); color:var(--warn); display:flex; align-items:center; justify-content:center; font-weight:800;">?</span>
+                    <h2 style="margin:0; font-size:17px; font-weight:800;">${loc.resultScreen.ocrWarningTitle}</h2>
+                  </div>
+                  <p style="margin:0; font-size:13px; line-height:1.4; color:var(--muted);">${escapeHtml(c.message || u.ambiguousTitle)}</p>
+                  <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+                    ${
+                      c.options
+                        ? c.options
+                            .map(
+                              (opt) => `
+                          <button type="button" data-token="${escapeHtml(c.token)}" data-opt="${escapeHtml(opt.id)}" onclick="handleResolveClick(this)" style="height:48px; border-radius:14px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; font-weight:700;">
+                            <span>${escapeHtml(opt.label)}</span>
+                            <span class="mono" style="font-size:12px; color:var(--muted);">${escapeHtml(opt.code || '')}</span>
+                          </button>`
+                            )
+                            .join('')
+                        : `<button type="button" data-token="${escapeHtml(c.token)}" data-opt="${escapeHtml(c.candidateCode)}" onclick="handleResolveClick(this)" style="height:48px; border-radius:14px; border:1.5px solid var(--accent); background:var(--soft); color:var(--ink); font-weight:700;">${escapeHtml(u.confirmCodeBtn(c.candidateCode))}</button>`
+                    }
+                  </div>
+                `
+                    )
+                    .join('')
+                : `
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <div>
+                      <div style="font-size:16px; font-weight:800;">${u.allClearTitle}</div>
+                      <div style="font-size:12.5px; color:var(--muted);">${u.allClearSub}</div>
+                    </div>
+                    <button type="button" onclick="switchScreen('result')" style="height:42px; padding:0 16px; border-radius:21px; border:none; background:var(--accent); color:var(--on-accent); font-weight:700; flex:none;">${u.goResultBtn}</button>
+                  </div>
+                `
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    // 3. SONUÇ EKRANI (Result.dc.html + LabelSafa Sakin Özet Sentezi) - 10 LANGUAGE LOCALIZED
+    function renderResultScreen() {
+      const loc = state.evalData.locale;
+      const u = getUiText(state.lang);
+      const reg = state.evalData.cards.regulatoryCard;
+      const prof = state.evalData.cards.profileCard;
+      const halal = state.evalData.cards.halalCard;
+      const obs = state.evalData.observations || [];
+
+      const score = reg.score;
+      const circumference = 238.8;
+      const dash = score !== null ? ((score / 100) * circumference).toFixed(1) : '0';
+
+      const penaltyItems = reg.findings.filter((f) => f.severity !== 'bilgi');
+      const ethanolFound = halal.findings.some((f) => f.category === 'B_alkol');
+
+      // Build list of items for Dikkat vs Tümü
+      const allRows = obs.map((o) => {
+        const regFind = reg.findings.find((f) => f.position === o.position);
+        const profAlert = prof.alerts.find((a) => a.position === o.position);
+        const shield = halal.falsePositiveShields.find((s) => s.rawToken === o.raw);
+
+        let kind = 'ok';
+        let levelText = u.noProblemBadge;
+        let whyText = o.substance
+          ? localizeItemExplanation('ok', 'izinli', o.substance.eu_detail, state.lang)
+          : u.stdIngredientDesc;
+        let sources = o.substance ? o.substance.sources || [] : [];
+
+        if (o.status === 'unrecognized' || (!o.substance && !o.halalRule && !o.hiddenSugar && !o.rapidCarb)) {
+          kind = 'unknown';
+          levelText = (loc.badges && loc.badges.unrecognized) || 'Bilinmeyen / Doğrulanmadı';
+          whyText = 'Bu bileşen resmi AB CosIng veya gıda veritabanında doğrudan eşleşmedi; resmi güvenlik veya helallik teyidi bulunmuyor.';
+        } else if (regFind && (regFind.severity === 'yuksek' || regFind.severity === 'orta' || regFind.severity === 'dusuk')) {
+          kind = 'warn';
+          levelText = regFind.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted;
+          whyText = regFind.legalText || localizeItemExplanation('warn', regFind.euStatus, '', state.lang);
+        } else if (profAlert) {
+          kind = 'info';
+          const profName = loc.profileScreen.profiles[profAlert.profile]
+            ? loc.profileScreen.profiles[profAlert.profile].name
+            : profAlert.profile;
+          levelText = `${u.infoBadge} · ${profName}`;
+          whyText = profAlert.explanation;
+        } else if (shield) {
+          kind = 'ok';
+          levelText = u.notEthanolBadge;
+          whyText = shield.explanation || u.shieldDesc;
+        }
+
+        return {
+          pos: o.position,
+          name: o.localizedName || (o.substance ? o.substance.name : o.raw),
+          kind,
+          levelText,
+          whyText,
+          sources
+        };
+      });
+
+      const flaggedRows = allRows.filter((r) => r.kind !== 'ok');
+      const visibleRows = state.showAllIngredients ? allRows : flaggedRows;
+
+      return `
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <img src="./assets/incifact-app-icon.png" width="28" height="28" style="border-radius:7px; display:block; flex:none; box-shadow: 0 1px 4px rgba(11, 19, 43, 0.2);" alt="InciFact Logo" />
+            <span style="font-weight:800; font-size:16px;">InciFact</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" onclick="switchScreen('compare')" style="height:34px; padding:0 12px; border-radius:17px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.compareBtnTop}</button>
+            <button type="button" onclick="switchScreen('main')" style="height:34px; padding:0 12px; border-radius:17px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.myPrefsBtnTop}</button>
+          </div>
+        </div>
+
+        <div>
+          <h1 style="margin:0; font-size:21px; font-weight:800; letter-spacing:-0.01em;">${state.productTitle}</h1>
+          <span style="font-size:13px; color:var(--muted);">
+            ${state.evalData.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${formatDigits(reg.totalCount, state.lang)} ${u.ingredientWord} · ${state.lang === 'ar' || state.lang === 'ur' ? '٪' + formatDigits(reg.coveragePercent, state.lang) : '%' + reg.coveragePercent} ${u.recognizedWord}
+          </span>
+        </div>
+
+        <!-- Score Ring & Penalty Breakdown Card -->
+        <div style="background:var(--surface); border-radius:22px; padding:16px; display:flex; gap:16px; align-items:center;">
+          <div style="position:relative; width:86px; height:86px; flex:none;">
+            <svg width="86" height="86" viewBox="0 0 88 88">
+              <circle cx="44" cy="44" r="38" fill="none" stroke="var(--line)" stroke-width="8"></circle>
+              <circle cx="44" cy="44" r="38" fill="none" stroke="${score !== null && score >= 75 ? 'var(--ok)' : 'var(--warn)'}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${dash} 238.8" transform="rotate(-90 44 44)"></circle>
+            </svg>
+            <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <span style="font-size:28px; font-weight:800; line-height:1;">${score !== null ? formatDigits(score, state.lang) : '—'}</span>
+              <span style="font-size:11px; color:var(--muted);" dir="ltr">${score !== null ? '/ ' + formatDigits(100, state.lang) : u.uncertainWord}</span>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:5px; flex:1; min-width:0;">
+            <span style="font-size:15px; font-weight:800; color:${reg.capApplied === 10 ? 'var(--bad)' : (score !== null && score >= 75 ? 'var(--ok)' : 'var(--warn)')};">
+              ${
+                reg.capApplied === 10
+                  ? u.euNonCompliant
+                  : !reg.canShowScore
+                  ? reg.scoreSuppressionReason === 'awaiting_user_confirmation'
+                    ? u.awaitingConfirm
+                    : u.lowCoverage
+                  : u.goodNoBanned
+              }
+            </span>
+            ${
+              penaltyItems.length > 0
+                ? `<span style="font-size:12px; color:var(--muted); font-weight:600;">${u.scoreReducers}</span>` +
+                  penaltyItems
+                    .slice(0, 3)
+                    .map(
+                      (p) =>
+                        `<div style="display:flex; align-items:center; gap:8px; font-size:13px;"><span class="mono" dir="ltr" style="color:var(--warn); width:28px;">${formatDigits(p.severity === 'yuksek' ? '−25' : p.severity === 'orta' ? '−10' : '−3', state.lang)}</span><span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(p.localizedName || p.name)}</span></div>`
+                    )
+                    .join('')
+                : `<span style="font-size:12.5px; color:var(--muted);">${u.noRestrictedFound}</span>`
+            }
+          </div>
+        </div>
+
+        <!-- 2x1 Personal & Halal Summary Tiles + Ethanol Row -->
+        <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px;">
+          <div onclick="switchScreen('main')" style="cursor:pointer; background:${(reg.score === null || reg.coveragePercent < 80 || prof.preferenceMatchScore === null || Object.values(prof.profileStatuses).includes('kapsam_yetersiz')) ? 'var(--surface)' : prof.alerts.length > 0 ? 'var(--warn-bg)' : 'var(--ok-bg)'}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px;">
+            <span style="font-size:11.5px; font-weight:800; color:${(reg.score === null || reg.coveragePercent < 80 || prof.preferenceMatchScore === null || Object.values(prof.profileStatuses).includes('kapsam_yetersiz')) ? 'var(--muted)' : prof.alerts.length > 0 ? 'var(--warn)' : 'var(--ok)'};">${u.forYouCaps}</span>
+            <span style="font-size:13.5px; font-weight:800;">${(reg.score === null || reg.coveragePercent < 80 || prof.preferenceMatchScore === null || Object.values(prof.profileStatuses).includes('kapsam_yetersiz')) ? (loc.badges.lowCoverage || 'Kapsam Yetersiz') : prof.alerts.length > 0 ? u.itemsAttentionFmt(prof.alerts.length) : u.fitsPrefs}</span>
+            <span style="font-size:12px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${(reg.score === null || reg.coveragePercent < 80 || prof.preferenceMatchScore === null || Object.values(prof.profileStatuses).includes('kapsam_yetersiz')) ? 'İçerik kapsamı yetersiz olduğu için doğrulanamadı' : prof.alerts.length > 0 ? escapeHtml((prof.alerts[0].localizedName || prof.alerts[0].substanceName) + ' (#' + formatDigits(prof.alerts[0].position, state.lang) + ')') : u.compatibleWithFilters}
+            </span>
+          </div>
+
+          <div onclick="switchScreen('halal')" style="cursor:pointer; background:${halal.overallStatus === 'uygun_gorunuyor' ? 'var(--ok-bg)' : halal.overallStatus === 'kaynak_belirsiz_musbooh' || halal.overallStatus === 'kapsam_yetersiz' ? 'var(--warn-bg)' : 'var(--bad-bg)'}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px;">
+            <span style="font-size:11.5px; font-weight:800; color:${halal.overallStatus === 'uygun_gorunuyor' ? 'var(--ok)' : halal.overallStatus === 'kaynak_belirsiz_musbooh' || halal.overallStatus === 'kapsam_yetersiz' ? 'var(--warn)' : 'var(--bad)'};">${u.halalCaps} · ${halal.selectedAuthority}</span>
+            <span style="font-size:13.5px; font-weight:800;">${halal.overallStatus === 'uygun_gorunuyor' ? u.noIssueSeen : halal.overallStatus === 'kaynak_belirsiz_musbooh' ? u.musboohInspect : halal.overallStatus === 'kapsam_yetersiz' ? (loc.badges.lowCoverage || u.lowCoverage) : u.halalRedShort}</span>
+            <span style="font-size:12px; color:var(--ink);">${u.tapForDetail}</span>
+          </div>
+        </div>
+
+        <!-- LabelSafa-style Calm Ethanol & False-Positive Shield Row -->
+        <div style="background:var(--surface); border-radius:16px; padding:11px 14px; display:flex; align-items:center; justify-content:space-between; font-size:13px;">
+          <span style="font-weight:700;">${u.ethanolLabel}</span>
+          <span style="color:${ethanolFound ? 'var(--warn)' : 'var(--ok)'}; font-weight:700;">
+            ${ethanolFound ? u.ethanolPresent : halal.falsePositiveShields.length > 0 ? u.ethanolOnlyFatty : u.ethanolNotListed}
+          </span>
+        </div>
+
+        <!-- Ingredients Filter Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:2px;">
+          <h2 style="margin:0; font-size:16px; font-weight:800;">${u.ingredientsHeader}</h2>
+          <div style="display:flex; padding:3px; border-radius:16px; background:var(--surface2);">
+            <button type="button" onclick="state.showAllIngredients=false; renderScreen();" style="height:30px; padding:0 12px; border-radius:13px; border:none; background:${!state.showAllIngredients ? 'var(--surface)' : 'transparent'}; color:${!state.showAllIngredients ? 'var(--ink)' : 'var(--muted)'}; font-size:12px; font-weight:700;">
+              ${u.attentionTab} · ${formatDigits(flaggedRows.length, state.lang)}
+            </button>
+            <button type="button" onclick="state.showAllIngredients=true; renderScreen();" style="height:30px; padding:0 12px; border-radius:13px; border:none; background:${state.showAllIngredients ? 'var(--surface)' : 'transparent'}; color:${state.showAllIngredients ? 'var(--ink)' : 'var(--muted)'}; font-size:12px; font-weight:700;">
+              ${u.allTab} · ${formatDigits(allRows.length, state.lang)}
+            </button>
+          </div>
+        </div>
+
+        <!-- Ingredient Cards -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${visibleRows
+            .map((it) => {
+              const badgeBg = it.kind === 'warn' ? 'var(--warn-bg)' : it.kind === 'info' ? 'var(--info-bg)' : it.kind === 'unknown' ? 'var(--surface2)' : 'var(--ok-bg)';
+              const fg = it.kind === 'warn' ? 'var(--warn)' : it.kind === 'info' ? 'var(--info)' : it.kind === 'unknown' ? 'var(--muted)' : 'var(--ok)';
+              return `
+              <div style="background:var(--surface); border-radius:18px; padding:12px 14px; display:flex; gap:10px;">
+                <span style="width:26px; height:26px; border-radius:13px; background:${badgeBg}; color:${fg}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex:none;">
+                  ${it.kind === 'warn' ? '!' : it.kind === 'info' ? 'i' : it.kind === 'unknown' ? '?' : '✓'}
+                </span>
+                <div style="display:flex; flex-direction:column; gap:4px; min-width:0; flex:1;">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px;">
+                    <div style="display:flex; align-items:baseline; gap:6px; min-width:0;">
+                      <span style="font-size:14px; font-weight:700;">${escapeHtml(it.name)}</span>
+                      <span class="mono" dir="ltr" style="font-size:11px; color:var(--muted);">#${formatDigits(it.pos, state.lang)}</span>
+                    </div>
+                    <span style="font-size:11.5px; font-weight:700; color:${fg}; flex:none;">${it.levelText}</span>
+                  </div>
+                  <span style="font-size:12.5px; line-height:1.38; color:var(--muted);">${it.whyText}</span>
+                  <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                    ${it.sources
+                      .map(
+                        (s) =>
+                          `<span class="mono" dir="ltr" style="font-size:10.5px; padding:2px 8px; border-radius:10px; border:1px solid var(--line); color:var(--ink);">${s} ↗</span>`
+                      )
+                      .join('')}
+                  </div>
+                </div>
+              </div>`;
+            })
+            .join('')}
+        </div>
+
+        <p style="margin:4px 0 0; font-size:11.5px; line-height:1.4; color:var(--muted);">
+          ${u.disclaimer}
+        </p>
+      `;
+    }
+
+    // 4. HELAL DEĞERLENDİRMESİ EKRANI (Halal.dc.html) - 10 LANGUAGE LOCALIZED
+    function renderHalalScreen() {
+      const loc = state.evalData.locale;
+      const u = getUiText(state.lang);
+      const halal = state.evalData.cards.halalCard;
+      const isOk = halal.overallStatus === 'uygun_gorunuyor';
+      const isBad = halal.overallStatus === 'uygunsuz_bulgu' || halal.overallStatus === 'conflict';
+      const isLowCov = halal.overallStatus === 'kapsam_yetersiz';
+      const statusLabel = isOk ? loc.badges.halalOk : isBad ? loc.badges.halalRed : isLowCov ? (loc.badges.lowCoverage || 'Kapsam Yetersiz (<%80)') : loc.badges.musbooh;
+      const subLabel = isOk ? u.halalSubOk : isBad ? u.halalSubBad : isLowCov ? (loc.badges.lowCoverage || u.lowCoverage) : u.halalSubWarn;
+
+      return `
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button type="button" onclick="switchScreen('result')" style="width:40px; height:40px; border-radius:20px; border:none; background:var(--surface); color:var(--ink); font-weight:800;">←</button>
+          <div>
+            <div style="font-size:17px; font-weight:800;">${u.halalEvalTitle}</div>
+            <div style="font-size:12.5px; color:var(--muted);">${state.productTitle} · ${u.authorityWord}: ${halal.selectedAuthority}</div>
+          </div>
+        </div>
+
+        <div style="background:${isOk ? 'var(--ok-bg)' : isBad ? 'var(--bad-bg)' : 'var(--warn-bg)'}; border-radius:22px; padding:16px; display:flex; flex-direction:column; gap:12px;">
+          <div>
+            <div style="font-size:21px; font-weight:800;">${statusLabel}</div>
+            <div style="font-size:13px; font-weight:600; color:${isOk ? 'var(--ok)' : isBad ? 'var(--bad)' : 'var(--warn)'};">${subLabel}</div>
+          </div>
+
+          <!-- 3-State Scale: Helal / Müşbooh / Haram -->
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:5px;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <div style="height:6px; border-radius:3px; background:${isOk ? 'var(--ok)' : 'var(--line)'};"></div>
+              <span style="font-size:12px; font-weight:${isOk ? '800' : '500'};">${u.scaleHalal}</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+              <div style="height:6px; width:100%; border-radius:3px; background:${!isOk && !isBad ? 'var(--warn)' : 'var(--line)'};"></div>
+              <span style="font-size:12px; font-weight:${!isOk && !isBad ? '800' : '500'};">${u.scaleMusbooh}</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+              <div style="height:6px; width:100%; border-radius:3px; background:${isBad ? 'var(--bad)' : 'var(--line)'};"></div>
+              <span style="font-size:12px; font-weight:${isBad ? '800' : '500'};">${u.scaleHaram}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hukuki Mikro-Feragatname (P0 Legal) -->
+        <div style="background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:flex-start; gap:8px;">
+            <span style="font-size:13px; line-height:1.2;">⚖️</span>
+            <span style="font-size:11.5px; line-height:1.45; color:var(--muted);">${u.legalDisclaimerMicro}</span>
+          </div>
+          <button type="button" onclick="openMethodologyModal()" style="align-self:flex-end; border:none; background:transparent; color:var(--accent); font-size:11.5px; font-weight:700; cursor:pointer; padding:2px 4px; text-decoration:underline;">
+            ${u.methodologyLink} →
+          </button>
+        </div>
+
+        <h2 style="margin:2px 0 0; font-size:15.5px; font-weight:800;">${u.whyThisResult}</h2>
+        <div style="background:var(--surface); border-radius:20px; display:flex; flex-direction:column;">
+          ${halal.findings
+            .map((f) => {
+              const badgeTxt =
+                f.status === 'yesil'
+                  ? loc.badges.halalOk
+                  : f.status === 'kirmizi' || f.status === 'conflict'
+                  ? loc.badges.halalRed
+                  : loc.badges.musbooh;
+              const expTxt = f.explanation || (f.status === 'kirmizi' ? u.haramDesc : u.musboohDesc);
+              return `
+              <div style="padding:12px 14px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:4px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                  <span style="font-size:14px; font-weight:700;">${escapeHtml(f.localizedName || f.canonical)}</span>
+                  <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:${f.status === 'yesil' ? 'var(--ok-bg)' : f.status === 'kirmizi' || f.status === 'conflict' ? 'var(--bad-bg)' : 'var(--warn-bg)'}; color:${f.status === 'yesil' ? 'var(--ok)' : f.status === 'kirmizi' || f.status === 'conflict' ? 'var(--bad)' : 'var(--warn)'};">
+                    ${badgeTxt}
+                  </span>
+                </div>
+                <span style="font-size:12.5px; line-height:1.4; color:var(--muted);">${escapeHtml(expTxt)}</span>
+                ${f.contextResolution ? `<span style="font-size:12px; font-weight:700; color:var(--accent);">${escapeHtml(f.contextResolution)}</span>` : ''}
+              </div>`;
+            })
+            .join('')}
+          ${halal.falsePositiveShields
+            .map(
+              (s) => `
+              <div style="padding:12px 14px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:4px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                  <span style="font-size:14px; font-weight:700;">${escapeHtml(s.localizedName || s.rawToken)}</span>
+                  <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:var(--ok-bg); color:var(--ok);">${u.notEthanolBadge}</span>
+                </div>
+                <span style="font-size:12.5px; line-height:1.4; color:var(--muted);">${escapeHtml(s.explanation || u.shieldDesc)}</span>
+              </div>`
+            )
+            .join('')}
+        </div>
+
+        <h2 style="margin:4px 0 0; font-size:15.5px; font-weight:800;">${u.howToClarify}</h2>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <!-- 1. Paketteki Helal Logosunu Doğrula (Simülasyon Toggle) -->
+          <button type="button" onclick="toggleHalalCertified()" style="min-height:50px; border-radius:16px; border:${state.claims.halalCertified ? 'none' : '1.5px solid var(--accent)'}; background:${state.claims.halalCertified ? 'var(--ok)' : 'var(--surface)'}; color:${state.claims.halalCertified ? '#FFFFFF' : 'var(--ink)'}; padding:0 16px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:all 0.2s; box-shadow:${state.claims.halalCertified ? '0 4px 14px rgba(27,110,63,0.25)' : 'none'};">
+            <span style="display:flex; align-items:center; gap:8px;">
+              <span>${state.claims.halalCertified ? '✓' : '🏷️'}</span>
+              <span>${u.verifyHalalLogoBtn}</span>
+            </span>
+            <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:10px; background:${state.claims.halalCertified ? 'rgba(255,255,255,0.22)' : 'var(--soft)'}; color:${state.claims.halalCertified ? '#FFFFFF' : 'var(--accent)'}; white-space:nowrap; flex:none;">
+              ${state.claims.halalCertified ? u.activeWord : u.simulateWord + ' ⚡'}
+            </span>
+          </button>
+
+          <!-- 2. Üreticiye Sormak İçin Hazır Mesajı Kopyala (Gerçek Pano Kopyalama) -->
+          <button type="button" onclick="copyManufacturerMessage()" style="min-height:50px; border-radius:16px; border:1.5px solid ${state.copiedToast ? 'var(--ok)' : 'var(--line)'}; background:${state.copiedToast ? 'var(--ok-bg)' : 'var(--surface)'}; color:${state.copiedToast ? 'var(--ok)' : 'var(--ink)'}; padding:0 16px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:all 0.2s;">
+            <span style="display:flex; align-items:center; gap:8px;">
+              <span>💬</span>
+              <span>${u.copyAskManufacturer}</span>
+            </span>
+            <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:10px; background:${state.copiedToast ? 'var(--ok)' : 'var(--surface2)'}; color:${state.copiedToast ? '#FFFFFF' : 'var(--ink)'}; white-space:nowrap; flex:none;">
+              ${state.copiedToast ? u.copiedWord : '📋'}
+            </span>
+          </button>
+
+          <!-- Kopyalanan Mesaj Önizlemesi (3 saniye sonra otomatik kapanır) -->
+          ${
+            state.copiedToast && state.lastCopiedMsg
+              ? `
+            <div style="background:var(--ok-bg); border:1.5px solid var(--ok); border-radius:14px; padding:12px 14px; font-size:12px; line-height:1.45; color:var(--ink); display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <span style="font-weight:800; color:var(--ok); font-size:12px;">✓ ${u.copiedWord} (${u.copiedToastBadge})</span>
+                <span style="font-size:11px; color:var(--muted); font-weight:600;">${u.readyForSharing}</span>
+              </div>
+              <div style="white-space:pre-wrap; font-size:11.5px; line-height:1.4; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:8px 10px;">${escapeHtml(state.lastCopiedMsg)}</div>
+            </div>`
+              : ''
+          }
+        </div>
+      `;
+    }
+
+    // 5. KARŞILAŞTIR & GEÇMİŞ EKRANI (History.dc.html) - 10 LANGUAGE LOCALIZED
+    function renderCompareScreen() {
+      const comp = state.compareData;
+      if (!comp) return '';
+      const loc = state.evalData.locale;
+      const u = getUiText(state.lang);
+      const a = comp.productA;
+      const b = comp.productB;
+      const diff = comp.decidingDifference;
+
+      const aScore = Number(a.score) || 0;
+      const bScore = Number(b.score) || 0;
+      const aBetter = aScore > bScore || (aScore === bScore && !a.hasBanned && b.hasBanned);
+      const bBetter = bScore > aScore || (aScore === bScore && !b.hasBanned && a.hasBanned);
+
+      const aBg = a.hasBanned ? 'var(--bad-bg)' : aBetter ? 'var(--ok-bg)' : bBetter ? 'var(--warn-bg)' : 'var(--surface2)';
+      const aColor = a.hasBanned ? 'var(--bad)' : aBetter ? 'var(--ok)' : bBetter ? 'var(--warn)' : 'var(--ink)';
+
+      const bBg = b.hasBanned ? 'var(--bad-bg)' : bBetter ? 'var(--ok-bg)' : aBetter ? 'var(--warn-bg)' : 'var(--surface2)';
+      const bColor = b.hasBanned ? 'var(--bad)' : bBetter ? 'var(--ok)' : aBetter ? 'var(--warn)' : 'var(--ink)';
+
+      const aBannedColor = a.hasBanned ? 'var(--bad)' : 'var(--ok)';
+      const bBannedColor = b.hasBanned ? 'var(--bad)' : 'var(--ok)';
+
+      const aAttnColor = a.attentionCount > 0 ? 'var(--warn)' : 'var(--muted)';
+      const bAttnColor = b.attentionCount > 0 ? 'var(--warn)' : 'var(--muted)';
+
+      const aProfileColor = (a.profileStatus === 'Kaçın / Dikkat' || a.hasBanned) ? 'var(--bad)' : (a.attentionCount > 0 ? 'var(--warn)' : 'var(--ok)');
+      const bProfileColor = (b.profileStatus === 'Kaçın / Dikkat' || b.hasBanned) ? 'var(--bad)' : (b.attentionCount > 0 ? 'var(--warn)' : 'var(--ok)');
+
+      const aHalalColor = (a.halalStatus === 'uygun' || a.halalStatus === 'halal') ? 'var(--ok)' : (a.halalStatus === 'haram' || a.halalStatus === 'conflict') ? 'var(--bad)' : 'var(--warn)';
+      const bHalalColor = (b.halalStatus === 'uygun' || b.halalStatus === 'halal') ? 'var(--ok)' : (b.halalStatus === 'haram' || b.halalStatus === 'conflict') ? 'var(--bad)' : 'var(--warn)';
+
+      return `
+        <h1 style="margin:0; font-size:24px; font-weight:800; letter-spacing:-0.02em;">${loc.compareScreen.title}</h1>
+
+        <div style="background:var(--surface); border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:10px;">
+          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${aBg}; border:1.5px solid ${aBetter ? 'var(--ok)' : a.hasBanned ? 'var(--bad)' : 'transparent'};">
+              <span style="font-size:30px; font-weight:800; line-height:1; color:${aColor};">${formatDigits(a.score, state.lang)}</span>
+              <span style="font-size:13px; font-weight:700; text-align:center;">${escapeHtml(a.name)}</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${bBg}; border:1.5px solid ${bBetter ? 'var(--ok)' : b.hasBanned ? 'var(--bad)' : 'transparent'};">
+              <span style="font-size:30px; font-weight:800; line-height:1; color:${bColor};">${formatDigits(b.score, state.lang)}</span>
+              <span style="font-size:13px; font-weight:700; text-align:center;">${escapeHtml(b.name)}</span>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column;">
+            <div style="display:grid; grid-template-columns:1fr 84px 84px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
+              <span style="color:var(--muted);">${loc.compareScreen.euBanRow}</span>
+              <span style="text-align:center; font-weight:700; color:${aBannedColor};">${a.hasBanned ? loc.badges.present : loc.badges.none}</span>
+              <span style="text-align:center; font-weight:700; color:${bBannedColor};">${b.hasBanned ? loc.badges.present : loc.badges.none}</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 84px 84px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
+              <span style="color:var(--muted);">${loc.compareScreen.attentionRow}</span>
+              <span style="text-align:center; font-weight:700; color:${aAttnColor};">${formatDigits(a.attentionCount, state.lang)}</span>
+              <span style="text-align:center; font-weight:700; color:${bAttnColor};">${formatDigits(b.attentionCount, state.lang)}</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 84px 84px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
+              <span style="color:var(--muted);">${loc.compareScreen.profileRow}</span>
+              <span style="text-align:center; font-weight:700; color:${aProfileColor};">${a.profileStatusLocalized || a.profileStatus}</span>
+              <span style="text-align:center; font-weight:700; color:${bProfileColor};">${b.profileStatusLocalized || b.profileStatus}</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 84px 84px; align-items:center; padding:8px 2px; font-size:13px;">
+              <span style="color:var(--muted);">${loc.compareScreen.halalRow}</span>
+              <span style="text-align:center; font-weight:700; color:${aHalalColor};">${a.halalStatusLocalized || a.halalStatus}</span>
+              <span style="text-align:center; font-weight:700; color:${bHalalColor};">${b.halalStatusLocalized || b.halalStatus}</span>
+            </div>
+          </div>
+
+          ${
+            diff
+              ? `
+            <div style="border-radius:14px; background:var(--bad-bg); padding:12px; display:flex; flex-direction:column; gap:5px;">
+              <span style="font-size:13px; font-weight:800; color:var(--bad);">⚡ ${diff.headline}</span>
+              <span style="font-size:12px; line-height:1.4; color:var(--ink);">${diff.explanation || u.restrictedDesc}</span>
+              <div style="display:flex; gap:6px; margin-top:2px;">
+                ${(diff.sources || [])
+                  .map(
+                    (s) =>
+                      `<span class="mono" dir="ltr" style="font-size:11px; padding:2px 8px; border-radius:10px; background:var(--surface); border:1px solid var(--line);">${s.id}</span>`
+                  )
+                  .join('')}
+              </div>
+            </div>`
+              : ''
+          }
+        </div>
+
+        <h2 style="margin:4px 0 0; font-size:16px; font-weight:800;">${u.recentScans}</h2>
+        <div style="background:var(--surface); border-radius:20px; display:flex; flex-direction:column;">
+          ${SAMPLES.slice(0, 3)
+            .map(
+              (s, i) => `
+              <button type="button" onclick="loadSample(${i})" style="border:none; background:transparent; text-align:start; display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:${i < 2 ? '1px solid var(--line)' : 'none'}; color:var(--ink);">
+                <span style="width:40px; height:40px; border-radius:12px; background:${i === 0 ? 'var(--ok-bg)' : 'var(--warn-bg)'}; color:${i === 0 ? 'var(--ok)' : 'var(--warn)'}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">
+                  ${i === 0 ? formatDigits('87', state.lang) : i === 1 ? 'M' : '?'}
+                </span>
+                <div style="flex:1;">
+                  <div style="font-size:14px; font-weight:700;">${getSampleTitle(i, state.lang)}</div>
+                  <div style="font-size:12px; color:var(--muted);">${s.type === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${u.tapToInspect}</div>
+                </div>
+                <span style="color:var(--muted);">→</span>
+              </button>`
+            )
+            .join('')}
+        </div>
+      `;
+    }
+
+    function openMethodologyModal() {
+      const modal = document.getElementById('methodologyModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeMethodologyModal() {
+      const modal = document.getElementById('methodologyModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    const initLive = document.getElementById('liveInput');
+    if (initLive) {
+      initLive.value = getSampleText(state.activeSampleIdx, state.lang);
+    }
+    refreshAll();
+  </script>
+
+  <!-- Hukuki Metodoloji & Kaynak Beyanı Modalı (P0 Legal) -->
+  <div id="methodologyModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--surface); border:1px solid var(--line); border-radius:24px; max-width:440px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.4);">
+      <div style="padding:16px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-weight:800; font-size:15px; color:var(--ink);">⚖️ Fıkhi Metodoloji & Kaynak Beyanı</span>
+        <button type="button" onclick="closeMethodologyModal()" style="border:none; background:var(--surface2); width:32px; height:32px; border-radius:16px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+      </div>
+      <div style="padding:16px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; font-size:12.5px; line-height:1.5; color:var(--ink);">
+        <div style="background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
+          InciFact, bağımsız bir bilimsel ve algoritmik tarama motorudur. Adı geçen kurumlarla herhangi bir organik, resmi veya ticari bağı bulunmamaktadır.
+        </div>
+        <div>
+          <strong style="color:var(--accent);">1. GİMDES (Türkiye):</strong><br>
+          <span style="color:var(--muted);">Helal Gıda ve İhtiyaç Maddeleri Standardı Madde 4.2 gereği böcek kaynaklı katkılar (E120 Karmin, Şellak) ve hayvansal şüpheli emülgatörler sertifikasız kabul edilmez.</span>
+        </div>
+        <div>
+          <strong style="color:var(--accent);">2. JAKIM (Malezya):</strong><br>
+          <span style="color:var(--muted);">Muzakarah Jawatankuasa Fatwa Majlis Kebangsaan (Fetva Bülteni No: 100/2012) uyarınca Karmin (E120) renklendiricisi gıdada ve kozmetikte helal kabul edilmektedir.</span>
+        </div>
+        <div>
+          <strong style="color:var(--accent);">3. MUI / BPJPH (Endonezya):</strong><br>
+          <span style="color:var(--muted);">Fatwa MUI No. 33 Tahun 2011 (Pewarna Makanan Cochineal) gereği košenil böceğinden elde edilen Karmin temiz ve caizdir.</span>
+        </div>
+        <div>
+          <strong style="color:var(--accent);">4. IFANCA (ABD / Global):</strong><br>
+          <span style="color:var(--muted);">Doğrulanmış sentetik veya mikrobiyal kaynaklı E471 gibi çift kaynaklı bileşenleri izinli sayar; açık domuz ve şarap türevlerini haram kabul eder.</span>
+        </div>
+      </div>
+      <div style="padding:12px 18px; border-top:1px solid var(--line); display:flex; justify-content:flex-end;">
+        <button type="button" onclick="closeMethodologyModal()" style="background:var(--ok); color:#FFFFFF; border:none; border-radius:12px; padding:8px 18px; font-weight:700; font-size:13px; cursor:pointer;">Anladım</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

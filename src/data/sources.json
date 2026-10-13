@@ -1,0 +1,279 @@
+{
+  "version": "2026-10-12",
+  "sources": {
+    "EU_1223_2009": {
+      "id": "EU_1223_2009",
+      "institution": "European Parliament & Council",
+      "title": "Regulation (EC) No 1223/2009 on Cosmetic Products (Annexes II-VI)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2009/1223/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_2024_996": {
+      "id": "EU_2024_996",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2024/996 (Vitamin A, Alpha-Arbutin, Arbutin, 4-MBC, Kojic Acid, Genistein, Daidzein, Triclocarban, Triclosan)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/996/oj/eng",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_2026_909": {
+      "id": "EU_2026_909",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2026/909 (Annex II Ban on Triphenyl Phosphate TPHP)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2026/909/oj",
+      "checked_at": "2026-10-13",
+      "type": "binding_regulation"
+    },
+    "EU_2019_831": {
+      "id": "EU_2019_831",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2019/831 (Annex II Ban on Boric Acid and Borates - entries 1395 & 1396)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2019/831/oj",
+      "checked_at": "2026-10-13",
+      "type": "binding_regulation"
+    },
+    "EU_2022_1176": {
+      "id": "EU_2022_1176",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2022/1176 (Benzophenone-3 and Octocrylene UV Filter Restrictions)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/1176/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_2022_2195": {
+      "id": "EU_2022_2195",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2022/2195 (Homosalate and BHT Restrictions)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2195/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_2021_1902": {
+      "id": "EU_2021_1902",
+      "title": "Commission Regulation (EU) 2021/1902 (Omnibus IV - Zinc Pyrithione & Lilial Ban)",
+      "jurisdiction": "EU",
+      "type": "regulation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2021/1902/oj"
+    },
+    "EU_358_2014": {
+      "id": "EU_358_2014",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) No 358/2014 (Ban on Isopropyl-, Isobutyl-, Phenyl-, Benzyl- and Pentylparaben)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2014/358/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_1004_2014": {
+      "id": "EU_1004_2014",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) No 1004/2014 (Propylparaben and Butylparaben 0.14% Limit & Under-3 Nappy Area Ban)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2014/1004/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_2022_1181": {
+      "id": "EU_2022_1181",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2022/1181 (Formaldehyde Releasers 0.001% Labelling Threshold)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/1181/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_2023_1545": {
+      "id": "EU_2023_1545",
+      "title": "Commission Regulation (EU) 2023/1545 (Extended Fragrance Allergens Labeling in Cosmetics)",
+      "jurisdiction": "EU",
+      "type": "regulation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2023/1545/oj"
+    },
+    "EC_ED_PRIORITY": {
+      "id": "EC_ED_PRIORITY",
+      "institution": "European Commission / SCCS",
+      "title": "European Commission Priority List of Potential Endocrine Disruptors in Cosmetics (Group A & Group B)",
+      "url": "https://single-market-economy.ec.europa.eu/sectors/cosmetics/cosmetic-products-specific-topics/endocrine-disruptors_en",
+      "checked_at": "2026-10-12",
+      "type": "agency_assessment"
+    },
+    "ECHA_SVHC": {
+      "id": "ECHA_SVHC",
+      "institution": "European Chemicals Agency (ECHA)",
+      "title": "Candidate List of Substances of Very High Concern (SVHC) / REACH Article 57(f)",
+      "url": "https://echa.europa.eu/candidate-list-table",
+      "checked_at": "2026-10-12",
+      "type": "agency_assessment"
+    },
+    "REACH_2024_1328": {
+      "id": "REACH_2024_1328",
+      "institution": "European Commission / REACH",
+      "title": "Commission Regulation (EU) 2024/1328 (Restriction on Cyclic Siloxanes D4, D5, D6)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1328/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "COSING": {
+      "id": "COSING",
+      "institution": "European Commission",
+      "title": "CosIng - Cosmetic Ingredient Database (Informational INCI Identifier Dictionary)",
+      "url": "https://single-market-economy.ec.europa.eu/sectors/cosmetics/cosmetic-ingredient-database_en",
+      "checked_at": "2026-10-12",
+      "type": "dictionary"
+    },
+    "EU_1333_2008": {
+      "id": "EU_1333_2008",
+      "institution": "European Parliament & Council",
+      "title": "Regulation (EC) No 1333/2008 on Food Additives (including Annex V Southampton Colours Warning)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2008/1333/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_2022_63": {
+      "id": "EU_2022_63",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2022/63 (Withdrawal of Titanium Dioxide E171 as Food Additive)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/63/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EU_1169_2011": {
+      "id": "EU_1169_2011",
+      "institution": "European Parliament & Council",
+      "title": "Regulation (EU) No 1169/2011 on Food Information to Consumers (Annex II Mandatory Allergens)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2011/1169/oj",
+      "checked_at": "2026-10-12",
+      "type": "binding_regulation"
+    },
+    "EFSA_NITRITE_2017": {
+      "id": "EFSA_NITRITE_2017",
+      "institution": "European Food Safety Authority (EFSA)",
+      "title": "EFSA Re-evaluation of Potassium Nitrite (E249), Sodium Nitrite (E250) and Nitrates (E251-E252)",
+      "url": "https://www.efsa.europa.eu/en/press/news/170615",
+      "checked_at": "2026-10-12",
+      "type": "agency_assessment"
+    },
+    "EFSA_SULFITE": {
+      "id": "EFSA_SULFITE",
+      "institution": "European Food Safety Authority (EFSA)",
+      "title": "EFSA Re-evaluation of Sulfur Dioxide and Sulfites (E220-E228) & 2025 Exposure Update",
+      "url": "https://www.efsa.europa.eu/en/supporting/pub/en-9754",
+      "checked_at": "2026-10-12",
+      "type": "agency_assessment"
+    },
+    "EFSA_CARRAGEENAN_2018": {
+      "id": "EFSA_CARRAGEENAN_2018",
+      "institution": "European Food Safety Authority (EFSA)",
+      "title": "EFSA Re-evaluation of Carrageenan (E407) as a Food Additive (2018)",
+      "url": "https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2018.5238",
+      "checked_at": "2026-10-12",
+      "type": "agency_assessment"
+    },
+    "EFSA_GLUTAMATE_2017": {
+      "id": "EFSA_GLUTAMATE_2017",
+      "institution": "European Food Safety Authority (EFSA)",
+      "title": "EFSA Re-evaluation of Glutamic Acid and Glutamates (E620-E625) Group ADI 30 mg/kg bw/day",
+      "url": "https://www.efsa.europa.eu/en/press/news/170712",
+      "checked_at": "2026-10-12",
+      "type": "agency_assessment"
+    },
+    "MOTHERTOBABY_2026": {
+      "id": "MOTHERTOBABY_2026",
+      "institution": "Organization of Teratology Information Specialists (OTIS)",
+      "title": "MotherToBaby Fact Sheet: Topical Acne Treatments in Pregnancy & Lactation",
+      "url": "https://mothertobaby.org/fact-sheets/topical-acne-treatments-pregnancy/",
+      "checked_at": "2026-10-12",
+      "type": "clinical_reference"
+    },
+    "DRAELOS_2006": {
+      "id": "DRAELOS_2006",
+      "institution": "Journal of the American Academy of Dermatology (JAAD)",
+      "title": "Draelos & DiNardo (2006): A re-evaluation of the comedogenicity concept in finished formulations",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/16488305/",
+      "checked_at": "2026-10-12",
+      "type": "clinical_study"
+    },
+    "OIC_SMIIC_1": {
+      "id": "OIC_SMIIC_1",
+      "institution": "SMIIC (Standards and Metrology Institute for Islamic Countries)",
+      "title": "OIC/SMIIC 1: General Requirements for Halal Food & OIC/SMIIC 4: Halal Cosmetics",
+      "url": "https://smiic.org/en/standards",
+      "checked_at": "2026-10-12",
+      "type": "halal_standard"
+    },
+    "GIMDES_STD": {
+      "id": "GIMDES_STD",
+      "institution": "GİMDES",
+      "title": "GİMDES Helal Gıda ve Kozmetik Sertifikalandırma Standardı",
+      "url": "https://www.gimdes.org/gimdes-standartlari/gimdes-helal-standardi",
+      "checked_at": "2026-10-12",
+      "type": "halal_standard"
+    },
+    "JAKIM_MKI_2012": {
+      "id": "JAKIM_MKI_2012",
+      "institution": "JAKIM / MKI Malaysia",
+      "title": "Kompilasi Pandangan Hukum Muzakarah Jawatankuasa Fatwa MKI (Alcohol 2011 & Cochineal/Carmine 2012 Decisions)",
+      "url": "https://www.islam.gov.my/images/ePenerbitan/KOMPILASI_MUZAKARAH_MKI_2016.pdf",
+      "checked_at": "2026-10-12",
+      "type": "halal_standard"
+    },
+    "MUI_33_2011": {
+      "id": "MUI_33_2011",
+      "institution": "Majelis Ulama Indonesia (MUI)",
+      "title": "MUI Fatwa No. 33 Tahun 2011 on Cochineal / Carmine (E120) Food Colouring",
+      "url": "https://digilib.uinsgd.ac.id/107810/",
+      "checked_at": "2026-10-12",
+      "type": "halal_standard"
+    },
+    "WHO_SUGAR_2015": {
+      "id": "WHO_SUGAR_2015",
+      "institution": "World Health Organization (WHO)",
+      "title": "WHO Guideline: Sugars Intake for Adults and Children (Free Sugars Definition)",
+      "url": "https://www.who.int/publications/i/item/9789241549028",
+      "checked_at": "2026-10-12",
+      "type": "agency_assessment"
+    },
+    "EU_2024_1328": {
+      "id": "EU_2024_1328",
+      "title": "Commission Regulation (EU) 2024/1328 (REACH Restriction on D4, D5, D6 Cyclosiloxanes)",
+      "jurisdiction": "EU",
+      "type": "regulation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1328/oj"
+    },
+    "BPJPH_MUI_ID": {
+      "id": "BPJPH_MUI_ID",
+      "title": "BPJPH / LPPOM MUI Indonesia Halal Product Assurance Standards (SJPH HAS 23000)",
+      "jurisdiction": "ID",
+      "type": "halal_standard",
+      "url": "https://halalmui.org/"
+    },
+    "EU_2024_197": {
+      "id": "EU_2024_197",
+      "title": "Commission Delegated Regulation (EU) 2024/197 & Omnibus VII (TPO Ban in Cosmetics from Sept 2025)",
+      "jurisdiction": "EU",
+      "type": "regulation",
+      "url": "https://eur-lex.europa.eu/eli/reg_del/2024/197/oj"
+    },
+    "EU_2023_2055": {
+      "id": "EU_2023_2055",
+      "title": "Commission Regulation (EU) 2023/2055 (REACH Restriction on Synthetic Polymer Microparticles / Microplastics)",
+      "jurisdiction": "EU",
+      "type": "regulation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2023/2055/oj"
+    },
+    "EU_2025_877": {
+      "id": "EU_2025_877",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2025/877 (Omnibus VII - TPO Ban in Cosmetic Products Annex II)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2025/877/oj",
+      "checked_at": "2026-10-13",
+      "type": "binding_regulation"
+    },
+    "EFSA": {
+      "id": "EFSA",
+      "institution": "European Food Safety Authority (EFSA)",
+      "title": "EFSA Scientific Opinions on Food Additives, Enzymes, Caffeine and Flavourings",
+      "url": "https://www.efsa.europa.eu/en/topics/topic/food-additives",
+      "checked_at": "2026-10-12",
+      "type": "official_opinion"
+    }
+  }
+}
