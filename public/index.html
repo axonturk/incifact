@@ -242,7 +242,7 @@
         </button>
         <button class="preset-chip" onclick="loadSample(1)">
           <span id="presetLbl-1">🍬 Meyveli Jöle Şekerleme (Jelatin & E120)</span>
-          <span id="presetBadge-1" class="mono" style="font-size:11px; color:var(--warn);">Müşbooh</span>
+          <span id="presetBadge-1" class="mono" style="font-size:11px; color:var(--warn);">Şüpheli</span>
         </button>
         <button class="preset-chip" onclick="loadSample(2)">
           <span id="presetLbl-2">🔍 OCR Belirsizliği: "Sodium Laur?l Sulfate"</span>
@@ -608,15 +608,15 @@
     }
 
     const PRESET_BADGES_I18N = {
-      tr: ['87/100', 'Müşbooh', 'SLS / SLES', 'A vs B', 'Helal', '10/100', '%100', 'Arapça RTL'],
-      en: ['87/100', 'Mushbooh', 'SLS Check', 'A vs B', 'Halal', '10/100', '100%', 'Arabic (RTL)'],
-      ar: ['٨٧/١٠٠', 'مشبوه', 'فحص SLS', 'أ مقابل ب', 'حلال', '١٠/١٠٠', '٪١٠٠', 'عربي RTL'],
+      tr: ['87/100', 'Şüpheli', 'SLS / SLES', 'A vs B', 'Helal', '10/100', '%100', 'Arapça RTL'],
+      en: ['87/100', 'Doubtful', 'SLS Check', 'A vs B', 'Halal', '10/100', '100%', 'Arabic (RTL)'],
+      ar: ['٨٧/١٠٠', 'مشكوك فيه', 'فحص SLS', 'أ مقابل ب', 'حلال', '١٠/١٠٠', '٪١٠٠', 'عربي RTL'],
       de: ['87/100', 'Zweifelhaft', 'SLS-Prüfung', 'A vs. B', 'Halal', '10/100', '100%', 'Arabisch (RTL)'],
       fr: ['87/100', 'Douteux', 'Test SLS', 'A vs B', 'Halal', '10/100', '100%', 'Arabe (RTL)'],
       id: ['87/100', 'Syubhat', 'Uji SLS', 'A vs B', 'Halal', '10/100', '100%', 'Arab (RTL)'],
       ms: ['87/100', 'Syubhah', 'Ujian SLS', 'A vs B', 'Halal', '10/100', '100%', 'Arab (RTL)'],
       es: ['87/100', 'Dudoso', 'Test SLS', 'A vs B', 'Halal', '10/100', '100%', 'Árabe (RTL)'],
-      ru: ['87/100', 'Мушбух', 'Проверка SLS', 'A против B', 'Халяль', '10/100', '100%', 'Арабский (RTL)'],
+      ru: ['87/100', 'Сомнительно', 'Проверка SLS', 'A против B', 'Халяль', '10/100', '100%', 'Арабский (RTL)'],
       ur: ['۸۷/۱۰۰', 'مشتبہ', 'SLS چیک', 'الف بمقابلہ ب', 'حلال', '۱۰/۱۰۰', '٪۱۰۰', 'عربی RTL']
     };
 
@@ -1094,7 +1094,7 @@
         compatibleWithFilters: 'Seçili filtrelerle uyumlu',
         halalCaps: 'HELAL',
         noIssueSeen: 'Sorun görülmedi',
-        musboohInspect: 'Müşbooh / İncele',
+        musboohInspect: 'Şüpheli / İncele',
         halalRedShort: 'Uygunsuz / Çelişki',
         tapForDetail: 'Detay için dokun →',
         ethanolLabel: '💧 Etil Alkol (Etanol)',
@@ -1119,7 +1119,7 @@
         halalSubOk: 'Şüpheli veya haram kaynak tespit edilmedi',
         halalSubBad: 'Seçilen kritere göre uygunsuz bileşen veya logo çelişkisi',
         halalSubWarn: 'Şüpheli (çift kaynaklı), kesin hüküm için kaynak doğrulaması gerekir',
-        scaleHalal: 'Helal', scaleMusbooh: 'Müşbooh', scaleHaram: 'Haram / Çelişki',
+        scaleHalal: 'Helal', scaleMusbooh: 'Şüpheli', scaleHaram: 'Haram / Çelişki',
         whyThisResult: 'Neden bu sonuç?',
         howToClarify: 'Nasıl netleşir?',
         verifyHalalLogoBtn: 'Paketteki helal logosunu doğrula',
@@ -1161,7 +1161,7 @@
         compatibleWithFilters: 'Compatible with selected filters',
         halalCaps: 'HALAL',
         noIssueSeen: 'No issues found',
-        musboohInspect: 'Mushbooh / Review',
+        musboohInspect: 'Doubtful / Review',
         halalRedShort: 'Non-Compliant / Conflict',
         tapForDetail: 'Tap for details →',
         ethanolLabel: '💧 Ethyl Alcohol (Ethanol)',
@@ -1186,7 +1186,7 @@
         halalSubOk: 'No doubtful or haram source detected',
         halalSubBad: 'Non-compliant ingredient or certification conflict detected',
         halalSubWarn: 'Doubtful (dual-source); origin verification required',
-        scaleHalal: 'Halal', scaleMusbooh: 'Mushbooh', scaleHaram: 'Haram / Conflict',
+        scaleHalal: 'Halal', scaleMusbooh: 'Doubtful', scaleHaram: 'Haram / Conflict',
         whyThisResult: 'Why this result?',
         howToClarify: 'How to clarify?',
         verifyHalalLogoBtn: 'Verify Halal logo on packaging',
@@ -1202,7 +1202,7 @@
         prefsHeader: 'InciFact · التفضيلات الشخصية',
         veganTitle: 'نباتي (Vegan)', veganDesc: 'المصادر الحيوانية وتعارض الشعارات',
         halalToggleTitle: 'فحص الحلال',
-        halalToggleDesc: 'محور مستقل تماماً؛ لا يُدمج مع النقاط الصحية ويوضح المواد المشبوهة بدقة.',
+        halalToggleDesc: 'محور مستقل تماماً؛ لا يُدمج مع النقاط الصحية ويوضح المواد المشكوك فيها بدقة.',
         seeResultBtn: 'عرض النتيجة', selectedWord: 'محدد',
         cameraTitle: 'كاميرا InciFact',
         cosmeticShort: 'تجميل', foodShort: 'غذاء',
@@ -1228,7 +1228,7 @@
         compatibleWithFilters: 'متوافق مع الفلاتر المختارة',
         halalCaps: 'حلال',
         noIssueSeen: 'لا توجد شبهة',
-        musboohInspect: 'مشبوه / راجع المصدر',
+        musboohInspect: 'مشكوك فيه / راجع المصدر',
         halalRedShort: 'غير متوافق / تعارض',
         tapForDetail: 'اضغط للتفاصيل ←',
         ethanolLabel: '💧 الكحول الإيثيلي (الإيثانول)',
@@ -1250,10 +1250,10 @@
         disclaimer: 'لأغراض إعلامية فقط وليس استشارة طبية. استشر طبيبك أو الصيدلي قبل اتخاذ القرارات الصحية.',
         halalEvalTitle: 'تقييم الحلال والمصدر',
         authorityWord: 'الجهة',
-        halalSubOk: 'لم يتم رصد أي مصدر محرم أو مشبوه',
+        halalSubOk: 'لم يتم رصد أي مصدر محرم أو مشكوك فيه',
         halalSubBad: 'تم رصد مكون غير متوافق أو تعارض مع الشعار',
-        halalSubWarn: 'مشبوه (ثنائي المصدر: قد يكون نباتياً أو حيوانياً)',
-        scaleHalal: 'حلال', scaleMusbooh: 'مشبوه', scaleHaram: 'حرام / تعارض',
+        halalSubWarn: 'مشكوك فيه (ثنائي المصدر: قد يكون نباتياً أو حيوانياً)',
+        scaleHalal: 'حلال', scaleMusbooh: 'مشكوك فيه', scaleHaram: 'حرام / تعارض',
         whyThisResult: 'لماذا هذه النتيجة؟',
         howToClarify: 'كيف نتأكد؟',
         verifyHalalLogoBtn: 'تأكيد وجود شعار الحلال على العبوة',
@@ -1295,7 +1295,7 @@
         compatibleWithFilters: 'Mit gewählten Filtern kompatibel',
         halalCaps: 'HALAL',
         noIssueSeen: 'Unbedenklich',
-        musboohInspect: 'Muschbooh / Prüfen',
+        musboohInspect: 'Zweifelhaft / Prüfen',
         halalRedShort: 'Unzulässig / Konflikt',
         tapForDetail: 'Für Details tippen →',
         ethanolLabel: '💧 Ethylalkohol (Ethanol)',
@@ -1320,7 +1320,7 @@
         halalSubOk: 'Keine bedenklichen oder Haram-Quellen erkannt',
         halalSubBad: 'Unzulässiger Stoff oder Siegel-Widerspruch',
         halalSubWarn: 'Zweifelhaft (pflanzlich oder tierisch möglich)',
-        scaleHalal: 'Halal', scaleMusbooh: 'Muschbooh', scaleHaram: 'Haram / Konflikt',
+        scaleHalal: 'Halal', scaleMusbooh: 'Zweifelhaft', scaleHaram: 'Haram / Konflikt',
         whyThisResult: 'Warum dieses Ergebnis?',
         howToClarify: 'Wie klären?',
         verifyHalalLogoBtn: 'Halal-Siegel auf der Packung bestätigen',
@@ -1362,7 +1362,7 @@
         compatibleWithFilters: 'Compatible avec vos filtres',
         halalCaps: 'HALAL',
         noIssueSeen: 'Aucun problème détecté',
-        musboohInspect: 'Mushbooh / À vérifier',
+        musboohInspect: 'Douteux / À vérifier',
         halalRedShort: 'Non conforme / Conflit',
         tapForDetail: 'Toucher pour les détails →',
         ethanolLabel: '💧 Alcool Éthylique (Éthanol)',
@@ -1387,7 +1387,7 @@
         halalSubOk: 'Aucune source illicite ou douteuse détectée',
         halalSubBad: 'Ingrédient non conforme ou contradiction de logo',
         halalSubWarn: 'Douteux (double origine végétale/animale possible)',
-        scaleHalal: 'Halal', scaleMusbooh: 'Mushbooh', scaleHaram: 'Haram / Conflit',
+        scaleHalal: 'Halal', scaleMusbooh: 'Douteux', scaleHaram: 'Haram / Conflit',
         whyThisResult: 'Pourquoi ce résultat ?',
         howToClarify: 'Comment clarifier ?',
         verifyHalalLogoBtn: 'Valider le logo Halal sur l\'emballage',
@@ -1563,7 +1563,7 @@
         compatibleWithFilters: 'Compatible con los filtros elegidos',
         halalCaps: 'HALAL',
         noIssueSeen: 'Sin problemas detectados',
-        musboohInspect: 'Mushbooh / Revisar',
+        musboohInspect: 'Dudoso / Revisar',
         halalRedShort: 'No apto / Conflicto',
         tapForDetail: 'Toca para ver detalles →',
         ethanolLabel: '💧 Alcohol Etílico (Etanol)',
@@ -1588,7 +1588,7 @@
         halalSubOk: 'No se detectaron fuentes ilícitas o dudosas',
         halalSubBad: 'Ingrediente no apto o conflicto con el sello',
         halalSubWarn: 'Dudoso (doble origen vegetal/animal posible)',
-        scaleHalal: 'Halal', scaleMusbooh: 'Mushbooh', scaleHaram: 'Haram / Conflicto',
+        scaleHalal: 'Halal', scaleMusbooh: 'Dudoso', scaleHaram: 'Haram / Conflicto',
         whyThisResult: '¿Por qué este resultado?',
         howToClarify: '¿Cómo aclarar?',
         verifyHalalLogoBtn: 'Verificar sello Halal en el envase',
@@ -1630,7 +1630,7 @@
         compatibleWithFilters: 'Совместимо с выбранными фильтрами',
         halalCaps: 'ХАЛЯЛЬ',
         noIssueSeen: 'Проблем не обнаружено',
-        musboohInspect: 'Мушбух / Проверить',
+        musboohInspect: 'Сомнительно / Проверить',
         halalRedShort: 'Недопустимо / Конфликт',
         tapForDetail: 'Нажмите для деталей →',
         ethanolLabel: '💧 Этиловый спирт (Этанол)',
@@ -1647,7 +1647,7 @@
         restrictedDesc: 'Компонент с ограничением концентрации по регламенту ЕС.',
         bannedDesc: 'Вещество запрещено Приложением II регламента ЕС.',
         shieldDesc: 'Смягчающий жирный спирт или консервант; НЕ является этиловым спиртом (этанолом).',
-        musboohDesc: 'Может иметь растительное или животное происхождение (Мушбух); проверьте сертификат Халяль/Веган.',
+        musboohDesc: 'Может иметь растительное или животное происхождение; проверьте сертификат Халяль/Веган.',
         haramDesc: 'Компонент не соответствует выбранному стандарту Халяль.',
         disclaimer: 'Только в ознакомительных целях; не является медицинской рекомендацией. Проконсультируйтесь с врачом.',
         halalEvalTitle: 'Оценка Халяль',
@@ -1655,7 +1655,7 @@
         halalSubOk: 'Запрещённых или сомнительных источников не выявлено',
         halalSubBad: 'Обнаружен недопустимый компонент или конфликт маркировки',
         halalSubWarn: 'Сомнительно (двойное происхождение: растительное/животное)',
-        scaleHalal: 'Халяль', scaleMusbooh: 'Мушбух', scaleHaram: 'Харам / Конфликт',
+        scaleHalal: 'Халяль', scaleMusbooh: 'Сомнительно', scaleHaram: 'Харам / Конфликт',
         whyThisResult: 'Почему такой результат?',
         howToClarify: 'Как уточнить?',
         verifyHalalLogoBtn: 'Подтвердить знак Халяль на упаковке',
@@ -1697,7 +1697,7 @@
         compatibleWithFilters: 'منتخب فلٹرز کے ساتھ مطابقت رکھتا ہے',
         halalCaps: 'حلال',
         noIssueSeen: 'کوئی مسئلہ نہیں ملا',
-        musboohInspect: 'مشبوہ / جائزہ لیں',
+        musboohInspect: 'مشکوک / جائزہ لیں',
         halalRedShort: 'غیر موزوں / تضاد',
         tapForDetail: 'تفصیل کے لیے ٹیپ کریں ←',
         ethanolLabel: '💧 ایتھائل الکوحل (ایتھنول)',
@@ -1714,15 +1714,15 @@
         restrictedDesc: 'یورپی یونین قوانین کے تحت مخصوص مقدار تک محدود جزو۔',
         bannedDesc: 'یورپی یونین ریگولیشن ضمیمہ II کے تحت ممنوعہ مادہ۔',
         shieldDesc: 'یہ جلد کو نرم رکھنے والا فیٹی الکوحل یا محفوظ پرزرویٹو ہے؛ نشہ آور ایتھائل الکوحل (ایتھنول) نہیں ہے۔',
-        musboohDesc: 'نباتاتی یا حیوانی دونوں ذرائع سے ہو سکتا ہے (مشبوہ)؛ پیکنگ پر حلال یا ویگن سرٹیفکیٹ چیک کریں۔',
+        musboohDesc: 'نباتاتی یا حیوانی دونوں ذرائع سے ہو سکتا ہے (مشکوک)؛ پیکنگ پر حلال یا ویگن سرٹیفکیٹ چیک کریں۔',
         haramDesc: 'منتخب حلال اتھارٹی کے معیار کے مطابق غیر موزوں جزو۔',
         disclaimer: 'صرف معلوماتی مقاصد کے لیے ہے، طبی مشورہ نہیں۔ صحت کے فیصلوں کے لیے ڈاکٹر یا فارماسسٹ سے رجوع کریں۔',
         halalEvalTitle: 'حلال تشخیص',
         authorityWord: 'ادارہ',
         halalSubOk: 'کوئی حرام یا مشکوک ذریعہ نہیں ملا',
         halalSubBad: 'غیر موزوں جزو یا سرٹیفکیٹ کا تضاد ملا',
-        halalSubWarn: 'مشبوہ (دوہرا ذریعہ: نباتاتی یا حیوانی تصدیق درکار ہے)',
-        scaleHalal: 'حلال', scaleMusbooh: 'مشبوہ', scaleHaram: 'حرام / تضاد',
+        halalSubWarn: 'مشکوک (دوہرا ذریعہ: نباتاتی یا حیوانی تصدیق درکار ہے)',
+        scaleHalal: 'حلال', scaleMusbooh: 'مشکوک', scaleHaram: 'حرام / تضاد',
         whyThisResult: 'یہ نتیجہ کیوں؟',
         howToClarify: 'کیسے واضح کریں؟',
         verifyHalalLogoBtn: 'پیکنگ پر حلال لوگو کی تصدیق کریں',
@@ -2272,7 +2272,7 @@
             <div style="font-size:13px; font-weight:600; color:${isOk ? 'var(--ok)' : isBad ? 'var(--bad)' : 'var(--warn)'};">${subLabel}</div>
           </div>
 
-          <!-- 3-State Scale: Helal / Müşbooh / Haram -->
+          <!-- 3-State Scale: Helal / Şüpheli / Haram -->
           <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:5px;">
             <div style="display:flex; flex-direction:column; gap:4px;">
               <div style="height:6px; border-radius:3px; background:${isOk ? 'var(--ok)' : 'var(--line)'};"></div>

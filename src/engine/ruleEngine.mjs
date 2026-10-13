@@ -428,7 +428,7 @@ const ENGINE_I18N = {
     shieldDesc: 'Kimyasal yapısında -OH grubu bulunan yağ alkolü / koruyucu; sarhoş edici etil alkol (etanol) değildir.',
     halalHaramDesc: 'Seçilen helal otoritesi kriterlerine göre uygunsuz / haram kaynaklı bileşen.',
     halalAlcoholDesc: 'Etil alkol (etanol) içerir; seçilen helal otoritesi kriterlerine göre incelenmelidir.',
-    halalMusboohDesc: 'Bitkisel veya hayvansal kaynaklı olabilir (Müşbooh); kesin hüküm için Helal veya Vegan sertifikası doğrulanmalıdır.',
+    halalMusboohDesc: 'Şüpheli (kaynağı belirsiz): bitkisel veya hayvansal kaynaklı olabilir; kesin hüküm için Helal veya Vegan sertifikası doğrulanmalıdır.',
     conflictHaram: 'ÇELİŞKİ UYARISI (CONFLICT): Etikette okunan bileşen ile ürün üzerindeki Helal/Vegan/Vejetaryen beyanı birbiriyle çelişiyor!',
     conflictAlcohol: 'Üründe Helal beyanı işaretlenmiş ancak içerikte etanol/alkol okundu. Sertifika kuruluşunun harici kullanım / eşik politikasını doğrulayın.',
     veganNoteAlcohol: 'NOT: Ürünün Vegan olması etil alkol (etanol) durumunu çözmez; bitkisel kaynaklı etanol de vegandır.',
@@ -462,7 +462,7 @@ const ENGINE_I18N = {
     shieldDesc: 'Non-intoxicating fatty alcohol / emollient or preservative; NOT intoxicating ethyl alcohol (ethanol).',
     halalHaramDesc: 'Non-halal ingredient according to the selected Halal authority criteria.',
     halalAlcoholDesc: 'Contains ethyl alcohol (ethanol); subject to threshold/topical ruling of the selected Halal authority.',
-    halalMusboohDesc: 'Doubtful / Dual-source ingredient (Mushbooh: can be plant or animal derived); verify Halal or Vegan certification on packaging.',
+    halalMusboohDesc: 'Doubtful (source unclear): can be plant- or animal-derived; verify Halal or Vegan certification on the packaging.',
     conflictHaram: 'CONFLICT ALERT: The detected ingredient contradicts the Halal/Vegan/Vegetarian claim on the product!',
     conflictAlcohol: 'Halal claim is marked, but ethanol/alcohol was detected in the ingredients. Verify the certifying body\'s topical/threshold policy.',
     veganNoteAlcohol: 'NOTE: A Vegan claim does not resolve ethyl alcohol (ethanol), as plant-fermented ethanol is also vegan.',
@@ -496,7 +496,7 @@ const ENGINE_I18N = {
     shieldDesc: 'كحول دهني مرطب أو مادة حافظة آمنة؛ وليس كحولاً إيثيلياً مسكراً (إيثانول).',
     halalHaramDesc: 'مكون غير متوافق (حرام) وفق معايير هيئة الحلال المختارة.',
     halalAlcoholDesc: 'يحتوي على كحول إيثيلي (إيثانول)؛ يخضع لسياسة الهيئة المختارة.',
-    halalMusboohDesc: 'مكون مشبوه (مزدوج المصدر: قد يكون نباتياً أو حيوانياً)؛ يرجى التحقق من شهادة الحلال أو النباتي (Vegan) على العبوة.',
+    halalMusboohDesc: 'مشكوك فيه (مصدره غير واضح): قد يكون نباتياً أو حيوانياً؛ يرجى التحقق من شهادة الحلال أو النباتي (Vegan) على العبوة.',
     conflictHaram: 'تنبيه تعارض: المكون المكتشف في القائمة يتعارض مع شعار الحلال/النباتي على المنتج!',
     conflictAlcohol: 'تم تحديد شعار الحلال ولكن تم رصد إيثانول في المكونات. تحقق من سياسة الهيئة المانحة للشهادة.',
     veganNoteAlcohol: 'ملاحظة: كون المنتج نباتياً (Vegan) لا يحل إشكالية الكحول الإيثيلي (الإيثانول).',
@@ -530,7 +530,7 @@ const ENGINE_I18N = {
     shieldDesc: 'Nicht berauschender Fettalkohol / Pflegestoff oder Konservierungsmittel; KEIN Trinkalkohol (Ethanol).',
     halalHaramDesc: 'Nicht-halaler Inhaltsstoff gemäß dem gewählten Halal-Standard.',
     halalAlcoholDesc: 'Enthält Ethylalkohol (Ethanol); gemäß den Richtlinien der gewählten Halal-Behörde zu prüfen.',
-    halalMusboohDesc: 'Zweifelhaft / Doppelter Ursprung (Mushbooh: pflanzlich oder tierisch); Halal- oder Vegan-Siegel prüfen.',
+    halalMusboohDesc: 'Zweifelhaft (Herkunft unklar): kann pflanzlich oder tierisch sein; Halal- oder Vegan-Siegel prüfen.',
     conflictHaram: 'KONFLIKTWARNUNG: Der erkannte Inhaltsstoff widerspricht der Halal-/Vegan-Angabe auf dem Produkt!',
     conflictAlcohol: 'Halal-Angabe aktiv, aber Ethanol/Alkohol erkannt. Bitte Richtlinie der Zertifizierungsstelle prüfen.',
     veganNoteAlcohol: 'HINWEIS: Ein Vegan-Siegel klärt Ethylalkohol (Ethanol) nicht, da pflanzliches Ethanol ebenfalls vegan ist.',
@@ -564,7 +564,7 @@ const ENGINE_I18N = {
     shieldDesc: 'Alcool gras émollient ou conservateur non intoxicant ; ce n\'est PAS de l\'alcool éthylique (éthanol).',
     halalHaramDesc: 'Ingrédient non conforme (Haram) selon l\'autorité Halal sélectionnée.',
     halalAlcoholDesc: 'Contient de l\'alcool éthylique (éthanol) ; à vérifier selon l\'autorité Halal choisie.',
-    halalMusboohDesc: 'Douteux / Double origine (Mushbooh : végétale ou animale) ; vérifiez la certification Halal ou Vegan.',
+    halalMusboohDesc: 'Douteux (origine incertaine) : peut être d\'origine végétale ou animale ; vérifiez la certification Halal ou Vegan.',
     conflictHaram: 'ALERTE CONFLIT : L\'ingrédient détecté contredit la mention Halal/Vegan du produit !',
     conflictAlcohol: 'Mention Halal activée mais éthanol détecté. Vérifiez la politique de l\'organisme certificateur.',
     veganNoteAlcohol: 'NOTE : Le statut Vegan ne résout pas la présence d\'alcool éthylique (éthanol).',
@@ -598,7 +598,7 @@ const ENGINE_I18N = {
     shieldDesc: 'Alkohol lemak pelembap / pengawet aman; BUKAN etil alkohol (etanol) yang memabukkan.',
     halalHaramDesc: 'Bahan tidak sesuai (Haram) menurut standar otoritas Halal yang dipilih.',
     halalAlcoholDesc: 'Mengandung etil alkohol (etanol); periksa kebijakan batas otoritas Halal yang dipilih.',
-    halalMusboohDesc: 'Syubhat / Sumber ganda (bisa nabati atau hewani); pastikan logo Halal atau Vegan resmi pada kemasan.',
+    halalMusboohDesc: 'Syubhat (sumber tidak jelas): bisa nabati atau hewani; pastikan logo Halal atau Vegan resmi pada kemasan.',
     conflictHaram: 'PERINGATAN KONFLIK: Bahan yang terdeteksi bertentangan dengan klaim Halal/Vegan pada produk!',
     conflictAlcohol: 'Klaim Halal aktif tetapi etanol terdeteksi. Periksa kebijakan lembaga sertifikasi.',
     veganNoteAlcohol: 'CATATAN: Klaim Vegan tidak menyelesaikan status etil alkohol (etanol).',
@@ -632,7 +632,7 @@ const ENGINE_I18N = {
     shieldDesc: 'Alkohol lemak pelembap / pengawet selamat; BUKAN etil alkohol (etanol) yang memabukkan.',
     halalHaramDesc: 'Ramuan tidak patuh (Haram) mengikut piawaian autoriti Halal yang dipilih.',
     halalAlcoholDesc: 'Mengandungi etil alkohol (etanol); tertakluk kepada garis panduan autoriti Halal yang dipilih.',
-    halalMusboohDesc: 'Syubhah / Dwi-sumber (boleh jadi tumbuhan atau haiwan); sila semak logo Halal atau Vegan pada bungkusan.',
+    halalMusboohDesc: 'Syubhah (sumber tidak jelas): boleh jadi tumbuhan atau haiwan; sila semak logo Halal atau Vegan pada bungkusan.',
     conflictHaram: 'AMARAN KONFLIK: Ramuan yang dikesan bercanggah dengan tuntutan Halal/Vegan pada produk!',
     conflictAlcohol: 'Tuntutan Halal diaktifkan tetapi etanol dikesan. Sila semak dasar badan pensijilan.',
     veganNoteAlcohol: 'NOTA: Tuntutan Vegan tidak menyelesaikan status etil alkohol (etanol).',
@@ -666,7 +666,7 @@ const ENGINE_I18N = {
     shieldDesc: 'Alcohol graso emoliente o conservante seguro; NO es alcohol etílico (etanol) intoxicante.',
     halalHaramDesc: 'Ingrediente no conforme (Haram) según el estándar de la autoridad Halal seleccionada.',
     halalAlcoholDesc: 'Contiene alcohol etílico (etanol); sujeto al criterio de la autoridad Halal seleccionada.',
-    halalMusboohDesc: 'Dudoso / Doble origen (Mushbooh: vegetal o animal); verifica el certificado Halal o Vegano en el envase.',
+    halalMusboohDesc: 'Dudoso (origen incierto): puede ser de origen vegetal o animal; verifica el certificado Halal o Vegano en el envase.',
     conflictHaram: 'ALERTA DE CONFLICTO: ¡El ingrediente detectado contradice la declaración Halal/Vegana del producto!',
     conflictAlcohol: 'Se marcó declaración Halal pero se detectó etanol. Verifica la política de la entidad certificadora.',
     veganNoteAlcohol: 'NOTA: Que un producto sea Vegano no resuelve el estado del alcohol etílico (etanol).',
@@ -700,7 +700,7 @@ const ENGINE_I18N = {
     shieldDesc: 'Безопасный жирный спирт (эмолент) или консервант; НЕ является этиловым спиртом (этанолом).',
     halalHaramDesc: 'Несоответствующий (Харам) компонент согласно критериям выбранного органа Халяль.',
     halalAlcoholDesc: 'Содержит этиловый спирт (этанол); требует проверки по стандарту выбранного органа Халяль.',
-    halalMusboohDesc: 'Сомнительный компонент двойного происхождения (Мушбух: растительный или животный); проверьте сертификат Халяль или Веган.',
+    halalMusboohDesc: 'Сомнительно (происхождение неясно): может быть растительного или животного происхождения; проверьте сертификат Халяль или Веган.',
     conflictHaram: 'ПРЕДУПРЕЖДЕНИЕ О КОНФЛИКТЕ: Обнаруженный компонент противоречит заявлению Халяль/Веган на упаковке!',
     conflictAlcohol: 'Указан статус Халяль, но в составе обнаружен этанол. Проверьте политику сертифицирующего органа.',
     veganNoteAlcohol: 'ПРИМЕЧАНИЕ: Веганский статус не решает вопрос наличия этилового спирта (этанола).',
@@ -734,7 +734,7 @@ const ENGINE_I18N = {
     shieldDesc: 'یہ فیٹی الکحل (جلد کو نرم کرنے والا) یا محفوظ پریزرویٹو ہے؛ نشہ آور ایتھائل الکحل (ایتھنول) نہیں ہے۔',
     halalHaramDesc: 'منتخب حلال اتھارٹی کے معیار کے مطابق غیر موزوں (حرام) جزو۔',
     halalAlcoholDesc: 'اس میں ایتھائل الکحل (ایتھنول) شامل ہے؛ منتخب حلال اتھارٹی کے اصولوں کے مطابق جانچ ضروری ہے۔',
-    halalMusboohDesc: 'مشبوہ (دوہرا ذریعہ: نباتاتی یا حیوانی ہو سکتا ہے)؛ حتمی فیصلے کے لیے پیکنگ پر حلال یا ویگن سرٹیفکیٹ چیک کریں۔',
+    halalMusboohDesc: 'مشکوک (ماخذ غیر واضح): نباتاتی یا حیوانی ہو سکتا ہے؛ حتمی فیصلے کے لیے پیکنگ پر حلال یا ویگن سرٹیفکیٹ چیک کریں۔',
     conflictHaram: 'تضاد کی تنبیہ: اجزاء میں شامل مادہ پیکنگ پر موجود حلال/ویگن دعوے سے متصادم ہے!',
     conflictAlcohol: 'حلال کا دعویٰ منتخب کیا گیا ہے لیکن اجزاء میں ایتھنول ملا ہے۔ سرٹیفکیٹ دینے والے ادارے کی پالیسی چیک کریں۔',
     veganNoteAlcohol: 'نوٹ: پروڈکٹ کا ویگن ہونا ایتھائل الکحل (ایتھنول) کے مسئلے کو حل نہیں کرتا۔',
@@ -1831,7 +1831,7 @@ export function evaluateProduct({
   }
 
   // Coverage Guard: If coverage is below 80% and no explicit haram/conflict was found,
-  // we cannot certify it as permissible ('uygun_gorunuyor') because unanalyzed ingredients might be non-halal/mushbooh.
+  // we cannot certify it as permissible ('uygun_gorunuyor') because unanalyzed ingredients might be non-halal/doubtful.
   if (coverageRatio < 0.8 && overallHalalStatus === 'uygun_gorunuyor') {
     overallHalalStatus = 'kapsam_yetersiz';
   }
@@ -2013,7 +2013,7 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
         evalA.cards.halalCard.overallStatus === 'uygun_gorunuyor'
           ? 'Uygun'
           : evalA.cards.halalCard.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? 'Müşbooh'
+          ? 'Şüpheli'
           : evalA.cards.halalCard.overallStatus === 'kapsam_yetersiz'
           ? 'Kapsam Yetersiz'
           : 'Uygunsuz / Çelişki',
@@ -2039,7 +2039,7 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
         evalB.cards.halalCard.overallStatus === 'uygun_gorunuyor'
           ? 'Uygun'
           : evalB.cards.halalCard.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? 'Müşbooh'
+          ? 'Şüpheli'
           : evalB.cards.halalCard.overallStatus === 'kapsam_yetersiz'
           ? 'Kapsam Yetersiz'
           : 'Uygunsuz / Çelişki',
