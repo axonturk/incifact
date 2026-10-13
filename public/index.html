@@ -238,11 +238,11 @@
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <button class="preset-chip" onclick="loadSample(0)">
           <span id="presetLbl-0">🧴 Günlük Nemlendirici Krem (Referans 87 Puan)</span>
-          <span id="presetBadge-0" class="mono" dir="ltr" style="font-size:11px; color:var(--ok);">87/100</span>
+          <span id="presetBadge-0" class="mono" dir="ltr" style="font-size:11px; color:var(--ok);">100/100</span>
         </button>
         <button class="preset-chip" onclick="loadSample(1)">
           <span id="presetLbl-1">🍬 Meyveli Jöle Şekerleme (Jelatin & E120)</span>
-          <span id="presetBadge-1" class="mono" style="font-size:11px; color:var(--warn);">Şüpheli</span>
+          <span id="presetBadge-1" class="mono" style="font-size:11px; color:var(--bad);">Uygunsuz / Çelişki</span>
         </button>
         <button class="preset-chip" onclick="loadSample(2)">
           <span id="presetLbl-2">🔍 OCR Belirsizliği: "Sodium Laur?l Sulfate"</span>
@@ -254,7 +254,7 @@
         </button>
         <button class="preset-chip" onclick="loadSample(4)">
           <span id="presetLbl-4">🐌 K-Beauty Salyangoz Özütü (COSRX Snail Mucin)</span>
-          <span id="presetBadge-4" class="mono" style="font-size:11px; color:var(--bad);">Helal</span>
+          <span id="presetBadge-4" class="mono" style="font-size:11px; color:var(--bad);">Uygunsuz / Çelişki</span>
         </button>
         <button class="preset-chip" onclick="loadSample(5)">
           <span id="presetLbl-5">💅 Jel Oje (TPO — Eylül 2025 AB Yasağı!)</span>
@@ -964,6 +964,48 @@
       refreshAll();
     }
 
+    // Preset badges that state a VERDICT are computed from the live engine (same language + authority as the UI),
+    // so a badge can never contradict the explanation. Topic badges (SLS / SLES, A vs B, AR RTL) stay static.
+    const PRESET_BADGE_MODE = { 0: 'score', 1: 'halal', 4: 'halal', 5: 'score', 6: 'coverage' };
+    let presetBadgeToken = 0;
+    async function refreshPresetVerdictBadges(halalAuthority, loc) {
+      const token = ++presetBadgeToken;
+      const b = (loc && loc.badges) || {};
+      await Promise.all(Object.entries(PRESET_BADGE_MODE).map(async ([idxStr, mode]) => {
+        const idx = Number(idxStr);
+        const s = SAMPLES[idx];
+        const pb = document.getElementById('presetBadge-' + idx);
+        if (!s || !pb) return;
+        try {
+          const res = await fetch('/api/evaluate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rawText: (s.texts && s.texts[state.lang]) || s.text, productType: s.type, halalAuthority, lang: state.lang })
+          });
+          const r = await res.json();
+          if (token !== presetBadgeToken || !r.cards) return; // a newer refresh superseded this one
+          const reg = r.cards.regulatoryCard;
+          let text, color;
+          if (mode === 'halal') {
+            const st = r.cards.halalCard.overallStatus;
+            if (st === 'uygun_gorunuyor') { text = b.halalOk; color = 'var(--ok)'; }
+            else if (st === 'kaynak_belirsiz_musbooh') { text = b.musbooh; color = 'var(--warn)'; }
+            else if (st === 'kapsam_yetersiz') { text = b.lowCoverage; color = 'var(--warn)'; }
+            else { text = b.halalRed; color = 'var(--bad)'; }
+          } else if (mode === 'coverage') {
+            text = state.lang === 'tr' ? `%${formatDigits(reg.coveragePercent, state.lang)}` : `${formatDigits(reg.coveragePercent, state.lang)}%`;
+            color = reg.coveragePercent >= 80 ? 'var(--ok)' : 'var(--warn)';
+          } else if (reg.score === null) {
+            text = b.lowCoverage; color = 'var(--warn)';
+          } else {
+            text = `${formatDigits(reg.score, state.lang)}/${formatDigits(100, state.lang)}`;
+            color = reg.score >= 80 ? 'var(--ok)' : reg.score >= 40 ? 'var(--warn)' : 'var(--bad)';
+          }
+          if (text) { pb.textContent = text; pb.style.color = color; }
+        } catch (_) { /* keep the static label if the API is unreachable */ }
+      }));
+    }
+
     async function refreshAll() {
       const activeProfiles = Object.entries(state.profiles)
         .filter(([k, v]) => v && k !== 'vegan' && k !== 'halal')
@@ -1039,8 +1081,9 @@
           const pl = document.getElementById('presetLbl-' + idx);
           if (pl) pl.textContent = `${icons[idx]} ${getSampleTitle(idx, state.lang)}`;
           const pb = document.getElementById('presetBadge-' + idx);
-          if (pb) pb.textContent = badgeList[idx] || '';
+          if (pb && !(idx in PRESET_BADGE_MODE)) pb.textContent = badgeList[idx] || '';
         });
+        refreshPresetVerdictBadges(halalAuthority, loc);
         const optC = document.getElementById('optCosmetic');
         const optF = document.getElementById('optFood');
         const ptTexts = PROD_TYPE_I18N[state.lang] || PROD_TYPE_I18N.en;
