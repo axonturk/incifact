@@ -6,6 +6,8 @@ const cases = [
   { rawText: 'Aqua, Methylisothiazolinone (20 ppm)', applicationType: 'rinse_off' },
   { rawText: 'Aqua, Methylchloroisothiazolinone 0.0012%, Methylisothiazolinone 0.0004%', applicationType: 'rinse_off' },
   { rawText: 'Aqua, Methylchloroisothiazolinone 0.0005%, Methylisothiazolinone 0.0005%', applicationType: 'rinse_off', expectScore: 10 },
+  { rawText: 'Aqua, Methylchloroisothiazolinone 0.0007%, Methylisothiazolinone 0.00025%', applicationType: 'rinse_off', expectScore: 10 },
+  { rawText: 'Aqua, Methylchloroisothiazolinone 0.0008%, Methylisothiazolinone 0.00025%', applicationType: 'rinse_off', expectScore: 10 },
   { rawText: 'Aqua, Methylchloroisothiazolinone 0.00075%, Methylisothiazolinone 0.00025%', applicationType: 'rinse_off', expectNotCapped: true },
   { rawText: 'Aqua, Methylchloroisothiazolinone 0.001125%, Methylisothiazolinone 0.000375%', applicationType: 'rinse_off', expectNotCapped: true },
   { rawText: 'Aqua, Methylchloroisothiazolinone, Methylisothiazolinone', applicationType: 'rinse_off', expectNotCapped: true },

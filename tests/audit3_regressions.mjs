@@ -73,6 +73,16 @@ t('MCI amount only, MI amount missing -> ratio unverified, not banned', () => {
   const f = miFinding('Aqua, Methylchloroisothiazolinone 0.0005%, Methylisothiazolinone');
   assert.equal(f.euStatus, 'kisitli'); assert.match(f.legalText, /DOĞRULANAMADI/);
 });
+t('MCI 0.0007% + MI 0.00025% (2.8:1) rinse-off -> 10 (Audit 5 boundary)', () => {
+  const r = reg({ rawText: 'Aqua, Methylchloroisothiazolinone 0.0007%, Methylisothiazolinone 0.00025%', applicationType: 'rinse_off' });
+  assert.equal(r.score, 10); assert.equal(r.capApplied, 10);
+  assert.match(miFinding('Aqua, Methylchloroisothiazolinone 0.0007%, Methylisothiazolinone 0.00025%').legalText, /2\.8:1/);
+});
+t('MCI 0.0008% + MI 0.00025% (3.2:1) rinse-off -> 10 (Audit 5 boundary)', () => {
+  const r = reg({ rawText: 'Aqua, Methylchloroisothiazolinone 0.0008%, Methylisothiazolinone 0.00025%', applicationType: 'rinse_off' });
+  assert.equal(r.score, 10); assert.equal(r.capApplied, 10);
+  assert.match(miFinding('Aqua, Methylchloroisothiazolinone 0.0008%, Methylisothiazolinone 0.00025%').legalText, /3\.2:1/);
+});
 
 console.log(`\n${pass}/${pass + fail} passed`);
 process.exit(fail ? 1 : 0);

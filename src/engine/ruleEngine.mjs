@@ -1303,19 +1303,20 @@ export function evaluateProduct({
         const miConc = combinedObs.length ? null : sumOf(miObs);
         const ratioKnown = isMixture && mciConc !== null && miConc !== null && miConc > 0;
         const ratio = ratioKnown ? mciConc / miConc : null;
-        const ratioValid = ratioKnown && ratio >= 2.7 && ratio <= 3.3; // 3:1 ± 10 % rounding tolerance
+        const ratioValid = ratioKnown && Math.abs(ratio - 3) <= 1e-6; // IEEE-754 binary float epsilon only
         const pct = (v) => `%${+v.toFixed(6)}`;
 
-        if (typeof totalIsoConc === 'number' && totalIsoConc > 0.0015) {
+        if (typeof totalIsoConc === 'number' && totalIsoConc > 0.0015 + 1e-12) {
           effectiveEuStatus = 'yasak';
           effectiveSeverity = 'yuksek';
           effectiveDetail = hasMci && isoConcs.length > 1
             ? `AB 1003/2014 Ek V/39: MCI + MI karışımı yalnızca durulanan ürünlerde toplam azami %0.0015 (15 ppm) izinlidir; etiketteki toplam ${pct(totalIsoConc)} bu sınırı aşıyor, YASAKTIR.`
             : 'AB 2017/1224 Ek V/57: Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) konsantrasyona kadar izinlidir; bu sınırın üzerindeki konsantrasyonlar YASAKTIR.';
         } else if (ratioKnown && !ratioValid) {
+          const fmtRatio = Math.abs(+ratio.toFixed(2) - 3) < 1e-9 ? +ratio.toFixed(6) : +ratio.toFixed(2);
           effectiveEuStatus = 'yasak';
           effectiveSeverity = 'yuksek';
-          effectiveDetail = `AB 1003/2014 Ek V/39: MCI/MI karışımına yalnızca 3:1 oranında izin verilir. Etiketteki oran ${+ratio.toFixed(2)}:1 (MCI ${pct(mciConc)}, MI ${pct(miConc)}); izin verilen karışım koşulunu sağlamıyor, bu kullanım YASAKTIR.`;
+          effectiveDetail = `AB 1003/2014 Ek V/39: MCI/MI karışımına yalnızca 3:1 oranında izin verilir. Etiketteki oran ${fmtRatio}:1 (MCI ${pct(mciConc)}, MI ${pct(miConc)}); izin verilen karışım koşulunu sağlamıyor, bu kullanım YASAKTIR.`;
         } else {
           effectiveEuStatus = 'kisitli';
           effectiveSeverity = 'orta';
