@@ -32,6 +32,7 @@ interface CompareSlotItem {
   name: string;
   rawText: string;
   productType: ProductType;
+  jurisdiction?: string;
   claims?: {
     halalCertified: boolean;
     veganStatus: 'none' | 'declared' | 'verified';
@@ -39,6 +40,8 @@ interface CompareSlotItem {
   };
   userConfirmations?: Record<string, string>;
 }
+
+type ScanHistoryEntry = CompareSlotItem & { score: number | null };
 
 const MOBILE_FEAT_I18N: Record<
   LangCode,
@@ -202,9 +205,7 @@ export default function InciFactMobileApp() {
   const [confirmations, setConfirmations] = useState<Record<string, string>>({});
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [ocrStatusMsg, setOcrStatusMsg] = useState<string | null>(null);
-  const [scanHistory, setScanHistory] = useState<
-    (CompareSlotItem & { score: number | null })[]
-  >([]);
+  const [scanHistory, setScanHistory] = useState<ScanHistoryEntry[]>([]);
   const isStorageHydrated = useRef(false);
 
   // Load persisted on-device watchlist and scan history from AsyncStorage on startup
