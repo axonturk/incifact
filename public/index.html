@@ -1135,9 +1135,24 @@
       }, 3000);
     }
 
+    function isElementVisibleFocusable(el) {
+      if (!el || el === document.body || !document.body.contains(el) || el.disabled) return false;
+      const style = window.getComputedStyle ? window.getComputedStyle(el) : null;
+      if (style && (style.display === 'none' || style.visibility === 'hidden')) return false;
+      if (el.offsetParent === null && (!style || style.position !== 'fixed')) return false;
+      return true;
+    }
+
     function fallbackCopy(text, preferredId) {
       const prevFocused = document.activeElement;
-      const prevId = preferredId || (prevFocused && prevFocused.id ? prevFocused.id : null);
+      const normalizedPrefId = preferredId === 'shareModalCopyBtn' ? 'openShareCardBtn' : preferredId;
+      const prevId =
+        normalizedPrefId ||
+        (prevFocused && prevFocused.id === 'shareModalCopyBtn'
+          ? 'openShareCardBtn'
+          : prevFocused && prevFocused.id
+          ? prevFocused.id
+          : null);
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.position = 'fixed';
@@ -1147,9 +1162,12 @@
       ta.select();
       try { document.execCommand('copy'); } catch (_) {}
       document.body.removeChild(ta);
+      const candById = prevId ? document.getElementById(prevId) : null;
       const restoreTarget =
-        (prevId ? document.getElementById(prevId) : null) ||
-        (prevFocused && prevFocused !== document.body && document.body.contains(prevFocused) ? prevFocused : null);
+        (isElementVisibleFocusable(candById) ? candById : null) ||
+        (isElementVisibleFocusable(prevFocused) ? prevFocused : null) ||
+        document.getElementById('openShareCardBtn') ||
+        document.getElementById('copyShareSummaryBtn');
       if (restoreTarget && typeof restoreTarget.focus === 'function') {
         try { restoreTarget.focus({ preventScroll: true }); } catch (_) { restoreTarget.focus(); }
       }
@@ -1853,7 +1871,12 @@
     }
 
     function copyShareSummaryText() {
-      const triggerId = document.activeElement && document.activeElement.id ? document.activeElement.id : null;
+      const activeEl = document.activeElement;
+      const rawTriggerId = activeEl && activeEl.id ? activeEl.id : null;
+      const isFromShareModal =
+        rawTriggerId === 'shareModalCopyBtn' ||
+        Boolean(activeEl && activeEl.closest && activeEl.closest('#shareCardModal'));
+      const triggerId = isFromShareModal ? 'openShareCardBtn' : rawTriggerId;
       const txt = generateShareSummaryText();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(txt).catch(() => fallbackCopy(txt, triggerId));

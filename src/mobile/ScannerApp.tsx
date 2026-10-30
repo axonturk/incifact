@@ -226,10 +226,17 @@ export default function InciFactMobileApp() {
           const parsedHist = JSON.parse(savedHist);
           if (Array.isArray(parsedHist)) {
             setScanHistory((prev) => {
-              const dedupedSaved = parsedHist.filter(
-                (h: any) => h && !prev.some((p) => p.rawText === h.rawText && p.productType === h.productType)
-              );
-              return [...prev, ...dedupedSaved].slice(0, 10);
+              const merged: ScanHistoryEntry[] = [];
+              const seenKeys = new Set<string>();
+              for (const h of [...prev, ...parsedHist]) {
+                if (!h || typeof h.rawText !== 'string') continue;
+                const key = `${h.rawText}::${h.productType || 'cosmetic'}::${h.jurisdiction || 'EU'}`;
+                if (!seenKeys.has(key)) {
+                  seenKeys.add(key);
+                  merged.push(h);
+                }
+              }
+              return merged.slice(0, 10);
             });
           }
         }
