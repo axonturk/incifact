@@ -2,7 +2,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { evaluateProduct, compareProducts } from './src/engine/ruleEngine.mjs';
+import { evaluateProduct, compareProducts, lookupBarcodeProduct, VERIFIED_BARCODE_CATALOG } from './src/engine/ruleEngine.mjs';
 import { SUPPORTED_LANGUAGES, UI_STRINGS } from './src/i18n/locales.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -100,6 +100,40 @@ const server = http.createServer((req, res) => {
           return;
         }
         const result = compareProducts(productA, productB, sharedOptions);
+        res.writeHead(200, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'X-Content-Type-Options': 'nosniff'
+        });
+        res.end(JSON.stringify(result, null, 2));
+      } catch (err) {
+        res.writeHead(400, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'X-Content-Type-Options': 'nosniff'
+        });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  if (req.method === 'GET' && pathname === '/api/barcode') {
+    const queryStr = (req.url || '').split('?')[1] || '';
+    const params = new URLSearchParams(queryStr);
+    const barcode = params.get('code') || params.get('barcode') || '';
+    const lang = params.get('lang') || 'tr';
+    const result = lookupBarcodeProduct({ barcode, lang });
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'X-Content-Type-Options': 'nosniff'
+    });
+    res.end(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  if (req.method === 'POST' && pathname === '/api/barcode') {
+    readJsonBody(req, res, (payload) => {
+      try {
+        const result = lookupBarcodeProduct(payload || {});
         res.writeHead(200, {
           'Content-Type': 'application/json; charset=utf-8',
           'X-Content-Type-Options': 'nosniff'

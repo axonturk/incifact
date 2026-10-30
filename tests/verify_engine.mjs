@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
-import { evaluateProduct, compareProducts, parseIngredientList } from '../src/engine/ruleEngine.mjs';
+import {
+  evaluateProduct,
+  compareProducts,
+  parseIngredientList,
+  normalizeBarcodeInput,
+  lookupBarcodeProduct
+} from '../src/engine/ruleEngine.mjs';
 
 console.log('======================================================================');
-console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (53 KABUL KRİTERİ)');
+console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (54 KABUL KRİTERİ)');
 console.log('======================================================================\n');
 
 let passed = 0;
@@ -1213,5 +1219,45 @@ runTest('53. Türkçe dışındaki 9 dilde Ek V/39 (MCI/MI 1:1 vs 3:1), Ek V/57 
   }
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/53 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// 54. Hibrit Barkod Okuyucu (EAN / Open Food & Beauty Facts) ve <%80 Kapsam OCR Yönlendirme Sigortası
+runTest('54. Hibrit Barkod Okuyucu: EAN-13 (Arapça/Urduca rakamlar dahil), 10 dilde ürün adı, <%80 kapsamda requiresOcrFallback=true ve bilinmeyen barkod koruması', () => {
+  // 1) Arapça ve Urduca rakamlarla barkod normalizasyonu
+  assert.deepEqual(normalizeBarcodeInput('٣٠١٧٦٢٠٤٢٢٠٠٣'), { valid: true, code: '3017620422003' });
+  assert.deepEqual(normalizeBarcodeInput('۳۳۳۷۸۷۵۵۹۷۳۸۸'), { valid: true, code: '3337875597388' });
+  assert.equal(normalizeBarcodeInput('abc-123').valid, false);
+
+  // 2) 10 dilde Nutella (3017620422003) ve CeraVe (3337875597388) %100 kapsamla çözümlenmeli
+  const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  for (const lang of langs) {
+    const nutella = lookupBarcodeProduct({ barcode: '3017620422003', lang });
+    assert.equal(nutella.valid, true);
+    assert.equal(nutella.found, true);
+    assert.equal(nutella.productType, 'food');
+    assert.equal(nutella.coveragePercent, 100);
+    assert.equal(nutella.requiresOcrFallback, false);
+    assert.ok(nutella.productName && nutella.productName.length > 3);
+  }
+
+  const cerave = lookupBarcodeProduct({ barcode: '3337875597388', lang: 'en' });
+  assert.equal(cerave.found, true);
+  assert.equal(cerave.evaluation.cards.regulatoryCard.score, 100);
+  assert.equal(cerave.requiresOcrFallback, false);
+
+  // 3) <%80 kapsamlı gönüllü kaydı (0000000000017) requiresOcrFallback = true dönmeli
+  const lowCov = lookupBarcodeProduct({ barcode: '0000000000017', lang: 'en' });
+  assert.equal(lowCov.found, true);
+  assert.ok(lowCov.coveragePercent < 80);
+  assert.equal(lowCov.requiresOcrFallback, true);
+  assert.equal(lowCov.fallbackReason, 'insufficient_coverage_under_80_percent');
+  assert.equal(lowCov.evaluation.cards.regulatoryCard.score, null);
+
+  // 4) Kayıtsız barkod (9999999999999) found=false ve requiresOcrFallback=true dönmeli
+  const missing = lookupBarcodeProduct({ barcode: '9999999999999', lang: 'tr' });
+  assert.equal(missing.valid, true);
+  assert.equal(missing.found, false);
+  assert.equal(missing.reason, 'barcode_not_found');
+  assert.equal(missing.requiresOcrFallback, true);
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/54 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
 

@@ -8,7 +8,7 @@ export interface OcrCaptureResult {
   imageUri?: string;
   extractedText?: string;
   detectedLanguageHint?: string;
-  confidence?: number;
+  confidence?: number | null;
   error?: string;
 }
 

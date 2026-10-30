@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { captureAndRecognizeLabel } from './ocrService';
+import { lookupBarcodeOnDevice, BarcodeLookupResult } from './barcodeService';
 import { SUPPORTED_LANGUAGES, getLocaleStrings } from '../i18n/locales.mjs';
 import { evaluateProduct, compareProducts } from '../engine/ruleEngine.mjs';
 
@@ -205,6 +206,8 @@ export default function InciFactMobileApp() {
   const [confirmations, setConfirmations] = useState<Record<string, string>>({});
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [ocrStatusMsg, setOcrStatusMsg] = useState<string | null>(null);
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [barcodeMeta, setBarcodeMeta] = useState<BarcodeLookupResult | null>(null);
   const [scanHistory, setScanHistory] = useState<ScanHistoryEntry[]>([]);
   const isStorageHydrated = useRef(false);
 
@@ -429,12 +432,37 @@ export default function InciFactMobileApp() {
   );
 
   const toggleProfile = (id: string) => {
-    setSelectedProfiles((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
+    setSelectedProfiles((prev: string[]) => (prev.includes(id) ? prev.filter((p: string) => p !== id) : [...prev, id]));
+  };
+
+  const handleBarcodeLookup = async (codeOverride?: string) => {
+    const targetCode = codeOverride !== undefined ? codeOverride : barcodeInput;
+    setBarcodeInput(targetCode);
+    const res = await lookupBarcodeOnDevice(targetCode, lang, {
+      userProfiles: selectedProfiles,
+      customWatchlist,
+      halalAuthority,
+      claims: { halalCertified: halalCert, veganStatus, vegetarianStatus: 'none' }
+    });
+    setBarcodeMeta(res);
+    if (res.found && res.rawText) {
+      if (res.productType) setProductType(res.productType);
+      setRawText(res.rawText);
+      setConfirmations({});
+      setOcrStatusMsg(`📦 ${res.productName || res.barcode} (${res.source || 'ODbL'})`);
+      if (!res.requiresOcrFallback) {
+        recordScanToHistory(res.productName);
+        setActiveTab('result');
+      }
+    } else {
+      setOcrStatusMsg(`⚠️ ${res.message}`);
+    }
   };
 
   const handleCameraScan = async (mode: 'camera' | 'gallery') => {
     const res = await captureAndRecognizeLabel(mode);
     if (!res.cancelled && res.extractedText) {
+      setBarcodeMeta(null);
       setRawText(res.extractedText);
       setConfirmations({});
       if (typeof res.confidence === 'number') {
@@ -752,6 +780,40 @@ export default function InciFactMobileApp() {
               )}
             </View>
 
+            {/* Hybrid Barcode Lookup Bar (Open Food / Beauty Facts ODbL) */}
+            <View style={{ marginBottom: 12, padding: 10, borderRadius: 12, backgroundColor: theme.subtle, borderWidth: 1, borderColor: theme.border }}>
+              <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }}>
+                <TextInput
+                  value={barcodeInput}
+                  onChangeText={(v: string) => setBarcodeInput(v)}
+                  placeholder="EAN-13 / UPC (3017620422003)"
+                  placeholderTextColor={theme.muted}
+                  style={{
+                    flex: 1,
+                    height: 40,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                    backgroundColor: theme.card,
+                    color: theme.text,
+                    paddingHorizontal: 10,
+                    fontSize: 12
+                  }}
+                />
+                <TouchableOpacity
+                  onPress={() => handleBarcodeLookup()}
+                  style={{ height: 40, paddingHorizontal: 12, borderRadius: 8, backgroundColor: theme.accent, justifyContent: 'center' }}
+                >
+                  <Text style={{ color: theme.onAccent, fontWeight: '800', fontSize: 12 }}>📦 EAN</Text>
+                </TouchableOpacity>
+              </View>
+              {barcodeMeta && (
+                <Text style={{ fontSize: 11, color: barcodeMeta.requiresOcrFallback ? '#B45309' : theme.accent, fontWeight: '700', marginTop: 6 }}>
+                  {barcodeMeta.message}
+                </Text>
+              )}
+            </View>
+
             <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', gap: 8, marginBottom: 12 }}>
               {(['cosmetic', 'food'] as ProductType[]).map((pt) => (
                 <TouchableOpacity
@@ -807,7 +869,8 @@ export default function InciFactMobileApp() {
             <TextInput
               multiline
               value={rawText}
-              onChangeText={(txt) => {
+              onChangeText={(txt: string) => {
+                setBarcodeMeta(null);
                 setRawText(txt);
                 setConfirmations({});
               }}

@@ -661,7 +661,10 @@
       evalData: null,
       compareData: null,
       copiedToast: false,
-      lastCopiedMsg: null
+      lastCopiedMsg: null,
+      activeBarcodeMeta: null,
+      barcodeInputVal: '',
+      barcodeStatusBanner: null
     };
 
     function getSampleTitle(idx, lang) {
@@ -1015,6 +1018,26 @@
       if (liveInput && state.activeSampleIdx !== null) {
         liveInput.value = getSampleText(state.activeSampleIdx, state.lang);
       }
+      if (state.activeBarcodeMeta && state.activeBarcodeMeta.barcode) {
+        fetch('/api/barcode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ barcode: state.activeBarcodeMeta.barcode, lang: state.lang })
+        })
+          .then((r) => r.json())
+          .then((bData) => {
+            if (bData && bData.found && state.activeBarcodeMeta && state.activeBarcodeMeta.barcode === bData.barcode) {
+              state.activeBarcodeMeta.productName = bData.productName;
+              state.activeBarcodeMeta.message = bData.message;
+              state.productTitle = bData.productName;
+              if (state.barcodeStatusBanner) {
+                state.barcodeStatusBanner.message = bData.message;
+              }
+              refreshAll();
+            }
+          })
+          .catch(() => {});
+      }
       refreshAll();
     }
 
@@ -1055,6 +1078,8 @@
     function loadSample(idx) {
       const s = SAMPLES[idx];
       state.activeSampleIdx = idx;
+      state.activeBarcodeMeta = null;
+      state.barcodeStatusBanner = null;
       if (idx === 7 && state.lang === 'tr') {
         state.autoDetected = false;
         state.lang = 'ar';
@@ -1075,6 +1100,8 @@
 
     function onInputChanged() {
       state.activeSampleIdx = null;
+      state.activeBarcodeMeta = null;
+      state.barcodeStatusBanner = null;
       state.userConfirmations = {};
       if (window._liveInputDebounce) clearTimeout(window._liveInputDebounce);
       window._liveInputDebounce = setTimeout(() => {
@@ -1717,6 +1744,8 @@
         return loadSample(h.sampleIdx);
       }
       state.activeSampleIdx = null;
+      state.activeBarcodeMeta = null;
+      state.barcodeStatusBanner = null;
       state.productTitle = h.title || deriveCustomProductTitle(h.rawText, state.lang);
       if (h.jurisdiction) state.jurisdiction = h.jurisdiction;
       if (h.claims) state.claims = { ...h.claims };
@@ -1726,6 +1755,165 @@
       state.screen = 'result';
       switchScreen('result');
       return refreshAll();
+    }
+
+    const BARCODE_UI_I18N = {
+      tr: {
+        title: '📦 Hibrit Barkod Okuyucu (EAN / Open Food & Beauty Facts)',
+        placeholder: '8–14 haneli barkod (Örn: 3017620422003)',
+        btn: 'Barkod Sorgula',
+        quickLbl: 'Hazır Barkodlar:'
+      },
+      en: {
+        title: '📦 Hybrid Barcode Lookup (EAN / Open Food & Beauty Facts)',
+        placeholder: '8–14 digit barcode (e.g. 3017620422003)',
+        btn: 'Lookup Barcode',
+        quickLbl: 'Quick Barcodes:'
+      },
+      ar: {
+        title: '📦 قارئ الباركود الهجين (EAN / Open Food & Beauty Facts)',
+        placeholder: 'باركود من 8 إلى 14 رقماً (مثال: 3017620422003)',
+        btn: 'فحص الباركود',
+        quickLbl: 'باركودات جاهزة:'
+      },
+      de: {
+        title: '📦 Hybrider Barcode-Scanner (EAN / Open Food & Beauty Facts)',
+        placeholder: '8–14-stelliger Barcode (z. B. 3017620422003)',
+        btn: 'Barcode prüfen',
+        quickLbl: 'Schnellwahl:'
+      },
+      fr: {
+        title: '📦 Lecteur Code-Barres Hybride (EAN / Open Food & Beauty Facts)',
+        placeholder: 'Code-barres 8–14 chiffres (ex. 3017620422003)',
+        btn: 'Vérifier Code',
+        quickLbl: 'Codes rapides :'
+      },
+      id: {
+        title: '📦 Pemindai Barcode Hibrida (EAN / Open Food & Beauty Facts)',
+        placeholder: '8–14 digit barcode (Mis: 3017620422003)',
+        btn: 'Cari Barcode',
+        quickLbl: 'Barcode Cepat:'
+      },
+      ms: {
+        title: '📦 Pengimbas Kod Bar Hibrid (EAN / Open Food & Beauty Facts)',
+        placeholder: '8–14 digit kod bar (Cth: 3017620422003)',
+        btn: 'Semak Kod Bar',
+        quickLbl: 'Kod Bar Pantas:'
+      },
+      es: {
+        title: '📦 Lector Híbrido de Código de Barras (Open Food & Beauty Facts)',
+        placeholder: 'Código de 8–14 dígitos (Ej. 3017620422003)',
+        btn: 'Buscar Código',
+        quickLbl: 'Códigos rápidos:'
+      },
+      ru: {
+        title: '📦 Гибридный поиск по штрихкоду (EAN / Open Food & Beauty Facts)',
+        placeholder: '8–14 цифр штрихкода (напр. 3017620422003)',
+        btn: 'Найти штрихкод',
+        quickLbl: 'Быстрые коды:'
+      },
+      ur: {
+        title: '📦 ہائبرڈ بارکوڈ اسکینر (EAN / Open Food & Beauty Facts)',
+        placeholder: '8 تا 14 ہندسوں کا بارکوڈ (مثلاً: 3017620422003)',
+        btn: 'بارکوڈ چیک کریں',
+        quickLbl: 'فوری بارکوڈز:'
+      }
+    };
+
+    const QUICK_BARCODES = [
+      { code: '3017620422003', label: 'Nutella' },
+      { code: '3337875597388', label: 'CeraVe' },
+      { code: '8809598450653', label: 'COSRX Snail' },
+      { code: '7622210449283', label: 'Oreo' },
+      { code: '5900000202501', label: 'TPO Gel' },
+      { code: '0000000000017', label: '<80% OCR' }
+    ];
+
+    async function lookupBarcodeFromUi(codeOverride) {
+      const inp = document.getElementById('barcodeInput');
+      const rawCode = codeOverride !== undefined ? String(codeOverride) : (inp ? inp.value : state.barcodeInputVal);
+      state.barcodeInputVal = rawCode;
+      if (inp) inp.value = rawCode;
+
+      try {
+        const res = await fetch('/api/barcode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            barcode: rawCode,
+            lang: state.lang
+          })
+        });
+        const data = await res.json();
+        if (!data || !data.found) {
+          state.barcodeStatusBanner = {
+            tone: 'warn',
+            barcode: (data && data.barcode) || rawCode,
+            message: (data && data.message) || 'Barcode not found.'
+          };
+          renderScreen();
+          return data;
+        }
+
+        // Save to 7-day local barcode cache (LRU max 50)
+        try {
+          const cacheList = loadSavedJson('incifact_barcode_cache_v1', []);
+          const nowMs = Date.now();
+          const ttlMs = 7 * 24 * 60 * 60 * 1000;
+          const validCache = Array.isArray(cacheList)
+            ? cacheList.filter((c) => c && c.barcode !== data.barcode && nowMs - (c.cachedAt || 0) < ttlMs)
+            : [];
+          validCache.unshift({
+            barcode: data.barcode,
+            productName: data.productName,
+            productType: data.productType,
+            rawText: data.rawText,
+            source: data.source,
+            updatedAt: data.updatedAt,
+            cachedAt: nowMs
+          });
+          saveJson('incifact_barcode_cache_v1', validCache.slice(0, 50));
+        } catch (_) {}
+
+        state.activeSampleIdx = null;
+        state.userConfirmations = {};
+        state.activeBarcodeMeta = {
+          barcode: data.barcode,
+          productName: data.productName,
+          productType: data.productType,
+          rawText: data.rawText,
+          source: data.source,
+          updatedAt: data.updatedAt,
+          requiresOcrFallback: Boolean(data.requiresOcrFallback),
+          message: data.message
+        };
+        state.barcodeStatusBanner = {
+          tone: data.requiresOcrFallback ? 'warn' : 'ok',
+          barcode: data.barcode,
+          message: data.message
+        };
+        state.productTitle = data.productName;
+        document.getElementById('prodType').value = data.productType || 'cosmetic';
+        document.getElementById('liveInput').value = data.rawText;
+
+        await refreshAll();
+        if (data.requiresOcrFallback) {
+          state.screen = 'scan';
+          switchScreen('scan');
+        } else {
+          state.screen = 'result';
+          switchScreen('result');
+        }
+        return data;
+      } catch (err) {
+        state.barcodeStatusBanner = {
+          tone: 'warn',
+          barcode: rawCode,
+          message: String(err && err.message ? err.message : err)
+        };
+        renderScreen();
+        return null;
+      }
     }
 
     function getUnifiedStatusPresentation() {
@@ -2247,15 +2435,22 @@
       const productType = document.getElementById('prodType').value;
       const halalAuthority = document.getElementById('halalAuth').value;
 
-      // Ensure manual edits to rawText never keep a stale preset sample title
+      // Ensure manual edits to rawText never keep a stale preset sample title or barcode title
       if (state.activeSampleIdx !== null) {
         const expectedSampleText = getSampleText(state.activeSampleIdx, state.lang);
         if (rawText.trim() !== expectedSampleText.trim()) {
           state.activeSampleIdx = null;
         }
       }
+      if (state.activeBarcodeMeta && state.activeBarcodeMeta.rawText) {
+        if (rawText.trim() !== state.activeBarcodeMeta.rawText.trim()) {
+          state.activeBarcodeMeta = null;
+        }
+      }
       if (state.activeSampleIdx !== null) {
         state.productTitle = getSampleTitle(state.activeSampleIdx, state.lang);
+      } else if (state.activeBarcodeMeta && state.activeBarcodeMeta.productName) {
+        state.productTitle = state.activeBarcodeMeta.productName;
       } else {
         state.productTitle = deriveCustomProductTitle(rawText, state.lang);
       }
@@ -3423,10 +3618,11 @@
       `;
     }
 
-    // 2. TARA / OCR DOĞRULAMA EKRANI (Scan.dc.html) - 10 LANGUAGE LOCALIZED
+      //2. TARA / OCR DOĞRULAMA EKRANI (Scan.dc.html) - 10 LANGUAGE LOCALIZED
     function renderScanScreen() {
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
+      const bUi = BARCODE_UI_I18N[state.lang] || BARCODE_UI_I18N.en;
       const obs = state.evalData.observations || [];
       const confirmations = state.evalData.unresolvedConfirmations || [];
       const recCount = obs.filter((o) => o.status === 'recognized').length;
@@ -3438,6 +3634,29 @@
             <span style="font-size:12px; padding:6px 12px; border-radius:16px; background:rgba(255,255,255,0.14); font-weight:700;">
               ${state.evalData.productType === 'cosmetic' ? loc.scanScreen.productTypeCosmetic : loc.scanScreen.productTypeFood}
             </span>
+          </div>
+
+          <!-- Hibrit Barkod Okuyucu (EAN / Open Food & Beauty Facts) -->
+          <div style="margin-top:10px; padding:10px 12px; border-radius:14px; border:1px solid rgba(197,160,89,0.45); background:rgba(20,28,51,0.72); display:flex; flex-direction:column; gap:7px;">
+            <span style="font-size:11.5px; font-weight:800; color:#EAD39C;">${escapeHtml(bUi.title)}</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input id="barcodeInput" type="text" inputmode="numeric" dir="ltr" value="${escapeHtml(state.barcodeInputVal || '')}" placeholder="${escapeHtml(bUi.placeholder)}" aria-label="${escapeHtml(bUi.placeholder)}" onkeydown="if(event.key==='Enter'){event.preventDefault();lookupBarcodeFromUi();}" oninput="state.barcodeInputVal=this.value" style="flex:1; min-width:0; min-height:44px; border-radius:10px; border:1px solid rgba(255,255,255,0.24); background:rgba(11,19,43,0.85); color:#FFFFFF; padding:0 10px; font-size:12.5px; font-family:ui-monospace,monospace;" />
+              <button id="barcodeLookupBtn" type="button" onclick="lookupBarcodeFromUi()" style="min-height:44px; padding:0 12px; border-radius:10px; border:none; background:#E6C98A; color:#0B132B; font-size:12px; font-weight:800; cursor:pointer; flex:none;">${escapeHtml(bUi.btn)}</button>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center;">
+              <span style="font-size:10.5px; color:#CBD5E1; font-weight:700;">${escapeHtml(bUi.quickLbl)}</span>
+              ${QUICK_BARCODES.map(
+                (q) =>
+                  `<button type="button" onclick="lookupBarcodeFromUi('${q.code}')" style="min-height:28px; padding:2px 8px; border-radius:8px; border:1px solid rgba(230,201,138,0.45); background:rgba(255,255,255,0.08); color:#F3F5F2; font-size:10.5px; font-weight:700; cursor:pointer;">${escapeHtml(q.label)} · ${q.code.slice(-4)}</button>`
+              ).join('')}
+            </div>
+            ${
+              state.barcodeStatusBanner
+                ? `<div id="barcodeStatusMsg" style="padding:7px 10px; border-radius:9px; background:${state.barcodeStatusBanner.tone === 'ok' ? 'rgba(16,185,129,0.22)' : 'rgba(245,158,11,0.24)'}; border:1px solid ${state.barcodeStatusBanner.tone === 'ok' ? '#34D399' : '#FBBF24'}; color:#FFFFFF; font-size:11.5px; font-weight:700; line-height:1.35;">
+                     ${state.barcodeStatusBanner.tone === 'ok' ? '🟢 ' : '⚠️ '}${escapeHtml(state.barcodeStatusBanner.message)}
+                   </div>`
+                : ''
+            }
           </div>
 
           <div style="margin-top:10px; padding:10px 14px; border-radius:14px; border:1px dashed rgba(197,160,89,0.55); background:rgba(15,41,30,0.65); display:flex; align-items:center; justify-content:space-between; gap:10px;">
@@ -3625,6 +3844,13 @@
           <span style="font-size:12.5px; color:var(--muted);">
             ${state.evalData.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${formatDigits(reg.totalCount, state.lang)} ${u.ingredientWord} · ${formatPercent(reg.coveragePercent, state.lang)} ${u.recognizedWord}
           </span>
+          ${
+            state.activeBarcodeMeta && state.activeBarcodeMeta.barcode
+              ? `<div style="margin-top:4px; display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:8px; background:var(--soft); border:1px solid var(--line); font-size:11px; font-weight:700; color:var(--accent);">
+                   📦 ${escapeHtml(state.activeBarcodeMeta.source || 'Open Food / Beauty Facts (ODbL)')} · EAN ${escapeHtml(state.activeBarcodeMeta.barcode)}
+                 </div>`
+              : ''
+          }
         </div>
 
         <!-- İlk 3 Saniye Tek Cümle Karar Başlığı (Verdict Hero) -->

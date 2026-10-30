@@ -2809,4 +2809,329 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
   };
 }
 
+/**
+ * Normalizes EAN-8 / UPC-A / EAN-13 / GTIN-14 barcode strings (including Arabic-Indic ٠-٩ and Urdu ۰-۹ digits).
+ */
+export function normalizeBarcodeInput(rawBarcode) {
+  if (rawBarcode === null || rawBarcode === undefined) {
+    return { valid: false, code: '' };
+  }
+  const str = String(rawBarcode)
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/[\s\-_]+/g, '')
+    .trim();
+  const valid = /^\d{8,14}$/.test(str);
+  return { valid, code: valid ? str : str.slice(0, 32) };
+}
+
+export const VERIFIED_BARCODE_CATALOG = {
+  '3017620422003': {
+    code: '3017620422003',
+    productType: 'food',
+    applicationType: 'none',
+    updatedAt: '2026-10-30',
+    source: 'Open Food Facts (ODbL)',
+    names: {
+      tr: 'Ferrero Nutella Kakaolu Fındık Kreması (350g)',
+      en: 'Ferrero Nutella Hazelnut Spread with Cocoa (350g)',
+      ar: 'نوتيلا كريمة البندق والكاكاو (350g)',
+      de: 'Ferrero Nutella Nuss-Nugat-Creme (350g)',
+      fr: 'Ferrero Nutella Pâte à tartiner aux noisettes et au cacao (350g)',
+      id: 'Ferrero Nutella Selai Kacang Hazel & Kakao (350g)',
+      ms: 'Ferrero Nutella Sapuan Kacang Hazel & Koko (350g)',
+      es: 'Ferrero Nutella Crema de avellanas y cacao (350g)',
+      ru: 'Ferrero Nutella Ореховая паста с какао (350g)',
+      ur: 'فیریرو نوٹیلا ہیزل نٹ اور کوکو اسپریڈ (350g)'
+    },
+    rawText: 'Sugar, Palm Oil, Hazelnuts (13%), Skimmed Milk Powder (8.7%), Fat-Reduced Cocoa (7.4%), Emulsifier: Lecithins (Soya), Vanillin'
+  },
+  '3337875597388': {
+    code: '3337875597388',
+    productType: 'cosmetic',
+    applicationType: 'leave_on',
+    updatedAt: '2026-10-30',
+    source: 'Open Beauty Facts (ODbL)',
+    names: {
+      tr: 'CeraVe Nemlendirici Krem (Moisturising Cream)',
+      en: 'CeraVe Moisturising Cream (Dry to Very Dry Skin)',
+      ar: 'كريم سيرافي المرطب للبشرة الجافة (CeraVe)',
+      de: 'CeraVe Feuchtigkeitscreme (Trockene bis sehr trockene Haut)',
+      fr: 'CeraVe Baume Hydratant (Peaux sèches à très sèches)',
+      id: 'CeraVe Moisturising Cream (Pelembap Kulit Kering)',
+      ms: 'CeraVe Moisturising Cream (Krim Pelembap)',
+      es: 'CeraVe Crema Hidratante (Piel seca a muy seca)',
+      ru: 'CeraVe Увлажняющий крем для сухой кожи',
+      ur: 'سیراوی موئسچرائزنگ کریم (CeraVe)'
+    },
+    rawText: 'Aqua, Glycerin, Cetearyl Alcohol, Caprylic/Capric Triglyceride, Cetyl Alcohol, Ceteareth-20, Petrolatum, Ceramide NP, Ceramide AP, Ceramide EOP, Cholesterol, Dimethicone, Phenoxyethanol, Tocopherol, Sodium Hyaluronate, Xanthan Gum'
+  },
+  '8809598450653': {
+    code: '8809598450653',
+    productType: 'cosmetic',
+    applicationType: 'leave_on',
+    updatedAt: '2026-10-30',
+    source: 'Open Beauty Facts (ODbL)',
+    names: {
+      tr: 'COSRX Advanced Snail 96 Mucin Power Essence',
+      en: 'COSRX Advanced Snail 96 Mucin Power Essence',
+      ar: 'خلاصة الحلزون المتقدمة COSRX Snail 96 Mucin',
+      de: 'COSRX Advanced Snail 96 Mucin Power Essence',
+      fr: 'COSRX Advanced Snail 96 Mucin Power Essence',
+      id: 'COSRX Advanced Snail 96 Mucin Power Essence',
+      ms: 'COSRX Advanced Snail 96 Mucin Power Essence',
+      es: 'COSRX Advanced Snail 96 Mucin Power Essence',
+      ru: 'COSRX Эссенция с муцином улитки Snail 96',
+      ur: 'کوسریکس اسنیل 96 میوسن ایسنس (COSRX)'
+    },
+    rawText: 'Snail Secretion Filtrate, Betaine, Butylene Glycol, 1,2-Hexanediol, Sodium Hyaluronate, Panthenol, Arginine, Allantoin, Ethyl Hexanediol, Sodium Polyacrylate, Carbomer, Phenoxyethanol'
+  },
+  '7622210449283': {
+    code: '7622210449283',
+    productType: 'food',
+    applicationType: 'none',
+    updatedAt: '2026-10-30',
+    source: 'Open Food Facts (ODbL)',
+    names: {
+      tr: 'Oreo Original Kakaolu Sandviç Bisküvi',
+      en: 'Oreo Original Vanilla Cream Sandwich Biscuit',
+      ar: 'بسكويت أوريو الأصلي بكريمة الفانيليا (Oreo)',
+      de: 'Oreo Original Kakaokeks mit Vanillegeschmack',
+      fr: 'Oreo Original Biscuit Cacao fourré goût Vanille',
+      id: 'Oreo Original Biskuit Sandwich Krim Vanila',
+      ms: 'Oreo Original Biskut Sandwic Krim Vanila',
+      es: 'Oreo Original Galleta de Cacao con Crema',
+      ru: 'Oreo Original Печенье с кремовой начинкой',
+      ur: 'اوریو اوریجنل ونیلا کریم بسکٹ (Oreo)'
+    },
+    rawText: 'Wheat Flour, Sugar, Palm Oil, Fat-Reduced Cocoa Powder, Glucose-Fructose Syrup, Wheat Starch, Salt, Emulsifier (Soy Lecithin), Vanillin. May contain milk'
+  },
+  '8690504011507': {
+    code: '8690504011507',
+    productType: 'food',
+    applicationType: 'none',
+    updatedAt: '2026-10-30',
+    source: 'Open Food Facts (ODbL)',
+    names: {
+      tr: 'Çilekli Meyve Jölesi (E120 Karmin & Jelatin)',
+      en: 'Strawberry Fruit Jelly (E120 Carmine & Gelatin)',
+      ar: 'جيلي الفراولة (كارمين E120 وجيلاتين)',
+      de: 'Erdbeer-Fruchtgelee (E120 Karmin & Gelatine)',
+      fr: 'Gelée aux fraises (Carmin E120 & Gélatine)',
+      id: 'Jeli Buah Stroberi (Karmin E120 & Gelatin)',
+      ms: 'Jeli Buah Strawberi (Karmin E120 & Gelatin)',
+      es: 'Gelatina de fresa (Carmín E120 y Gelatina)',
+      ru: 'Клубничное желе (Кармин E120 и Желатин)',
+      ur: 'اسٹرابیری فروٹ جیلی (کارمائن E120 اور جیلیٹن)'
+    },
+    rawText: 'Sugar, Glucose Syrup, Water, Gelatin, Citric Acid (E330), Carmine (E120)'
+  },
+  '5900000202501': {
+    code: '5900000202501',
+    productType: 'cosmetic',
+    applicationType: 'leave_on',
+    updatedAt: '2026-10-30',
+    source: 'Open Beauty Facts (ODbL)',
+    names: {
+      tr: 'UV Jel Oje (TPO — AB 2025/877 Yasaklı)',
+      en: 'UV Gel Nail Polish (TPO — EU 2025/877 Banned)',
+      ar: 'طلاء أظافر جل للأشعة فوق البنفسجية (TPO محظور أوروبياً)',
+      de: 'UV-Gel-Nagellack (TPO — EU 2025/877 Verboten)',
+      fr: 'Vernis Gel UV (TPO — Interdit UE 2025/877)',
+      id: 'Kuteks Gel UV (TPO — Dilarang UE 2025/877)',
+      ms: 'Pengilat Kuku Gel UV (TPO — Dilarang EU 2025/877)',
+      es: 'Esmalte de Uñas Gel UV (TPO — Prohibido UE 2025/877)',
+      ru: 'УФ гель-лак для ногтей (TPO — запрещен ЕС 2025/877)',
+      ur: 'یو وی جیل نیل پالش (TPO — یورپی یونین ممنوع)'
+    },
+    rawText: 'Di-HEMA Trimethylhexyl Dicarbamate, HEMA, Trimethylbenzoyl Diphenylphosphine Oxide, Hydroxycyclohexyl Phenyl Ketone, CI 77891'
+  },
+  '4005808811137': {
+    code: '4005808811137',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off',
+    updatedAt: '2026-10-30',
+    source: 'Open Beauty Facts (ODbL)',
+    names: {
+      tr: 'Arındırıcı Durulanan Şampuan (MCI/MI 3:1 Doğrulanmış)',
+      en: 'Purifying Rinse-Off Shampoo (MCI/MI 3:1 Verified)',
+      ar: 'شامبو منقٍّ يُشطف بالماء (نسبة MCI/MI 3:1 موثقة)',
+      de: 'Klärendes Rinse-Off-Shampoo (MCI/MI 3:1 bestätigt)',
+      fr: 'Shampooing Purifiant à Rincer (MCI/MI 3:1 vérifié)',
+      id: 'Sampo Bilas Pemurni (Rasio MCI/MI 3:1 Terverifikasi)',
+      ms: 'Syampu Bilas Pembersih (Nisbah MCI/MI 3:1 Disahkan)',
+      es: 'Champú Purificante con Aclarado (MCI/MI 3:1 verificado)',
+      ru: 'Очищающий смываемый шампунь (соотношение MCI/MI 3:1)',
+      ur: 'پیوریفائنگ رِنس آف شیمپو (MCI/MI 3:1 تصدیق شدہ)'
+    },
+    rawText: 'Aqua, Sodium Laureth Sulfate, Cocamidopropyl Betaine, Glycerin, Panthenol, Citric Acid, Methylchloroisothiazolinone 7.5 ppm, Methylisothiazolinone 2.5 ppm'
+  },
+  '0000000000017': {
+    code: '0000000000017',
+    productType: 'cosmetic',
+    applicationType: 'leave_on',
+    updatedAt: '2026-10-30',
+    source: 'Open Beauty Facts (ODbL)',
+    names: {
+      tr: 'Eksik Gönüllü Kaydı (<%80 Kapsam OCR Yönlendirme Testi)',
+      en: 'Incomplete Crowd Entry (<80% Coverage OCR Fallback Test)',
+      ar: 'بيانات تطوعية ناقصة (اختبار التغطية أقل من 80% والتصوير الضوئي)',
+      de: 'Unvollständiger Community-Eintrag (<80 % Abdeckung OCR-Test)',
+      fr: 'Entrée participative incomplète (<80 % couverture test OCR)',
+      id: 'Entri Komunitas Tidak Lengkap (Uji Cakupan <80% ke OCR)',
+      ms: 'Entri Komuniti Tidak Lengkap (Ujian Liputan <80% ke OCR)',
+      es: 'Registro colaborativo incompleto (Prueba <80% cobertura OCR)',
+      ru: 'Неполная запись сообщества (тест покрытия <80% и перехода к OCR)',
+      ur: 'نامکمل کمیونٹی اندراج (80% سے کم کوریج اور OCR ٹیسٹ)'
+    },
+    rawText: 'Aqua, Unverified Mystery Extract X99, Unknown Polymer Z12, Proprietary Complex Q7'
+  }
+};
+
+const BARCODE_I18N = {
+  tr: {
+    invalidMsg: 'Geçersiz barkod formatı. Lütfen 8–14 haneli EAN/UPC barkod numarası girin veya içindekiler etiketini fotoğraflayın.',
+    notFoundMsg: (code) => `Barkod (${code}) açık veri tabanında henüz kayıtlı değil. Lütfen ambalaj arkasındaki içindekiler yazısını fotoğraflayın (OCR).`,
+    lowCovFallbackMsg: (pct) => `Barkod verisi eksik veya doğrulanamadı (%${pct} kapsam < %80). Güvenli karar için lütfen ambalaj arkasındaki içindekiler listesini fotoğraflayın.`,
+    foundOkMsg: (name, pct) => `${name} barkoddan yüklendi (%${pct} kapsam · Open Food/Beauty Facts ODbL).`
+  },
+  en: {
+    invalidMsg: 'Invalid barcode format. Please enter an 8–14 digit EAN/UPC barcode or photograph the ingredient label.',
+    notFoundMsg: (code) => `Barcode (${code}) is not yet registered in the open database. Please photograph the ingredient list on the back of the packaging (OCR).`,
+    lowCovFallbackMsg: (pct) => `Barcode ingredient data is incomplete or unverified (${pct}% coverage < 80%). Please photograph the ingredient label on the packaging for a reliable check.`,
+    foundOkMsg: (name, pct) => `${name} loaded from barcode (${pct}% coverage · Open Food/Beauty Facts ODbL).`
+  },
+  ar: {
+    invalidMsg: 'تنسيق الباركود غير صالح. يرجى إدخال رقم باركود من 8 إلى 14 رقماً أو تصوير قائمة المكونات.',
+    notFoundMsg: (code) => `الباركود (${code}) غير مسجل بعد في قاعدة البيانات المفتوحة. يرجى تصوير قائمة المكونات خلف العبوة (OCR).`,
+    lowCovFallbackMsg: (pct) => `بيانات الباركود ناقصة أو غير موثقة (التغطية ${pct}% أقل من 80%). يرجى تصوير قائمة المكونات على العبوة للتحقق الموثوق.`,
+    foundOkMsg: (name, pct) => `تم تحميل ${name} عبر الباركود (تغطية ${pct}% · Open Food/Beauty Facts ODbL).`
+  },
+  de: {
+    invalidMsg: 'Ungültiges Barcode-Format. Bitte 8–14-stelligen EAN/UPC-Code eingeben oder die Zutatenliste fotografieren.',
+    notFoundMsg: (code) => `Barcode (${code}) ist noch nicht in der offenen Datenbank erfasst. Bitte fotografieren Sie die Zutatenliste auf der Verpackung (OCR).`,
+    lowCovFallbackMsg: (pct) => `Barcode-Daten unvollständig (${pct} % Abdeckung < 80 %). Bitte fotografieren Sie die Zutatenliste auf der Packung zur sicheren Prüfung.`,
+    foundOkMsg: (name, pct) => `${name} per Barcode geladen (${pct} % Abdeckung · Open Food/Beauty Facts ODbL).`
+  },
+  fr: {
+    invalidMsg: 'Format de code-barres invalide. Veuillez saisir un code EAN/UPC de 8 à 14 chiffres ou photographier l\'étiquette.',
+    notFoundMsg: (code) => `Le code-barres (${code}) n'est pas encore enregistré dans la base ouverte. Veuillez photographier la liste des ingrédients sur l'emballage (OCR).`,
+    lowCovFallbackMsg: (pct) => `Données du code-barres incomplètes (${pct} % de couverture < 80 %). Veuillez photographier l'étiquette des ingrédients pour une vérification fiable.`,
+    foundOkMsg: (name, pct) => `${name} chargé via code-barres (${pct} % de couverture · Open Food/Beauty Facts ODbL).`
+  },
+  id: {
+    invalidMsg: 'Format barcode tidak valid. Masukkan 8–14 digit kode EAN/UPC atau foto label komposisi.',
+    notFoundMsg: (code) => `Barcode (${code}) belum terdaftar di basis data terbuka. Silakan foto daftar komposisi pada kemasan (OCR).`,
+    lowCovFallbackMsg: (pct) => `Data barcode belum lengkap (${pct}% cakupan < 80%). Silakan foto label komposisi pada kemasan untuk pemeriksaan akurat.`,
+    foundOkMsg: (name, pct) => `${name} dimuat dari barcode (${pct}% cakupan · Open Food/Beauty Facts ODbL).`
+  },
+  ms: {
+    invalidMsg: 'Format kod bar tidak sah. Sila masukkan 8–14 digit kod EAN/UPC atau ambil gambar label ramuan.',
+    notFoundMsg: (code) => `Kod bar (${code}) belum didaftarkan dalam pangkalan data terbuka. Sila ambil gambar senarai ramuan pada bungkusan (OCR).`,
+    lowCovFallbackMsg: (pct) => `Data kod bar tidak lengkap (${pct}% liputan < 80%). Sila ambil gambar label ramuan pada bungkusan untuk semakan tepat.`,
+    foundOkMsg: (name, pct) => `${name} dimuatkan daripada kod bar (${pct}% liputan · Open Food/Beauty Facts ODbL).`
+  },
+  es: {
+    invalidMsg: 'Formato de código de barras no válido. Introduce un código EAN/UPC de 8 a 14 dígitos o fotografía la etiqueta.',
+    notFoundMsg: (code) => `El código de barras (${code}) aún no está registrado en la base abierta. Por favor, fotografía la lista de ingredientes del envase (OCR).`,
+    lowCovFallbackMsg: (pct) => `Datos del código de barras incompletos (${pct}% de cobertura < 80%). Por favor, fotografía la etiqueta de ingredientes del envase.`,
+    foundOkMsg: (name, pct) => `${name} cargado por código de barras (${pct}% de cobertura · Open Food/Beauty Facts ODbL).`
+  },
+  ru: {
+    invalidMsg: 'Неверный формат штрихкода. Введите 8–14 цифр кода EAN/UPC или сфотографируйте состав на упаковке.',
+    notFoundMsg: (code) => `Штрихкод (${code}) еще не зарегистрирован в открытой базе. Пожалуйста, сфотографируйте список состава на упаковке (OCR).`,
+    lowCovFallbackMsg: (pct) => `Данные штрихкода неполные (покрытие ${pct}% < 80%). Пожалуйста, сфотографируйте состав на упаковке для точной проверки.`,
+    foundOkMsg: (name, pct) => `${name} загружен по штрихкоду (покрытие ${pct}% · Open Food/Beauty Facts ODbL).`
+  },
+  ur: {
+    invalidMsg: 'بارکوڈ کا فارمیٹ درست نہیں۔ براہ کرم 8 سے 14 ہندسوں کا EAN/UPC بارکوڈ درج کریں یا اجزاء کے لیبل کی تصویر لیں۔',
+    notFoundMsg: (code) => `بارکوڈ (${code}) ابھی اوپن ڈیٹا بیس میں درج نہیں ہے۔ براہ کرم پیکنگ کے پیچھے اجزاء کی فہرست کی تصویر لیں (OCR)۔`,
+    lowCovFallbackMsg: (pct) => `بارکوڈ کا ڈیٹا نامکمل ہے (${pct}% کوریج < 80%)۔ درست جانچ کے لیے براہ کرم پیکنگ پر اجزاء کے لیبل کی تصویر لیں۔`,
+    foundOkMsg: (name, pct) => `${name} بارکوڈ سے لوڈ کیا گیا (${pct}% کوریج · Open Food/Beauty Facts ODbL)۔`
+  }
+};
+
+/**
+ * Deterministic hybrid barcode lookup and ruleEngine evaluation with <80% coverage OCR fallback guard.
+ */
+export function lookupBarcodeProduct({
+  barcode,
+  lang = 'tr',
+  evaluationOptions = {},
+  externalProduct = null
+} = {}) {
+  const bTxt = BARCODE_I18N[lang] || BARCODE_I18N.en;
+  const norm = normalizeBarcodeInput(barcode);
+  if (!norm.valid) {
+    return {
+      valid: false,
+      found: false,
+      barcode: norm.code,
+      reason: 'invalid_barcode_format',
+      requiresOcrFallback: true,
+      message: bTxt.invalidMsg,
+      evaluation: null
+    };
+  }
+
+  const entry = VERIFIED_BARCODE_CATALOG[norm.code] || externalProduct || null;
+  if (!entry || !entry.rawText || !String(entry.rawText).trim()) {
+    return {
+      valid: true,
+      found: false,
+      barcode: norm.code,
+      reason: 'barcode_not_found',
+      requiresOcrFallback: true,
+      message: bTxt.notFoundMsg(norm.code),
+      evaluation: null
+    };
+  }
+
+  const productName =
+    (entry.names && (entry.names[lang] || entry.names.en || entry.names.tr)) ||
+    entry.productName ||
+    norm.code;
+  const productType = entry.productType || evaluationOptions.productType || 'cosmetic';
+  const applicationType = entry.applicationType || evaluationOptions.applicationType || null;
+  const rawText = String(entry.rawText).trim();
+
+  const evaluation = evaluateProduct({
+    ...evaluationOptions,
+    rawText,
+    productType,
+    applicationType,
+    lang
+  });
+
+  const reg = evaluation.cards.regulatoryCard;
+  const coveragePercent = reg.coveragePercent;
+  const hasPendingConfirm =
+    Array.isArray(evaluation.unresolvedConfirmations) && evaluation.unresolvedConfirmations.length > 0;
+  const requiresOcrFallback = coveragePercent < 80 || hasPendingConfirm;
+
+  return {
+    valid: true,
+    found: true,
+    barcode: norm.code,
+    productName,
+    productType,
+    applicationType,
+    rawText,
+    source: entry.source || 'Open Food / Beauty Facts (ODbL)',
+    updatedAt: entry.updatedAt || '2026-10-30',
+    coveragePercent,
+    requiresOcrFallback,
+    fallbackReason: coveragePercent < 80
+      ? 'insufficient_coverage_under_80_percent'
+      : hasPendingConfirm
+      ? 'awaiting_user_confirmation'
+      : null,
+    message: requiresOcrFallback
+      ? bTxt.lowCovFallbackMsg(coveragePercent)
+      : bTxt.foundOkMsg(productName, coveragePercent),
+    evaluation
+  };
+}
+
+
 

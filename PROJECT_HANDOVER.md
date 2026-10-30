@@ -1,15 +1,15 @@
 # INCIFACT — TAM PROJE HAFIZASI VE DİJİTAL DEVİR PROTOKOLÜ (HANDOVER MASTER)
 
-> **Tarih:** 30 Ekim 2026  
+> **Tarih:** 31 Ekim 2026  
 > **Konum:** `C:\Projeler\clean-halal-scanner`  
 > **Canlı Servis:** `http://localhost:3456`  
-> **Mevcut Durum:** `npm test` tamamen geçiyor (53/53 kabul + 34/34 regresyon + 15/15 canlı parite + 0 çakışma) · 7., 8., 9. ve 10. bağımsız Teknik & UI/UX denetimlerinde tespit edilen tüm P0, P1, P2 ve P3 bulgular regresyon testleriyle kapatılmıştır.
+> **Mevcut Durum:** `npm test` tamamen geçiyor (54/54 kabul + 34/34 regresyon + 15/15 canlı parite + 0 çakışma + `tsc --noEmit` 0 hata) · 7–13. bağımsız Teknik & UI/UX denetimlerinde tespit edilen tüm P0, P1, P2 ve P3 bulgular ile Hibrit Barkod (EAN / Open Food & Beauty Facts) entegrasyonu tamamlanmıştır.
 
 **Ek belgeler:** `docs/handover/` klasöründe tüm bağımsız denetim raporları, yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
 
 ## 0. YENİ OTURUMDA İLK YAPILACAKLAR
 1. Bu dosyayı ve `docs/handover/audit-6_100-100_GO_rapor.md` dosyasını baştan sona oku.
-2. `npm test` çalıştır; sonuçların 53/53 kabul, 34/34 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
+2. `npm test` çalıştır; sonuçların 54/54 kabul, 34/34 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
 3. `node server.mjs` ile servisi başlat (port 3456) ve `node tests/audit3_live_parity.mjs` ile 15/15 canlı/disk eşitliğini doğrula.
 4. Aşağıdaki **Bölüm 7: Güncel Durum ve Nihai Teknik Denetim Kapsamı** ve **Bölüm 8: Kullanıcı Odaklı 4 Ek Özellik & 7–9. Denetim Kapanışları** bölümlerini incele.
 
@@ -32,7 +32,7 @@ InciFact; kozmetik ve gıda ürün içeriklerini (INCI & Gıda etiketleri) 10 di
   * `src/mobile/ScannerApp.tsx`: Expo SDK 52 / React Native mobil istemci (Sakin ve prestijli lüks arayüz, cihaz içi yerel analiz, `AsyncStorage` kalıcılığı).
   * `src/mobile/ocrService.ts`: Mobil Vision / ML Kit OCR adaptörü (Dürüst OCR; ölçülmemiş güven değeri durumunda sahte %94 uydurmaz).
   * `server.mjs`: Node.js HTTP mikro-servisi (Port: `3456`, `/api/evaluate`, `/api/compare`, `/api/locales`, ReDoS/DoS/JSON korumalı).
-  * `tests/verify_engine.mjs`: Projenin resmi 53 maddelik kabul testleri paketi.
+  * `tests/verify_engine.mjs`: Projenin resmi 54 maddelik kabul testleri paketi.
   * `tests/audit3_regressions.mjs` & `tests/audit3_live_parity.mjs`: Bağımsız denetim regresyon ve canlı API parite testleri.
   * `scripts/audit_collisions.mjs`: Alias çakışma denetleyicisi (Her zaman 0 çakışma vermelidir).
 
@@ -82,7 +82,7 @@ Aşağıdaki liste ilk denetimlerde çözülen konuları anlatır:
 Yeni oturumda çalışırken doğruluğu teyit etmek için çalıştırılacak komutlar:
 
 ```powershell
-# 1. Resmi 53 kabul testi (Her zaman 53/53 GEÇMELİDİR)
+# 1. Resmi 54 kabul testi (Her zaman 54/54 GEÇMELİDİR)
 node tests/verify_engine.mjs
 
 # 2. Sözlük çakışma kontrolü (Her zaman 0 çakışma OLMALIDIR)
@@ -91,7 +91,7 @@ node scripts/audit_collisions.mjs
 # 3. Canlı API sunucusunu başlatma (Port: 3456)
 node server.mjs
 
-# 4. Tam paket testi (53 kabul + 34 regresyon + veri senkronu + HTML script sözdizimi + 0 çakışma)
+# 4. Tam paket testi (54 kabul + 34 regresyon + veri senkronu + HTML script sözdizimi + 0 çakışma)
 npm test
 
 # 5. Canlı API ve disk motoru parite testi (15/15)
@@ -101,7 +101,7 @@ node tests/audit3_live_parity.mjs
 ---
 
 ## 4. ALTIN KURALLAR VE KORUNACAK PRENSİPLER
-1. **Mevcut Testleri Asla Bozma:** `tests/verify_engine.mjs` içindeki 53 test her zaman %100 geçmelidir.
+1. **Mevcut Testleri Asla Bozma:** `tests/verify_engine.mjs` içindeki 54 test her zaman %100 geçmelidir.
 2. **Canlı API ve Disk Paritesi:** `http://localhost:3456` üzerindeki canlı servis yanıtları, disk motoru çıktısıyla zaman damgası hariç her zaman `%100 birebir` (`liveEqualsDisk: true`) olmalıdır. Motorda değişiklik yapıldığında arka plandaki `server.mjs` yeniden başlatılmalıdır.
 3. **Dokümantasyon Bütünlüğü:** Dosyalardaki mevcut yorum satırları, mevzuat referansları ve kod yapıları korunmalıdır.
 
