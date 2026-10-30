@@ -1228,14 +1228,37 @@ runTest('54. Hibrit Barkod Okuyucu: EAN-13 (Arapça/Urduca rakamlar dahil), 10 d
 
   // 2) 10 dilde Nutella (3017620422003) ve CeraVe (3337875597388) %100 kapsamla çözümlenmeli
   const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  const wrongFlourRegex = /buğday unu|wheat flour|weizenmehl|farine de blé|harina de trigo|пшеничная мука|دقيق القمح|میدہ/i;
   for (const lang of langs) {
-    const nutella = lookupBarcodeProduct({ barcode: '3017620422003', lang });
+    const nutella = lookupBarcodeProduct({
+      barcode: '3017620422003',
+      lang,
+      evaluationOptions: { userProfiles: ['astim_alerji'] }
+    });
     assert.equal(nutella.valid, true);
     assert.equal(nutella.found, true);
     assert.equal(nutella.productType, 'food');
     assert.equal(nutella.coveragePercent, 100);
     assert.equal(nutella.requiresOcrFallback, false);
     assert.ok(nutella.productName && nutella.productName.length > 3);
+
+    const sugarObs = nutella.evaluation.observations.find((o) => o.raw === 'Sugar');
+    assert.ok(sugarObs && sugarObs.status === 'recognized' && sugarObs.sugar && sugarObs.sugar.id === 'sugar');
+
+    const lecObs = nutella.evaluation.observations.find((o) => /lecithins/i.test(o.raw));
+    assert.ok(lecObs && lecObs.substance && lecObs.substance.id === 'food_emulsifiers_lecithin_pgpr');
+    assert.ok(lecObs.halalRule && lecObs.halalRule.id === 'lecithin_e322');
+    assert.ok(
+      !wrongFlourRegex.test(lecObs.localizedName),
+      `Dil=${lang} Lecithins (Soya) yanlışlıkla un olarak adlandırıldı: "${lecObs.localizedName}"`
+    );
+
+    const soyAlert = nutella.evaluation.cards.profileCard.alerts.find((a) => /lecithins/i.test(a.rawToken));
+    assert.ok(soyAlert, `Dil=${lang} Soya alerjen uyarısı bulunmalı`);
+    assert.ok(
+      !wrongFlourRegex.test(soyAlert.explanation),
+      `Dil=${lang} Soya alerjen uyarısında yanlış un adı geçti: "${soyAlert.explanation}"`
+    );
   }
 
   const cerave = lookupBarcodeProduct({ barcode: '3337875597388', lang: 'en' });

@@ -3752,7 +3752,7 @@
           : u.stdIngredientDesc;
         let sources = o.substance ? o.substance.sources || [] : [];
 
-        if (o.status === 'unrecognized' || (!o.substance && !o.halalRule && !o.hiddenSugar && !o.rapidCarb)) {
+        if (o.status === 'unrecognized' || (!o.substance && !o.halalRule && !o.sugar && !o.hiddenSugar && !o.rapidCarb)) {
           kind = 'unknown';
           levelText = (loc.badges && loc.badges.unrecognized) || 'Unrecognized';
           whyText = ft.unrecognizedWhy || u.stdIngredientDesc;

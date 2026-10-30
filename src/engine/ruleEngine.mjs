@@ -804,6 +804,17 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
   const lowerRaw = rawToken.toLowerCase();
 
   // 1. Check direct table for specific entities
+  if (entity.id === 'ceramide_np' && /\bceramide\s+(ap|eop|ns|eos|ng)\b/i.test(lowerRaw)) {
+    const suffix = lowerRaw.match(/\bceramide\s+(ap|eop|ns|eos|ng)\b/i)[1].toUpperCase();
+    const map = { tr: `Seramid ${suffix}`, en: `Ceramide ${suffix}`, ar: `سيراميد ${suffix}`, de: `Ceramid ${suffix}`, fr: `Céramide ${suffix}`, id: `Seramida ${suffix}`, ms: `Seramida ${suffix}`, es: `Ceramida ${suffix}`, ru: `Керамид ${suffix}`, ur: `سیرامائیڈ ${suffix}` };
+    return map[lang] || `Ceramide ${suffix}`;
+  }
+  if (
+    entity.id === 'food_emulsifiers_lecithin_pgpr' &&
+    !/lecithin|lesitin|lécithin|lecitin|лецитин|ليسيثين|لیسیتھین|e\s*322\b/i.test(lowerRaw)
+  ) {
+    return rawToken;
+  }
   if (SPECIFIC_ENTITIES_10LANG[entity.id] && SPECIFIC_ENTITIES_10LANG[entity.id][lang]) {
     const mapped = SPECIFIC_ENTITIES_10LANG[entity.id][lang];
     if (lang === 'ar' && /[\u0600-\u06FF]/.test(rawToken)) return rawToken;
@@ -826,6 +837,10 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
       const map = { tr: 'Kakao Tozu', en: 'Cocoa Powder', ar: 'مسحوق الكاكاو', de: 'Kakaopulver', fr: 'Poudre de cacao', es: 'Cacao en polvo', ru: 'Какао-порошок', id: 'Bubuk Kakao', ms: 'Serbuk Koko', ur: 'کوکو پاؤڈر' };
       return map[lang] || 'Cocoa Powder';
     }
+    if (/wheat\s+starch|buğday\s+nişastası|weizenstärke|amidon\s+de\s+blé|almidón\s+de\s+trigo|пшеничный\s+крахмал|نشا\s+القمح/.test(lowerRaw)) {
+      const map = { tr: 'Buğday Nişastası', en: 'Wheat Starch', ar: 'نشا القمح', de: 'Weizenstärke', fr: 'Amidon de blé', es: 'Almidón de trigo', ru: 'Пшеничный крахмал', id: 'Pati Gandum', ms: 'Kanji Gandum', ur: 'گندم کا نشاستہ' };
+      return map[lang] || 'Wheat Starch';
+    }
     if (/mehl|flour|buğday unu|farine|harina|мука|دقيق|میدہ/.test(lowerRaw)) {
       const map = { tr: 'Buğday Unu', en: 'Wheat Flour', ar: 'دقيق القمح', de: 'Weizenmehl', fr: 'Farine de blé', es: 'Harina de trigo', ru: 'Пшеничная мука', id: 'Tepung Terigu', ms: 'Tepung Gandum', ur: 'میدہ' };
       return map[lang] || 'Wheat Flour';
@@ -834,6 +849,11 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
       const map = { tr: 'Patates', en: 'Potatoes', ar: 'بطاطس', de: 'Kartoffeln', fr: 'Pommes de terre', es: 'Patatas', ru: 'Картофель', id: 'Kentang', ms: 'Kentang', ur: 'آلو' };
       return map[lang] || 'Potatoes';
     }
+    if (/\b(soy|soya|soja|kedelai|соя|صويا|سویا)\b/.test(lowerRaw)) {
+      const map = { tr: 'Soya', en: 'Soya', ar: 'صويا', de: 'Soja', fr: 'Soja', es: 'Soja', ru: 'Соя', id: 'Kedelai (Soya)', ms: 'Soya', ur: 'سویا' };
+      return map[lang] || 'Soya';
+    }
+    return rawToken;
   }
 
   // 3. Disambiguate botanical oils & butters
@@ -850,6 +870,39 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
       const map = { tr: 'Ayçiçek Yağı', en: 'Sunflower Oil', ar: 'زيت عباد الشمس', de: 'Sonnenblumenöl', fr: 'Huile de tournesol', es: 'Aceite de girasol', ru: 'Подсолнечное масло', id: 'Minyak Bunga Matahari', ms: 'Minyak Bunga Matahari', ur: 'سورج مکھی کا تیل' };
       return map[lang] || 'Sunflower Oil';
     }
+    return rawToken;
+  }
+
+  // 3.2. Disambiguate salts, bases & amino pH adjusters
+  if (entity.id === 'ph_adjusters_salts_bases') {
+    if (/\b(salt|tuz|sea salt|deniz tuzu|maris sal|sel|salz|sal|garam|соль|ملح|نمک|sodium chloride|sodyum klorür)\b/i.test(lowerRaw)) {
+      const map = { tr: 'Tuz (Sodyum Klorür)', en: 'Salt (Sodium Chloride)', ar: 'ملح (كلوريد الصوديوم)', de: 'Salz (Natriumchlorid)', fr: 'Sel (Chlorure de sodium)', id: 'Garam (Natrium Klorida)', ms: 'Garam (Natrium Klorida)', es: 'Sal (Cloruro de sodio)', ru: 'Соль (Хлорид натрия)', ur: 'نمک (سوڈیم کلورائیڈ)' };
+      return map[lang] || 'Salt';
+    }
+    if (/\b(arginine|arjinin|arginin|arginina|аргинин|أرجينين|ارجینین)\b/i.test(lowerRaw)) {
+      const map = { tr: 'Arjinin (Arginine)', en: 'Arginine', ar: 'أرجينين (Arginine)', de: 'Arginin', fr: 'Arginine', id: 'Arginin', ms: 'Arginin', es: 'Arginina', ru: 'Аргинин (Arginine)', ur: 'ارجینین (Arginine)' };
+      return map[lang] || 'Arginine';
+    }
+    return rawToken;
+  }
+
+  // 3.3. Disambiguate polymers & gums
+  if (entity.id === 'polymers_carbomer_acrylates') {
+    if (/^\s*(carbomer|karbomer|карбомер|كاربومير)\s*$/i.test(lowerRaw)) {
+      const map = { tr: 'Karbomer (Carbomer)', en: 'Carbomer', ar: 'كاربومير (Carbomer)', de: 'Carbomer', fr: 'Carbomère', id: 'Karbomer', ms: 'Karbomer', es: 'Carbómero', ru: 'Карбомер (Carbomer)', ur: 'کاربومر (Carbomer)' };
+      return map[lang] || 'Carbomer';
+    }
+    return rawToken;
+  }
+  if (entity.id === 'natural_gums_hydrocolloids') {
+    if (/xanthan|ksantan/i.test(lowerRaw)) {
+      const map = { tr: 'Ksantan Gam (Xanthan Gum)', en: 'Xanthan Gum', ar: 'صمغ الزانثان (Xanthan Gum)', de: 'Xanthan Gum', fr: 'Gomme xanthane', id: 'Gom Xanthan', ms: 'Gam Xanthan', es: 'Goma xantana', ru: 'Ксантановая камедь (Xanthan Gum)', ur: 'زینتھن گم (Xanthan Gum)' };
+      return map[lang] || 'Xanthan Gum';
+    }
+    return rawToken;
+  }
+  if (entity.id === 'cosmetic_specialty_solvents_boosters') {
+    return rawToken;
   }
 
   // 3.5. Disambiguate soothing botanicals
@@ -1787,14 +1840,26 @@ export function evaluateProduct({
     const hasHairDye = observations.some((o) => o.substance && o.substance.id === 'hair_dye_sensitizers_ppd_resorcinol');
     if (hasHairDye) {
       profileStatuses['cocuk_metabolik'] = 'false';
+      const hairDyeI18n = {
+        tr: { name: 'Saç Boyası / Yaş Sınırı (16 Yaş)', loc: 'Oksidatif Saç Boyası Bileşeni', exp: 'AB 1223/2009 Ek III Uyarısı: Oksidatif saç boyaları 16 yaşından küçüklerin kullanımına uygun değildir.' },
+        en: { name: 'Hair Dye / Age Limit (Under 16)', loc: 'Oxidative Hair Dye Active', exp: 'EU 1223/2009 Annex III Warning: Oxidative hair dyes are not intended for use on persons under the age of 16.' },
+        ar: { name: 'صبغة شعر / حد العمر (16 سنة)', loc: 'مكون صبغة شعر مؤكسدة', exp: 'تحذير لائحة الاتحاد الأوروبي 1223/2009 الملحق الثالث: صبغات الشعر المؤكسدة غير مخصصة لمن هم دون 16 عاماً.' },
+        de: { name: 'Haarfärbemittel / Altersgrenze (16 Jahre)', loc: 'Oxidatives Haarfärbemittel', exp: 'EU 1223/2009 Anhang III Warnhinweis: Oxidative Haarfärbemittel sind nicht für Personen unter 16 Jahren bestimmt.' },
+        fr: { name: 'Colorant capillaire / Limite d\'âge (16 ans)', loc: 'Colorant capillaire d\'oxydation', exp: 'Avertissement UE 1223/2009 Annexe III : Les colorants capillaires d\'oxydation ne sont pas destinés aux personnes de moins de 16 ans.' },
+        id: { name: 'Pewarna Rambut / Batas Usia (16 Tahun)', loc: 'Bahan Pewarna Rambut Oksidatif', exp: 'Peringatan UE 1223/2009 Lampiran III: Pewarna rambut oksidatif tidak ditujukan untuk usia di bawah 16 tahun.' },
+        ms: { name: 'Pewarna Rambut / Had Umur (16 Tahun)', loc: 'Bahan Pewarna Rambut Oksidatif', exp: 'Amaran EU 1223/2009 Lampiran III: Pewarna rambut oksidatif tidak sesuai digunakan pada individu di bawah umur 16 tahun.' },
+        es: { name: 'Tinte capilar / Límite de edad (16 años)', loc: 'Tinte capilar oxidativo', exp: 'Advertencia UE 1223/2009 Anexo III: Los tintes capilares oxidativos no están destinados a menores de 16 años.' },
+        ru: { name: 'Краска для волос / Возраст (до 16 лет)', loc: 'Окислительный краситель для волос', exp: 'Предупреждение ЕС 1223/2009 Приложение III: Окислительные краски для волос не предназначены для лиц младше 16 лет.' },
+        ur: { name: 'ہیئر ڈائی / عمر کی حد (16 سال)', loc: 'آکسیڈیٹو ہیئر ڈائی جزو', exp: 'یورپی یونین 1223/2009 ضمیمہ III انتباہ: آکسیڈیٹو ہیئر ڈائی 16 سال سے کم عمر افراد کے لیے موزوں نہیں۔' }
+      }[lang] || { name: 'Hair Dye / Age Limit (Under 16)', loc: 'Oxidative Hair Dye Active', exp: 'EU 1223/2009 Annex III Warning: Oxidative hair dyes are not intended for use on persons under the age of 16.' };
       profileAlerts.push({
         profile: 'cocuk_metabolik',
-        substanceName: 'Saç Boyası / Yaş Sınırı (16 Yaş)',
-        localizedName: 'Oksidatif Saç Boyası Bileşeni',
+        substanceName: hairDyeI18n.name,
+        localizedName: hairDyeI18n.loc,
         rawToken: 'Hair Dye Sensitizer',
         position: 1,
         level: 'kirmizi',
-        explanation: 'AB 1223/2009 Ek III Uyarısı: Oksidatif saç boyaları 16 yaşından küçüklerin kullanımına uygun değildir.',
+        explanation: hairDyeI18n.exp,
         sources: [sourcesData.sources.EU_1223_2009].filter(Boolean)
       });
     }
@@ -1802,6 +1867,34 @@ export function evaluateProduct({
 
   // Major food allergens (EU 1169/2011 Annex II) for astim_alerji
   if (productType === 'food' && userProfiles.includes('astim_alerji')) {
+    const ALLERGEN_I18N = {
+      gluten: { tr: 'Gluten / Buğday', en: 'Gluten / Wheat', ar: 'الغلوتين / القمح', de: 'Gluten / Weizen', fr: 'Gluten / Blé', id: 'Gluten / Gandum', ms: 'Gluten / Gandum', es: 'Gluten / Trigo', ru: 'Глютен / Пшеница', ur: 'گلوٹین / گندم' },
+      crustaceans: { tr: 'Kabuklular', en: 'Crustaceans', ar: 'القشريات', de: 'Krebstiere', fr: 'Crustacés', id: 'Krustasea', ms: 'Krustasea', es: 'Crustáceos', ru: 'Ракообразные', ur: 'کرسٹیشینز' },
+      egg: { tr: 'Yumurta', en: 'Egg', ar: 'البيض', de: 'Ei', fr: 'Œuf', id: 'Telur', ms: 'Telur', es: 'Huevo', ru: 'Яйцо', ur: 'انڈہ' },
+      fish: { tr: 'Balık', en: 'Fish', ar: 'السمك', de: 'Fisch', fr: 'Poisson', id: 'Ikan', ms: 'Ikan', es: 'Pescado', ru: 'Рыба', ur: 'مچھلی' },
+      peanut: { tr: 'Yer Fıstığı', en: 'Peanuts', ar: 'الفول السوداني', de: 'Erdnüsse', fr: 'Arachides', id: 'Kacang Tanah', ms: 'Kacang Tanah', es: 'Cacahuetes', ru: 'Арахис', ur: 'مونگ پھلی' },
+      soy: { tr: 'Soya', en: 'Soy / Soya', ar: 'الصويا', de: 'Soja', fr: 'Soja', id: 'Kedelai (Soya)', ms: 'Soya', es: 'Soja', ru: 'Соя', ur: 'سویا' },
+      milk: { tr: 'Süt / Süt Ürünleri', en: 'Milk / Dairy', ar: 'الحليب / الألبان', de: 'Milch / Laktose', fr: 'Lait / Produits laitiers', id: 'Susu / Produk Susu', ms: 'Susu / Produk Tenusu', es: 'Leche / Lácteos', ru: 'Молоко / Лактоза', ur: 'دودھ / ڈیری' },
+      tree_nuts: { tr: 'Sert Kabuklu Yemişler (Fındık/Badem)', en: 'Tree Nuts (Hazelnuts/Almonds)', ar: 'المكسرات (بندق/لوز)', de: 'Schalenfrüchte (Haselnüsse/Mandeln)', fr: 'Fruits à coque (Noisettes/Amandes)', id: 'Kacang Pohon (Hazel/Almond)', ms: 'Kekacang Pokok (Hazel/Badam)', es: 'Frutos de cáscara (Avellanas/Almendras)', ru: 'Орехи (Фундук/Миндаль)', ur: 'میوہ جات (ہیزل نٹ/بادام)' },
+      celery: { tr: 'Kereviz', en: 'Celery', ar: 'الكرفس', de: 'Sellerie', fr: 'Céleri', id: 'Seledri', ms: 'Saderi', es: 'Apio', ru: 'Сельдерей', ur: 'اجوائن / سیلری' },
+      mustard: { tr: 'Hardal', en: 'Mustard', ar: 'الخردل', de: 'Senf', fr: 'Moutarde', id: 'Mustar', ms: 'Biji Sawi (Mustard)', es: 'Mostaza', ru: 'Горчица', ur: 'رائی (مسٹرڈ)' },
+      sesame: { tr: 'Susam', en: 'Sesame', ar: 'السمسم', de: 'Sesam', fr: 'Sésame', id: 'Wijen', ms: 'Bijan', es: 'Sésamo', ru: 'Кунжут', ur: 'تل (سیسم)' },
+      sulphites: { tr: 'Sülfitler', en: 'Sulphites', ar: 'الكبريتيت', de: 'Sulfite', fr: 'Sulfites', id: 'Sulfit', ms: 'Sulfit', es: 'Sulfitos', ru: 'Сульфиты', ur: 'سلفائٹس' },
+      lupin: { tr: 'Acıbakla (Lüpen)', en: 'Lupin', ar: 'الترمس', de: 'Lupinen', fr: 'Lupin', id: 'Lupin', ms: 'Lupin', es: 'Altramuces', ru: 'Люпин', ur: 'لوپن' },
+      molluscs: { tr: 'Yumuşakçalar', en: 'Molluscs', ar: 'الرخويات', de: 'Weichtiere', fr: 'Mollusques', id: 'Moluska', ms: 'Moluska', es: 'Moluscos', ru: 'Моллюски', ur: 'مولسکس' }
+    };
+    const ALLERGEN_EXP_I18N = {
+      tr: (aName, item) => `${aName} (AB 1169/2011 Ek II Majör Gıda Alerjeni): Ürün ${item} içermektedir. Alerjisi veya intoleransı olan bireyler için risklidir.`,
+      en: (aName, item) => `${aName} (EU 1169/2011 Annex II Major Food Allergen): Product contains ${item}. Poses a risk for individuals with allergies or intolerances.`,
+      ar: (aName, item) => `${aName} (مسبب حساسية غذائية رئيسي حسب لائحة الاتحاد الأوروبي 1169/2011 الملحق II): يحتوي المنتج على ${item}. يشكل خطراً على المصابين بالحساسية.`,
+      de: (aName, item) => `${aName} (EU 1169/2011 Anhang II Hauptallergen): Produkt enthält ${item}. Risiko für Personen mit Allergien oder Unverträglichkeiten.`,
+      fr: (aName, item) => `${aName} (UE 1169/2011 Annexe II Allergène alimentaire majeur) : Le produit contient ${item}. Risque pour les personnes allergiques ou intolérantes.`,
+      id: (aName, item) => `${aName} (Alergen Pangan Utama Lampiran II UE 1169/2011): Produk mengandung ${item}. Berisiko bagi individu dengan alergi atau intoleransi.`,
+      ms: (aName, item) => `${aName} (Alergen Makanan Utama Lampiran II EU 1169/2011): Produk mengandungi ${item}. Berisiko bagi individu yang mempunyai alahan atau intoleransi.`,
+      es: (aName, item) => `${aName} (UE 1169/2011 Anexo II Alérgeno alimentario principal): El producto contiene ${item}. Riesgo para personas con alergias o intolerancias.`,
+      ru: (aName, item) => `${aName} (Основной пищевой аллерген по Приложению II Регламента ЕС 1169/2011): Продукт содержит ${item}. Опасно при аллергии или непереносимости.`,
+      ur: (aName, item) => `${aName} (یورپی یونین 1169/2011 ضمیمہ II بڑا غذائی الرجن): پروڈکٹ میں ${item} شامل ہے۔ الرجی کے شکار افراد کے لیے خطرناک ہے۔`
+    };
     const MAJOR_FOOD_ALLERGENS = [
       { id: 'gluten', names: /(?:^|[^\p{L}\p{N}])(wheat|buğday|gluten|flour|un|weizen|farine|trigo|пшениц[а-я]*|دقيق|قمح|arpa|barley|çavdar|rye|oats|yulaf|spelt|kamut)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Gluten / Buğday' },
       { id: 'crustaceans', names: /(?:^|[^\p{L}\p{N}])(crustacean[s]?|kabuklu[lar]*|shrimp|karides|prawn[s]?|crab|yengeç|lobster|ıstakoz|istakoz|crevette[s]?|krabbe[n]?|garnelen|langostinos|mariscos|ракообразн[а-я]*|креветк[а-я]*|قشريات|جھینگا)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Kabuklular' },
@@ -1841,16 +1934,20 @@ export function evaluateProduct({
         return true;
       });
 
+      const expFn = ALLERGEN_EXP_I18N[lang] || ALLERGEN_EXP_I18N.en;
       for (const matchedAllergen of matchedAllergens) {
         profileStatuses['astim_alerji'] = 'false';
+        const aLabels = ALLERGEN_I18N[matchedAllergen.id] || {};
+        const aName = aLabels[lang] || aLabels.en || matchedAllergen.tr;
+        const itemLabel = obs.localizedName || obs.raw;
         profileAlerts.push({
           profile: 'astim_alerji',
-          substanceName: matchedAllergen.tr,
-          localizedName: obs.localizedName || obs.raw,
+          substanceName: aName,
+          localizedName: itemLabel,
           rawToken: obs.raw,
           position: obs.position,
           level: 'kirmizi',
-          explanation: `${matchedAllergen.tr} (AB 1169/2011 Ek II Majör Gıda Alerjeni): Ürün ${obs.localizedName || obs.raw} içermektedir. Alerjisi veya intoleransı olan bireyler için risklidir.`,
+          explanation: expFn(aName, itemLabel),
           sources: [sourcesData.sources.EU_1169_2011].filter(Boolean)
         });
       }
@@ -1860,14 +1957,28 @@ export function evaluateProduct({
     const crossContactMatch = fullCrossContactText.match(/(?:may\s+contain|traces?\s+of|eser\s+miktarda\s+(?:içerebilir|bulunabilir)|kann\s+spuren\s+von|peut\s+contenir\s+des\s+traces|puede\s+contener\s+trazas|قد\s+يحتوي\s+على|может\s+содержать\s+следы|میں\s+شامل\s+ہو\s+سکتا\s+ہے)\s*[:\-–]?\s*([^.,;\n]+)/iu);
     if (crossContactMatch) {
       profileStatuses['astim_alerji'] = 'false';
+      const traceTarget = crossContactMatch[1].trim();
+      const traceRaw = crossContactMatch[0].trim();
+      const traceI18n = {
+        tr: { name: 'Çapraz Bulaşma Uyarısı', loc: `Eser Miktarda: ${traceTarget}`, exp: `Ambalajda çapraz bulaşma (eser miktarda) uyarısı bulunmaktadır: "${traceRaw}". Alerjik bireyler için çapraz temas riski taşır.` },
+        en: { name: 'Cross-Contact Trace Warning', loc: `May Contain Traces: ${traceTarget}`, exp: `Packaging declares a cross-contact trace warning: "${traceRaw}". Poses a cross-contamination risk for allergic individuals.` },
+        ar: { name: 'تحذير التلوث المتبادل (آثار)', loc: `قد يحتوي على آثار: ${traceTarget}`, exp: `تتضمن العبوة تحذيراً من آثار التلوث المتبادل: "${traceRaw}". يشكل خطراً على المصابين بالحساسية.` },
+        de: { name: 'Spurenhinweis (Kreuzkontamination)', loc: `Spuren möglich: ${traceTarget}`, exp: `Auf der Verpackung befindet sich ein Spurenhinweis: „${traceRaw}“. Risiko für Allergiker durch Kreuzkontamination.` },
+        fr: { name: 'Avertissement de traces (Contamination croisée)', loc: `Traces possibles : ${traceTarget}`, exp: `L'emballage indique un avertissement de traces : « ${traceRaw} ». Risque de contamination croisée pour les personnes allergiques.` },
+        id: { name: 'Peringatan Kontaminasi Silang (Jejak)', loc: `Jejak Alergen: ${traceTarget}`, exp: `Kemasan mencantumkan peringatan kontaminasi silang: "${traceRaw}". Berisiko bagi individu yang alergi.` },
+        ms: { name: 'Amaran Pencemaran Silang (Surih)', loc: `Mungkin Mengandungi: ${traceTarget}`, exp: `Bungkusan menyatakan amaran pencemaran silang: "${traceRaw}". Berisiko bagi individu yang mempunyai alahan.` },
+        es: { name: 'Advertencia de trazas (Contaminación cruzada)', loc: `Posibles trazas: ${traceTarget}`, exp: `El envase incluye una advertencia de trazas: "${traceRaw}". Riesgo de contaminación cruzada para personas alérgicas.` },
+        ru: { name: 'Предупреждение о следах аллергенов', loc: `Возможны следы: ${traceTarget}`, exp: `На упаковке указано предупреждение о перекрёстном загрязнении: «${traceRaw}». Риск для людей с аллергией.` },
+        ur: { name: 'کراس کنٹیمینیشن (ذرات) کا انتباہ', loc: `معمولی ذرات ممکن: ${traceTarget}`, exp: `پیکنگ پر کراس کنٹیمینیشن کا انتباہ موجود ہے: "${traceRaw}"۔ الرجی کے شکار افراد کے لیے احتیاط ضروری ہے۔` }
+      }[lang] || { name: 'Cross-Contact Trace Warning', loc: `May Contain Traces: ${traceTarget}`, exp: `Packaging declares a cross-contact trace warning: "${traceRaw}". Poses a cross-contamination risk for allergic individuals.` };
       profileAlerts.push({
         profile: 'astim_alerji',
-        substanceName: 'Çapraz Bulaşma Uyarısı',
-        localizedName: `Eser Miktarda: ${crossContactMatch[1].trim()}`,
-        rawToken: crossContactMatch[0].trim(),
+        substanceName: traceI18n.name,
+        localizedName: traceI18n.loc,
+        rawToken: traceRaw,
         position: observations.length + 1,
         level: 'sari',
-        explanation: `Ambalajda çapraz bulaşma (eser miktarda) uyarısı bulunmaktadır: "${crossContactMatch[0].trim()}". Alerjik bireyler için çapraz temas riski taşır.`,
+        explanation: traceI18n.exp,
         sources: [sourcesData.sources.EU_1169_2011].filter(Boolean)
       });
     }
@@ -2904,7 +3015,8 @@ export const VERIFIED_BARCODE_CATALOG = {
       ru: 'Oreo Original Печенье с кремовой начинкой',
       ur: 'اوریو اوریجنل ونیلا کریم بسکٹ (Oreo)'
     },
-    rawText: 'Wheat Flour, Sugar, Palm Oil, Fat-Reduced Cocoa Powder, Glucose-Fructose Syrup, Wheat Starch, Salt, Emulsifier (Soy Lecithin), Vanillin. May contain milk'
+    rawText: 'Wheat Flour, Sugar, Palm Oil, Fat-Reduced Cocoa Powder, Glucose-Fructose Syrup, Wheat Starch, Salt, Emulsifier (Soy Lecithin), Vanillin',
+    allergenStatement: 'May contain milk'
   },
   '8690504011507': {
     code: '8690504011507',
@@ -3098,6 +3210,7 @@ export function lookupBarcodeProduct({
   const evaluation = evaluateProduct({
     ...evaluationOptions,
     rawText,
+    allergenStatement: entry.allergenStatement || evaluationOptions.allergenStatement || '',
     productType,
     applicationType,
     lang
