@@ -709,6 +709,7 @@
       if (val === null || val === undefined) return '';
       const d = formatDigits(val, lang);
       if (lang === 'tr') return `%${d}`;
+      if (lang === 'de') return `${d} %`;
       if (lang === 'ar' || lang === 'ur') return `${d}٪`;
       return `${d}%`;
     }
@@ -1224,7 +1225,8 @@
         lowCovTileSub: 'Tanınan bileşen oranı <%80 olduğu için uygunluk doğrulanamadı.',
         pendingOcrTileSub: 'Okuma belirsizliği var; karar için Tara sekmesinde onay bekleniyor.',
         moreItemsFmt: (n) => `+${n} ek dikkat maddesi daha...`,
-        regIndexNote: 'Mevzuat Uyum Endeksi (Tıbbi sağlık puanı değildir)'
+        regIndexNote: 'Mevzuat Uyum Endeksi (Tıbbi sağlık puanı değildir)',
+        removeItemAria: (item) => `${item} maddesini kaldır`
       },
       en: {
         watchlistTitle: '🧬 My Personal Blacklist (Custom Ingredients)',
@@ -1257,7 +1259,8 @@
         lowCovTileSub: 'Cannot verify suitability because recognized ingredient coverage is below 80%.',
         pendingOcrTileSub: 'Ambiguous label text; awaiting confirmation on the Scan tab.',
         moreItemsFmt: (n) => `+${n} more flagged item(s)...`,
-        regIndexNote: 'Regulatory Compliance Index (Not a medical health score)'
+        regIndexNote: 'Regulatory Compliance Index (Not a medical health score)',
+        removeItemAria: (item) => `Remove ${item}`
       },
       ar: {
         watchlistTitle: '🧬 قائمتي السوداء الشخصية (إضافة مكون خاص)',
@@ -1267,7 +1270,7 @@
         watchlistQuickLbl: 'إضافة سريعة:',
         watchlistEmpty: 'لم تتم إضافة مكونات خاصة بعد.',
         watchlistBadge: '🧬 القائمة الشخصية',
-        watchlistLimitMsg: '⚠️ تم الوصول إلى الحد الأقصى (50/50 مكوناً).',
+        watchlistLimitMsg: '⚠️ تم الوصول إلى الحد الأقصى (٥٠/٥٠ مكوناً).',
         shareCardBtn: '📸 بطاقة النتيجة (صورة / مشاركة)',
         shareTextBtn: '💬 نسخ الملخص',
         shareCopiedToast: '✓ تم نسخ ملخص التحليل إلى الحافظة!',
@@ -1284,13 +1287,14 @@
         resetCompareBtn: 'الوضع الافتراضي',
         customScanPrefix: 'تحليل مخصص',
         statusPendingOcr: 'بانتظار تأكيد القراءة',
-        statusLowCoverage: 'تغطية غير كافية (<80%)',
+        statusLowCoverage: 'تغطية غير كافية (<٨٠٪)',
         statusNoData: 'بيانات غير متوفرة',
         unrecognizedWhy: 'لم يتطابق هذا المكون مع قاعدة بيانات CosIng الأوروبية أو المضافات الغذائية المعتمدة؛ لم يتم التحقق من الأمان أو الحلال.',
-        lowCovTileSub: 'تعذر التحقق لأن نسبة المكونات المعروفة أقل من 80%.',
+        lowCovTileSub: 'تعذر التحقق لأن نسبة المكونات المعروفة أقل من ٨٠٪.',
         pendingOcrTileSub: 'يوجد غموض في القراءة؛ يرجى التأكيد في تبويب المسح.',
         moreItemsFmt: (n) => `+${n} تنبيهات إضافية...`,
-        regIndexNote: 'مؤشر الامتثال التنظيمي (ليس تقييماً طبياً للصحة)'
+        regIndexNote: 'مؤشر الامتثال التنظيمي (ليس تقييماً طبياً للصحة)',
+        removeItemAria: (item) => `إزالة ${item}`
       },
       de: {
         watchlistTitle: '🧬 Meine persönliche Sperrliste (Eigene Stoffe)',
@@ -1317,13 +1321,14 @@
         resetCompareBtn: 'Standardpaar',
         customScanPrefix: 'Eigene Analyse',
         statusPendingOcr: 'OCR-Bestätigung offen',
-        statusLowCoverage: 'Abdeckung unzureichend (<80%)',
+        statusLowCoverage: 'Abdeckung unzureichend (<80 %)',
         statusNoData: 'Keine Daten / Unklar',
         unrecognizedWhy: 'Dieser Stoff wurde in der offiziellen EU-CosIng- oder Lebensmitteldatenbank nicht erkannt; keine bestätigte Bewertung möglich.',
         lowCovTileSub: 'Eignung nicht prüfbar, da weniger als 80 % der Stoffe erkannt wurden.',
         pendingOcrTileSub: 'Lesefehler/Mehrdeutigkeit; bitte im Scan-Tab bestätigen.',
         moreItemsFmt: (n) => `+${n} weitere Hinweise...`,
-        regIndexNote: 'Regulierungs-Index (Kein medizinischer Gesundheitswert)'
+        regIndexNote: 'Regulierungs-Index (Kein medizinischer Gesundheitswert)',
+        removeItemAria: (item) => `${item} entfernen`
       },
       fr: {
         watchlistTitle: '🧬 Ma Liste Noire Personnelle (Ingrédients à éviter)',
@@ -1350,13 +1355,14 @@
         resetCompareBtn: 'Paire par défaut',
         customScanPrefix: 'Analyse perso',
         statusPendingOcr: 'Confirmation OCR requise',
-        statusLowCoverage: 'Couverture insuffisante (<80%)',
+        statusLowCoverage: 'Couverture insuffisante (<80 %)',
         statusNoData: 'Données insuffisantes',
         unrecognizedWhy: 'Cet ingrédient ne correspond pas directement à la base officielle UE CosIng ou alimentaire ; statut non vérifié.',
         lowCovTileSub: 'Validation impossible car moins de 80 % des ingrédients sont reconnus.',
         pendingOcrTileSub: 'Lecture ambiguë ; confirmation requise dans l\'onglet Scan.',
         moreItemsFmt: (n) => `+${n} autre(s) alerte(s)...`,
-        regIndexNote: 'Indice Réglementaire (Non médical)'
+        regIndexNote: 'Indice Réglementaire (Non médical)',
+        removeItemAria: (item) => `Retirer ${item}`
       },
       id: {
         watchlistTitle: '🧬 Daftar Hitam Pribadi Saya (Bahan Kustom)',
@@ -1389,7 +1395,8 @@
         lowCovTileSub: 'Tidak dapat diverifikasi karena cakupan bahan yang dikenali di bawah 80%.',
         pendingOcrTileSub: 'Teks label ambigu; konfirmasi diperlukan di tab Pindai.',
         moreItemsFmt: (n) => `+${n} peringatan lainnya...`,
-        regIndexNote: 'Indeks Kepatuhan Regulasi (Bukan skor medis)'
+        regIndexNote: 'Indeks Kepatuhan Regulasi (Bukan skor medis)',
+        removeItemAria: (item) => `Hapus ${item}`
       },
       ms: {
         watchlistTitle: '🧬 Senarai Hitam Peribadi Saya (Ramuan Khas)',
@@ -1422,7 +1429,8 @@
         lowCovTileSub: 'Tidak dapat disahkan kerana liputan ramuan dikenali kurang daripada 80%.',
         pendingOcrTileSub: 'Bacaan label kabur; sila sahkan pada tab Imbas.',
         moreItemsFmt: (n) => `+${n} lagi item perhatian...`,
-        regIndexNote: 'Indeks Pematuhan Peraturan (Bukan skor kesihatan perubatan)'
+        regIndexNote: 'Indeks Pematuhan Peraturan (Bukan skor kesihatan perubatan)',
+        removeItemAria: (item) => `Buang ${item}`
       },
       es: {
         watchlistTitle: '🧬 Mi Lista Negra Personal (Ingredientes propios)',
@@ -1455,7 +1463,8 @@
         lowCovTileSub: 'No se puede verificar la idoneidad porque la cobertura es inferior al 80%.',
         pendingOcrTileSub: 'Lectura ambigua; confirma el ingrediente en la pestaña Escanear.',
         moreItemsFmt: (n) => `+${n} advertencia(s) más...`,
-        regIndexNote: 'Índice Regulatorio (No es una puntuación médica)'
+        regIndexNote: 'Índice Regulatorio (No es una puntuación médica)',
+        removeItemAria: (item) => `Eliminar ${item}`
       },
       ru: {
         watchlistTitle: '🧬 Мой личный чёрный список (Свои вещества)',
@@ -1488,7 +1497,8 @@
         lowCovTileSub: 'Невозможно подтвердить совместимость при охвате состава менее 80%.',
         pendingOcrTileSub: 'Неоднозначное распознавание; подтвердите компонент на вкладке Сканировать.',
         moreItemsFmt: (n) => `+ещё ${n} предупреждений...`,
-        regIndexNote: 'Регуляторный индекс (Не является медицинской оценкой)'
+        regIndexNote: 'Регуляторный индекс (Не является медицинской оценкой)',
+        removeItemAria: (item) => `Удалить ${item}`
       },
       ur: {
         watchlistTitle: '🧬 میری ذاتی بلیک لسٹ (مخصوص اجزاء شامل کریں)',
@@ -1498,7 +1508,7 @@
         watchlistQuickLbl: 'فوری اضافہ:',
         watchlistEmpty: 'ابھی تک کوئی ذاتی ممنوع جزو شامل نہیں کیا گیا۔',
         watchlistBadge: '🧬 ذاتی بلیک لسٹ',
-        watchlistLimitMsg: '⚠️ زیادہ سے زیادہ 50 اجزاء کی حد مکمل ہو گئی (50/50)۔',
+        watchlistLimitMsg: '⚠️ زیادہ سے زیادہ ۵۰ اجزاء کی حد مکمل ہو گئی (۵۰/۵۰)۔',
         shareCardBtn: '📸 نتیجہ کارڈ (PNG / شیئر کریں)',
         shareTextBtn: '💬 خلاصہ کاپی کریں',
         shareCopiedToast: '✓ تجزیے کا خلاصہ کاپی ہو گیا!',
@@ -1515,13 +1525,14 @@
         resetCompareBtn: 'ڈیفالٹ موازنہ',
         customScanPrefix: 'مخصوص تجزیہ',
         statusPendingOcr: 'OCR تصدیق درکار ہے',
-        statusLowCoverage: 'کوریج ناکافی (<80%)',
+        statusLowCoverage: 'کوریج ناکافی (<۸۰٪)',
         statusNoData: 'ڈیٹا دستیاب نہیں',
         unrecognizedWhy: 'یہ جزو سرکاری EU CosIng یا فوڈ ایڈیٹیو ڈیٹا بیس سے براہ راست مطابقت نہیں رکھتا؛ حلال یا حفاظتی تصدیق موجود نہیں۔',
-        lowCovTileSub: 'شناخت شدہ اجزاء کی شرح 80 فیصد سے کم ہونے کی وجہ سے مطابقت کی تصدیق ممکن نہیں۔',
+        lowCovTileSub: 'شناخت شدہ اجزاء کی شرح ۸۰٪ سے کم ہونے کی وجہ سے مطابقت کی تصدیق ممکن نہیں۔',
         pendingOcrTileSub: 'لیبل کی عبارت مبہم ہے؛ براہ کرم اسکین ٹیب میں تصدیق کریں۔',
         moreItemsFmt: (n) => `+${n} مزید انتباہی اجزاء...`,
-        regIndexNote: 'ریگولیٹری اشاریہ (یہ طبی صحت کا اسکور نہیں ہے)'
+        regIndexNote: 'ریگولیٹری اشاریہ (یہ طبی صحت کا اسکور نہیں ہے)',
+        removeItemAria: (item) => `${item} کو ہٹائیں`
       }
     };
 
@@ -1858,11 +1869,14 @@
 
     function syncShareModalI18n() {
       const fTxt = getFeatText(state.lang);
+      const u = getUiText(state.lang);
       const dir = (state.evalData && state.evalData.dir) || (state.lang === 'ar' || state.lang === 'ur' ? 'rtl' : 'ltr');
       const modal = document.getElementById('shareCardModal');
       if (modal) modal.setAttribute('dir', dir);
       const tEl = document.getElementById('shareCardModalTitle');
       if (tEl) tEl.textContent = fTxt.shareModalTitle;
+      const xBtn = document.getElementById('shareModalCloseBtn');
+      if (xBtn && u.methodologyClose) xBtn.setAttribute('aria-label', u.methodologyClose);
       const dBtn = document.getElementById('shareModalDownloadBtn');
       if (dBtn) dBtn.textContent = fTxt.downloadPngBtn;
       const wBtn = document.getElementById('shareModalWaBtn');
@@ -2478,7 +2492,7 @@
         myPrefsBtnTop: '⚙ تفضيلاتي',
         uncertainWord: 'غير مؤكد',
         awaitingConfirm: 'بانتظار التأكيد (راجع تبويب المسح)',
-        lowCoverage: 'بيانات غير كافية (<٪٨٠)',
+        lowCoverage: 'بيانات غير كافية (<٨٠٪)',
         euNonCompliant: 'مخالف للوائح الاتحاد الأوروبي',
         goodNoBanned: 'جيد · خالٍ من المواد المحظورة أوروبياً',
         scoreReducers: 'مواد تخفض التقييم',
@@ -2545,7 +2559,7 @@
         myPrefsBtnTop: '⚙ Profil',
         uncertainWord: 'Unklar',
         awaitingConfirm: 'Bestätigung erforderlich (siehe Scan)',
-        lowCoverage: 'Unzureichende Abdeckung (<80%)',
+        lowCoverage: 'Unzureichende Abdeckung (<80 %)',
         euNonCompliant: 'EU-Rechtswidrig (Verboten)',
         goodNoBanned: 'Gut · Keine EU-verbotenen Stoffe',
         scoreReducers: 'Abzüge durch',
@@ -2947,7 +2961,7 @@
         myPrefsBtnTop: '⚙ ترجیحات',
         uncertainWord: 'غیر یقینی',
         awaitingConfirm: 'تصدیق کا انتظار ہے (اسکین ٹیب دیکھیں)',
-        lowCoverage: 'ناکافی ڈیٹا (<٪۸۰)',
+        lowCoverage: 'ناکافی ڈیٹا (<۸۰٪)',
         euNonCompliant: 'یورپی یونین قوانین کے خلاف',
         goodNoBanned: 'بہترین · کوئی ممنوعہ مادہ نہیں',
         scoreReducers: 'اسکور کم کرنے والے اجزاء',
@@ -3013,61 +3027,131 @@
         disclaimer: 'Bu analiz, seçilen kurumların kamuya açık fıkhi standartlarına dayalı bağımsız bir algoritmik ön incelemedir. Kurumların resmi onayı veya tescili niteliğinde değildir. Nihai güvence için ambalajdaki resmi sertifika logosunu ve numarasını teyit ediniz.',
         link: 'Fıkhi Metodoloji & Resmi Fetva Kaynakları',
         title: 'Fıkhi Metodoloji ve Kaynak Beyanı',
-        close: 'Kapat'
+        close: 'Kapat',
+        bodyIntro: 'InciFact, bağımsız bir bilimsel ve algoritmik tarama motorudur. Adı geçen kurumlarla herhangi bir organik, resmi veya ticari bağı bulunmamaktadır.',
+        items: [
+          ['1. GİMDES (Türkiye):', 'Helal Gıda ve İhtiyaç Maddeleri Standardı Madde 4.2 gereği böcek kaynaklı katkılar (E120 Karmin, Şellak, Salyangoz Müsini), etanol ve hayvansal şüpheli emülgatörler sertifikasız kabul edilmez.'],
+          ['2. JAKIM (Malezya):', 'Muzakarah Jawatankuasa Fatwa Majlis Kebangsaan (Fetva Bülteni No: 100/2012) uyarınca Karmin (E120) renklendiricisi caizdir; harici kozmetikte salyangoz müsini (Irsyad Al-Fatwa Serisi 188) işkencesiz üretim ve temizlik şartına bağlıdır.'],
+          ['3. MUI / BPJPH (Endonezya):', 'Fatwa MUI No. 33 Tahun 2011 uyarınca košenil böceğinden elde edilen Karmin caizdir; Fatwa MUI No. 24 Tahun 2012 uyarınca salyangoz tüketimi haram olup harici kozmetik kullanımı üretim ve arındırma denetimine tabidir.'],
+          ['4. IFANCA (ABD / Global):', 'Doğrulanmış bitkisel/sentetik kaynaklı çift kaynaklı bileşenleri sertifika kapsamında değerlendirir; açık domuz ve şarap türevlerini haram kabul eder.']
+        ]
       },
       en: {
         disclaimer: 'This assessment is an independent algorithmic screening based on publicly available standards of the selected authorities. It is not an official endorsement or certification. Please verify the official certification logo and number on packaging.',
         link: 'Methodology & Official Fatwa Sources',
         title: 'Jurisprudential Methodology & Source Disclosure',
-        close: 'Close'
+        close: 'Close',
+        bodyIntro: 'InciFact is an independent scientific and algorithmic screening engine. It has no organic, official, or commercial affiliation with the cited institutions.',
+        items: [
+          ['1. GİMDES (Turkey):', 'Under Halal Food & Consumables Standard Art. 4.2, insect-derived additives (E120 Carmine, Shellac, Snail Mucin), ethanol, and uncertified animal-suspect emulsifiers are not accepted.'],
+          ['2. JAKIM (Malaysia):', 'Under National Fatwa Committee Ruling No. 100/2012, Carmine (E120) colorant is permissible; topical snail mucin (Irsyad Al-Fatwa Series 188) is subject to non-harmful extraction and purity verification.'],
+          ['3. MUI / BPJPH (Indonesia):', 'Under Fatwa MUI No. 33/2011, cochineal-derived Carmine is permissible; under Fatwa MUI No. 24/2012, snail consumption as food is haram while topical cosmetic use requires purification audit.'],
+          ['4. IFANCA (US / Global):', 'Evaluates dual-source emulsifiers (such as E471) through verified plant/microbial origin or certification, while strictly prohibiting porcine and intoxicant derivatives.']
+        ]
       },
       ar: {
         disclaimer: 'هذا التقييم هو فحص خوارزمي مستقل يستند إلى المعايير الفقهية المعلنة للجهات المختارة، ولا يُعد اعتماداً أو ترخيصاً رسمياً. يُرجى التحقق من شعار ورقم الشهادة المعتمدة على العبوة.',
         link: 'المنهجية الفقهية ومصادر الفتاوى الرسمية',
         title: 'المنهجية الفقهية ومصادر الأحكام',
-        close: 'إغلاق'
+        close: 'إغلاق',
+        bodyIntro: 'إن InciFact محرك فحص علمي وخوارزمي مستقل تماماً، ولا تربطه أي علاقة رسمية أو تجارية بالهيئات المذكورة.',
+        items: [
+          ['١. GİMDES (تركيا):', 'وفق معيار الحلال (المادة ٤.٢)، لا تُقبل المضافات المستخلصة من الحشرات (كارمين E120، شيلاك، إفراز الحلزون) ولا الإيثانول أو المستحلبات المشتبه بمصدرها الحيواني دون شهادة.'],
+          ['٢. JAKIM (ماليزيا):', 'وفق قرار لجنة الفتوى الوطنية رقم 100/2012 يُباح ملون الكارمين (E120)؛ وفي التجميل الخارجي يخضع مستخلص الحلزون (إرشاد الفتوى ١٨٨) لشروط الطهارة وعدم الإيذاء.'],
+          ['٣. MUI / BPJPH (إندونيسيا):', 'وفق فتوى MUI رقم 33 لسنة 2011 يُباح الكارمين، ووفق الفتوى رقم 24 لسنة 2012 يحرم أكل الحلزون بينما يخضع استخدامه التجميلي الخارجي للتنقية والرقابة.'],
+          ['٤. IFANCA (أمريكا / عالمي):', 'تعتمد المكونات مزدوجة المصدر (مثل E471) عند ثبوت أصلها النباتي أو بشهادة حلال موثقة، مع تحريم مشتقات الخنزير والمسكرات قطعياً.']
+        ]
       },
       de: {
         disclaimer: 'Diese Analyse ist eine unabhängige algorithmische Vorprüfung auf Grundlage öffentlich zugänglicher Standards der ausgewählten Institutionen. Sie stellt keine offizielle Zertifizierung dar. Bitte prüfen Sie das offizielle Siegel auf der Packung.',
         link: 'Methodik & Offizielle Fatwa-Quellen',
-        title: 'Fıqh-Methodik & Quellennachweis',
-        close: 'Schließen'
+        title: 'Fiqh-Methodik & Quellennachweis',
+        close: 'Schließen',
+        bodyIntro: 'InciFact ist eine unabhängige wissenschaftliche und algorithmische Prüf-Engine und steht in keiner offiziellen oder kommerziellen Verbindung zu den genannten Institutionen.',
+        items: [
+          ['1. GİMDES (Türkei):', 'Gemäß Halal-Standard Art. 4.2 werden insektenbasierte Stoffe (E120 Karmin, Schellack, Schneckenschleim), Ethanol sowie unzertifizierte Emulgatoren abgelehnt.'],
+          ['2. JAKIM (Malaysia):', 'Laut Fatwa-Ausschuss (Nr. 100/2012) ist Karmin (E120) zulässig; topischer Schneckenschleim (Irsyad Al-Fatwa 188) erfordert schadfreie Gewinnung und Reinheitsprüfung.'],
+          ['3. MUI / BPJPH (Indonesien):', 'Gemäß Fatwa MUI Nr. 33/2011 ist Karmin zulässig; gemäß Fatwa Nr. 24/2012 ist der Verzehr von Schnecken haram, während kosmetische Anwendung einer Reinheitsprüfung unterliegt.'],
+          ['4. IFANCA (USA / Global):', 'Bewertet doppelt-ursprüngliche Stoffe (z. B. E471) anhand verifizierter pflanzlicher Herkunft oder Zertifizierung; Schweine- und Weinderivate sind strikt haram.']
+        ]
       },
       fr: {
         disclaimer: 'Cette évaluation est un examen algorithmique indépendant basé sur les normes publiques des autorités sélectionnées. Elle ne constitue pas une certification officielle. Veuillez vérifier le logo et le numéro de certification sur l\'emballage.',
         link: 'Méthodologie & Sources Officielles des Fatwas',
         title: 'Méthodologie Juridique & Divulgation des Sources',
-        close: 'Fermer'
+        close: 'Fermer',
+        bodyIntro: 'InciFact est un moteur d\'analyse scientifique et algorithmique indépendant, sans aucun lien officiel ou commercial avec les organismes cités.',
+        items: [
+          ['1. GİMDES (Turquie) :', 'Selon la norme Halal art. 4.2, les additifs issus d\'insectes (Carmin E120, Shellac, Mucine d\'escargot), l\'éthanol et les émulsifiants douteux non certifiés sont refusés.'],
+          ['2. JAKIM (Malaisie) :', 'Selon la décision n° 100/2012 du Comité des Fatwas, le Carmin (E120) est licite ; en cosmétique externe, la mucine d\'escargot (Irsyad Al-Fatwa 188) exige vérification de pureté.'],
+          ['3. MUI / BPJPH (Indonésie) :', 'Selon la Fatwa MUI n° 33/2011, le Carmin est licite ; selon la Fatwa n° 24/2012, la consommation d\'escargot est haram mais l\'usage cosmétique externe dépend du contrôle de purification.'],
+          ['4. IFANCA (USA / Global) :', 'Valide les ingrédients à double origine (ex. E471) sur preuve d\'origine végétale ou certification, et interdit strictement les dérivés porcins et alcooliques.']
+        ]
       },
       id: {
         disclaimer: 'Analisis ini merupakan penyaringan algoritmik independen berdasarkan standar publik lembaga terkait. Bukan merupakan sertifikasi resmi. Silakan verifikasi nomor dan logo sertifikasi halal resmi pada kemasan.',
         link: 'Metodologi & Sumber Fatwa Resmi',
         title: 'Metodologi Fikih & Sumber Rujukan',
-        close: 'Tutup'
+        close: 'Tutup',
+        bodyIntro: 'InciFact adalah mesin pemindai ilmiah dan algoritmik independen tanpa afiliasi resmi atau komersial dengan lembaga yang disebutkan.',
+        items: [
+          ['1. GİMDES (Turki):', 'Berdasarkan Standar Halal Pasal 4.2, bahan turunan serangga (Karmin E120, Syelak, Lendir Siput), etanol, dan pengemulsi syubhat tanpa sertifikat tidak diterima.'],
+          ['2. JAKIM (Malaysia):', 'Berdasarkan Muzakarah Fatwa Kebangsaan No. 100/2012, pewarna Karmin (E120) dibolehkan; lendir siput kosmetik (Irsyad Al-Fatwa 188) wajib memenuhi syarat kesucian.'],
+          ['3. MUI / BPJPH (Indonesia):', 'Berdasarkan Fatwa MUI No. 33 Tahun 2011 Karmin halal; berdasarkan Fatwa MUI No. 24 Tahun 2012 konsumsi siput sebagai pangan haram dan penggunaan kosmetik luar wajib diverifikasi.'],
+          ['4. IFANCA (AS / Global):', 'Menilai bahan sumber ganda (seperti E471) melalui verifikasi sumber nabati/sertifikat, serta menolak tegas turunan babi dan khamr.']
+        ]
       },
       ms: {
         disclaimer: 'Penilaian ini adalah saringan algoritma bebas berdasarkan piawaian awam pihak berkuasa yang dipilih. Ia bukan perakuan rasmi. Sila sahkan logo dan nombor sijil rasmi pada bungkusan produk.',
         link: 'Metodologi & Sumber Fatwa Rasmi',
         title: 'Metodologi Fiqh & Rujukan Rasmi',
-        close: 'Tutup'
+        close: 'Tutup',
+        bodyIntro: 'InciFact ialah enjin saringan saintifik dan algoritma bebas tanpa sebarang kaitan rasmi atau komersial dengan institusi yang dinyatakan.',
+        items: [
+          ['1. GİMDES (Turki):', 'Mengikut Piawaian Halal Perkara 4.2, bahan berasaskan serangga (Karmin E120, Syelak, Mucin Siput), etanol dan pengemulsi syubhah tanpa sijil tidak diterima.'],
+          ['2. JAKIM (Malaysia):', 'Mengikut Muzakarah Jawatankuasa Fatwa Kebangsaan Bil. 100/2012, pewarna Karmin (E120) adalah harus; mucin siput kosmetik (Irsyad Al-Fatwa Siri 188) tertakluk pada syarat kesucian.'],
+          ['3. MUI / BPJPH (Indonesia):', 'Mengikut Fatwa MUI No. 33 Tahun 2011 Karmin adalah harus; mengikut Fatwa MUI No. 24 Tahun 2012 pemakanan siput adalah haram manakala kegunaan kosmetik luaran memerlukan semakan.'],
+          ['4. IFANCA (AS / Global):', 'Menilai ramuan dwi-sumber (seperti E471) melalui pengesahan sumber tumbuhan atau sijil Halal, serta menolak sepenuhnya derivatif khinzir dan arak.']
+        ]
       },
       es: {
         disclaimer: 'Esta evaluación es un análisis algorítmico independiente basado en estándares públicos de las entidades seleccionadas. No constituye una certificación oficial. Verifique el sello y código oficial en el empaque.',
         link: 'Metodología & Fuentes Oficiales de Fatwas',
         title: 'Metodología & Divulgación de Fuentes',
-        close: 'Cerrar'
+        close: 'Cerrar',
+        bodyIntro: 'InciFact es un motor de análisis científico y algorítmico independiente sin vínculo oficial ni comercial con las instituciones citadas.',
+        items: [
+          ['1. GİMDES (Turquía):', 'Según la Norma Halal Art. 4.2, no se aceptan aditivos derivados de insectos (Carmín E120, Goma laca, Baba de caracol), etanol ni emulsionantes dudosos sin certificar.'],
+          ['2. JAKIM (Malasia):', 'Según el Comité Nacional de Fatwas N.º 100/2012, el Carmín (E120) es lícito; la baba de caracol en cosmética tópica (Irsyad Al-Fatwa 188) requiere verificación de pureza.'],
+          ['3. MUI / BPJPH (Indonesia):', 'Según la Fatwa MUI N.º 33/2011 el Carmín es lícito; según la Fatwa N.º 24/2012 el consumo alimentario de caracol es haram y el uso cosmético externo requiere auditoría.'],
+          ['4. IFANCA (EE. UU. / Global):', 'Evalúa emulsionantes de doble origen (como E471) mediante origen vegetal verificado o certificación, prohibiendo derivados porcinos y alcohólicos.']
+        ]
       },
       ru: {
         disclaimer: 'Данный анализ представляет собой независимую алгоритмическую проверку на основе публичных стандартов выбранных организаций. Он не является официальным сертификатом. Проверяйте официальный знак на упаковке.',
         link: 'Методология и официальные источники фетв',
         title: 'Методология и источники стандартов',
-        close: 'Закрыть'
+        close: 'Закрыть',
+        bodyIntro: 'InciFact — независимый научный и алгоритмический сервис проверки состава, не имеющий официальной или коммерческой связи с указанными организациями.',
+        items: [
+          ['1. GİMDES (Турция):', 'Согласно ст. 4.2 стандарта Халяль, добавки из насекомых (Кармин E120, Шеллак, Муцин улитки), этанол и несертифицированные эмульгаторы не допускаются.'],
+          ['2. JAKIM (Малайзия):', 'Согласно решению Национального комитета фетв № 100/2012, краситель Кармин (E120) дозволен; муцин улитки в косметике (Irsyad Al-Fatwa 188) требует подтверждения чистоты.'],
+          ['3. MUI / BPJPH (Индонезия):', 'По фетве MUI № 33/2011 Кармин дозволен; по фетве № 24/2012 употребление улиток в пищу харам, а наружное косметическое применение требует проверки.'],
+          ['4. IFANCA (США / Глобальный):', 'Оценивает компоненты двойного происхождения (например, E471) при подтверждении растительного источника или сертификата и строго исключает свиные и спиртовые производные.']
+        ]
       },
       ur: {
         disclaimer: 'یہ تجزیہ منتخب اداروں کے عوامی معیارات پر مبنی ایک خود مختار الگورتھمک جانچ ہے۔ یہ کوئی سرکاری تصدیق یا سرٹیفکیٹ نہیں ہے۔ پیکیجنگ پر سرکاری سرٹیفکیٹ لوگو اور نمبر کی تصدیق کریں۔',
         link: 'فقہی طریقہ کار اور سرکاری فتاویٰ کے ذرائع',
         title: 'فقہی طریقہ کار اور ماخذ کا بیان',
-        close: 'بند کریں'
+        close: 'بند کریں',
+        bodyIntro: 'InciFact ایک خود مختار سائنسی اور الگورتھمک اسکیننگ انجن ہے۔ اس کا مذکورہ اداروں سے کوئی سرکاری یا تجارتی تعلق نہیں ہے۔',
+        items: [
+          ['١. GİMDES (ترکی):', 'حلال اسٹینڈرڈ شق 4.2 کے تحت کیڑوں سے حاصل کردہ اجزاء (کارمین E120، شیلیک، اسنیل میوسن)، ایتھنول اور مشکوک ایملسیفائرز بغیر سرٹیفکیٹ قبول نہیں کیے جاتے۔'],
+          ['٢. JAKIM (ملائیشیا):', 'نیشنل فتویٰ کمیٹی کے فیصلے نمبر 100/2012 کے مطابق کارمین (E120) جائز ہے؛ کاسمیٹکس میں اسنیل میوسن (ارشاد الفتویٰ 188) طہارت کی تصدیق سے مشروط ہے۔'],
+          ['٣. MUI / BPJPH (انڈونیشیا):', 'فتویٰ MUI نمبر 33/2011 کے تحت کارمین جائز ہے؛ فتویٰ نمبر 24/2012 کے تحت گھونگھے (Snail) بطور خوراک حرام ہیں جبکہ بیرونی کاسمیٹک استعمال کی جانچ ضروری ہے۔'],
+          ['٤. IFANCA (امریکہ / عالمی):', 'دوہرے ذرائع والے اجزاء (جیسے E471) کو تصدیق شدہ نباتاتی ماخذ یا حلال سرٹیفکیٹ کی بنیاد پر جانچتا ہے اور سور و شراب کے مشتقات کو قطعی حرام قرار دیتا ہے۔']
+        ]
       }
     };
 
@@ -3082,7 +3166,9 @@
         legalDisclaimerMicro: legal.disclaimer,
         methodologyLink: legal.link,
         methodologyTitle: legal.title,
-        methodologyClose: legal.close
+        methodologyClose: legal.close,
+        methodologyBodyIntro: legal.bodyIntro || LEGAL_I18N.en.bodyIntro,
+        methodologyItems: legal.items || LEGAL_I18N.en.items
       };
     }
 
@@ -3097,6 +3183,10 @@
     function renderScreen() {
       const el = document.getElementById('screenContent');
       if (!state.evalData) return;
+      const prevFocusedId =
+        document.activeElement && el.contains(document.activeElement) && document.activeElement.id
+          ? document.activeElement.id
+          : null;
 
       if (state.screen === 'main') {
         el.innerHTML = renderMainScreen();
@@ -3108,6 +3198,20 @@
         el.innerHTML = renderHalalScreen();
       } else if (state.screen === 'compare') {
         el.innerHTML = renderCompareScreen();
+      }
+
+      if (prevFocusedId) {
+        const shareModal = document.getElementById('shareCardModal');
+        const methModal = document.getElementById('methodologyModal');
+        const modalOpen =
+          (shareModal && shareModal.style.display === 'flex') ||
+          (methModal && methModal.style.display === 'flex');
+        if (!modalOpen) {
+          const nextFocusEl = document.getElementById(prevFocusedId);
+          if (nextFocusEl && typeof nextFocusEl.focus === 'function') {
+            nextFocusEl.focus({ preventScroll: true });
+          }
+        }
       }
     }
 
@@ -3207,7 +3311,7 @@
                       (item, i) => `
                   <span class="watch-chip" title="${escapeHtml(item)}">
                     <span class="watch-chip__label">🧬 ${escapeHtml(item)}</span>
-                    <button type="button" class="watch-chip__remove" aria-label="Remove ${escapeHtml(item)}" onclick="removeWatchlistItem(${i})">✕</button>
+                    <button type="button" class="watch-chip__remove" aria-label="${escapeHtml(getFeatText(state.lang).removeItemAria ? getFeatText(state.lang).removeItemAria(item) : 'Remove ' + item)}" onclick="removeWatchlistItem(${i})">✕</button>
                   </span>`
                     )
                     .join('')
@@ -3433,19 +3537,11 @@
       const flaggedRows = allRows.filter((r) => r.kind !== 'ok');
       const visibleRows = state.showAllIngredients ? allRows : flaggedRows;
 
-      // 1-Line First-3-Seconds Verdict Hero
+      // 1-Line First-3-Seconds Verdict Hero (Definite Red ALWAYS takes priority over Pending OCR / Low Coverage)
       let verdictHeroBg = 'var(--ok-bg)';
       let verdictHeroCol = 'var(--ok)';
       let verdictHeroText = `🟢 ${u.goodNoBanned} · ${loc.badges.halalOk}`;
-      if (unified.hasPendingOcr) {
-        verdictHeroBg = 'var(--warn-bg)';
-        verdictHeroCol = 'var(--warn)';
-        verdictHeroText = `🟡 ${ft.statusPendingOcr} — ${ft.pendingOcrTileSub}`;
-      } else if (unified.isLowCov) {
-        verdictHeroBg = 'var(--warn-bg)';
-        verdictHeroCol = 'var(--warn)';
-        verdictHeroText = `⚪ ${loc.badges.lowCoverage || ft.statusLowCoverage} — ${ft.lowCovTileSub}`;
-      } else if (reg.capApplied === 10 || unified.halalTone === 'bad' || unified.profTone === 'bad') {
+      if (reg.capApplied === 10 || unified.halalTone === 'bad' || unified.profTone === 'bad') {
         verdictHeroBg = 'var(--bad-bg)';
         verdictHeroCol = 'var(--bad)';
         const reason =
@@ -3455,16 +3551,28 @@
             ? u.euNonCompliant
             : `${u.forYouCaps}: ${unified.profileTitle}`;
         verdictHeroText = `🔴 ${reason}`;
+      } else if (unified.hasPendingOcr) {
+        verdictHeroBg = 'var(--warn-bg)';
+        verdictHeroCol = 'var(--warn)';
+        verdictHeroText = `🟡 ${ft.statusPendingOcr} — ${ft.pendingOcrTileSub}`;
+      } else if (unified.isLowCov) {
+        verdictHeroBg = 'var(--warn-bg)';
+        verdictHeroCol = 'var(--warn)';
+        verdictHeroText = `⚪ ${loc.badges.lowCoverage || ft.statusLowCoverage} — ${ft.lowCovTileSub}`;
       } else if (unified.halalTone === 'warn' || unified.profTone === 'warn' || penaltyItems.length > 0) {
         verdictHeroBg = 'var(--warn-bg)';
         verdictHeroCol = 'var(--warn)';
-        const reason =
-          unified.halalTone === 'warn'
-            ? `${halal.selectedAuthority}: ${unified.halalTitle}`
-            : unified.profTone === 'warn'
-            ? `${u.forYouCaps}: ${unified.profileTitle}`
-            : u.itemsAttentionFmt(penaltyItems.length);
-        verdictHeroText = `🟡 ${reason}`;
+        if (unified.halalTone === 'warn' && unified.profTone === 'ok' && penaltyItems.length === 0) {
+          verdictHeroText = `🟢 ${u.fitsPrefs} · 🟡 ${halal.selectedAuthority}: ${unified.halalTitle}`;
+        } else {
+          const reason =
+            unified.halalTone === 'warn'
+              ? `${halal.selectedAuthority}: ${unified.halalTitle}`
+              : unified.profTone === 'warn'
+              ? `${u.forYouCaps}: ${unified.profileTitle}`
+              : u.itemsAttentionFmt(penaltyItems.length);
+          verdictHeroText = `🟡 ${reason}`;
+        }
       }
 
       return `
@@ -3580,7 +3688,7 @@
             <button id="openShareCardBtn" type="button" onclick="openShareCardModal(this)" style="height:40px; border-radius:14px; border:1.5px solid var(--accent); background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
               <span>${ft.shareCardBtn}</span>
             </button>
-            <button type="button" onclick="copyShareSummaryText()" style="height:40px; border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <button id="copyShareSummaryBtn" type="button" onclick="copyShareSummaryText()" style="height:40px; border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;">
               <span>${ft.shareTextBtn}</span>
             </button>
           </div>
@@ -3619,11 +3727,14 @@
 
         <!-- Ingredient Cards (DOM XSS Escaped) -->
         <div style="display:flex; flex-direction:column; gap:8px;">
-          ${visibleRows
-            .map((it) => {
-              const badgeBg = it.kind === 'warn' ? 'var(--warn-bg)' : it.kind === 'info' ? 'var(--info-bg)' : it.kind === 'unknown' ? 'var(--surface2)' : 'var(--ok-bg)';
-              const fg = it.kind === 'warn' ? 'var(--warn)' : it.kind === 'info' ? 'var(--info)' : it.kind === 'unknown' ? 'var(--muted)' : 'var(--ok)';
-              return `
+          ${
+            visibleRows.length === 0
+              ? `<div style="background:var(--ok-bg); color:var(--ok); border-radius:16px; padding:12px 14px; font-size:12.5px; font-weight:700;">✓ ${escapeHtml(u.noRestrictedFound)}</div>`
+              : visibleRows
+                  .map((it) => {
+                    const badgeBg = it.kind === 'warn' ? 'var(--warn-bg)' : it.kind === 'info' ? 'var(--info-bg)' : it.kind === 'unknown' ? 'var(--surface2)' : 'var(--ok-bg)';
+                    const fg = it.kind === 'warn' ? 'var(--warn)' : it.kind === 'info' ? 'var(--info)' : it.kind === 'unknown' ? 'var(--muted)' : 'var(--ok)';
+                    return `
               <div style="background:var(--surface); border-radius:18px; padding:12px 14px; display:flex; gap:10px;">
                 <span style="width:26px; height:26px; border-radius:13px; background:${badgeBg}; color:${fg}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex:none;">
                   ${it.kind === 'warn' ? '!' : it.kind === 'info' ? 'i' : it.kind === 'unknown' ? '?' : '✓'}
@@ -3647,8 +3758,9 @@
                   </div>
                 </div>
               </div>`;
-            })
-            .join('')}
+                  })
+                  .join('')
+          }
         </div>
 
         <p style="margin:4px 0 0; font-size:11.5px; line-height:1.4; color:var(--muted);">
@@ -4034,13 +4146,34 @@
       const modal = document.getElementById('methodologyModal');
       if (modal) {
         const u = getUiText(state.lang);
+        const dir = (state.evalData && state.evalData.dir) || (state.lang === 'ar' || state.lang === 'ur' ? 'rtl' : 'ltr');
+        modal.setAttribute('dir', dir);
         const titleEl = document.getElementById('methodologyModalTitle');
         const closeBtn = document.getElementById('methodologyModalOkBtn');
+        const xBtn = document.getElementById('methodologyModalCloseBtn');
+        const bodyEl = document.getElementById('methodologyModalBody');
         if (titleEl) titleEl.textContent = '⚖️ ' + u.methodologyTitle;
         if (closeBtn) closeBtn.textContent = u.methodologyClose;
+        if (xBtn) xBtn.setAttribute('aria-label', u.methodologyClose);
+        if (bodyEl && Array.isArray(u.methodologyItems)) {
+          bodyEl.innerHTML = `
+            <div style="display:flex; align-items:center; gap:12px; background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
+              <img src="./assets/incifact-corporate-seal.jpg" alt="InciFact Corporate Seal" width="54" height="54" style="border-radius:10px; flex:none; border:1px solid rgba(197,160,89,0.4);" />
+              <span>${escapeHtml(u.methodologyBodyIntro)}</span>
+            </div>
+            ${u.methodologyItems
+              .map(
+                ([heading, desc]) => `
+              <div>
+                <strong style="color:var(--accent);">${escapeHtml(heading)}</strong><br>
+                <span style="color:var(--muted);">${escapeHtml(desc)}</span>
+              </div>`
+              )
+              .join('')}
+          `;
+        }
         modal.style.display = 'flex';
         modal.setAttribute('aria-hidden', 'false');
-        const xBtn = document.getElementById('methodologyModalCloseBtn');
         if (xBtn) {
           xBtn.focus();
           requestAnimationFrame(() => setTimeout(() => xBtn.focus(), 0));
@@ -4127,14 +4260,14 @@
         <span id="methodologyModalTitle" style="font-weight:800; font-size:15px; color:var(--ink);">⚖️ Fıkhi Metodoloji & Kaynak Beyanı</span>
         <button id="methodologyModalCloseBtn" type="button" aria-label="Close" onclick="closeMethodologyModal()" style="border:none; background:var(--surface2); width:36px; height:36px; border-radius:18px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
       </div>
-      <div style="padding:16px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; font-size:12.5px; line-height:1.5; color:var(--ink);">
+      <div id="methodologyModalBody" style="padding:16px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; font-size:12.5px; line-height:1.5; color:var(--ink);">
         <div style="display:flex; align-items:center; gap:12px; background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
           <img src="./assets/incifact-corporate-seal.jpg" alt="InciFact Corporate Seal" width="54" height="54" style="border-radius:10px; flex:none; border:1px solid rgba(197,160,89,0.4);" />
           <span>InciFact, bağımsız bir bilimsel ve algoritmik tarama motorudur. Adı geçen kurumlarla herhangi bir organik, resmi veya ticari bağı bulunmamaktadır.</span>
         </div>
         <div>
           <strong style="color:var(--accent);">1. GİMDES (Türkiye):</strong><br>
-          <span style="color:var(--muted);">Helal Gıda ve İhtiyaç Maddeleri Standardı Madde 4.2 gereği böcek kaynaklı katkılar (E120 Karmin, Şellak, Salyangoz Müsini) ve hayvansal şüpheli emülgatörler sertifikasız kabul edilmez.</span>
+          <span style="color:var(--muted);">Helal Gıda ve İhtiyaç Maddeleri Standardı Madde 4.2 gereği böcek kaynaklı katkılar (E120 Karmin, Şellak, Salyangoz Müsini), etanol ve hayvansal şüpheli emülgatörler sertifikasız kabul edilmez.</span>
         </div>
         <div>
           <strong style="color:var(--accent);">2. JAKIM (Malezya):</strong><br>
@@ -4150,7 +4283,7 @@
         </div>
       </div>
       <div style="padding:12px 18px; border-top:1px solid var(--line); display:flex; justify-content:flex-end;">
-        <button id="methodologyModalOkBtn" type="button" onclick="closeMethodologyModal()" style="background:var(--ok); color:#FFFFFF; border:none; border-radius:12px; padding:8px 18px; font-weight:700; font-size:13px; cursor:pointer;">Anladım</button>
+        <button id="methodologyModalOkBtn" type="button" onclick="closeMethodologyModal()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; padding:8px 18px; font-weight:700; font-size:13px; cursor:pointer;">Kapat</button>
       </div>
     </div>
   </div>

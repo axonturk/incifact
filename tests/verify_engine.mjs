@@ -1091,5 +1091,81 @@ runTest('50. "without Parfum" negasyonu yakalanmalı ve >50 kara liste sınır a
   assert.equal(r251.cards.profileCard.preferenceMatchScore, null);
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/50 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// 51. MCI Kısaltmasıyla 3:1 Karışım Oranı Kontrolü (9. Denetim P1)
+runTest('51. MCI kısaltmasıyla "MCI 5 ppm, MI 5 ppm" (1:1) yasaklı (10 puan) ve "MCI 7.5 ppm, MI 2.5 ppm" (3:1) doğrulanmış izinli (80 puan) olmalı', () => {
+  const rBadPpm = evaluateProduct({
+    rawText: 'Aqua, Glycerin, Panthenol, MCI 5 ppm, MI 5 ppm',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off',
+    lang: 'tr'
+  });
+  assert.equal(rBadPpm.cards.regulatoryCard.score, 10);
+  assert.equal(rBadPpm.cards.regulatoryCard.capApplied, 10);
+  const fBad = rBadPpm.cards.regulatoryCard.findings.find((f) => f.substanceId === 'mi_mci');
+  assert.ok(fBad && /1:1/.test(fBad.legalText));
+
+  const rBadMgKg = evaluateProduct({
+    rawText: 'Aqua, Glycerin, Panthenol, MCI 5 mg/kg, MI 5 mg/kg',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off',
+    lang: 'tr'
+  });
+  assert.equal(rBadMgKg.cards.regulatoryCard.score, 10);
+  assert.equal(rBadMgKg.cards.regulatoryCard.capApplied, 10);
+
+  const rBadPct = evaluateProduct({
+    rawText: 'Aqua, Glycerin, Panthenol, MCI 0.0005%, MI 0.0005%',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off',
+    lang: 'tr'
+  });
+  assert.equal(rBadPct.cards.regulatoryCard.score, 10);
+  assert.equal(rBadPct.cards.regulatoryCard.capApplied, 10);
+
+  const rGood3to1 = evaluateProduct({
+    rawText: 'Aqua, Glycerin, Panthenol, MCI 7.5 ppm, MI 2.5 ppm',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off',
+    lang: 'tr'
+  });
+  assert.equal(rGood3to1.cards.regulatoryCard.score, 80);
+  assert.equal(rGood3to1.cards.regulatoryCard.capApplied, null);
+  const fGood = rGood3to1.cards.regulatoryCard.findings.find((f) => f.substanceId === 'mi_mci');
+  assert.ok(fGood && /3:1 olarak doğrulandı/.test(fGood.legalText));
+});
+
+// 52. B_alkol + Sertifika GİMDES Conflict Davranışı ve 10 Dilde compareProducts Yasal Açıklama Yerelleştirmesi (9. Denetim P2)
+runTest('52. Kozmetik Alcohol Denat. + sertifika GİMDES te conflict dönmeli (diğer 3 otorite sari kalmalı); compareProducts 10 dilde Türkçe legalText sızdırmamalı', () => {
+  const rEthGimdes = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Alcohol Denat., Panthenol, Tocopherol',
+    productType: 'cosmetic',
+    halalAuthority: 'GIMDES',
+    claims: { halalCertified: true, veganStatus: 'none', vegetarianStatus: 'none' }
+  });
+  assert.equal(rEthGimdes.cards.halalCard.overallStatus, 'conflict');
+  const fEth = rEthGimdes.cards.halalCard.findings.find((f) => f.ruleId === 'ethanol_cosmetic_or_food');
+  assert.equal(fEth.status, 'conflict');
+  assert.equal(fEth.authorityMatrix.GIMDES, 'conflict');
+  assert.equal(fEth.authorityMatrix.JAKIM, 'sari');
+  assert.equal(fEth.authorityMatrix.MUI, 'sari');
+  assert.equal(fEth.authorityMatrix.IFANCA, 'sari');
+  assert.equal(fEth.hasAuthorityDifference, true);
+
+  const nonTrLangs = ['en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  const trLeakRegex = /AB 2016\/1198|durulanmayan|YASAKTIR|kısıtlamasına tabi|Ek III|kozmetik ürünlerde/i;
+  for (const lang of nonTrLangs) {
+    const comp = compareProducts(
+      { name: 'Product A', rawText: 'Aqua, Glycerin, Panthenol, Tocopherol, Methylisothiazolinone', productType: 'cosmetic' },
+      { name: 'Product B', rawText: 'Aqua, Glycerin, Panthenol, Tocopherol, Citric Acid', productType: 'cosmetic' },
+      { lang }
+    );
+    assert.ok(comp.decidingDifference && comp.decidingDifference.explanation);
+    assert.ok(
+      !trLeakRegex.test(comp.decidingDifference.explanation),
+      `Dil=${lang} compareProducts decidingDifference.explanation içinde Türkçe sızıntı: "${comp.decidingDifference.explanation}"`
+    );
+  }
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/52 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
 

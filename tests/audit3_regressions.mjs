@@ -83,6 +83,16 @@ t('MCI 0.0008% + MI 0.00025% (3.2:1) rinse-off -> 10 (Audit 5 boundary)', () => 
   assert.equal(r.score, 10); assert.equal(r.capApplied, 10);
   assert.match(miFinding('Aqua, Methylchloroisothiazolinone 0.0008%, Methylisothiazolinone 0.00025%').legalText, /3\.2:1/);
 });
+t('MCI 5 ppm + MI 5 ppm (1:1 via MCI abbreviation) rinse-off -> 10', () => {
+  const r = reg({ rawText: 'Aqua, MCI 5 ppm, MI 5 ppm', applicationType: 'rinse_off' });
+  assert.equal(r.score, 10); assert.equal(r.capApplied, 10);
+  assert.match(miFinding('Aqua, MCI 5 ppm, MI 5 ppm').legalText, /1:1/);
+});
+t('MCI 7.5 ppm + MI 2.5 ppm (3:1 via MCI abbreviation) rinse-off -> 80', () => {
+  const r = reg({ rawText: 'Aqua, MCI 7.5 ppm, MI 2.5 ppm', applicationType: 'rinse_off' });
+  assert.equal(r.score, 80); assert.notEqual(r.capApplied, 10);
+  assert.match(miFinding('Aqua, MCI 7.5 ppm, MI 2.5 ppm').legalText, /3:1 olarak doğrulandı/);
+});
 
 console.log(`\n${pass}/${pass + fail} passed`);
 process.exit(fail ? 1 : 0);

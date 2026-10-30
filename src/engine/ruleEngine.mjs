@@ -1288,7 +1288,8 @@ export function evaluateProduct({
       const isoObs = observations.filter((o) => o.substance && o.substance.id === sub.id);
       const isoConcs = isoObs.map((o) => parseConcentration(o.raw)).filter((c) => typeof c === 'number' && !isNaN(c));
       const totalIsoConc = isoConcs.length > 0 ? isoConcs.reduce((a, b) => a + b, 0) : conc;
-      const hasMci = isoObs.some((o) => /chloro|klor|chlor/i.test(o.raw));
+      const isMciRaw = (r) => /chloro|klor|chlor|хлор|(?:^|[^\p{L}])mci(?:[^\p{L}]|$)/iu.test(r);
+      const hasMci = isoObs.some((o) => isMciRaw(o.raw));
       const labelSaysRinseOff = /\b(rinse[_\s-]?off|shampoo|cleanser|wash[_\s-]?off|soap|sabun|şampuan)\b/i.test(rawText);
       // Explicit structured field wins over free label words; on conflict apply the stricter (leave-on) rule
       const isRinseOff = explicitAppType ? explicitAppType === 'rinse_off' : (appType === 'rinse_off' || labelSaysRinseOff);
@@ -1300,8 +1301,11 @@ export function evaluateProduct({
         effectiveDetail = 'AB 2016/1198 (Ek V/57 değişikliği) uyarınca durulanmayan (leave-on) kozmetik ürünlerde kesinlikle YASAKTIR. Yalnızca durulanan (rinse-off) ürünlerde azami %0.0015 (15 ppm) izinlidir.' + conflictNote;
       } else {
         // Separate MCI and MI amounts (EU 1003/2014 Annex V/39: MCI:MI = 3:1, total max 0.0015 % in rinse-off only)
-        const isMciRaw = (r) => /chloro|klor|chlor/i.test(r);
-        const isCombinedToken = (r) => isMciRaw(r) && /(?:^|[^a-z])(?:methylisothiazolinone|mi)(?:[^a-z]|$)/i.test(r.replace(/methylchloroisothiazolinone/gi, ' '));
+        const isCombinedToken = (r) =>
+          isMciRaw(r) &&
+          /(?:^|[^\p{L}])(?:methylisothiazolinone|mi)(?:[^\p{L}]|$)/iu.test(
+            r.replace(/methylchloroisothiazolinone/gi, ' ').replace(/(?:^|[^\p{L}])mci(?:[^\p{L}]|$)/giu, ' ')
+          );
         const sumOf = (list) => {
           const vals = list.map((o) => parseConcentration(o.raw));
           return vals.every((v) => typeof v === 'number' && !isNaN(v)) ? vals.reduce((a, b) => a + b, 0) : null;
@@ -1453,6 +1457,14 @@ export function evaluateProduct({
       }
 
       const mappedSources = (sub.sources || []).map((sid) => sourcesData.sources[sid]).filter(Boolean);
+      const finalLegalText =
+        lang === 'tr' || effectiveDetail === et.e171FoodBanned || effectiveDetail === et.ci77891CosmeticOk
+          ? effectiveDetail
+          : effectiveEuStatus === 'yasak'
+          ? et.bannedGeneric
+          : effectiveEuStatus === 'kisitli' || effectiveSeverity !== 'bilgi'
+          ? et.restrictedGeneric
+          : et.permittedGeneric;
 
       regulatoryFindings.push({
         substanceId: sub.id,
@@ -1467,7 +1479,7 @@ export function evaluateProduct({
           jurisdiction === 'TR' && effectiveEuStatus === 'yasak'
             ? 'AB mevzuatı uyumsuzluğu tespit edildi; Türkiye pazarı için güncel TİTCK / Türk Gıda Kodeksi (TGK) geçiş hükümleri ayrıca teyit edilmelidir.'
             : null,
-        legalText: effectiveDetail,
+        legalText: finalLegalText,
         falsePositiveNote: lang === 'tr' ? sub.note : null,
         verification: sub.verification,
         sources: mappedSources
@@ -2075,7 +2087,7 @@ export function evaluateProduct({
         st = 'kirmizi';
       }
       if (certAppliesHere) {
-        st = productType === 'food' && rule.id === 'ethanol_cosmetic_or_food' ? 'conflict' : 'sari';
+        st = st === 'kirmizi' ? 'conflict' : 'sari';
         if (st === 'conflict') isConflict = true;
         resNote = et.conflictAlcohol;
       } else if (claims.veganStatus !== 'none') {

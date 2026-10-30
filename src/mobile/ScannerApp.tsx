@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -205,6 +205,7 @@ export default function InciFactMobileApp() {
   const [scanHistory, setScanHistory] = useState<
     (CompareSlotItem & { score: number | null })[]
   >([]);
+  const isStorageHydrated = useRef(false);
 
   // Load persisted on-device watchlist and scan history from AsyncStorage on startup
   useEffect(() => {
@@ -213,16 +214,33 @@ export default function InciFactMobileApp() {
         const savedWatch = await AsyncStorage.getItem('incifact_custom_watchlist_v1');
         if (savedWatch) {
           const parsedWatch = JSON.parse(savedWatch);
-          if (Array.isArray(parsedWatch)) setCustomWatchlist(parsedWatch.slice(0, 50));
+          if (Array.isArray(parsedWatch)) {
+            setCustomWatchlist((prev) => Array.from(new Set([...parsedWatch, ...prev])).slice(0, 50));
+          }
         }
         const savedHist = await AsyncStorage.getItem('incifact_scan_history_v1');
         if (savedHist) {
           const parsedHist = JSON.parse(savedHist);
-          if (Array.isArray(parsedHist)) setScanHistory(parsedHist.slice(0, 10));
+          if (Array.isArray(parsedHist)) {
+            setScanHistory((prev) => [...prev, ...parsedHist].slice(0, 10));
+          }
         }
-      } catch {}
+      } catch {
+      } finally {
+        isStorageHydrated.current = true;
+      }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!isStorageHydrated.current) return;
+    AsyncStorage.setItem('incifact_custom_watchlist_v1', JSON.stringify(customWatchlist)).catch(() => {});
+  }, [customWatchlist]);
+
+  useEffect(() => {
+    if (!isStorageHydrated.current) return;
+    AsyncStorage.setItem('incifact_scan_history_v1', JSON.stringify(scanHistory)).catch(() => {});
+  }, [scanHistory]);
 
   // Side-by-side comparison state (preserves productType, claims & confirmations per slot)
   const [slotA, setSlotA] = useState<CompareSlotItem>({

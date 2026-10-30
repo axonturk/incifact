@@ -3,15 +3,15 @@
 > **Tarih:** 30 Ekim 2026  
 > **Konum:** `C:\Projeler\clean-halal-scanner`  
 > **Canlı Servis:** `http://localhost:3456`  
-> **Mevcut Durum:** `npm test` tamamen geçiyor (50/50 kabul + 32/32 regresyon + 15/15 canlı parite + 0 çakışma) · 7. ve 8. bağımsız Teknik & UI/UX denetimlerinde tespit edilen tüm P0, P1 ve P2 bulgular regresyon testleriyle kapatılmıştır.
->
-> **Ek belgeler:** `docs/handover/` klasöründe tüm bağımsız denetim raporları, yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
+> **Mevcut Durum:** `npm test` tamamen geçiyor (52/52 kabul + 34/34 regresyon + 15/15 canlı parite + 0 çakışma) · 7., 8. ve 9. bağımsız Teknik & UI/UX denetimlerinde tespit edilen tüm P0, P1 ve P2 bulgular regresyon testleriyle kapatılmıştır.
+
+**Ek belgeler:** `docs/handover/` klasöründe tüm bağımsız denetim raporları, yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
 
 ## 0. YENİ OTURUMDA İLK YAPILACAKLAR
 1. Bu dosyayı ve `docs/handover/audit-6_100-100_GO_rapor.md` dosyasını baştan sona oku.
-2. `npm test` çalıştır; sonuçların 50/50 kabul, 32/32 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
+2. `npm test` çalıştır; sonuçların 52/52 kabul, 34/34 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
 3. `node server.mjs` ile servisi başlat (port 3456) ve `node tests/audit3_live_parity.mjs` ile 15/15 canlı/disk eşitliğini doğrula.
-4. Aşağıdaki **Bölüm 7: Güncel Durum ve Nihai Teknik Denetim Kapsamı** ve **Bölüm 8: Kullanıcı Odaklı 4 Ek Özellik & 7–8. Denetim Kapanışları** bölümlerini incele.
+4. Aşağıdaki **Bölüm 7: Güncel Durum ve Nihai Teknik Denetim Kapsamı** ve **Bölüm 8: Kullanıcı Odaklı 4 Ek Özellik & 7–9. Denetim Kapanışları** bölümlerini incele.
 
 ---
 
@@ -173,11 +173,13 @@ Kaynak: `docs/handover/audit-6_100-100_GO_rapor.md` (Hedef commit: `cdaf95cdeb48
    - 1. Profil ekranında serbest metin + hızlı öneri çipleri (`Niacinamide`, `Phenoxyethanol`, `Parfum`, `SLS`, `Palm Oil`, `MSG E621`, `Silicones`) ve cihaz içi kalıcı depolama (`incifact_custom_watchlist_v1`).
 4. **🔄 Son Tarananlar Geçmişi & Tek Tıkla Karşılaştırmaya Aktarma (`scanHistory` & `A`/`B` Atama):**
    - Taranan ürünlerin cihaz içinde (`incifact_scan_history_v1`) otomatik saklanması; 3. Sonuç ekranından veya 5. Karşılaştır ekranındaki **🕘 Son Tarananlar** listesinden tek tıkla **🅰️ 1. Ürün (A) Yap** / **🅱️ 2. Ürün (B) Yap** ataması ve canlı yan yana karşılaştırma.
-5. **🛡️ 7. ve 8. Bağımsız Teknik & UI/UX Denetim Kapanışları (Test 42–50):**
+5. **🛡️ 7., 8. ve 9. Bağımsız Teknik & UI/UX Denetim Kapanışları (Test 42–52):**
    - Parantezsiz `ppm` / `mg/kg` (`Methylisothiazolinone 20 ppm`, `MI 20 ppm` vs `10 ppm`) ayrıştırma, puanlama (`10` vs `90`) ve `compareProducts` `decidingDifference` tespiti (Test 46–47).
-   - 10 dilin tamamında `status === 'yesil'` olan helal bulgularının `halalOkDesc` ile tutarlı açıklama üretmesi (Test 48).
-   - Helal sertifikası (`halalCertified: true`) beyanının `authorityMatrix` içinde yalnız seçili otoriteyi çözmesi; `D_tartismali` kategorisinde `kirmizi` + sertifika (`Carmine E120` / `GIMDES`) durumunda `conflict`, `sari` + sertifika (`Snail Mucin` / `MUI` kozmetik) durumunda `yesil` üretmesi (Test 45, 49).
+   - `MCI` kısaltmasının (`MCI 5 ppm, MI 5 ppm`, `MCI 5 mg/kg, MI 5 mg/kg`, `MCI 0.0005%, MI 0.0005%` vs `MCI 7.5 ppm, MI 2.5 ppm`) AB 1003/2014 Ek V/39 `3:1` MCI:MI karışım oranı denetimine dahil edilmesi (Test 51).
+   - 10 dilin tamamında `status === 'yesil'` olan helal bulgularının `halalOkDesc` ile tutarlı açıklama üretmesi ve `compareProducts` yasal açıklamalarının (`legalText` / `decidingDifference.explanation`) 10 dilde yerelleştirilmesi (Test 48, 52).
+   - Helal sertifikası (`halalCertified: true`) beyanının `authorityMatrix` içinde yalnız seçili otoriteyi çözmesi; `D_tartismali` ve `B_alkol` kategorilerinde `kirmizi` + sertifika (`Carmine E120` veya `Alcohol Denat.` / `GIMDES`) durumunda `conflict`, `sari` + sertifika (`Snail Mucin` / `MUI` kozmetik) durumunda `yesil` üretmesi (Test 45, 49, 52).
    - Kelime sınırlı negasyon (`free`, `without`, `no`, `sin`, `sans`, `ohne`), yağ alkolü koruması (`Alcohol` vs `Cetyl Alcohol`), 2 harfli alt-dize koruması ve `>50` kara liste sınır aşımında `'unknown'` belirsizlik koruması (Test 42–44, 50).
+   - Web arayüzünde `Verdict Hero` keskin kırmızı önceliği, 3 saniyelik toast sonrası `renderScreen()` odak (`focus`) korunumu, 10 dilde Fıkhi Metodoloji modal gövdesi ve koyu tema WCAG AA kontrast uyumu.
    - Web ve Native (`ScannerApp.tsx`) 6-durumlu paylaşım önceliği (kesin kırmızı bulgunun OCR uyarısıyla örtülmemesi), `AsyncStorage` kalıcılığı, 390px mobil çerçeve hizalaması ve İlk 3 Saniye Karar Başlığı (`Verdict Hero`).
 
 
