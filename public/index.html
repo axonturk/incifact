@@ -1036,25 +1036,25 @@
       document.getElementById('liveInput').value = getSampleText(idx, state.lang);
       state.screen = s.screen;
       switchScreen(s.screen);
-      refreshAll();
+      return refreshAll();
     }
 
     function onInputChanged() {
       state.activeSampleIdx = null;
       state.userConfirmations = {};
-      refreshAll();
+      return refreshAll();
     }
 
     function toggleProfile(key) {
       state.profiles[key] = !state.profiles[key];
-      refreshAll();
+      return refreshAll();
     }
 
     function resolveAmbiguity(token, chosenId) {
       state.userConfirmations[token] = chosenId;
       state.screen = 'result';
       switchScreen('result');
-      refreshAll();
+      return refreshAll();
     }
 
     function generateManufacturerMessage(lang) {
@@ -1597,21 +1597,20 @@
         state.compareSlotToast = null;
         renderScreen();
       }, 3200);
-      refreshAll();
+      return refreshAll();
     }
 
     function resetCustomCompare() {
       state.customCompareA = null;
       state.customCompareB = null;
-      refreshAll();
+      return refreshAll();
     }
 
     function loadHistoryItem(idx) {
       const h = state.scanHistory && state.scanHistory[idx];
-      if (!h) return;
+      if (!h) return Promise.resolve();
       if (h.sampleIdx !== null && h.sampleIdx !== undefined && SAMPLES[h.sampleIdx]) {
-        loadSample(h.sampleIdx);
-        return;
+        return loadSample(h.sampleIdx);
       }
       state.activeSampleIdx = null;
       state.productTitle = h.title || deriveCustomProductTitle(h.rawText, state.lang);
@@ -1622,7 +1621,7 @@
       document.getElementById('liveInput').value = h.rawText;
       state.screen = 'result';
       switchScreen('result');
-      refreshAll();
+      return refreshAll();
     }
 
     function getUnifiedStatusPresentation() {
@@ -1697,6 +1696,20 @@
         profTone = 'warn';
       }
 
+      const profileBg = profTone === 'bad' ? 'var(--bad-bg)' : profTone === 'warn' ? 'var(--warn-bg)' : 'var(--ok-bg)';
+      const profileFg = profTone === 'bad' ? 'var(--bad)' : profTone === 'warn' ? 'var(--warn)' : 'var(--ok)';
+      const profileTitle = profText;
+      const profileSub = hasPendingOcr
+        ? fTxt.pendingOcrTileSub
+        : isLowCov || profStValues.includes('kapsam_yetersiz')
+        ? fTxt.lowCovTileSub
+        : prof.alerts.length > 0
+        ? (prof.alerts[0].localizedName || prof.alerts[0].substanceName) + ' (#' + formatDigits(prof.alerts[0].position, state.lang) + ')'
+        : u.compatibleWithFilters;
+      const halalBg = halalTone === 'bad' ? 'var(--bad-bg)' : halalTone === 'warn' ? 'var(--warn-bg)' : 'var(--ok-bg)';
+      const halalFg = halalTone === 'bad' ? 'var(--bad)' : halalTone === 'warn' ? 'var(--warn)' : 'var(--ok)';
+      const halalTitle = halalText;
+
       return {
         hasPendingOcr,
         isLowCov,
@@ -1704,10 +1717,17 @@
         halalEmoji,
         halalColorHex,
         halalTone,
+        halalBg,
+        halalFg,
+        halalTitle,
         profText,
         profEmoji,
         profColorHex,
-        profTone
+        profTone,
+        profileBg,
+        profileFg,
+        profileTitle,
+        profileSub
       };
     }
 
@@ -2067,7 +2087,10 @@
       }
     }
 
+    let refreshReqToken = 0;
+
     async function refreshAll() {
+      const myReqToken = ++refreshReqToken;
       const activeProfiles = Object.entries(state.profiles)
         .filter(([k, v]) => v && k !== 'vegan' && k !== 'halal')
         .map(([k]) => k);
@@ -2104,7 +2127,9 @@
           lang: state.lang
         })
       });
-      state.evalData = await evalRes.json();
+      const nextEvalData = await evalRes.json();
+      if (myReqToken !== refreshReqToken) return;
+      state.evalData = nextEvalData;
       recordCurrentScanToHistory(state.evalData, rawText, productType);
 
       const cNames = COMPARE_NAMES[state.lang] || COMPARE_NAMES.en;
@@ -2125,7 +2150,9 @@
           }
         })
       });
-      state.compareData = await compRes.json();
+      const nextCompareData = await compRes.json();
+      if (myReqToken !== refreshReqToken) return;
+      state.compareData = nextCompareData;
       syncShareModalI18n();
 
       // Update top tabs, bottom nav, right studio panel & phone frame direction for RTL (Arabic / Urdu)
