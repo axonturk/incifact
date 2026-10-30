@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { evaluateProduct, compareProducts, parseIngredientList } from '../src/engine/ruleEngine.mjs';
 
 console.log('======================================================================');
-console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (50 KABUL KRİTERİ)');
+console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (53 KABUL KRİTERİ)');
 console.log('======================================================================\n');
 
 let passed = 0;
@@ -1167,5 +1167,51 @@ runTest('52. Kozmetik Alcohol Denat. + sertifika GİMDES te conflict dönmeli (d
   }
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/52 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// 53. 10 Dilde Ek/Koşul Doğruluğu (Annex V/39 3:1 vs 1:1, Annex V/57 15 ppm, Annex VI/32 %3) (10. Denetim P2)
+runTest('53. Türkçe dışındaki 9 dilde Ek V/39 (MCI/MI 1:1 vs 3:1), Ek V/57 (MI >15 ppm) ve Ek VI/32 ihlalleri yanlışlıkla Ek II dememeli, doğru Ek ve oranı korumalı', () => {
+  const nonTrLangs = ['en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  const wrongAnnex2Regex = /Annex II\b|Anhang II\b|Annexe II\b|Anexo II\b|Lampiran II\b|Приложению II\b|الملحق الثاني|ضمیمہ II\b/;
+
+  for (const lang of nonTrLangs) {
+    // 1) MCI 5 ppm + MI 5 ppm (1:1 in rinse_off) vs MCI 7.5 ppm + MI 2.5 ppm (3:1 in rinse_off)
+    const compMci = compareProducts(
+      {
+        name: 'Product A',
+        rawText: 'Aqua, Glycerin, Panthenol, Tocopherol, MCI 5 ppm, MI 5 ppm',
+        productType: 'cosmetic',
+        applicationType: 'rinse_off'
+      },
+      {
+        name: 'Product B',
+        rawText: 'Aqua, Glycerin, Panthenol, Tocopherol, MCI 7.5 ppm, MI 2.5 ppm',
+        productType: 'cosmetic',
+        applicationType: 'rinse_off'
+      },
+      { lang }
+    );
+    assert.ok(compMci.decidingDifference && compMci.decidingDifference.explanation);
+    const expMci = compMci.decidingDifference.explanation;
+    assert.ok(
+      /V\/39/.test(expMci) && /3:1/.test(expMci) && /1:1/.test(expMci),
+      `Dil=${lang} MCI/MI 1:1 ihlalinde V/39, 3:1 ve 1:1 korunmalı: "${expMci}"`
+    );
+    assert.ok(
+      !wrongAnnex2Regex.test(expMci),
+      `Dil=${lang} MCI/MI Ek V/39 ihlali yanlışlıkla Annex II olarak raporlanmamalı: "${expMci}"`
+    );
+
+    // 2) MI 20 ppm in rinse_off (>15 ppm Annex V/57 violation)
+    const evalMi20 = evaluateProduct({
+      rawText: 'Aqua, Glycerin, Panthenol, Tocopherol, Citric Acid, MI 20 ppm',
+      productType: 'cosmetic',
+      applicationType: 'rinse_off',
+      lang
+    });
+    const fMi20 = evalMi20.cards.regulatoryCard.findings.find((f) => f.substanceId === 'mi_mci');
+    assert.ok(fMi20 && /V\/57/.test(fMi20.legalText) && /15 ppm/.test(fMi20.legalText));
+    assert.ok(!wrongAnnex2Regex.test(fMi20.legalText));
+  }
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/53 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
 

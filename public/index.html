@@ -1118,12 +1118,13 @@
     }
 
     function copyManufacturerMessage() {
+      const triggerId = document.activeElement && document.activeElement.id ? document.activeElement.id : null;
       const msg = generateManufacturerMessage(state.lang);
       state.lastCopiedMsg = msg;
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(msg).catch(() => fallbackCopy(msg));
+        navigator.clipboard.writeText(msg).catch(() => fallbackCopy(msg, triggerId));
       } else {
-        fallbackCopy(msg);
+        fallbackCopy(msg, triggerId);
       }
       state.copiedToast = true;
       renderScreen();
@@ -1134,7 +1135,9 @@
       }, 3000);
     }
 
-    function fallbackCopy(text) {
+    function fallbackCopy(text, preferredId) {
+      const prevFocused = document.activeElement;
+      const prevId = preferredId || (prevFocused && prevFocused.id ? prevFocused.id : null);
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.position = 'fixed';
@@ -1144,6 +1147,12 @@
       ta.select();
       try { document.execCommand('copy'); } catch (_) {}
       document.body.removeChild(ta);
+      const restoreTarget =
+        (prevId ? document.getElementById(prevId) : null) ||
+        (prevFocused && prevFocused !== document.body && document.body.contains(prevFocused) ? prevFocused : null);
+      if (restoreTarget && typeof restoreTarget.focus === 'function') {
+        try { restoreTarget.focus({ preventScroll: true }); } catch (_) { restoreTarget.focus(); }
+      }
     }
 
     function toggleHalalCertified() {
@@ -1844,11 +1853,12 @@
     }
 
     function copyShareSummaryText() {
+      const triggerId = document.activeElement && document.activeElement.id ? document.activeElement.id : null;
       const txt = generateShareSummaryText();
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(txt).catch(() => fallbackCopy(txt));
+        navigator.clipboard.writeText(txt).catch(() => fallbackCopy(txt, triggerId));
       } else {
-        fallbackCopy(txt);
+        fallbackCopy(txt, triggerId);
       }
       state.shareToast = true;
       renderScreen();
@@ -2626,7 +2636,7 @@
         myPrefsBtnTop: '⚙ Préférences',
         uncertainWord: 'Incertain',
         awaitingConfirm: 'Confirmation requise (voir Scanner)',
-        lowCoverage: 'Données insuffisantes (<80%)',
+        lowCoverage: 'Données insuffisantes (<80 %)',
         euNonCompliant: 'Non conforme UE (Interdit)',
         goodNoBanned: 'Bon · Aucune substance interdite UE',
         scoreReducers: 'Substances pénalisantes',
@@ -4283,7 +4293,7 @@
         </div>
       </div>
       <div style="padding:12px 18px; border-top:1px solid var(--line); display:flex; justify-content:flex-end;">
-        <button id="methodologyModalOkBtn" type="button" onclick="closeMethodologyModal()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; padding:8px 18px; font-weight:700; font-size:13px; cursor:pointer;">Kapat</button>
+        <button id="methodologyModalOkBtn" type="button" onclick="closeMethodologyModal()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; min-height:44px; min-width:88px; padding:10px 22px; font-weight:700; font-size:13px; cursor:pointer;">Kapat</button>
       </div>
     </div>
   </div>

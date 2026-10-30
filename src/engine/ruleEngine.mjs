@@ -1457,14 +1457,220 @@ export function evaluateProduct({
       }
 
       const mappedSources = (sub.sources || []).map((sid) => sourcesData.sources[sid]).filter(Boolean);
-      const finalLegalText =
-        lang === 'tr' || effectiveDetail === et.e171FoodBanned || effectiveDetail === et.ci77891CosmeticOk
-          ? effectiveDetail
-          : effectiveEuStatus === 'yasak'
-          ? et.bannedGeneric
-          : effectiveEuStatus === 'kisitli' || effectiveSeverity !== 'bilgi'
-          ? et.restrictedGeneric
-          : et.permittedGeneric;
+      const localizeRegulatoryLegalText = (detail, euStatus, severity, targetLang, engineText) => {
+        if (targetLang === 'tr' || detail === engineText.e171FoodBanned || detail === engineText.ci77891CosmeticOk) {
+          return detail;
+        }
+        const d = String(detail || '');
+        const normPct = (s) => String(s || '').replace(/^%([\d.]+)/, '$1%');
+        // 1. Annex V/39 MCI/MI wrong ratio (e.g. 1:1 instead of 3:1)
+        const ratioMatch = d.match(/Ek V\/39: MCI\/MI karışımına yalnızca 3:1 oranında izin verilir\. Etiketteki oran ([\d.]+):1 \(MCI (%[\d.]+), MI (%[\d.]+)\)/);
+        if (ratioMatch) {
+          const [, r, mciRaw, miRaw] = ratioMatch;
+          const mci = normPct(mciRaw);
+          const mi = normPct(miRaw);
+          const map = {
+            en: `EU 1003/2014 Annex V/39: MCI/MI mixture is permitted only at a 3:1 ratio in rinse-off products. Label ratio is ${r}:1 (MCI ${mci}, MI ${mi}); prohibited under Annex V/39 conditions (Score capped at 10).`,
+            de: `EU 1003/2014 Anhang V/39: Die MCI/MI-Mischung ist nur im Verhältnis 3:1 in abspülbaren Produkten zulässig. Etikettenverhältnis ${r}:1 (MCI ${mci}, MI ${mi}); Verstoß gegen Anhang V/39, verboten (Maximalwert 10).`,
+            fr: `UE 1003/2014 Annexe V/39 : Le mélange MCI/MI n'est autorisé qu'au rapport 3:1 dans les produits à rincer. Rapport détecté ${r}:1 (MCI ${mci}, MI ${mi}) ; interdit selon l'Annexe V/39 (Score plafonné à 10).`,
+            es: `UE 1003/2014 Anexo V/39: La mezcla MCI/MI solo se permite en proporción 3:1 en productos que se aclaran. Proporción en etiqueta ${r}:1 (MCI ${mci}, MI ${mi}); prohibido según el Anexo V/39 (Puntuación máx. 10).`,
+            id: `UE 1003/2014 Lampiran V/39: Campuran MCI/MI hanya diizinkan pada rasio 3:1 dalam produk bilas. Rasio label ${r}:1 (MCI ${mci}, MI ${mi}); dilarang menurut Lampiran V/39 (Skor maks. 10).`,
+            ms: `EU 1003/2014 Lampiran V/39: Campuran MCI/MI hanya dibenarkan pada nisbah 3:1 dalam produk bilas. Nisbah label ${r}:1 (MCI ${mci}, MI ${mi}); dilarang mengikut Lampiran V/39 (Skor maks. 10).`,
+            ru: `ЕС 1003/2014 Приложение V/39: Смесь MCI/MI разрешена только в соотношении 3:1 в смываемых продуктах. На этикетке ${r}:1 (MCI ${mci}, MI ${mi}); запрещено по Приложению V/39 (Макс. балл 10).`,
+            ar: `لائحة الاتحاد الأوروبي 1003/2014 الملحق V/39: يُسمح بمزيج MCI/MI فقط بنسبة 3:1 في المنتجات التي تُشطف. النسبة على الملصق ${r}:1 (MCI ${mci}، MI ${mi})؛ محظور لمخالفة شروط الملحق V/39 (الحد الأقصى 10).`,
+            ur: `یورپی یونین 1003/2014 ضمیمہ V/39: دھلنے والی مصنوعات میں MCI/MI آمیزے کی اجازت صرف 3:1 کے تناسب سے ہے۔ لیبل کا تناسب ${r}:1 (MCI ${mci}، MI ${mi})؛ ضمیمہ V/39 کی شرائط کی خلاف ورزی پر ممنوع (زیادہ سے زیادہ اسکور 10)۔`
+          };
+          return map[targetLang] || map.en;
+        }
+        // 2. Annex V/39 MCI+MI total > 0.0015% (15 ppm)
+        const totalMciMatch = d.match(/Ek V\/39: MCI \+ MI karışımı yalnızca durulanan ürünlerde toplam azami %0\.0015 \(15 ppm\) izinlidir; etiketteki toplam (%[\d.]+)/);
+        if (totalMciMatch) {
+          const tot = normPct(totalMciMatch[1]);
+          const map = {
+            en: `EU 1003/2014 Annex V/39: MCI + MI mixture is permitted only in rinse-off products up to 0.0015% (15 ppm) total; label total ${tot} exceeds Annex V/39 limit and is prohibited (Score capped at 10).`,
+            de: `EU 1003/2014 Anhang V/39: Die MCI+MI-Mischung ist nur in abspülbaren Produkten bis max. 0.0015% (15 ppm) zulässig; Gesamtwert ${tot} überschreitet Anhang V/39, verboten (Maximalwert 10).`,
+            fr: `UE 1003/2014 Annexe V/39 : Le mélange MCI + MI est limité à 0.0015% (15 ppm) au total dans les produits à rincer ; le total ${tot} dépasse l'Annexe V/39, interdit (Score plafonné à 10).`,
+            es: `UE 1003/2014 Anexo V/39: La mezcla MCI + MI se limita a un máximo total de 0.0015% (15 ppm) en productos que se aclaran; el total ${tot} supera el Anexo V/39, prohibido (Puntuación máx. 10).`,
+            id: `UE 1003/2014 Lampiran V/39: Campuran MCI + MI dibatasi maks. 0.0015% (15 ppm) total pada produk bilas; total ${tot} melebihi batas Lampiran V/39, dilarang (Skor maks. 10).`,
+            ms: `EU 1003/2014 Lampiran V/39: Campuran MCI + MI dihadkan maks. 0.0015% (15 ppm) jumlah pada produk bilas; jumlah ${tot} melebihi had Lampiran V/39, dilarang (Skor maks. 10).`,
+            ru: `ЕС 1003/2014 Приложение V/39: Смесь MCI + MI разрешена только в смываемых продуктах до 0.0015% (15 ppm) суммарно; сумма ${tot} превышает лимит Приложения V/39, запрещено (Макс. балл 10).`,
+            ar: `لائحة الاتحاد الأوروبي 1003/2014 الملحق V/39: يُسمح بمزيج MCI + MI في المنتجات التي تُشطف بحد أقصى 0.0015% (15 ppm)؛ الإجمالي ${tot} يتجاوز حد الملحق V/39 ومحظور (الحد الأقصى 10).`,
+            ur: `یورپی یونین 1003/2014 ضمیمہ V/39: MCI + MI آمیزے کی حد دھلنے والی مصنوعات میں زیادہ سے زیادہ 0.0015% (15 ppm) ہے؛ کل مقدار ${tot} ضمیمہ V/39 کی حد سے متجاوز اور ممنوع ہے (زیادہ سے زیادہ اسکور 10)۔`
+          };
+          return map[targetLang] || map.en;
+        }
+        // 3. Annex V/39 MCI/MI 3:1 verified
+        const verifiedMciMatch = d.match(/Ek V\/39: MCI\/MI oranı 3:1 olarak doğrulandı \(MCI (%[\d.]+), MI (%[\d.]+), toplam (%[\d.]+)\)/);
+        if (verifiedMciMatch) {
+          const [, mciRaw, miRaw, totRaw] = verifiedMciMatch;
+          const mci = normPct(mciRaw), mi = normPct(miRaw), tot = normPct(totRaw);
+          const map = {
+            en: `EU 1003/2014 Annex V/39: MCI/MI 3:1 ratio verified (MCI ${mci}, MI ${mi}, total ${tot}); permitted only in rinse-off products up to 0.0015% (15 ppm) total.`,
+            de: `EU 1003/2014 Anhang V/39: MCI/MI-Verhältnis 3:1 bestätigt (MCI ${mci}, MI ${mi}, gesamt ${tot}); nur in abspülbaren Produkten bis max. 0.0015% (15 ppm) zulässig.`,
+            fr: `UE 1003/2014 Annexe V/39 : Rapport MCI/MI 3:1 vérifié (MCI ${mci}, MI ${mi}, total ${tot}) ; autorisé uniquement dans les produits à rincer jusqu'à 0.0015% (15 ppm).`,
+            es: `UE 1003/2014 Anexo V/39: Proporción MCI/MI 3:1 verificada (MCI ${mci}, MI ${mi}, total ${tot}); permitido solo en productos que se aclaran hasta 0.0015% (15 ppm).`,
+            id: `UE 1003/2014 Lampiran V/39: Rasio MCI/MI 3:1 terverifikasi (MCI ${mci}, MI ${mi}, total ${tot}); diizinkan hanya pada produk bilas maks. 0.0015% (15 ppm).`,
+            ms: `EU 1003/2014 Lampiran V/39: Nisbah MCI/MI 3:1 disahkan (MCI ${mci}, MI ${mi}, jumlah ${tot}); dibenarkan hanya pada produk bilas maks. 0.0015% (15 ppm).`,
+            ru: `ЕС 1003/2014 Приложение V/39: Соотношение MCI/MI 3:1 подтверждено (MCI ${mci}, MI ${mi}, всего ${tot}); разрешено только в смываемых продуктах до 0.0015% (15 ppm).`,
+            ar: `لائحة الاتحاد الأوروبي 1003/2014 الملحق V/39: تم التحقق من نسبة MCI/MI وهي 3:1 (MCI ${mci}، MI ${mi}، الإجمالي ${tot})؛ مسموح في المنتجات التي تُشطف حتى 0.0015% (15 ppm).`,
+            ur: `یورپی یونین 1003/2014 ضمیمہ V/39: MCI/MI کا 3:1 تناسب تصدیق شدہ ہے (MCI ${mci}، MI ${mi}، کل ${tot})؛ صرف دھلنے والی مصنوعات میں 0.0015% (15 ppm) تک اجازت ہے۔`
+          };
+          return map[targetLang] || map.en;
+        }
+        // 4. Annex V/39 MCI/MI unverified quantities
+        if (d.includes('Ek V/39:') && d.includes('DOĞRULANAMADI')) {
+          const map = {
+            en: 'EU 1003/2014 Annex V/39: MCI/MI mixture is restricted to rinse-off products at a 3:1 ratio and max 0.0015% (15 ppm) total; exact ratio/concentration cannot be verified from the label alone.',
+            de: 'EU 1003/2014 Anhang V/39: MCI/MI-Mischung ist auf abspülbare Produkte im Verhältnis 3:1 und max. 0.0015% (15 ppm) beschränkt; Mengen auf dem Etikett nicht angegeben.',
+            fr: 'UE 1003/2014 Annexe V/39 : Mélange MCI/MI restreint aux produits à rincer au rapport 3:1 et max. 0.0015% (15 ppm) ; concentrations non précisées sur l\'étiquette.',
+            es: 'UE 1003/2014 Anexo V/39: Mezcla MCI/MI restringida a productos que se aclaran en proporción 3:1 y máx. 0.0015% (15 ppm); cantidades no indicadas en la etiqueta.',
+            id: 'UE 1003/2014 Lampiran V/39: Campuran MCI/MI dibatasi untuk produk bilas pada rasio 3:1 dan maks. 0.0015% (15 ppm); konsentrasi tidak tercantum pada label.',
+            ms: 'EU 1003/2014 Lampiran V/39: Campuran MCI/MI dihadkan kepada produk bilas pada nisbah 3:1 dan maks. 0.0015% (15 ppm); kepekatan tidak dinyatakan pada label.',
+            ru: 'ЕС 1003/2014 Приложение V/39: Смесь MCI/MI ограничена смываемыми продуктами в соотношении 3:1 и до 0.0015% (15 ppm); точные концентрации на этикетке не указаны.',
+            ar: 'لائحة الاتحاد الأوروبي 1003/2014 الملحق V/39: يقتصر مزيج MCI/MI على المنتجات التي تُشطف بنسبة 3:1 وحد أقصى 0.0015% (15 ppm)؛ التركيز غير مذكور على الملصق.',
+            ur: 'یورپی یونین 1003/2014 ضمیمہ V/39: MCI/MI آمیزہ دھلنے والی مصنوعات میں 3:1 تناسب اور زیادہ سے زیادہ 0.0015% (15 ppm) تک محدود ہے؛ لیبل پر مقدار درج نہیں۔'
+          };
+          return map[targetLang] || map.en;
+        }
+        // 5. Annex V/57 MI leave-on ban
+        if (d.includes('AB 2016/1198') && d.includes('Ek V/57')) {
+          const map = {
+            en: 'EU 2016/1198 Annex V/57: Strictly prohibited in leave-on cosmetic products (Score capped at 10). Permitted only in rinse-off products up to 0.0015% (15 ppm).',
+            de: 'EU 2016/1198 Anhang V/57: In nicht abspülbaren Kosmetika (Leave-on) streng verboten (Maximalwert 10). Nur in abspülbaren Produkten bis 0.0015% (15 ppm) zulässig.',
+            fr: 'UE 2016/1198 Annexe V/57 : Strictement interdit dans les cosmétiques sans rinçage (Score plafonné à 10). Autorisé uniquement dans les produits à rincer jusqu\'à 0.0015% (15 ppm).',
+            es: 'UE 2016/1198 Anexo V/57: Estrictamente prohibido en cosméticos sin aclarado (Puntuación máx. 10). Permitido solo en productos que se aclaran hasta 0.0015% (15 ppm).',
+            id: 'UE 2016/1198 Lampiran V/57: Dilarang keras pada kosmetik tanpa bilas / leave-on (Skor maks. 10). Hanya diizinkan pada produk bilas hingga 0.0015% (15 ppm).',
+            ms: 'EU 2016/1198 Lampiran V/57: Dilarang sama sekali dalam kosmetik tanpa bilas / leave-on (Skor maks. 10). Hanya dibenarkan dalam produk bilas sehingga 0.0015% (15 ppm).',
+            ru: 'ЕС 2016/1198 Приложение V/57: Строго запрещено в несмываемой косметике (Макс. балл 10). Разрешено только в смываемых продуктах до 0.0015% (15 ppm).',
+            ar: 'لائحة الاتحاد الأوروبي 2016/1198 الملحق V/57: محظور تماماً في مستحضرات التجميل التي لا تُشطف (الحد الأقصى 10). مسموح فقط في منتجات الشطف حتى 0.0015% (15 ppm).',
+            ur: 'یورپی یونین 2016/1198 ضمیمہ V/57: بغیر دھلنے والی (leave-on) کاسمیٹکس میں سختی سے ممنوع (زیادہ سے زیادہ اسکور 10)۔ صرف دھلنے والی مصنوعات میں 0.0015% (15 ppm) تک اجازت ہے۔'
+          };
+          return map[targetLang] || map.en;
+        }
+        // 6. Annex V/57 MI rinse-off > 15 ppm ban vs <= 15 ppm restricted
+        if (d.includes('AB 2017/1224 Ek V/57')) {
+          if (euStatus === 'yasak') {
+            const map = {
+              en: 'EU 2017/1224 Annex V/57: Permitted only in rinse-off products up to max 0.0015% (15 ppm); concentrations above 15 ppm violate Annex V/57 and are prohibited (Score capped at 10).',
+              de: 'EU 2017/1224 Anhang V/57: Nur in abspülbaren Produkten bis max. 0.0015% (15 ppm) zulässig; Werte über 15 ppm verstoßen gegen Anhang V/57 und sind verboten (Maximalwert 10).',
+              fr: 'UE 2017/1224 Annexe V/57 : Autorisé uniquement dans les produits à rincer jusqu\'à 0.0015% (15 ppm) ; au-delà de 15 ppm, interdit selon l\'Annexe V/57 (Score plafonné à 10).',
+              es: 'UE 2017/1224 Anexo V/57: Permitido solo en productos que se aclaran hasta máx. 0.0015% (15 ppm); por encima de 15 ppm incumple el Anexo V/57 y está prohibido (Puntuación máx. 10).',
+              id: 'UE 2017/1224 Lampiran V/57: Hanya diizinkan pada produk bilas maks. 0.0015% (15 ppm); di atas 15 ppm melanggar Lampiran V/57 dan dilarang (Skor maks. 10).',
+              ms: 'EU 2017/1224 Lampiran V/57: Hanya dibenarkan pada produk bilas maks. 0.0015% (15 ppm); melebihi 15 ppm melanggar Lampiran V/57 dan dilarang (Skor maks. 10).',
+              ru: 'ЕС 2017/1224 Приложение V/57: Разрешено только в смываемых продуктах до 0.0015% (15 ppm); превышение 15 ppm нарушает Приложение V/57 и запрещено (Макс. балл 10).',
+              ar: 'لائحة الاتحاد الأوروبي 2017/1224 الملحق V/57: مسموح فقط في المنتجات التي تُشطف بحد أقصى 0.0015% (15 ppm)؛ تجاوز 15 ppm يخالف الملحق V/57 ومحظور (الحد الأقصى 10).',
+              ur: 'یورپی یونین 2017/1224 ضمیمہ V/57: صرف دھلنے والی مصنوعات میں زیادہ سے زیادہ 0.0015% (15 ppm) تک اجازت ہے؛ 15 ppm سے زائد مقدار ضمیمہ V/57 کے تحت ممنوع ہے (زیادہ سے زیادہ اسکور 10)۔'
+            };
+            return map[targetLang] || map.en;
+          }
+          const map = {
+            en: 'EU 2017/1224 Annex V/57: Restricted to rinse-off cosmetic products up to a maximum concentration of 0.0015% (15 ppm).',
+            de: 'EU 2017/1224 Anhang V/57: Beschränkt auf abspülbare Kosmetika bis zu einer Höchstkonzentration von 0.0015% (15 ppm).',
+            fr: 'UE 2017/1224 Annexe V/57 : Restreint aux cosmétiques à rincer jusqu\'à une concentration maximale de 0.0015% (15 ppm).',
+            es: 'UE 2017/1224 Anexo V/57: Restringido a cosméticos que se aclaran hasta una concentración máxima de 0.0015% (15 ppm).',
+            id: 'UE 2017/1224 Lampiran V/57: Dibatasi untuk kosmetik bilas hingga konsentrasi maksimum 0.0015% (15 ppm).',
+            ms: 'EU 2017/1224 Lampiran V/57: Dihadkan kepada kosmetik bilas sehingga kepekatan maksimum 0.0015% (15 ppm).',
+            ru: 'ЕС 2017/1224 Приложение V/57: Ограничено смываемыми косметическими средствами с максимальной концентрацией 0.0015% (15 ppm).',
+            ar: 'لائحة الاتحاد الأوروبي 2017/1224 الملحق V/57: مقيد في مستحضرات التجميل التي تُشطف بحد أقصى للتركيز 0.0015% (15 ppm).',
+            ur: 'یورپی یونین 2017/1224 ضمیمہ V/57: صرف دھلنے والی کاسمیٹک مصنوعات میں زیادہ سے زیادہ 0.0015% (15 ppm) ارتکاز تک محدود ہے۔'
+          };
+          return map[targetLang] || map.en;
+        }
+        // 7. Annex VI/32 Mexoryl 400
+        if (d.includes('AB 2020/1684 Ek VI/32')) {
+          if (euStatus === 'yasak') {
+            return {
+              en: 'EU 2020/1684 Annex VI/32: Prohibited in spray/aerosol inhalation products or above the 3% maximum UV-filter concentration limit (Score capped at 10).',
+              de: 'EU 2020/1684 Anhang VI/32: Verboten in Spray-/Aerosolprodukten (Inhalationsrisiko) oder über dem Höchstwert von 3% (Maximalwert 10).',
+              fr: 'UE 2020/1684 Annexe VI/32 : Interdit dans les sprays/aérosols exposant les poumons par inhalation ou au-delà de la limite de 3% (Score plafonné à 10).',
+              es: 'UE 2020/1684 Anexo VI/32: Prohibido en aerosoles/sprays con riesgo de inhalación o por encima del límite máximo del 3% (Puntuación máx. 10).',
+              id: 'UE 2020/1684 Lampiran VI/32: Dilarang pada produk semprot/aerosol (risiko inhalasi) atau di atas batas maksimum 3% (Skor maks. 10).',
+              ms: 'EU 2020/1684 Lampiran VI/32: Dilarang dalam produk semburan/aerosol (risiko sedutan) atau melebihi had maksimum 3% (Skor maks. 10).',
+              ru: 'ЕС 2020/1684 Приложение VI/32: Запрещено в спреях/аэрозолях (риск вдыхания) или при превышении лимита 3% (Макс. балл 10).',
+              ar: 'لائحة الاتحاد الأوروبي 2020/1684 الملحق VI/32: محظور في البخاخات/الرذاذ أو عند تجاوز الحد الأقصى 3% (الحد الأقصى 10).',
+              ur: 'یورپی یونین 2020/1684 ضمیمہ VI/32: اسپرے/ایروسول مصنوعات میں یا 3% کی زیادہ سے زیادہ حد سے تجاوز کرنے پر ممنوع (زیادہ سے زیادہ اسکور 10)۔'
+            }[targetLang] || engineText.bannedGeneric;
+          }
+          return {
+            en: 'EU 2020/1684 Annex VI/32: Permitted as a UV filter up to 3%; must not be used in spray/aerosol applications that may lead to lung exposure by inhalation.',
+            de: 'EU 2020/1684 Anhang VI/32: Als UV-Filter bis max. 3% zulässig; nicht in Sprays/Aerosolen mit Inhalationsrisiko verwenden.',
+            fr: 'UE 2020/1684 Annexe VI/32 : Autorisé comme filtre UV jusqu\'à 3% ; interdit dans les sprays/aérosols pouvant entraîner une exposition pulmonaire.',
+            es: 'UE 2020/1684 Anexo VI/32: Permitido como filtro UV hasta el 3%; prohibido en aerosoles/sprays con exposición pulmonar por inhalación.',
+            id: 'UE 2020/1684 Lampiran VI/32: Diizinkan sebagai filter UV hingga 3%; dilarang dalam aplikasi semprot/aerosol.',
+            ms: 'EU 2020/1684 Lampiran VI/32: Dibenarkan sebagai penapis UV sehingga 3%; dilarang dalam aplikasi semburan/aerosol.',
+            ru: 'ЕС 2020/1684 Приложение VI/32: Разрешен как УФ-фильтр до 3%; не использовать в спреях/аэрозолях с риском вдыхания.',
+            ar: 'لائحة الاتحاد الأوروبي 2020/1684 الملحق VI/32: مسموح كمرشح للأشعة فوق البنفسجية حتى 3%؛ يمنع استخدامه في البخاخات.',
+            ur: 'یورپی یونین 2020/1684 ضمیمہ VI/32: UV فلٹر کے طور پر 3% تک اجازت ہے؛ اسپرے/ایروسول مصنوعات میں استعمال ممنوع ہے۔'
+          }[targetLang] || engineText.restrictedGeneric;
+        }
+        // 8. Annex III/14 Hydroquinone nail exception vs consumer ban
+        if (d.includes('AB 1223/2009 Ek III/14')) {
+          if (euStatus === 'yasak') {
+            return {
+              en: 'EU 1223/2009 Annex III/14 & Annex II/1339: Hydroquinone nail exception applies only to professional artificial nail systems (max 0.02%); prohibited in consumer use (Score capped at 10).',
+              de: 'EU 1223/2009 Anhang III/14 & Anhang II/1339: Ausnahme gilt nur für gewerbliche Kunstnagelsysteme (max. 0.02%); für Verbraucher verboten (Maximalwert 10).',
+              fr: 'UE 1223/2009 Annexe III/14 & Annexe II/1339 : Exception réservée aux systèmes d\'ongles artificiels professionnels (max. 0.02%) ; interdit au grand public (Score plafonné à 10).',
+              es: 'UE 1223/2009 Anexo III/14 y Anexo II/1339: Excepción exclusiva para sistemas profesionales de uñas artificiales (máx. 0.02%); prohibido para consumidores (Puntuación máx. 10).',
+              id: 'UE 1223/2009 Lampiran III/14 & Lampiran II/1339: Pengecualian hanya untuk sistem kuku buatan profesional (maks. 0.02%); dilarang untuk konsumen (Skor maks. 10).',
+              ms: 'EU 1223/2009 Lampiran III/14 & Lampiran II/1339: Pengecualian hanya untuk sistem kuku tiruan profesional (maks. 0.02%); dilarang untuk pengguna umum (Skor maks. 10).',
+              ru: 'ЕС 1223/2009 Приложение III/14 и II/1339: Исключение только для профессиональных систем искусственных ногтей (до 0.02%); запрещено для бытового применения (Макс. балл 10).',
+              ar: 'لائحة الاتحاد الأوروبي 1223/2009 الملحق III/14 وII/1339: الاستثناء يقتصر على أنظمة الأظافر الصناعية المهنية (حد أقصى 0.02%)؛ محظور للاستخدام المنزلي (الحد الأقصى 10).',
+              ur: 'یورپی یونین 1223/2009 ضمیمہ III/14 اور II/1339: استثنیٰ صرف پیشہ ورانہ مصنوعی ناخنوں کے نظام (زیادہ سے زیادہ 0.02%) کے لیے ہے؛ گھریلو استعمال ممنوع (زیادہ سے زیادہ اسکور 10)۔'
+            }[targetLang] || engineText.bannedGeneric;
+          }
+          return {
+            en: 'EU 1223/2009 Annex III/14: Permitted only in professional artificial nail systems up to 0.02% in the final mixture; prohibited in skin creams.',
+            de: 'EU 1223/2009 Anhang III/14: Nur in gewerblichen Kunstnagelsystemen bis max. 0.02% zulässig; in Hautcremes verboten.',
+            fr: 'UE 1223/2009 Annexe III/14 : Autorisé uniquement dans les systèmes d\'ongles artificiels professionnels jusqu\'à 0.02% ; interdit dans les crèmes.',
+            es: 'UE 1223/2009 Anexo III/14: Permitido solo en sistemas profesionales de uñas artificiales hasta 0.02%; prohibido en cremas.',
+            id: 'UE 1223/2009 Lampiran III/14: Diizinkan hanya pada sistem kuku buatan profesional hingga 0.02%; dilarang dalam krim kulit.',
+            ms: 'EU 1223/2009 Lampiran III/14: Dibenarkan hanya dalam sistem kuku tiruan profesional sehingga 0.02%; dilarang dalam krim kulit.',
+            ru: 'ЕС 1223/2009 Приложение III/14: Разрешено только в профессиональных системах искусственных ногтей до 0.02%; запрещено в кремах.',
+            ar: 'لائحة الاتحاد الأوروبي 1223/2009 الملحق III/14: مسموح فقط في أنظمة الأظافر الصناعية المهنية حتى 0.02%؛ محظور في كريمات البشرة.',
+            ur: 'یورپی یونین 1223/2009 ضمیمہ III/14: صرف پیشہ ورانہ مصنوعی ناخنوں کے نظام میں 0.02% تک اجازت ہے؛ جلد کی کریموں میں ممنوع۔'
+          }[targetLang] || engineText.restrictedGeneric;
+        }
+        // 9. Annex V/29 Phenoxyethanol > 1.0%
+        if (d.includes('AB 1223/2009 Ek V/29') && euStatus === 'yasak') {
+          return {
+            en: 'EU 1223/2009 Annex V/29: Phenoxyethanol is permitted up to a maximum concentration of 1.0%; concentrations above 1.0% violate Annex V/29 and are prohibited (Score capped at 10).',
+            de: 'EU 1223/2009 Anhang V/29: Phenoxyethanol ist bis max. 1.0% zulässig; Konzentrationen über 1.0% verstoßen gegen Anhang V/29 und sind verboten (Maximalwert 10).',
+            fr: 'UE 1223/2009 Annexe V/29 : Le phénoxyéthanol est autorisé jusqu\'à 1.0% max. ; au-delà de 1.0%, interdit selon l\'Annexe V/29 (Score plafonné à 10).',
+            es: 'UE 1223/2009 Anexo V/29: El fenoxietanol se permite hasta un máximo del 1.0%; por encima del 1.0% incumple el Anexo V/29 y está prohibido (Puntuación máx. 10).',
+            id: 'UE 1223/2009 Lampiran V/29: Fenoksietanol diizinkan hingga maks. 1.0%; di atas 1.0% melanggar Lampiran V/29 dan dilarang (Skor maks. 10).',
+            ms: 'EU 1223/2009 Lampiran V/29: Fenoksietanol dibenarkan sehingga maks. 1.0%; melebihi 1.0% melanggar Lampiran V/29 dan dilarang (Skor maks. 10).',
+            ru: 'ЕС 1223/2009 Приложение V/29: Феноксиэтанол разрешен в концентрации до 1.0%; превышение 1.0% нарушает Приложение V/29 и запрещено (Макс. балл 10).',
+            ar: 'لائحة الاتحاد الأوروبي 1223/2009 الملحق V/29: يُسمح بالفينوكسي إيثانول بحد أقصى 1.0%؛ تجاوز 1.0% يخالف الملحق V/29 ومحظور (الحد الأقصى 10).',
+            ur: 'یورپی یونین 1223/2009 ضمیمہ V/29: فینوکسی ایتھانول کی اجازت زیادہ سے زیادہ 1.0% تک ہے؛ اس سے زائد مقدار ضمیمہ V/29 کے تحت ممنوع ہے (زیادہ سے زیادہ اسکور 10)۔'
+          }[targetLang] || engineText.bannedGeneric;
+        }
+        // 10. Annex III Hair dye > 4.0%
+        if (d.includes('AB 1223/2009 Ek III: Saç boyalarında') && euStatus === 'yasak') {
+          return {
+            en: 'EU 1223/2009 Annex III: Exceeds the maximum permitted hair dye concentration limit in the ready-for-use mixture; prohibited under Annex III conditions (Score capped at 10).',
+            de: 'EU 1223/2009 Anhang III: Überschreitet die zulässige Höchstkonzentration für Haarfärbemittel; gemäß Anhang III verboten (Maximalwert 10).',
+            fr: 'UE 1223/2009 Annexe III : Dépasse la concentration maximale autorisée pour les colorants capillaires ; interdit selon l\'Annexe III (Score plafonné à 10).',
+            es: 'UE 1223/2009 Anexo III: Supera el límite máximo de concentración permitido en tintes capilares; prohibido según el Anexo III (Puntuación máx. 10).',
+            id: 'UE 1223/2009 Lampiran III: Melebihi batas konsentrasi maksimum pewarna rambut; dilarang menurut syarat Lampiran III (Skor maks. 10).',
+            ms: 'EU 1223/2009 Lampiran III: Melebihi had kepekatan maksimum pewarna rambut; dilarang mengikut syarat Lampiran III (Skor maks. 10).',
+            ru: 'ЕС 1223/2009 Приложение III: Превышает предельно допустимую концентрацию для красок для волос; запрещено по Приложению III (Макс. балл 10).',
+            ar: 'لائحة الاتحاد الأوروبي 1223/2009 الملحق III: يتجاوز الحد الأقصى المسموح به لتركيز صبغات الشعر؛ محظور بموجب شروط الملحق III (الحد الأقصى 10).',
+            ur: 'یورپی یونین 1223/2009 ضمیمہ III: بالوں کے رنگ میں زیادہ سے زیادہ ارتکاز کی حد سے متجاوز ہے؛ ضمیمہ III کے تحت ممنوع (زیادہ سے زیادہ اسکور 10)۔'
+          }[targetLang] || engineText.bannedGeneric;
+        }
+        return euStatus === 'yasak'
+          ? engineText.bannedGeneric
+          : euStatus === 'kisitli' || severity !== 'bilgi'
+          ? engineText.restrictedGeneric
+          : engineText.permittedGeneric;
+      };
+      const finalLegalText = localizeRegulatoryLegalText(
+        effectiveDetail,
+        effectiveEuStatus,
+        effectiveSeverity,
+        lang,
+        et
+      );
 
       regulatoryFindings.push({
         substanceId: sub.id,

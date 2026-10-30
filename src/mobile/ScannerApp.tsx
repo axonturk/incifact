@@ -211,22 +211,29 @@ export default function InciFactMobileApp() {
   useEffect(() => {
     (async () => {
       try {
-        const savedWatch = await AsyncStorage.getItem('incifact_custom_watchlist_v1');
+        const [savedWatch, savedHist] = await Promise.all([
+          AsyncStorage.getItem('incifact_custom_watchlist_v1'),
+          AsyncStorage.getItem('incifact_scan_history_v1')
+        ]);
+        isStorageHydrated.current = true;
         if (savedWatch) {
           const parsedWatch = JSON.parse(savedWatch);
           if (Array.isArray(parsedWatch)) {
             setCustomWatchlist((prev) => Array.from(new Set([...parsedWatch, ...prev])).slice(0, 50));
           }
         }
-        const savedHist = await AsyncStorage.getItem('incifact_scan_history_v1');
         if (savedHist) {
           const parsedHist = JSON.parse(savedHist);
           if (Array.isArray(parsedHist)) {
-            setScanHistory((prev) => [...prev, ...parsedHist].slice(0, 10));
+            setScanHistory((prev) => {
+              const dedupedSaved = parsedHist.filter(
+                (h: any) => h && !prev.some((p) => p.rawText === h.rawText && p.productType === h.productType)
+              );
+              return [...prev, ...dedupedSaved].slice(0, 10);
+            });
           }
         }
       } catch {
-      } finally {
         isStorageHydrated.current = true;
       }
     })();
@@ -311,7 +318,6 @@ export default function InciFactMobileApp() {
     if (!customWatchlist.some((w) => w.toLowerCase() === val.toLowerCase())) {
       const next = [...customWatchlist, val].slice(0, 50);
       setCustomWatchlist(next);
-      AsyncStorage.setItem('incifact_custom_watchlist_v1', JSON.stringify(next)).catch(() => {});
     }
     setWatchInput('');
   };
@@ -319,7 +325,6 @@ export default function InciFactMobileApp() {
   const removeWatchTerm = (term: string) => {
     const next = customWatchlist.filter((w) => w !== term);
     setCustomWatchlist(next);
-    AsyncStorage.setItem('incifact_custom_watchlist_v1', JSON.stringify(next)).catch(() => {});
   };
 
   const formatHalalSummaryStatus = () => {
@@ -371,7 +376,6 @@ export default function InciFactMobileApp() {
         entry,
         ...prev.filter((p) => !(p.rawText === rawText && p.productType === productType))
       ].slice(0, 10);
-      AsyncStorage.setItem('incifact_scan_history_v1', JSON.stringify(next)).catch(() => {});
       return next;
     });
     return entry;
