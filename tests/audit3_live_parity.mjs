@@ -1,5 +1,5 @@
-// Live API vs disk engine parity for the audit-3 vectors (timestamp excluded).
-import { evaluateProduct } from '../src/engine/ruleEngine.mjs';
+// Live API vs disk engine parity for the audit-3 vectors & 30 barcode vectors (timestamp excluded).
+import { evaluateProduct, lookupBarcodeProduct } from '../src/engine/ruleEngine.mjs';
 const cases = [
   { rawText: 'Aqua, Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate ٤٪', applicationType: 'lotion' },
   { rawText: 'Aqua, Methylisothiazolinone ٠٫٠٠١٦٪', applicationType: 'rinse_off' },
@@ -30,5 +30,18 @@ for (const c of cases) {
   if (same && res.status === 200 && expectOk) ok++;
   console.log(res.status, same ? 'EQUAL' : 'DIFF ', expectOk ? 'OK ' : 'BAD', 'score=' + r.score, 'cap=' + r.capApplied, al.length ? 'allergens=' + al.join('|') : '', '<-', input.rawText.slice(0, 70));
 }
-console.log(`\n${ok}/${cases.length} live==disk`);
-process.exit(ok === cases.length ? 0 : 1);
+
+const barcodeCodes = ['3017620422003', '3337875597388', '0000000000017'];
+const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+let barcodeOk = 0;
+for (const code of barcodeCodes) {
+  for (const lang of langs) {
+    const disk = lookupBarcodeProduct({ barcode: code, lang });
+    const res = await fetch(`http://localhost:3456/api/barcode?code=${code}&lang=${lang}`);
+    const live = await res.json();
+    if (res.status === 200 && strip(disk) === strip(live)) barcodeOk++;
+  }
+}
+
+console.log(`\n${ok}/${cases.length} live==disk | ${barcodeOk}/30 barcode live==disk`);
+process.exit(ok === cases.length && barcodeOk === 30 ? 0 : 1);

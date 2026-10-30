@@ -88,3 +88,6 @@ for (const [k, v] of sugarMap) {
   }
 }
 console.log('Total cross-domain collisions:', crossCollisions.length);
+if (internalSubCollisions.length > 0 || internalHalalCollisions.length > 0 || crossCollisions.length > 0) {
+  process.exit(1);
+}
