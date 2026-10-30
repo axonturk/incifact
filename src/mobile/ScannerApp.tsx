@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -10,6 +10,7 @@ import {
   Modal,
   Share
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { captureAndRecognizeLabel } from './ocrService';
 import { SUPPORTED_LANGUAGES, getLocaleStrings } from '../i18n/locales.mjs';
 import { evaluateProduct, compareProducts } from '../engine/ruleEngine.mjs';
@@ -46,6 +47,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: string;
     recentScansTitle: string;
     scannedLabel: (slot: string) => string;
+    customScanPrefix: string;
     pendingOcr: string;
     lowCoverage: string;
   }
@@ -55,6 +57,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'Sonuç Özeti Paylaş',
     recentScansTitle: 'Son Tarananlar (Tek Tıkla A / B Karşılaştır)',
     scannedLabel: (s) => `Taranan Ürün (${s})`,
+    customScanPrefix: 'Özel Analiz',
     pendingOcr: 'OCR Teyidi Bekliyor',
     lowCoverage: 'Kapsam Yetersiz (<%80)'
   },
@@ -63,6 +66,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'Share Result Summary',
     recentScansTitle: 'Recent Scans (1-Click Compare A / B)',
     scannedLabel: (s) => `Scanned Product (${s})`,
+    customScanPrefix: 'Custom Scan',
     pendingOcr: 'Awaiting OCR Confirmation',
     lowCoverage: 'Low Coverage (<80%)'
   },
@@ -71,6 +75,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'مشاركة ملخص النتيجة',
     recentScansTitle: 'عمليات الفحص الأخيرة (مقارنة بنقرة أ / ب)',
     scannedLabel: (s) => `المنتج الممسوح (${s})`,
+    customScanPrefix: 'فحص مخصص',
     pendingOcr: 'بانتظار تأكيد القراءة',
     lowCoverage: 'التغطية غير كافية (<80%)'
   },
@@ -79,6 +84,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'Ergebnis teilen',
     recentScansTitle: 'Letzte Scans (1-Klick Vergleich A / B)',
     scannedLabel: (s) => `Gescanntes Produkt (${s})`,
+    customScanPrefix: 'Eigene Analyse',
     pendingOcr: 'OCR-Bestätigung ausstehend',
     lowCoverage: 'Abdeckung unzureichend (<80%)'
   },
@@ -87,6 +93,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'Partager le résumé',
     recentScansTitle: 'Scans récents (Comparer A / B en 1 clic)',
     scannedLabel: (s) => `Produit scanné (${s})`,
+    customScanPrefix: 'Analyse perso',
     pendingOcr: 'Confirmation OCR requise',
     lowCoverage: 'Couverture insuffisante (<80%)'
   },
@@ -95,6 +102,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'Bagikan Ringkasan Hasil',
     recentScansTitle: 'Pindaian Terakhir (1-Klik Bandingkan A / B)',
     scannedLabel: (s) => `Produk Dipindai (${s})`,
+    customScanPrefix: 'Analisis Khusus',
     pendingOcr: 'Menunggu Konfirmasi OCR',
     lowCoverage: 'Cakupan Kurang (<80%)'
   },
@@ -103,6 +111,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'Kongsi Ringkasan Keputusan',
     recentScansTitle: 'Imbasan Terkini (1-Klik Banding A / B)',
     scannedLabel: (s) => `Produk Diimbas (${s})`,
+    customScanPrefix: 'Analisis Khas',
     pendingOcr: 'Menunggu Pengesahan OCR',
     lowCoverage: 'Liputan Tidak Mencukupi (<80%)'
   },
@@ -111,6 +120,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'Compartir Resumen',
     recentScansTitle: 'Escaneos Recientes (Comparar A / B)',
     scannedLabel: (s) => `Producto Escaneado (${s})`,
+    customScanPrefix: 'Análisis propio',
     pendingOcr: 'Confirmación OCR pendiente',
     lowCoverage: 'Cobertura insuficiente (<80%)'
   },
@@ -119,6 +129,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'Поделиться результатом',
     recentScansTitle: 'Недавние сканы (Сравнить A / B)',
     scannedLabel: (s) => `Проверенный продукт (${s})`,
+    customScanPrefix: 'Свой анализ',
     pendingOcr: 'Ожидает подтверждения OCR',
     lowCoverage: 'Недостаточный охват (<80%)'
   },
@@ -127,6 +138,7 @@ const MOBILE_FEAT_I18N: Record<
     shareCardBtn: 'نتیجہ شیئر کریں',
     recentScansTitle: 'حالیہ اسکینز (موازنہ A / B)',
     scannedLabel: (s) => `اسکین شدہ پروڈکٹ (${s})`,
+    customScanPrefix: 'مخصوص تجزیہ',
     pendingOcr: 'OCR تصدیق درکار ہے',
     lowCoverage: 'کوریج ناکافی (<80%)'
   }
@@ -192,30 +204,35 @@ export default function InciFactMobileApp() {
   const [ocrStatusMsg, setOcrStatusMsg] = useState<string | null>(null);
   const [scanHistory, setScanHistory] = useState<
     (CompareSlotItem & { score: number | null })[]
-  >([
-    {
-      name: 'CeraVe Nemlendirici Krem',
-      rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Caprylic/Capric Triglyceride, Cetyl Alcohol, Ceteareth-20, Petrolatum, Ceramide NP, Ceramide AP, Ceramide EOP, Carbomer, Dimethicone, Sodium Hyaluronate, Cholesterol, Phenoxyethanol, Tocopherol',
-      productType: 'cosmetic',
-      score: 100
-    },
-    {
-      name: 'Klasik Gece Kremi',
-      rawText: 'Ingredients: Aqua, Glycerin, Isopropyl Myristate, Cetearyl Alcohol, Propylparaben, Butylphenyl Methylpropional, Methylisothiazolinone, Parfum, Linalool',
-      productType: 'cosmetic',
-      score: 10
-    }
-  ]);
+  >([]);
+
+  // Load persisted on-device watchlist and scan history from AsyncStorage on startup
+  useEffect(() => {
+    (async () => {
+      try {
+        const savedWatch = await AsyncStorage.getItem('incifact_custom_watchlist_v1');
+        if (savedWatch) {
+          const parsedWatch = JSON.parse(savedWatch);
+          if (Array.isArray(parsedWatch)) setCustomWatchlist(parsedWatch.slice(0, 50));
+        }
+        const savedHist = await AsyncStorage.getItem('incifact_scan_history_v1');
+        if (savedHist) {
+          const parsedHist = JSON.parse(savedHist);
+          if (Array.isArray(parsedHist)) setScanHistory(parsedHist.slice(0, 10));
+        }
+      } catch {}
+    })();
+  }, []);
 
   // Side-by-side comparison state (preserves productType, claims & confirmations per slot)
   const [slotA, setSlotA] = useState<CompareSlotItem>({
-    name: 'CeraVe Nemlendirici Krem (A)',
+    name: 'Product A',
     rawText:
       'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Caprylic/Capric Triglyceride, Cetyl Alcohol, Ceteareth-20, Petrolatum, Ceramide NP, Ceramide AP, Ceramide EOP, Carbomer, Dimethicone, Sodium Hyaluronate, Cholesterol, Phenoxyethanol, Tocopherol',
     productType: 'cosmetic'
   });
   const [slotB, setSlotB] = useState<CompareSlotItem>({
-    name: 'Klasik Gece Kremi (B)',
+    name: 'Product B',
     rawText:
       'Ingredients: Aqua, Glycerin, Isopropyl Myristate, Cetearyl Alcohol, Propylparaben, Butylphenyl Methylpropional, Methylisothiazolinone, Parfum, Linalool',
     productType: 'cosmetic'
@@ -274,34 +291,40 @@ export default function InciFactMobileApp() {
     const val = (term ?? watchInput).trim();
     if (val.length < 2 || customWatchlist.length >= 50) return;
     if (!customWatchlist.some((w) => w.toLowerCase() === val.toLowerCase())) {
-      setCustomWatchlist((prev) => [...prev, val]);
+      const next = [...customWatchlist, val].slice(0, 50);
+      setCustomWatchlist(next);
+      AsyncStorage.setItem('incifact_custom_watchlist_v1', JSON.stringify(next)).catch(() => {});
     }
     setWatchInput('');
   };
 
   const removeWatchTerm = (term: string) => {
-    setCustomWatchlist((prev) => prev.filter((w) => w !== term));
+    const next = customWatchlist.filter((w) => w !== term);
+    setCustomWatchlist(next);
+    AsyncStorage.setItem('incifact_custom_watchlist_v1', JSON.stringify(next)).catch(() => {});
   };
 
   const formatHalalSummaryStatus = () => {
     const halal = evalMain.cards.halalCard;
-    if ((evalMain.unresolvedConfirmations || []).length > 0 || halal.overallStatus === 'unknown') {
-      return `🟡 ${ft.pendingOcr}`;
-    }
-    if (halal.overallStatus === 'kapsam_yetersiz' || evalMain.coveragePercent < 80) {
-      return `🟡 ${ft.lowCoverage}`;
-    }
-    if (halal.overallStatus === 'uygun_gorunuyor') return `🟢 ${t.badges.halalOk}`;
+    const covPct = evalMain.cards.regulatoryCard.coveragePercent;
+    // Definite Haram / Conflict findings ALWAYS take priority over pending OCR or low coverage
     if (halal.overallStatus === 'uygunsuz_bulgu' || halal.overallStatus === 'conflict') {
       return `🔴 ${t.badges.halalRed}`;
     }
+    if ((evalMain.unresolvedConfirmations || []).length > 0 || halal.overallStatus === 'unknown') {
+      return `🟡 ${ft.pendingOcr}`;
+    }
+    if (halal.overallStatus === 'kapsam_yetersiz' || covPct < 80) {
+      return `🟡 ${ft.lowCoverage}`;
+    }
+    if (halal.overallStatus === 'uygun_gorunuyor') return `🟢 ${t.badges.halalOk}`;
     return `🟡 ${t.badges.musbooh}`;
   };
 
   const handleShareResultCard = async () => {
     const reg = evalMain.cards.regulatoryCard;
     const halal = evalMain.cards.halalCard;
-    const scoreTxt = reg.canShowScore ? `${reg.score}/100` : `— (${evalMain.coveragePercent}%)`;
+    const scoreTxt = reg.canShowScore ? `${reg.score}/100` : `— (${reg.coveragePercent}%)`;
     const msg = `🛡️ INCIFACT — ${t.resultScreen.scoreLabel}: ${scoreTxt}\n🌙 ${t.resultScreen.halalSummaryLabel} (${halal.selectedAuthority}): ${formatHalalSummaryStatus()}\n⚖️ ${t.halalScreen.legalDisclaimerMicro || ''}`;
     try {
       await Share.share({ message: msg });
@@ -309,14 +332,14 @@ export default function InciFactMobileApp() {
   };
 
   const recordScanToHistory = (customLabel?: string) => {
-    const firstTokens = rawText
+    const allTokens = rawText
       .replace(/^[\s\S]*?ingredients\s*:\s*/i, '')
       .split(/[,;\n]+/)
       .map((s) => s.trim())
-      .filter(Boolean)
-      .slice(0, 2)
-      .join(', ');
-    const derivedName = customLabel || (firstTokens ? `Analiz: ${firstTokens}` : ft.scannedLabel('1'));
+      .filter(Boolean);
+    const nonBase = allTokens.filter((tk) => !/^(aqua|water|eau|wasser|agua|su|glycerin|glycerine|gliserin)$/i.test(tk));
+    const chosenTokens = (nonBase.length > 0 ? nonBase : allTokens).slice(0, 2).join(', ');
+    const derivedName = customLabel || (chosenTokens ? `${ft.customScanPrefix}: ${chosenTokens}` : ft.scannedLabel('1'));
     const entry: CompareSlotItem & { score: number | null } = {
       name: derivedName,
       rawText,
@@ -325,10 +348,14 @@ export default function InciFactMobileApp() {
       userConfirmations: { ...confirmations },
       score: evalMain.cards.regulatoryCard.score
     };
-    setScanHistory((prev) => [
-      entry,
-      ...prev.filter((p) => !(p.rawText === rawText && p.productType === productType)).slice(0, 7)
-    ]);
+    setScanHistory((prev) => {
+      const next = [
+        entry,
+        ...prev.filter((p) => !(p.rawText === rawText && p.productType === productType))
+      ].slice(0, 10);
+      AsyncStorage.setItem('incifact_scan_history_v1', JSON.stringify(next)).catch(() => {});
+      return next;
+    });
     return entry;
   };
 
@@ -802,10 +829,10 @@ export default function InciFactMobileApp() {
             )}
 
             <Text style={[styles.sectionTitle, { color: theme.text, textAlign: isRtl ? 'right' : 'left' }]}>
-              {t.resultScreen.scoreLabel}: {evalMain.cards.regulatoryCard.canShowScore ? `${formatDigits(evalMain.cards.regulatoryCard.score, lang)} / ${formatDigits(100, lang)}` : `— (${formatDigits(evalMain.coveragePercent, lang)}%)`}
+              {t.resultScreen.scoreLabel}: {evalMain.cards.regulatoryCard.canShowScore ? `${formatDigits(evalMain.cards.regulatoryCard.score, lang)} / ${formatDigits(100, lang)}` : `— (${formatDigits(evalMain.cards.regulatoryCard.coveragePercent, lang)}%)`}
             </Text>
             <Text style={[styles.sectionSub, { color: theme.muted, textAlign: isRtl ? 'right' : 'left' }]}>
-              {t.resultScreen.coverageLabel}: {lang === 'ar' || lang === 'ur' ? '٪' + formatDigits(evalMain.coveragePercent, lang) : '%' + evalMain.coveragePercent} • {formatHalalSummaryStatus()}
+              {t.resultScreen.coverageLabel}: {lang === 'ar' || lang === 'ur' ? '٪' + formatDigits(evalMain.cards.regulatoryCard.coveragePercent, lang) : lang === 'tr' ? '%' + evalMain.cards.regulatoryCard.coveragePercent : evalMain.cards.regulatoryCard.coveragePercent + '%'} • {formatHalalSummaryStatus()}
             </Text>
             {evalMain.cards.regulatoryCard.findings.map((f: any, idx: number) => (
               <Text

@@ -59,8 +59,8 @@ export function parseConcentration(str) {
   // Normalize Eastern Arabic / Persian digits, Arabic percent sign and Arabic decimal separator
   const s = normalizeDigitsToAscii(str).replace(/[٪﹪％]/g, '%').replace(/٫/g, '.');
   const num = (v) => parseFloat(v.replace(',', '.'));
-  // ppm → percent (1 ppm = 0.0001 %)
-  const ppm = s.match(/(\d+(?:[.,]\d+)?)\s*ppm\b/i);
+  // ppm or mg/kg → percent (1 ppm = 1 mg/kg = 0.0001 %)
+  const ppm = s.match(/(\d+(?:[.,]\d+)?)\s*(?:ppm|mg\s*\/\s*kg)\b/i);
   if (ppm) return num(ppm[1]) / 10000;
   const m1 = s.match(/%\s*(\d+(?:[.,]\d+)?)/);
   if (m1) return num(m1[1]);
@@ -269,10 +269,10 @@ export function parseIngredientList(rawText) {
   // Expand parenthetical codes, percentages, colon functional wrappers, and slash synonyms
   const expanded = [];
   rawTokens.forEach((tok) => {
-    // Strip trailing dots/asterisks/Urdu full stop and numeric percentages like (%13), (13.5%), %13, 13%, ٪١٣
+    // Strip trailing dots/asterisks/Urdu full stop and numeric percentages / ppm / mg/kg like (%13), (13.5%), (20 ppm), %13, 13%, 20 ppm, ٪١٣
     let cleanedTok = tok
-      .replace(/\(\s*[%٪]?\s*[\d\u0660-\u0669\u06F0-\u06F9]+(?:[.,٫][\d\u0660-\u0669\u06F0-\u06F9]+)?\s*[%٪]?\s*\)/gu, '')
-      .replace(/(?:^|\s)[%٪]?[\d\u0660-\u0669\u06F0-\u06F9]+(?:[.,٫][\d\u0660-\u0669\u06F0-\u06F9]+)?[%٪](?=\s|$)/gu, '')
+      .replace(/\(\s*[%٪]?\s*[\d\u0660-\u0669\u06F0-\u06F9]+(?:[.,٫][\d\u0660-\u0669\u06F0-\u06F9]+)?\s*(?:[%٪]|ppm|mg\s*\/\s*kg)?\s*\)/giu, '')
+      .replace(/(?:^|\s)[%٪]?[\d\u0660-\u0669\u06F0-\u06F9]+(?:[.,٫][\d\u0660-\u0669\u06F0-\u06F9]+)?\s*(?:[%٪]|ppm\b|mg\s*\/\s*kg\b)(?=\s|$)/giu, '')
       .replace(/[*•.۔]+$/u, '')
       .trim();
     if (!cleanedTok) return;
@@ -426,6 +426,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `Bu değerlendirme bir helal sertifikası değildir; seçtiğiniz kurumun (${auth}) yayımlanmış kriterlerine göre etiket analizi sunar.`,
     appleDisclaimer: 'Bu uygulama etiket bilgilerini resmi kaynaklara bağlı kurallarla açıklar; tıbbi teşhis, tedavi önerisi veya resmi helal sertifikası vermez. Sağlığınızla ilgili kararlar öncesinde doktorunuza veya eczacınıza danışın.',
     shieldDesc: 'Kimyasal yapısında -OH grubu bulunan yağ alkolü / koruyucu; sarhoş edici etil alkol (etanol) değildir.',
+    halalOkDesc: 'Seçilen helal otoritesi kriterlerine ve ürün bağlamına göre helal / uygun kabul edilen bileşen.',
     halalHaramDesc: 'Seçilen helal otoritesi kriterlerine göre uygunsuz / haram kaynaklı bileşen.',
     halalAlcoholDesc: 'Etil alkol (etanol) içerir; seçilen helal otoritesi kriterlerine göre incelenmelidir.',
     halalMusboohDesc: 'Şüpheli (kaynağı belirsiz): bitkisel veya hayvansal kaynaklı olabilir; kesin hüküm için Helal veya Vegan sertifikası doğrulanmalıdır.',
@@ -460,6 +461,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `This assessment is not an official Halal certificate; it analyzes the label according to published ${auth} criteria.`,
     appleDisclaimer: 'This app explains ingredient labels using official regulatory rules; it does not provide medical diagnosis, treatment advice, or official Halal certification. Consult your doctor or pharmacist for health decisions.',
     shieldDesc: 'Non-intoxicating fatty alcohol / emollient or preservative; NOT intoxicating ethyl alcohol (ethanol).',
+    halalOkDesc: 'Permissible (Halal) ingredient according to the selected Halal authority criteria and product context.',
     halalHaramDesc: 'Non-halal ingredient according to the selected Halal authority criteria.',
     halalAlcoholDesc: 'Contains ethyl alcohol (ethanol); subject to threshold/topical ruling of the selected Halal authority.',
     halalMusboohDesc: 'Doubtful (source unclear): can be plant- or animal-derived; verify Halal or Vegan certification on the packaging.',
@@ -494,6 +496,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `هذا التقييم ليس شهادة حلال رسمية؛ بل يقدم تحليلاً للملصق وفق معايير (${auth}) المنشورة.`,
     appleDisclaimer: 'يوضح هذا التطبيق معلومات الملصق وفق القواعد التنظيمية الرسمية؛ ولا يقدم تشخيصاً طبياً أو فتوى رسمية. استشر طبيبك أو الصيدلي قبل اتخاذ قرارات صحية.',
     shieldDesc: 'كحول دهني مرطب أو مادة حافظة آمنة؛ وليس كحولاً إيثيلياً مسكراً (إيثانول).',
+    halalOkDesc: 'مكون مباح (حلال) وفق معايير هيئة الحلال المختارة وسياق المنتج.',
     halalHaramDesc: 'مكون غير متوافق (حرام) وفق معايير هيئة الحلال المختارة.',
     halalAlcoholDesc: 'يحتوي على كحول إيثيلي (إيثانول)؛ يخضع لسياسة الهيئة المختارة.',
     halalMusboohDesc: 'مشكوك فيه (مصدره غير واضح): قد يكون نباتياً أو حيوانياً؛ يرجى التحقق من شهادة الحلال أو النباتي (Vegan) على العبوة.',
@@ -528,6 +531,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `Diese Bewertung ist kein offizielles Halal-Zertifikat, sondern prüft das Etikett nach ${auth}-Kriterien.`,
     appleDisclaimer: 'Dient nur zu Informationszwecken; keine medizinische Beratung. Fragen Sie bei gesundheitlichen Entscheidungen Ihren Arzt oder Apotheker.',
     shieldDesc: 'Nicht berauschender Fettalkohol / Pflegestoff oder Konservierungsmittel; KEIN Trinkalkohol (Ethanol).',
+    halalOkDesc: 'Zulässiger (Halal) Inhaltsstoff gemäß den Kriterien der gewählten Halal-Behörde.',
     halalHaramDesc: 'Nicht-halaler Inhaltsstoff gemäß dem gewählten Halal-Standard.',
     halalAlcoholDesc: 'Enthält Ethylalkohol (Ethanol); gemäß den Richtlinien der gewählten Halal-Behörde zu prüfen.',
     halalMusboohDesc: 'Zweifelhaft (Herkunft unklar): kann pflanzlich oder tierisch sein; Halal- oder Vegan-Siegel prüfen.',
@@ -562,6 +566,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `Cette évaluation n'est pas un certificat halal officiel ; elle analyse l'étiquette selon les critères ${auth}.`,
     appleDisclaimer: 'À titre informatif uniquement, ne constitue pas un avis médical. Consultez votre médecin ou pharmacien.',
     shieldDesc: 'Alcool gras émollient ou conservateur non intoxicant ; ce n\'est PAS de l\'alcool éthylique (éthanol).',
+    halalOkDesc: 'Ingrédient conforme (Halal) selon les critères de l\'autorité Halal sélectionnée.',
     halalHaramDesc: 'Ingrédient non conforme (Haram) selon l\'autorité Halal sélectionnée.',
     halalAlcoholDesc: 'Contient de l\'alcool éthylique (éthanol) ; à vérifier selon l\'autorité Halal choisie.',
     halalMusboohDesc: 'Douteux (origine incertaine) : peut être d\'origine végétale ou animale ; vérifiez la certification Halal ou Vegan.',
@@ -596,6 +601,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `Penilaian ini bukan sertifikat halal resmi; menganalisis label berdasarkan kriteria ${auth}.`,
     appleDisclaimer: 'Hanya untuk tujuan informasi, bukan saran medis. Konsultasikan dengan dokter atau apoteker Anda.',
     shieldDesc: 'Alkohol lemak pelembap / pengawet aman; BUKAN etil alkohol (etanol) yang memabukkan.',
+    halalOkDesc: 'Bahan yang diperbolehkan (Halal) menurut standar otoritas Halal yang dipilih.',
     halalHaramDesc: 'Bahan tidak sesuai (Haram) menurut standar otoritas Halal yang dipilih.',
     halalAlcoholDesc: 'Mengandung etil alkohol (etanol); periksa kebijakan batas otoritas Halal yang dipilih.',
     halalMusboohDesc: 'Syubhat (sumber tidak jelas): bisa nabati atau hewani; pastikan logo Halal atau Vegan resmi pada kemasan.',
@@ -630,6 +636,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `Penilaian ini bukan sijil halal rasmi; ia menganalisis label mengikut kriteria ${auth}.`,
     appleDisclaimer: 'Untuk tujuan maklumat sahaja, bukan nasihat perubatan. Rujuk doktor atau ahli farmasi anda.',
     shieldDesc: 'Alkohol lemak pelembap / pengawet selamat; BUKAN etil alkohol (etanol) yang memabukkan.',
+    halalOkDesc: 'Ramuan yang dibenarkan (Halal) mengikut piawaian autoriti Halal yang dipilih.',
     halalHaramDesc: 'Ramuan tidak patuh (Haram) mengikut piawaian autoriti Halal yang dipilih.',
     halalAlcoholDesc: 'Mengandungi etil alkohol (etanol); tertakluk kepada garis panduan autoriti Halal yang dipilih.',
     halalMusboohDesc: 'Syubhah (sumber tidak jelas): boleh jadi tumbuhan atau haiwan; sila semak logo Halal atau Vegan pada bungkusan.',
@@ -664,6 +671,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `Esta evaluación no es un certificado halal oficial; analiza la etiqueta según los criterios de ${auth}.`,
     appleDisclaimer: 'Solo con fines informativos, no es consejo médico. Consulta a tu médico o farmacéutico para decisiones de salud.',
     shieldDesc: 'Alcohol graso emoliente o conservante seguro; NO es alcohol etílico (etanol) intoxicante.',
+    halalOkDesc: 'Ingrediente permitido (Halal) según los criterios de la autoridad Halal seleccionada.',
     halalHaramDesc: 'Ingrediente no conforme (Haram) según el estándar de la autoridad Halal seleccionada.',
     halalAlcoholDesc: 'Contiene alcohol etílico (etanol); sujeto al criterio de la autoridad Halal seleccionada.',
     halalMusboohDesc: 'Dudoso (origen incierto): puede ser de origen vegetal o animal; verifica el certificado Halal o Vegano en el envase.',
@@ -698,6 +706,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `Эта оценка не является официальным сертификатом Халяль; анализ выполнен по критериям ${auth}.`,
     appleDisclaimer: 'Только в информационных целях, не является медицинской рекомендацией. Проконсультируйтесь с врачом или фармацевтом.',
     shieldDesc: 'Безопасный жирный спирт (эмолент) или консервант; НЕ является этиловым спиртом (этанолом).',
+    halalOkDesc: 'Допустимый (Халяль) компонент согласно критериям выбранного органа Халяль.',
     halalHaramDesc: 'Несоответствующий (Харам) компонент согласно критериям выбранного органа Халяль.',
     halalAlcoholDesc: 'Содержит этиловый спирт (этанол); требует проверки по стандарту выбранного органа Халяль.',
     halalMusboohDesc: 'Сомнительно (происхождение неясно): может быть растительного или животного происхождения; проверьте сертификат Халяль или Веган.',
@@ -732,6 +741,7 @@ const ENGINE_I18N = {
     halalDisclaimer: (auth) => `یہ تجزیہ کوئی سرکاری حلال سرٹیفکیٹ نہیں ہے؛ یہ منتخب ادارے (${auth}) کے معیارات کے مطابق لیبل کا جائزہ پیش کرتا ہے۔`,
     appleDisclaimer: 'صرف معلومات کے لیے ہے، طبی مشورہ نہیں۔ صحت سے متعلق فیصلوں کے لیے اپنے ڈاکٹر یا فارماسسٹ سے مشورہ کریں۔',
     shieldDesc: 'یہ فیٹی الکحل (جلد کو نرم کرنے والا) یا محفوظ پریزرویٹو ہے؛ نشہ آور ایتھائل الکحل (ایتھنول) نہیں ہے۔',
+    halalOkDesc: 'منتخب حلال اتھارٹی کے معیار کے مطابق جائز (حلال) جزو۔',
     halalHaramDesc: 'منتخب حلال اتھارٹی کے معیار کے مطابق غیر موزوں (حرام) جزو۔',
     halalAlcoholDesc: 'اس میں ایتھائل الکحل (ایتھنول) شامل ہے؛ منتخب حلال اتھارٹی کے اصولوں کے مطابق جانچ ضروری ہے۔',
     halalMusboohDesc: 'مشکوک (ماخذ غیر واضح): نباتاتی یا حیوانی ہو سکتا ہے؛ حتمی فیصلے کے لیے پیکنگ پر حلال یا ویگن سرٹیفکیٹ چیک کریں۔',
@@ -1701,7 +1711,7 @@ export function evaluateProduct({
     )
   );
   const watchlistLimitExceeded = deduplicatedWatchlist.length > 50;
-  // Evaluate up to 250 items so the 51st item is never silently ignored as safe, while flagging watchlistLimitExceeded
+  // Evaluate up to 500 items so item #51..#500 is never silently ignored when present; if watchlistLimitExceeded is true and no match is found, status becomes 'unknown' (never certified 'true')
   const sanitizedWatchlist = deduplicatedWatchlist.slice(0, 250);
 
   const WATCHLIST_ALERT_I18N = {
@@ -1744,8 +1754,10 @@ export function evaluateProduct({
       const names = [sub.name, sub.e_code, sub.ci_code, ...aliases].filter(Boolean).map((x) => x.toLowerCase());
       if (names.some((n) => n === wLower || foldTurkish(n) === wFold)) {
         for (const n of names) {
-          stems.add(n);
-          stems.add(foldTurkish(n));
+          if (n.length >= 3 || n === wLower || foldTurkish(n) === wFold) {
+            stems.add(n);
+            stems.add(foldTurkish(n));
+          }
         }
       }
     }
@@ -1756,8 +1768,10 @@ export function evaluateProduct({
       const names = [hr.canonical, ...codes, ...aliases].filter(Boolean).map((x) => x.toLowerCase());
       if (names.some((n) => n === wLower || foldTurkish(n) === wFold)) {
         for (const n of names) {
-          stems.add(n);
-          stems.add(foldTurkish(n));
+          if (n.length >= 3 || n === wLower || foldTurkish(n) === wFold) {
+            stems.add(n);
+            stems.add(foldTurkish(n));
+          }
         }
       }
     }
@@ -1772,8 +1786,8 @@ export function evaluateProduct({
       // Suffix negation bound directly to the watched stem (e.g. "Niacinamide-free", "Parfümsüz", "Paraben-free")
       const suffixRe = new RegExp(`(?<![\\p{L}\\p{N}])${esc}[\\s\\-]*(?:free|frei|siz|sız|suz|süz|içermez|icermez)(?![\\p{L}\\p{N}])`, 'iu');
       if (suffixRe.test(rawLower) || suffixRe.test(rawFold)) return true;
-      // Prefix negation bound directly to the watched stem (e.g. "ohne Parfum", "sans parfum", "sin perfume", "بدون عطر")
-      const prefixRe = new RegExp(`(?<![\\p{L}\\p{N}])(?:ohne|sans|sin|tanpa|bebas|free\\s+of|free\\s+from|بدون|بغیر|без)\\s+${esc}(?![\\p{L}\\p{N}])`, 'iu');
+      // Prefix negation bound directly to the watched stem (e.g. "without Parfum", "ohne Parfum", "sans parfum", "sin perfume", "بدون عطر")
+      const prefixRe = new RegExp(`(?<![\\p{L}\\p{N}])(?:without|no|ohne|sans|sin|tanpa|bebas|free\\s+of|free\\s+from|libre\\s+de|خالي\\s+من|خالٍ\\s+من|بدون|بغیر|без)\\s+${esc}(?![\\p{L}\\p{N}])`, 'iu');
       if (prefixRe.test(rawLower) || prefixRe.test(rawFold)) return true;
     }
     return false;
@@ -1913,6 +1927,11 @@ export function evaluateProduct({
     }
   }
 
+  if (sanitizedWatchlist.length > 0 && watchlistLimitExceeded && profileStatuses['ozel_kara_liste'] === 'true') {
+    // Exceeding the 50-item watchlist limit must never certify compatibility ('true' / 100) when unverified items remain
+    profileStatuses['ozel_kara_liste'] = 'unknown';
+  }
+
   const effectiveProfileCount = userProfiles.length + (sanitizedWatchlist.length > 0 ? 1 : 0);
   let preferenceMatchScore = null;
   if (effectiveProfileCount > 0) {
@@ -2028,6 +2047,9 @@ export function evaluateProduct({
   };
 
   function resolveAuthorityRulingWithContext(rule, authKey, isExplicitPlantToken) {
+    // A user-declared Halal certificate on the product applies to the active/selected authority being verified,
+    // not as a blanket 4-authority global certification across all foreign bodies in the comparison matrix.
+    const certAppliesHere = Boolean(claims.halalCertified && authKey === halalAuthority);
     let st = (rule.authority_rulings && rule.authority_rulings[authKey]) || rule.authority_rulings.general_cautious;
     let resNote = null;
     let isConflict = false;
@@ -2038,7 +2060,7 @@ export function evaluateProduct({
 
     if (rule.category === 'A_haram') {
       if (
-        claims.halalCertified ||
+        certAppliesHere ||
         (claims.veganStatus !== 'none' && !rule.vegan_compatible) ||
         (claims.vegetarianStatus !== 'none' && rule.vegetarian_compatible === false)
       ) {
@@ -2052,7 +2074,7 @@ export function evaluateProduct({
       if (productType === 'food' && rule.id === 'ethanol_cosmetic_or_food') {
         st = 'kirmizi';
       }
-      if (claims.halalCertified) {
+      if (certAppliesHere) {
         st = productType === 'food' && rule.id === 'ethanol_cosmetic_or_food' ? 'conflict' : 'sari';
         if (st === 'conflict') isConflict = true;
         resNote = et.conflictAlcohol;
@@ -2070,7 +2092,7 @@ export function evaluateProduct({
       } else if (isExplicitPlantToken) {
         st = 'yesil';
         resNote = et.plantSourceResolved;
-      } else if (claims.halalCertified) {
+      } else if (certAppliesHere) {
         st = 'yesil';
         resNote = et.halalCertResolved;
       } else if (rule.vegan_claim_resolves && claims.veganStatus === 'verified') {
@@ -2091,10 +2113,13 @@ export function evaluateProduct({
         isConflict = true;
         st = 'conflict';
         resNote = et.conflictInsectVegan;
-      } else if (rule.id === 'snail_mucin_halal' && productType === 'food' && claims.halalCertified) {
+      } else if (certAppliesHere && st === 'kirmizi') {
         isConflict = true;
         st = 'conflict';
         resNote = et.conflictHaram;
+      } else if (certAppliesHere && st === 'sari') {
+        st = 'yesil';
+        resNote = et.halalCertResolved;
       }
     }
 
@@ -2133,7 +2158,9 @@ export function evaluateProduct({
     }
 
     const localizedRuleExplanation =
-      lang === 'tr'
+      statusForAuthority === 'yesil'
+        ? contextResolution || (lang === 'tr' && rule.category === 'H_helal' ? rule.template_tr : et.halalOkDesc)
+        : lang === 'tr'
         ? rule.template_tr
         : rule.category === 'B_alkol'
         ? et.halalAlcoholDesc
@@ -2271,6 +2298,9 @@ export function evaluateProduct({
     jurisdiction,
     halalAuthority,
     claims,
+    coveragePercent: regulatoryCard.coveragePercent,
+    recognizedCount: regulatoryCard.recognizedCount,
+    totalCount: regulatoryCard.totalCount,
     unresolvedConfirmations,
     observations,
     cards: {
@@ -2370,10 +2400,26 @@ function summarizeProductForComparison(evalRes, locale, lang) {
  * Compares two products side-by-side (Product A vs Product B) and deterministically extracts
  * the "Deciding Difference" (Farkı Yaratan Madde) without any LLM hallucination or token cost.
  */
+const DEFAULT_COMPARE_NAMES_I18N = {
+  tr: ['Ürün A', 'Ürün B'],
+  en: ['Product A', 'Product B'],
+  ar: ['المنتج أ', 'المنتج ب'],
+  de: ['Produkt A', 'Produkt B'],
+  fr: ['Produit A', 'Produit B'],
+  id: ['Produk A', 'Produk B'],
+  ms: ['Produk A', 'Produk B'],
+  es: ['Producto A', 'Producto B'],
+  ru: ['Продукт А', 'Продукт Б'],
+  ur: ['پروڈکٹ الف', 'پروڈکٹ ب']
+};
+
 export function compareProducts(productA, productB, sharedOptions = {}) {
   const lang = sharedOptions.lang || 'tr';
   const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === lang) || SUPPORTED_LANGUAGES[0];
   const locale = getLocaleStrings(lang);
+  const [defNameA, defNameB] = DEFAULT_COMPARE_NAMES_I18N[langMeta.code] || DEFAULT_COMPARE_NAMES_I18N.en;
+  const nameA = productA.name || defNameA;
+  const nameB = productB.name || defNameB;
 
   const evalA = evaluateProduct({ ...sharedOptions, ...productA, lang });
   const evalB = evaluateProduct({ ...sharedOptions, ...productB, lang });
@@ -2405,7 +2451,7 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
       (statusRank[f.euStatus] || 0) > (statusRank[fA.euStatus] || 0) ||
       (severityRank[f.severity] || 0) > (severityRank[fA.severity] || 0)
     ) {
-      uniqueFindings.push({ side: 'B', productName: productB.name || 'Ürün B', finding: f });
+      uniqueFindings.push({ side: 'B', productName: nameB, finding: f });
     }
   }
   for (const f of regA.findings) {
@@ -2416,7 +2462,7 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
       (statusRank[f.euStatus] || 0) > (statusRank[fB.euStatus] || 0) ||
       (severityRank[f.severity] || 0) > (severityRank[fB.severity] || 0)
     ) {
-      uniqueFindings.push({ side: 'A', productName: productA.name || 'Ürün A', finding: f });
+      uniqueFindings.push({ side: 'A', productName: nameA, finding: f });
     }
   }
 
@@ -2449,11 +2495,11 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
     const uniqueAlerts = [];
     for (const a of alertsB) {
       const k = `${a.profile}:${(a.substanceName || a.rawToken || '').toLowerCase()}`;
-      if (!alertKeysA.has(k)) uniqueAlerts.push({ side: 'B', productName: productB.name || 'Ürün B', alert: a });
+      if (!alertKeysA.has(k)) uniqueAlerts.push({ side: 'B', productName: nameB, alert: a });
     }
     for (const a of alertsA) {
       const k = `${a.profile}:${(a.substanceName || a.rawToken || '').toLowerCase()}`;
-      if (!alertKeysB.has(k)) uniqueAlerts.push({ side: 'A', productName: productA.name || 'Ürün A', alert: a });
+      if (!alertKeysB.has(k)) uniqueAlerts.push({ side: 'A', productName: nameA, alert: a });
     }
     if (uniqueAlerts.length > 0) {
       uniqueAlerts.sort((x, y) => (y.alert.level === 'kirmizi' ? 2 : 1) - (x.alert.level === 'kirmizi' ? 2 : 1));
@@ -2478,13 +2524,13 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
       for (const f of evalB.cards.halalCard.findings || []) {
         const fA = hMapA.get(f.ruleId);
         if ((halalRank[f.status] || 0) > (fA ? halalRank[fA.status] || 0 : 0)) {
-          uniqueHalal.push({ side: 'B', productName: productB.name || 'Ürün B', finding: f });
+          uniqueHalal.push({ side: 'B', productName: nameB, finding: f });
         }
       }
       for (const f of evalA.cards.halalCard.findings || []) {
         const fB = hMapB.get(f.ruleId);
         if ((halalRank[f.status] || 0) > (fB ? halalRank[fB.status] || 0 : 0)) {
-          uniqueHalal.push({ side: 'A', productName: productA.name || 'Ürün A', finding: f });
+          uniqueHalal.push({ side: 'A', productName: nameA, finding: f });
         }
       }
       if (uniqueHalal.length > 0) {
@@ -2514,7 +2560,7 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
     dir: langMeta.dir,
     locale,
     productA: {
-      name: productA.name || 'Ürün A',
+      name: nameA,
       score: regA.score,
       canShowScore: regA.canShowScore,
       hasBanned: bannedA.length > 0,
@@ -2528,7 +2574,7 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
       evaluation: evalA
     },
     productB: {
-      name: productB.name || 'Ürün B',
+      name: nameB,
       score: regB.score,
       canShowScore: regB.canShowScore,
       hasBanned: bannedB.length > 0,

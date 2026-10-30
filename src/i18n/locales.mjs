@@ -195,7 +195,8 @@ export const UI_STRINGS = {
       conflict: 'Etiket Çelişkisi!',
       none: 'Yok',
       present: 'Var!',
-      lowCoverage: 'Kapsam Yetersiz (<%80)'
+      lowCoverage: 'Kapsam Yetersiz (<%80)',
+      unrecognized: 'Tanınmadı'
     }
   },
 
@@ -277,7 +278,8 @@ export const UI_STRINGS = {
       conflict: 'Label Conflict!',
       none: 'None',
       present: 'Present!',
-      lowCoverage: 'Insufficient Coverage (<80%)'
+      lowCoverage: 'Insufficient Coverage (<80%)',
+      unrecognized: 'Unrecognized'
     }
   },
 
@@ -359,7 +361,8 @@ export const UI_STRINGS = {
       conflict: 'تعارض في الملصق!',
       none: 'لا يوجد',
       present: 'موجود!',
-      lowCoverage: 'تغطية غير كافية (أقل من ٨٠٪)'
+      lowCoverage: 'تغطية غير كافية (أقل من ٨٠٪)',
+      unrecognized: 'غير معروف'
     }
   },
 
@@ -441,7 +444,8 @@ export const UI_STRINGS = {
       conflict: 'Etiketten-Widerspruch!',
       none: 'Keine',
       present: 'Vorhanden!',
-      lowCoverage: 'Unzureichende Abdeckung (<80%)'
+      lowCoverage: 'Unzureichende Abdeckung (<80%)',
+      unrecognized: 'Nicht erkannt'
     }
   },
 
@@ -523,7 +527,8 @@ export const UI_STRINGS = {
       conflict: 'Conflit d\'Étiquette !',
       none: 'Aucun',
       present: 'Présent !',
-      lowCoverage: 'Couverture Insuffisante (<80%)'
+      lowCoverage: 'Couverture Insuffisante (<80%)',
+      unrecognized: 'Non reconnu'
     }
   },
 
@@ -605,7 +610,8 @@ export const UI_STRINGS = {
       conflict: 'Konflik Label!',
       none: 'Tidak Ada',
       present: 'Ada!',
-      lowCoverage: 'Cakupan Tidak Cukup (<80%)'
+      lowCoverage: 'Cakupan Tidak Cukup (<80%)',
+      unrecognized: 'Tidak Dikenali'
     }
   },
 
@@ -687,7 +693,8 @@ export const UI_STRINGS = {
       conflict: 'Konflik Label!',
       none: 'Tiada',
       present: 'Ada!',
-      lowCoverage: 'Liputan Tidak Mencukupi (<80%)'
+      lowCoverage: 'Liputan Tidak Mencukupi (<80%)',
+      unrecognized: 'Tidak Dikenali'
     }
   },
 
@@ -769,7 +776,8 @@ export const UI_STRINGS = {
       conflict: '¡Conflicto en Etiqueta!',
       none: 'Ninguno',
       present: '¡Presente!',
-      lowCoverage: 'Cobertura Insuficiente (<80%)'
+      lowCoverage: 'Cobertura Insuficiente (<80%)',
+      unrecognized: 'No reconocido'
     }
   },
 
@@ -851,7 +859,8 @@ export const UI_STRINGS = {
       conflict: 'Конфликт на этикетке!',
       none: 'Нет',
       present: 'Есть!',
-      lowCoverage: 'Недостаточный охват (<80%)'
+      lowCoverage: 'Недостаточный охват (<80%)',
+      unrecognized: 'Не распознано'
     }
   },
 
@@ -933,7 +942,8 @@ export const UI_STRINGS = {
       conflict: 'لیبل پر تضاد!',
       none: 'کوئی نہیں',
       present: 'موجود ہے!',
-      lowCoverage: 'ناکافی کوریج (۸۰٪ سے کم)'
+      lowCoverage: 'ناکافی کوریج (۸۰٪ سے کم)',
+      unrecognized: 'غیر شناخت شدہ'
     }
   }
 };

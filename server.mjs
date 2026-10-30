@@ -53,7 +53,9 @@ function readJsonBody(req, res, callback) {
 }
 
 const server = http.createServer((req, res) => {
-  if (req.method === 'GET' && req.url === '/api/locales') {
+  const pathname = (req.url || '/').split('?')[0];
+
+  if (req.method === 'GET' && pathname === '/api/locales') {
     res.writeHead(200, {
       'Content-Type': 'application/json; charset=utf-8',
       'X-Content-Type-Options': 'nosniff'
@@ -62,7 +64,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.method === 'POST' && req.url === '/api/evaluate') {
+  if (req.method === 'POST' && pathname === '/api/evaluate') {
     readJsonBody(req, res, (payload) => {
       try {
         if (payload && payload.type && !payload.productType) {
@@ -85,7 +87,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.method === 'POST' && req.url === '/api/compare') {
+  if (req.method === 'POST' && pathname === '/api/compare') {
     readJsonBody(req, res, (payload) => {
       try {
         const { productA, productB, sharedOptions } = payload;
@@ -115,9 +117,8 @@ const server = http.createServer((req, res) => {
   }
 
   // Static Assets handler (public/assets/*)
-  if ((req.method === 'GET' || req.method === 'HEAD') && req.url.startsWith('/assets/')) {
-    const rawUrlPath = req.url.split('?')[0];
-    const safeSubPath = path.normalize(rawUrlPath.replace(/^\/assets\//, '')).replace(/^(\.\.[\/\\])+/, '');
+  if ((req.method === 'GET' || req.method === 'HEAD') && pathname.startsWith('/assets/')) {
+    const safeSubPath = path.normalize(pathname.replace(/^\/assets\//, '')).replace(/^(\.\.[\/\\])+/, '');
     const filePath = path.join(__dirname, 'public/assets', safeSubPath);
     if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
       const ext = path.extname(filePath).toLowerCase();
@@ -149,7 +150,7 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  if ((req.method === 'GET' || req.method === 'HEAD') && (req.url === '/' || req.url === '/index.html')) {
+  if ((req.method === 'GET' || req.method === 'HEAD') && (pathname === '/' || pathname === '/index.html')) {
     const htmlPath = path.join(__dirname, 'public/index.html');
     const html = fs.readFileSync(htmlPath, 'utf8');
     res.writeHead(200, {

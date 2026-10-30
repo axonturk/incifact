@@ -1,17 +1,17 @@
 # INCIFACT — TAM PROJE HAFIZASI VE DİJİTAL DEVİR PROTOKOLÜ (HANDOVER MASTER)
 
-> **Tarih:** 14 Ekim 2026  
+> **Tarih:** 30 Ekim 2026  
 > **Konum:** `C:\Projeler\clean-halal-scanner`  
 > **Canlı Servis:** `http://localhost:3456`  
-> **Mevcut Durum:** `npm test` tamamen geçiyor (41/41 kabul + 32/32 regresyon + 15/15 canlı parite) · Son **bağımsız** denetim: **100/100 · GO** — *denetlenen kural motoru ve yerel API regresyon kapsamı için* (6. denetim, commit `cdaf95cdeb489f1de5cb7d9843968c046e0aea81`; rapor `docs/handover/audit-6_100-100_GO_rapor.md`). Puan geçmişi: 56 → 68 → 80 → 92 → 94 → **100 (GO)**.
+> **Mevcut Durum:** `npm test` tamamen geçiyor (50/50 kabul + 32/32 regresyon + 15/15 canlı parite + 0 çakışma) · 7. ve 8. bağımsız Teknik & UI/UX denetimlerinde tespit edilen tüm P0, P1 ve P2 bulgular regresyon testleriyle kapatılmıştır.
 >
-> **Ek belgeler:** `docs/handover/` klasöründe tüm bağımsız denetim raporları (`56/100`, `68/100`, `80/100`, `92/100`, `94/100`, `100/100 GO`), yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
+> **Ek belgeler:** `docs/handover/` klasöründe tüm bağımsız denetim raporları, yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
 
 ## 0. YENİ OTURUMDA İLK YAPILACAKLAR
 1. Bu dosyayı ve `docs/handover/audit-6_100-100_GO_rapor.md` dosyasını baştan sona oku.
-2. `npm test` çalıştır; sonuçların 41/41 kabul, 32/32 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
+2. `npm test` çalıştır; sonuçların 50/50 kabul, 32/32 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
 3. `node server.mjs` ile servisi başlat (port 3456) ve `node tests/audit3_live_parity.mjs` ile 15/15 canlı/disk eşitliğini doğrula.
-4. Aşağıdaki **Bölüm 7: Güncel Durum ve Nihai Teknik Denetim (100/100 GO) Kapsamı** ve **Bölüm 8: Kullanıcı Odaklı 4 Ek Özellik (10 Dilde)** bölümlerini incele.
+4. Aşağıdaki **Bölüm 7: Güncel Durum ve Nihai Teknik Denetim Kapsamı** ve **Bölüm 8: Kullanıcı Odaklı 4 Ek Özellik & 7–8. Denetim Kapanışları** bölümlerini incele.
 
 ---
 
@@ -24,15 +24,15 @@ InciFact; kozmetik ve gıda ürün içeriklerini (INCI & Gıda etiketleri) 10 di
   * `src/engine/ruleEngine.mjs`: Projenin kalbi olan deterministik kural motoru. 4 kart üretir (`regulatoryCard`, `profileCard`, `halalCard`, `veganSugarCard`). Platform bağımsızdır (`node:fs`/`path`/`url` içermez, veriyi `src/data/generated/*.mjs` ES modüllerinden alır). Regex tabanlı ReDoS korumalı tokenizer, kimyasal lokant koruması (`1,2-Hexanediol`, `1،2-ہیکسانڈیول`), konsantrasyon ayrıştırıcı (`parseConcentration`), tarih/takvim doğrulayıcı (`isValidDate`), 14 majör alerjen motoru ve çok dilli normalizasyon içerir.
   * `src/data/substances.json`: Temel aktif bileşenler, AB Ek II/III/V/VI kısıtları, 10 dildeki eşanlamlılar (alias). Düzenlendikten sonra `npm run build:data` ile ES modüllerine derlenir.
   * `src/data/halal_rules.json`: GİMDES, JAKIM, MUI, IFANCA fetva ve standart matrisi; Etanol, Karmin, Jelatin, Kolesterol (`cholesterol_lipid`), E471.
-  * `src/data/cosing_ingredients.json`: 30.594 resmi AB CosIng bileşeni (`s:0` izinli, `s:1` kısıtlı, `s:2` yasaklı).
+  * `src/data/cosing_ingredients.json`: 30.609 resmi AB CosIng bileşeni (`s:0` izinli, `s:1` kısıtlı, `s:2` yasaklı).
   * `src/data/hidden_sugars.json`: 50+ serbest ve gizli şeker kaynağı (şurup, dekstroz vs.), maltodekstrin ayrımı.
   * `src/data/sources.json`: 22 resmi hukuki dayanak ve bilimsel otorite kaynağı (EFSA, AB 1223/2009, AB 1169/2011, FDA, GİMDES, JAKIM vb.).
   * `src/i18n/locales.mjs`: 10 pazar dili (TR, EN, AR, DE, FR, ID, MS, ES, RU, UR), RTL kuralları (`dir: 'rtl'`), yerelleştirilmiş arayüz metinleri.
   * `public/index.html`: 5 ekranlı canlı web stüdyosu / simülatörü (Profil, OCR Tara, Sonuç, Helal, Karşılaştır) ve yan denetim paneli.
-  * `src/mobile/ScannerApp.tsx`: Expo SDK 52 / React Native mobil istemci (Sakin ve prestijli lüks arayüz, cihaz içi yerel analiz).
+  * `src/mobile/ScannerApp.tsx`: Expo SDK 52 / React Native mobil istemci (Sakin ve prestijli lüks arayüz, cihaz içi yerel analiz, `AsyncStorage` kalıcılığı).
   * `src/mobile/ocrService.ts`: Mobil Vision / ML Kit OCR adaptörü (Dürüst OCR; ölçülmemiş güven değeri durumunda sahte %94 uydurmaz).
   * `server.mjs`: Node.js HTTP mikro-servisi (Port: `3456`, `/api/evaluate`, `/api/compare`, `/api/locales`, ReDoS/DoS/JSON korumalı).
-  * `tests/verify_engine.mjs`: Projenin resmi 39 maddelik kabul testleri paketi.
+  * `tests/verify_engine.mjs`: Projenin resmi 50 maddelik kabul testleri paketi.
   * `tests/audit3_regressions.mjs` & `tests/audit3_live_parity.mjs`: Bağımsız denetim regresyon ve canlı API parite testleri.
   * `scripts/audit_collisions.mjs`: Alias çakışma denetleyicisi (Her zaman 0 çakışma vermelidir).
 
@@ -82,7 +82,7 @@ Aşağıdaki liste ilk denetimlerde çözülen konuları anlatır:
 Yeni oturumda çalışırken doğruluğu teyit etmek için çalıştırılacak komutlar:
 
 ```powershell
-# 1. Resmi 39 kabul testi (Her zaman 39/39 GEÇMELİDİR)
+# 1. Resmi 50 kabul testi (Her zaman 50/50 GEÇMELİDİR)
 node tests/verify_engine.mjs
 
 # 2. Sözlük çakışma kontrolü (Her zaman 0 çakışma OLMALIDIR)
@@ -91,20 +91,17 @@ node scripts/audit_collisions.mjs
 # 3. Canlı API sunucusunu başlatma (Port: 3456)
 node server.mjs
 
-# 4. Bağımsız denetçinin 20 senaryo stres testi
-node "C:\Users\fakma\OneDrive\Belgeler\ChatGPT\DERS LABLARI\incifact-20-audit-2026-10-13\stress20.mjs"
+# 4. Tam paket testi (50 kabul + 32 regresyon + veri senkronu + HTML script sözdizimi + 0 çakışma)
+npm test
 
-# 5. Bağımsız denetçinin dil önceliği ve TPO testi
-node "C:\Users\fakma\OneDrive\Belgeler\ChatGPT\DERS LABLARI\incifact-20-audit-2026-10-13\language-precedence.mjs"
-
-# 6. Bağımsız denetçinin bitkisel öncelik ve API dayanıklılık testi
-node "C:\Users\fakma\OneDrive\Belgeler\ChatGPT\DERS LABLARI\incifact-20-audit-2026-10-13\final-checks.mjs"
+# 5. Canlı API ve disk motoru parite testi (15/15)
+node tests/audit3_live_parity.mjs
 ```
 
 ---
 
 ## 4. ALTIN KURALLAR VE KORUNACAK PRENSİPLER
-1. **Mevcut Testleri Asla Bozma:** `tests/verify_engine.mjs` içindeki 39 test her zaman %100 geçmelidir.
+1. **Mevcut Testleri Asla Bozma:** `tests/verify_engine.mjs` içindeki 50 test her zaman %100 geçmelidir.
 2. **Canlı API ve Disk Paritesi:** `http://localhost:3456` üzerindeki canlı servis yanıtları, disk motoru çıktısıyla zaman damgası hariç her zaman `%100 birebir` (`liveEqualsDisk: true`) olmalıdır. Motorda değişiklik yapıldığında arka plandaki `server.mjs` yeniden başlatılmalıdır.
 3. **Dokümantasyon Bütünlüğü:** Dosyalardaki mevcut yorum satırları, mevzuat referansları ve kod yapıları korunmalıdır.
 
@@ -176,5 +173,12 @@ Kaynak: `docs/handover/audit-6_100-100_GO_rapor.md` (Hedef commit: `cdaf95cdeb48
    - 1. Profil ekranında serbest metin + hızlı öneri çipleri (`Niacinamide`, `Phenoxyethanol`, `Parfum`, `SLS`, `Palm Oil`, `MSG E621`, `Silicones`) ve cihaz içi kalıcı depolama (`incifact_custom_watchlist_v1`).
 4. **🔄 Son Tarananlar Geçmişi & Tek Tıkla Karşılaştırmaya Aktarma (`scanHistory` & `A`/`B` Atama):**
    - Taranan ürünlerin cihaz içinde (`incifact_scan_history_v1`) otomatik saklanması; 3. Sonuç ekranından veya 5. Karşılaştır ekranındaki **🕘 Son Tarananlar** listesinden tek tıkla **🅰️ 1. Ürün (A) Yap** / **🅱️ 2. Ürün (B) Yap** ataması ve canlı yan yana karşılaştırma.
+5. **🛡️ 7. ve 8. Bağımsız Teknik & UI/UX Denetim Kapanışları (Test 42–50):**
+   - Parantezsiz `ppm` / `mg/kg` (`Methylisothiazolinone 20 ppm`, `MI 20 ppm` vs `10 ppm`) ayrıştırma, puanlama (`10` vs `90`) ve `compareProducts` `decidingDifference` tespiti (Test 46–47).
+   - 10 dilin tamamında `status === 'yesil'` olan helal bulgularının `halalOkDesc` ile tutarlı açıklama üretmesi (Test 48).
+   - Helal sertifikası (`halalCertified: true`) beyanının `authorityMatrix` içinde yalnız seçili otoriteyi çözmesi; `D_tartismali` kategorisinde `kirmizi` + sertifika (`Carmine E120` / `GIMDES`) durumunda `conflict`, `sari` + sertifika (`Snail Mucin` / `MUI` kozmetik) durumunda `yesil` üretmesi (Test 45, 49).
+   - Kelime sınırlı negasyon (`free`, `without`, `no`, `sin`, `sans`, `ohne`), yağ alkolü koruması (`Alcohol` vs `Cetyl Alcohol`), 2 harfli alt-dize koruması ve `>50` kara liste sınır aşımında `'unknown'` belirsizlik koruması (Test 42–44, 50).
+   - Web ve Native (`ScannerApp.tsx`) 6-durumlu paylaşım önceliği (kesin kırmızı bulgunun OCR uyarısıyla örtülmemesi), `AsyncStorage` kalıcılığı, 390px mobil çerçeve hizalaması ve İlk 3 Saniye Karar Başlığı (`Verdict Hero`).
+
 
 

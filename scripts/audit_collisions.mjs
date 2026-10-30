@@ -75,6 +75,7 @@ for (const c of internalHalalCollisions) {
 
 console.log('\n--- 3. CROSS DOMAIN (SUBSTANCES vs SUGARS) ---');
 const sugarMap = new Map();
+const crossCollisions = [];
 for (const sg of sugarsData.free_sugars) {
   for (const a of sg.aliases || []) {
     sugarMap.set(foldToken(a), sg);
@@ -82,6 +83,8 @@ for (const sg of sugarsData.free_sugars) {
 }
 for (const [k, v] of sugarMap) {
   if (subMap.has(k)) {
+    crossCollisions.push({ alias: k, sugar: v.canonical, substance: subMap.get(k).id });
     console.log(`  [SUGAR vs SUBSTANCE] "${k}" -> sugar ${v.canonical} vs substance ${subMap.get(k).id}`);
   }
 }
+console.log('Total cross-domain collisions:', crossCollisions.length);

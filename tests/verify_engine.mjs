@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { evaluateProduct, compareProducts, parseIngredientList } from '../src/engine/ruleEngine.mjs';
 
 console.log('======================================================================');
-console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (15 KABUL KRİTERİ)');
+console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (50 KABUL KRİTERİ)');
 console.log('======================================================================\n');
 
 let passed = 0;
@@ -980,5 +980,116 @@ runTest('46. compareProducts: Aynı maddenin farklı konsantrasyonunu (MI 20 ppm
   assert.equal(compWatch.productA.halalStatusCode, 'uygun');
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/46 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// 47. Parantezsiz ppm / mg/kg Yazımı ve MI / MCI Kısaltması Tanıma + Karşılaştırma (8. Denetim P1)
+runTest('47. Parantezsiz "Methylisothiazolinone 20 ppm", "MI 20 ppm" ve "MI 10 ppm" %100 tanınmalı, durulanan üründe 10 vs 90 puan ve decidingDifference üretmeli', () => {
+  const r20 = evaluateProduct({
+    rawText: 'Aqua, Glycerin, Panthenol, Citric Acid, Methylisothiazolinone 20 ppm',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off',
+    lang: 'tr'
+  });
+  assert.equal(r20.coveragePercent, 100);
+  assert.equal(r20.cards.regulatoryCard.score, 10);
+
+  const r10 = evaluateProduct({
+    rawText: 'Aqua, Glycerin, Panthenol, Citric Acid, Methylisothiazolinone 10 ppm',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off',
+    lang: 'tr'
+  });
+  assert.equal(r10.coveragePercent, 100);
+  assert.equal(r10.cards.regulatoryCard.score, 90);
+
+  const compUnparen = compareProducts(
+    { name: 'Şampuan A (20 ppm)', rawText: 'Shampoo: Aqua, Glycerin, Panthenol, Citric Acid, MI 20 ppm', productType: 'cosmetic' },
+    { name: 'Şampuan B (10 ppm)', rawText: 'Shampoo: Aqua, Glycerin, Panthenol, Citric Acid, MI 10 ppm', productType: 'cosmetic' },
+    { lang: 'tr' }
+  );
+  assert.equal(compUnparen.productA.score, 10);
+  assert.equal(compUnparen.productB.score, 90);
+  assert.ok(compUnparen.decidingDifference, 'Parantezsiz MI 20 ppm vs MI 10 ppm karşılaştırmasında decidingDifference üretilmeli');
+});
+
+// 48. 10 Dilde Yeşil (Helal) Bulgularda "Doubtful / Şüpheli" Açıklama Çelişkisi Olmaması (8. Denetim P1)
+runTest('48. 10 dilin tamamında status === "yesil" olan helal bulguları asla "Doubtful / Şüpheli" açıklaması taşımamalı', () => {
+  const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  const forbiddenRegex = /doubtful|şüpheli|zweifelhaft|douteux|syubhat|syubhah|dudoso|сомнительно|مشكوك|مشکوک/i;
+  for (const lang of langs) {
+    // Carmine (E120) under JAKIM is 'yesil', and E471 with halalCertified:true is 'yesil'
+    const res = evaluateProduct({
+      rawText: 'Ingredients: Water, Sugar, Citric Acid, Carmine (E120), E471',
+      productType: 'food',
+      halalAuthority: 'JAKIM',
+      claims: { halalCertified: true, veganStatus: 'none', vegetarianStatus: 'none' },
+      lang
+    });
+    const greenFindings = res.cards.halalCard.findings.filter((f) => f.status === 'yesil');
+    assert.ok(greenFindings.length >= 2);
+    for (const gf of greenFindings) {
+      assert.ok(
+        !forbiddenRegex.test(gf.explanation),
+        `Dil=${lang}, kural=${gf.ruleId} yeşil olduğu halde şüpheli açıklama döndü: "${gf.explanation}"`
+      );
+    }
+  }
+});
+
+// 49. Helal Sertifikasının Yalnız Seçili Otoriteyi Çözmesi ve D_tartismali Çelişki/Çözüm Tutarlılığı (8. Denetim P2)
+runTest('49. Helal sertifikası yalnız seçili otoriteyi yeşile çevirmeli; GİMDES te E120+sertifika conflict, MUI de kozmetik salyangoz+sertifika yesil olmalı', () => {
+  // A. E471 with MUI selected + halalCertified: true -> MUI is 'yesil', while GIMDES/JAKIM/IFANCA remain 'sari' in authorityMatrix
+  const rE471 = evaluateProduct({
+    rawText: 'Ingredients: Water, Sugar, E471',
+    productType: 'food',
+    halalAuthority: 'MUI',
+    claims: { halalCertified: true, veganStatus: 'none', vegetarianStatus: 'none' }
+  });
+  const fE471 = rE471.cards.halalCard.findings.find((f) => f.ruleId === 'e471');
+  assert.equal(fE471.status, 'yesil');
+  assert.equal(fE471.authorityMatrix.MUI, 'yesil');
+  assert.equal(fE471.authorityMatrix.GIMDES, 'sari');
+  assert.equal(fE471.authorityMatrix.JAKIM, 'sari');
+
+  // B. Carmine (E120) under GIMDES with halalCertified: true -> 'conflict'
+  const rCarmine = evaluateProduct({
+    rawText: 'Ingredients: Water, Sugar, Carmine (E120)',
+    productType: 'food',
+    halalAuthority: 'GIMDES',
+    claims: { halalCertified: true, veganStatus: 'none', vegetarianStatus: 'none' }
+  });
+  assert.equal(rCarmine.cards.halalCard.overallStatus, 'conflict');
+
+  // C. Cosmetic Snail Mucin under MUI with halalCertified: true -> 'yesil'
+  const rSnailMui = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Snail Secretion Filtrate, Butylene Glycol, Panthenol, Allantoin',
+    productType: 'cosmetic',
+    halalAuthority: 'MUI',
+    claims: { halalCertified: true, veganStatus: 'none', vegetarianStatus: 'none' }
+  });
+  const fSnail = rSnailMui.cards.halalCard.findings.find((f) => f.ruleId === 'snail_mucin_halal');
+  assert.equal(fSnail.status, 'yesil');
+  assert.equal(rSnailMui.cards.halalCard.overallStatus, 'uygun_gorunuyor');
+});
+
+// 50. "without Parfum" Negasyonu ve >50 Kara Liste Sınır Aşımında "unknown" Belirsizlik Koruması (8. Denetim P2)
+runTest('50. "without Parfum" negasyonu yakalanmalı ve >50 kara liste sınır aşımında eşleşme yoksa "unknown" dönmeli', () => {
+  const rWithout = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Panthenol, without Parfum, Niacinamide',
+    productType: 'cosmetic',
+    customWatchlist: ['Parfum']
+  });
+  assert.equal(rWithout.cards.profileCard.profileStatuses.ozel_kara_liste, 'true');
+
+  // >250 dummy items + Niacinamide at index 250 -> watchlistLimitExceeded: true, must NOT certify 'true' or score 100
+  const list251 = Array.from({ length: 250 }, (_, i) => `UnmatchedCustomTerm${i + 1}`).concat(['Niacinamide']);
+  const r251 = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Panthenol, Citric Acid',
+    productType: 'cosmetic',
+    customWatchlist: list251
+  });
+  assert.equal(r251.cards.profileCard.watchlistLimitExceeded, true);
+  assert.equal(r251.cards.profileCard.profileStatuses.ozel_kara_liste, 'unknown');
+  assert.equal(r251.cards.profileCard.preferenceMatchScore, null);
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/50 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
 
