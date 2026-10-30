@@ -420,7 +420,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'AB Yönetmeliği kapsamında konsantrasyon, saflık veya etiketleme kısıtlamasına tabi bileşen.',
     permittedGeneric: 'Uluslararası INCI / Gıda kodeksinde izinli standart bileşen.',
     methodDisclaimer: 'Bu endeks resmi bir kurumun sağlık puanı değildir; uygulamanın yayımlanmış metodolojisiyle bileşen listesinden hesaplanır.',
-    kvkkNotice: 'Mobil uygulamada seçimin yalnızca bu cihazda işlenir. Web önizlemesinde yalnızca bu bilgisayardaki yerel sunucuya analiz için gönderilir; kaydedilmez, üçüncü taraflarla paylaşılmaz.',
+    kvkkNotice: 'Mobil uygulamada seçimin yalnızca bu cihazda işlenir. Web önizlemesinde yalnızca bu bilgisayardaki yerel sunucuya analiz için gönderilir; uzak sunucuda/bulutta saklanmaz ve üçüncü taraflarla paylaşılmaz (tercihleriniz, kişisel kara listeniz ve son taramalarınız yalnızca cihaz içi hafızada tutulur, istediğiniz an silinebilir).',
     veriYokMsg: (name, prof) => `${name} için bu profilde (${prof}) yeterli doğrulanmış bilimsel veri bulunamadı (veri_yok). Otomatik güvenli veya riskli sayılmaz.`,
     profileAlertGeneric: (name) => `${name}: Seçili hassasiyet profiliniz için dikkat edilmesi önerilen bileşen.`,
     halalDisclaimer: (auth) => `Bu değerlendirme bir helal sertifikası değildir; seçtiğiniz kurumun (${auth}) yayımlanmış kriterlerine göre etiket analizi sunar.`,
@@ -454,7 +454,7 @@ const ENGINE_I18N = {
     restrictedGeneric: 'Regulated substance subject to concentration, purity, or labeling restrictions under EU Regulation.',
     permittedGeneric: 'Permitted standard ingredient under international INCI / Food Codex regulations.',
     methodDisclaimer: 'This index is not an official government health score; it is calculated deterministically from the ingredient list using published methodology.',
-    kvkkNotice: 'In the mobile app your choices are processed only on this device. In the web preview they are sent only to the local server on this computer for analysis, never stored or shared with third parties.',
+    kvkkNotice: 'In the mobile app your choices are processed only on this device. In the web preview they are sent only to the local server on this computer for analysis, never stored on remote servers/cloud or shared with third parties (preferences, personal blacklist, and scan history are kept only in on-device storage and can be cleared anytime).',
     veriYokMsg: (name, prof) => `Insufficient verified clinical data for ${name} under profile (${prof}). Not automatically marked safe or unsafe.`,
     profileAlertGeneric: (name) => `${name}: Flagged for caution under your selected sensitivity profile.`,
     halalDisclaimer: (auth) => `This assessment is not an official Halal certificate; it analyzes the label according to published ${auth} criteria.`,
@@ -1687,19 +1687,22 @@ export function evaluateProduct({
   }
 
   // Personal Custom Watchlist / Blacklist ("Benim Yasaklılarım" — Device-Local Custom Sensitivities)
-  let sanitizedWatchlist = [];
+  let rawWatchlistItems = [];
   if (typeof customWatchlist === 'string') {
-    sanitizedWatchlist = customWatchlist.split(',').map((s) => s.trim()).filter(Boolean);
+    rawWatchlistItems = customWatchlist.split(',').map((s) => s.trim()).filter(Boolean);
   } else if (Array.isArray(customWatchlist)) {
-    sanitizedWatchlist = customWatchlist.map((s) => String(s || '').trim()).filter(Boolean);
+    rawWatchlistItems = customWatchlist.map((s) => String(s || '').trim()).filter(Boolean);
   }
-  sanitizedWatchlist = Array.from(
+  const deduplicatedWatchlist = Array.from(
     new Set(
-      sanitizedWatchlist
+      rawWatchlistItems
         .map((s) => s.slice(0, 80))
         .filter((s) => s.length >= 2)
     )
-  ).slice(0, 50);
+  );
+  const watchlistLimitExceeded = deduplicatedWatchlist.length > 50;
+  // Evaluate up to 250 items so the 51st item is never silently ignored as safe, while flagging watchlistLimitExceeded
+  const sanitizedWatchlist = deduplicatedWatchlist.slice(0, 250);
 
   const WATCHLIST_ALERT_I18N = {
     tr: (term, item) => `Kişisel Kara Listeniz ("${term}") ile eşleşti: Ürün içeriğinde "${item}" tespit edildi.`,
@@ -1714,33 +1717,181 @@ export function evaluateProduct({
     ur: (term, item) => `آپ کی ذاتی بلیک لسٹ ("${term}") سے مطابقت: اجزاء میں "${item}" پایا گیا۔`
   };
 
+  function escapeRegexLiteral(str) {
+    return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  const UMBRELLA_RULE_IDS = new Set([
+    'safe_alcohol_like_non_ethanol',
+    'common_whole_food_ingredients',
+    'non_comedogenic_botanical_oils_butters',
+    'soothing_botanical_extracts',
+    'safe_amino_acids_peptides_ferments',
+    'safe_vitamins_minerals_salts',
+    'safe_emollients_silicones_polymers',
+    'safe_surfactants_cleansers',
+    'safe_food_acids_stabilizers_spices'
+  ]);
+
+  function expandWatchTermStems(watchTerm) {
+    const wLower = String(watchTerm || '').trim().toLowerCase();
+    const wFold = foldTurkish(wLower);
+    const stems = new Set([wLower, wFold].filter(Boolean));
+    // Expand known synonyms if the watch term matches a specific single-substance entry (not an umbrella class)
+    for (const sub of substancesData.substances || []) {
+      if (UMBRELLA_RULE_IDS.has(sub.id)) continue;
+      const aliases = Array.isArray(sub.aliases) ? sub.aliases : [];
+      const names = [sub.name, sub.e_code, sub.ci_code, ...aliases].filter(Boolean).map((x) => x.toLowerCase());
+      if (names.some((n) => n === wLower || foldTurkish(n) === wFold)) {
+        for (const n of names) {
+          stems.add(n);
+          stems.add(foldTurkish(n));
+        }
+      }
+    }
+    for (const hr of halalData.rules || []) {
+      if (UMBRELLA_RULE_IDS.has(hr.id) || hr.category === 'SAFE_NON_ETHANOL') continue;
+      const aliases = Array.isArray(hr.aliases) ? hr.aliases : [];
+      const codes = Array.isArray(hr.codes) ? hr.codes : [];
+      const names = [hr.canonical, ...codes, ...aliases].filter(Boolean).map((x) => x.toLowerCase());
+      if (names.some((n) => n === wLower || foldTurkish(n) === wFold)) {
+        for (const n of names) {
+          stems.add(n);
+          stems.add(foldTurkish(n));
+        }
+      }
+    }
+    return Array.from(stems).filter((s) => s.length >= 2);
+  }
+
+  function isWatchTermNegatedInRaw(rawStr, watchStems) {
+    const rawLower = String(rawStr || '').trim().toLowerCase();
+    const rawFold = foldTurkish(rawLower);
+    for (const stem of watchStems) {
+      const esc = escapeRegexLiteral(stem);
+      // Suffix negation bound directly to the watched stem (e.g. "Niacinamide-free", "Parfümsüz", "Paraben-free")
+      const suffixRe = new RegExp(`(?<![\\p{L}\\p{N}])${esc}[\\s\\-]*(?:free|frei|siz|sız|suz|süz|içermez|icermez)(?![\\p{L}\\p{N}])`, 'iu');
+      if (suffixRe.test(rawLower) || suffixRe.test(rawFold)) return true;
+      // Prefix negation bound directly to the watched stem (e.g. "ohne Parfum", "sans parfum", "sin perfume", "بدون عطر")
+      const prefixRe = new RegExp(`(?<![\\p{L}\\p{N}])(?:ohne|sans|sin|tanpa|bebas|free\\s+of|free\\s+from|بدون|بغیر|без)\\s+${esc}(?![\\p{L}\\p{N}])`, 'iu');
+      if (prefixRe.test(rawLower) || prefixRe.test(rawFold)) return true;
+    }
+    return false;
+  }
+
+  const GENERIC_ALCOHOL_WATCH_TERMS = new Set([
+    'alcohol',
+    'alkol',
+    'ethanol',
+    'etanol',
+    'ethyl alcohol',
+    'etil alkol',
+    'alkohol',
+    'alcool',
+    'спирт',
+    'كحول',
+    'الکحل',
+    'الکوحل'
+  ]);
+
+  const CHEMICAL_FAMILY_ROOTS = new Set([
+    'paraben',
+    'sulfate',
+    'sulphate',
+    'sulfat',
+    'sülfat',
+    'silicone',
+    'silikon',
+    'dimethicone',
+    'siloxane',
+    'phthalate',
+    'isothiazolinone'
+  ]);
+
   if (sanitizedWatchlist.length > 0) {
     profileStatuses['ozel_kara_liste'] = 'true';
     for (const obs of observations) {
-      const rawLower = (obs.raw || '').toLowerCase();
-      const isNegatedRaw = /(?:free|frei|siz|sız|suz|süz|ohne|sans|sin|tanpa|bebas|içermez|icermez|بدون|بغیر|без)/iu.test(rawLower);
-      if (isNegatedRaw) continue;
-
+      const rawFull = String(obs.raw || '').trim().toLowerCase();
+      const rawBase = rawFull.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
       const normRaw = normalizeToken(obs.raw || '');
+      const normBase = normalizeToken(rawBase);
       const foldedRaw = foldTurkish(obs.raw || '');
-      const locLower = (obs.localizedName || '').toLowerCase();
-      const subNameLower = obs.substance ? (obs.substance.name || '').toLowerCase() : '';
-      const subAliases = obs.substance && Array.isArray(obs.substance.aliases) ? obs.substance.aliases : [];
+      const foldBase = foldTurkish(rawBase);
+      const locLower = String(obs.localizedName || '').trim().toLowerCase();
+      const locBase = locLower.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      const isUmbrellaSub = Boolean(obs.substance && UMBRELLA_RULE_IDS.has(obs.substance.id));
+      const isUmbrellaHalal = Boolean(
+        obs.halalRule && (UMBRELLA_RULE_IDS.has(obs.halalRule.id) || obs.halalRule.category === 'SAFE_NON_ETHANOL')
+      );
+      const subNameLower = obs.substance && !isUmbrellaSub ? String(obs.substance.name || '').trim().toLowerCase() : '';
+      const subAliases =
+        obs.substance && !isUmbrellaSub && Array.isArray(obs.substance.aliases)
+          ? obs.substance.aliases.map((a) => a.toLowerCase())
+          : [];
+      const halalAliases =
+        obs.halalRule && !isUmbrellaHalal && Array.isArray(obs.halalRule.aliases)
+          ? obs.halalRule.aliases.map((a) => a.toLowerCase())
+          : [];
+      const sugarAliases = obs.sugar && Array.isArray(obs.sugar.aliases) ? obs.sugar.aliases.map((a) => a.toLowerCase()) : [];
+      const allKnownAliases = [rawBase, locLower, locBase, subNameLower, ...subAliases, ...halalAliases, ...sugarAliases].filter(Boolean);
+
+      const isFattyAlcoholShielded = Boolean(obs.halalRule && obs.halalRule.category === 'SAFE_NON_ETHANOL');
 
       for (const watchTerm of sanitizedWatchlist) {
+        const lowerWatch = watchTerm.trim().toLowerCase();
         const normWatch = normalizeToken(watchTerm);
-        const foldWatch = foldTurkish(watchTerm);
-        const lowerWatch = watchTerm.toLowerCase();
-        if (!normWatch) continue;
+        const foldWatch = foldTurkish(lowerWatch);
+        if (!normWatch && !lowerWatch) continue;
 
-        const matched =
-          normRaw === normWatch ||
+        // 1. Target-bound negation check: only exempt if the negation is bound to this watched term (not a different parenthetical term)
+        const watchStems = expandWatchTermStems(watchTerm);
+        if (isWatchTermNegatedInRaw(obs.raw || '', watchStems)) {
+          continue;
+        }
+
+        // 2. Fatty alcohol shield: generic "Alcohol" / "Alkol" in watchlist must NOT flag Cetyl/Cetearyl/Stearyl Alcohol or Phenoxyethanol
+        if (isFattyAlcoholShielded && (GENERIC_ALCOHOL_WATCH_TERMS.has(lowerWatch) || GENERIC_ALCOHOL_WATCH_TERMS.has(foldWatch))) {
+          continue;
+        }
+
+        // 3. Exact identity or known alias match
+        let matched =
+          rawFull === lowerWatch ||
+          rawBase === lowerWatch ||
           foldedRaw === foldWatch ||
-          normRaw.includes(normWatch) ||
-          foldedRaw.includes(foldWatch) ||
-          locLower.includes(lowerWatch) ||
-          subNameLower.includes(lowerWatch) ||
-          subAliases.some((al) => al === lowerWatch || foldTurkish(al) === foldWatch);
+          foldBase === foldWatch ||
+          (normWatch.length >= 3 && (normRaw === normWatch || normBase === normWatch)) ||
+          allKnownAliases.some((al) => al === lowerWatch || foldTurkish(al) === foldWatch);
+
+        // 4. Whole-word boundary match (for terms >= 3 chars, e.g. "Sinensis", "Lysine", "Tyrosine", "Freesia") — never matches 2-char substrings like "ni" or "in"
+        if (!matched && foldWatch.length >= 3) {
+          const wordRe = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegexLiteral(foldWatch)}(?![\\p{L}\\p{N}])`, 'iu');
+          const wordReRaw = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegexLiteral(lowerWatch)}(?![\\p{L}\\p{N}])`, 'iu');
+          if (
+            wordRe.test(foldBase) ||
+            wordReRaw.test(rawBase) ||
+            wordRe.test(foldTurkish(locBase)) ||
+            wordRe.test(foldTurkish(subNameLower)) ||
+            allKnownAliases.some((al) => wordRe.test(foldTurkish(al)))
+          ) {
+            matched = true;
+          }
+        }
+
+        // 5. Explicit chemical family root match (e.g. "paraben" -> "methylparaben", "silicone" / "dimethicone")
+        if (!matched && CHEMICAL_FAMILY_ROOTS.has(foldWatch)) {
+          if (
+            foldBase.includes(foldWatch) ||
+            foldTurkish(locBase).includes(foldWatch) ||
+            foldTurkish(subNameLower).includes(foldWatch) ||
+            allKnownAliases.some((al) => foldTurkish(al).includes(foldWatch))
+          ) {
+            // Double-check that the family root itself is not negated in rawFull (e.g. "Paraben-free")
+            if (!isWatchTermNegatedInRaw(obs.raw || '', [foldWatch, lowerWatch])) {
+              matched = true;
+            }
+          }
+        }
 
         if (matched) {
           profileStatuses['ozel_kara_liste'] = 'false';
@@ -1764,7 +1915,7 @@ export function evaluateProduct({
 
   const effectiveProfileCount = userProfiles.length + (sanitizedWatchlist.length > 0 ? 1 : 0);
   let preferenceMatchScore = null;
-  if (effectiveProfileCount > 0 && unresolvedConfirmations.length === 0) {
+  if (effectiveProfileCount > 0) {
     if (coverageRatio < 0.8) {
       for (const prof of Object.keys(profileStatuses)) {
         if (profileStatuses[prof] === 'true') {
@@ -1772,8 +1923,15 @@ export function evaluateProduct({
         }
       }
       preferenceMatchScore = null;
+    } else if (unresolvedConfirmations.length > 0) {
+      for (const prof of Object.keys(profileStatuses)) {
+        if (profileStatuses[prof] === 'true') {
+          profileStatuses[prof] = 'unknown';
+        }
+      }
+      preferenceMatchScore = null;
     } else {
-      const hasUnknown = Object.values(profileStatuses).some((st) => st === 'unknown');
+      const hasUnknown = Object.values(profileStatuses).some((st) => st === 'unknown' || st === 'kapsam_yetersiz');
       if (!hasUnknown) {
         const matchCount = Object.values(profileStatuses).filter((st) => st === 'true').length;
         preferenceMatchScore = Math.round((100 * matchCount) / effectiveProfileCount);
@@ -1784,7 +1942,13 @@ export function evaluateProduct({
   const profileCard = {
     cardTitle: et.profCardTitle,
     selectedProfiles: userProfiles,
-    ...(sanitizedWatchlist.length > 0 ? { customWatchlist: sanitizedWatchlist } : {}),
+    ...(sanitizedWatchlist.length > 0
+      ? {
+          customWatchlist: sanitizedWatchlist.slice(0, 50),
+          maxWatchlistItems: 50,
+          watchlistLimitExceeded
+        }
+      : {}),
     profileStatuses,
     preferenceMatchScore,
     alerts: profileAlerts,
@@ -1802,10 +1966,10 @@ export function evaluateProduct({
 
   const AUTHORITY_DIFF_REASONS_10LANG = {
     carmine_e120: {
-      tr: 'Karmin (E120) koşnil böceğinden elde edilir. GİMDES ve IFANCA böcek kaynaklı boyaları uygunsuz (Kırmızı) kabul ederken; Malezya JAKIM (2012) ve Endonezya MUI (Fetva 33/2011) akıcı kanı olmayan böcek kategorisinde değerlendirerek Helal (Yeşil) saymaktadır.',
-      en: 'Carmine (E120) is derived from cochineal insects. GİMDES and IFANCA reject insect-derived colorants (Red), whereas Malaysia JAKIM (2012) and Indonesia MUI (Fatwa 33/2011) classify non-flowing-blood insects as Halal-permissible (Green).',
+      tr: 'Karmin (E120) koşnil böceğinden elde edilir. GİMDES ve IFANCA böcek kaynaklı boyaları uygunsuz (Kırmızı) kabul ederken; Malezya JAKIM (MKI 2012) ve Endonezya MUI (Fetva No. 33/2011 — fayda ve zararsızlık koşuluyla) akıcı kanı olmayan böcek kategorisinde değerlendirerek gıda boyası olarak Helal (Yeşil) saymaktadır.',
+      en: 'Carmine (E120) is derived from cochineal insects. GİMDES and IFANCA reject insect-derived colorants (Red), whereas Malaysia JAKIM (MKI 2012) and Indonesia MUI (Fatwa No. 33/2011) classify non-flowing-blood insects as Halal-permissible food coloring (Green).',
       ar: 'يُستخرج الكارمين (E120) من حشرة الكوشينيل. ترفضه GİMDES وIFANCA، بينما تجيزه JAKIM الماليزية وMUI الإندونيسية (فتوى 33/2011) لكونها حشرة لا دم لها سائل.',
-      de: 'Karmin (E120) stammt aus Cochenilleschildläusen. GİMDES und IFANCA stufen es als unzulässig (Rot) ein, während JAKIM und MUI (Fatwa 33/2011) es als Halal (Grün) anerkennen.',
+      de: 'Karmin (E120) stammt aus Cochenilleschildläusen. GİMDES und IFANCA stufen es als unzulässig (Rot) ein, während JAKIM (2012) und MUI (Fatwa 33/2011) es als Halal (Grün) anerkennen.',
       fr: 'Le Carmin (E120) est issu de la cochenille. GİMDES et IFANCA le refusent (Rouge), tandis que JAKIM et MUI (Fatwa 33/2011) l\'autorisent comme Halal (Vert).',
       id: 'Karmin (E120) berasal dari serangga cochineal. MUI (Fatwa No. 33/2011) dan JAKIM menyatakan Halal (Hijau), sedangkan GİMDES dan IFANCA menolaknya (Merah).',
       ms: 'Karmin (E120) diperoleh daripada serangga cochineal. JAKIM (MKI 2012) dan MUI mengesahkannya Halal (Hijau), manakala GİMDES dan IFANCA menolaknya (Merah).',
@@ -1838,16 +2002,16 @@ export function evaluateProduct({
       ur: 'شیلاک (E904) لاکھ کیڑے کی رال ہے۔ JAKIM، MUI اور IFANCA اسے حلال (سبز) مانتے ہیں جبکہ GİMDES اسے مسترد (سرخ) کرتا ہے۔'
     },
     snail_mucin_halal: {
-      tr: 'Kara salyangozu salgısı (Snail Mucin); GİMDES, JAKIM ve MUI kriterlerinde kara haşaratı/yumuşakçası kapsamında kozmetik helal sertifikasyonuna uygun görülmezken (Kırmızı), IFANCA üretim/arıtma yöntemine göre şüpheli (Sarı) kategorisinde inceler.',
-      en: 'Land Snail Mucin is rejected (Red) by GİMDES, JAKIM, and MUI under land mollusc/pest rulings, while IFANCA evaluates it as source/process-dependent (Yellow).',
-      ar: 'مستخلص الحلزون البري مرفوض (أحمر) لدى GİMDES وJAKIM وMUI ضمن الحشرات والرخويات البرية، بينما تصنفه IFANCA كمشبوه يحتاج فحصاً (أصفر).',
-      de: 'Schneckenschleim (Snail Mucin) wird von GİMDES, JAKIM und MUI abgelehnt (Rot), während IFANCA ihn als prüfbedürftig (Gelb) einstuft.',
-      fr: 'La mucine d\'escargot terrestre est refusée (Rouge) par GİMDES, JAKIM et MUI, tandis qu\'IFANCA la classe comme douteuse à vérifier (Jaune).',
-      id: 'Lendir siput darat (Snail Mucin) ditolak (Merah) oleh MUI, JAKIM, dan GİMDES, sementara IFANCA mengkategorikannya syubhat/perlu verifikasi (Kuning).',
-      ms: 'Mucin siput darat ditolak (Merah) oleh JAKIM, MUI dan GİMDES, manakala IFANCA mengklasifikasikannya sebagai syubhah/perlu semakan (Kuning).',
-      es: 'La mucina de caracol terrestre es rechazada (Rojo) por GİMDES, JAKIM y MUI, mientras que IFANCA la evalúa como dudosa (Amarillo).',
-      ru: 'Муцин сухопутной улитки отклоняется (Красный) GİMDES, JAKIM и MUI, тогда как IFANCA относит его к сомнительным (Жёлтый).',
-      ur: 'خشکی کے گھونگھے کا لعاب (Snail Mucin) GİMDES، JAKIM اور MUI کے نزدیک نامناسب (سرخ) ہے جبکہ IFANCA اسے مشکوک (پیلا) شمار کرتا ہے۔'
+      tr: 'Kara salyangozu salgısı (Snail Mucin): Gıda olarak tüketimi tüm kurumlarda uygunsuzdur (Kırmızı). Harici kozmetik kullanımında GİMDES reddederken (Kırmızı); Endonezya MUI (Fetva No. 24/2012 & LPPOM non-food rehberi), Malezya (Mufti Wilayah İrşad el-Fetva Seri 188 / JAKIM ürün teyidi) ve IFANCA harici kullanımı saflık, üretim yöntemi ve sertifika doğrulamasına bağlı (Sarı/Şüpheli) değerlendirir.',
+      en: 'Land Snail Mucin: Oral food consumption is prohibited across all authorities (Red). For external cosmetic use, GİMDES rejects it (Red), whereas Indonesia MUI (Fatwa No. 24/2012 & LPPOM non-food guidance), Malaysia (Mufti Wilayah Series 188 / JAKIM product verification), and IFANCA evaluate topical use as conditional upon purity, extraction method, and certification (Yellow).',
+      ar: 'خلاصة الحلزون البري: يحرم تناولها غذائياً لدى جميع الهيئات (أحمر). أما في الاستخدام التجميلي الخارجي فترفضها GİMDES (أحمر)، بينما تصنفها MUI الإندونيسية (فتوى 24/2012 للاستخدام غير الغذائي) وماليزيا (إرشاد الفتوى 188 / تحقق JAKIM) وIFANCA كمشروطة بالطهارة والتحقق من الشهادة (أصفر).',
+      de: 'Schneckenschleim (Snail Mucin): Als Lebensmittel unzulässig (Rot). Bei äußerlicher Kosmetikanwendung lehnt GİMDES ihn ab (Rot), während MUI (Fatwa Nr. 24/2012 für Non-Food), Malaysia (Mufti Wilayah Serie 188 / JAKIM-Prüfung) und IFANCA ihn unter Reinheits- und Zertifizierungsbedingungen als prüfbedürftig (Gelb) einstufen.',
+      fr: 'Mucine d\'escargot : Interdite en alimentation (Rouge). En usage cosmétique externe, GİMDES la refuse (Rouge), tandis que MUI (Fatwa 24/2012 non-alimentaire), la Malaisie (Mufti Wilayah Série 188 / vérification JAKIM) et IFANCA l\'évaluent sous condition de pureté et de certification (Jaune).',
+      id: 'Lendir siput darat (Snail Mucin): Konsumsi pangan haram (Merah). Untuk kosmetik luar (non-pangan), GİMDES menolak (Merah), sedangkan MUI (Fatwa No. 24/2012 & panduan LPPOM), Malaysia (Mufti Wilayah Seri 188 / verifikasi produk JAKIM), dan IFANCA menilai bersyarat pada kemurnian, proses, dan sertifikasi (Kuning).',
+      ms: 'Mucin siput darat (Snail Mucin): Penggunaan makanan adalah haram (Merah). Bagi kosmetik luaran, GİMDES menolak (Merah), manakala Malaysia (Mufti Wilayah Siri 188 / semakan pensijilan produk JAKIM), MUI (Fatwa No. 24/2012 bukan makanan) dan IFANCA menilai secara bersyarat mengikut kesucian dan pengesahan sijil (Kuning).',
+      es: 'Mucina de caracol terrestre: Prohibida en alimentación (Rojo). En cosmética externa, GİMDES la rechaza (Rojo), mientras que MUI (Fatwa 24/2012 uso no alimentario), Malasia (Mufti Wilayah Serie 188 / verificación JAKIM) e IFANCA la evalúan sujeta a pureza y certificación (Amarillo).',
+      ru: 'Муцин сухопутной улитки: В пищу запрещён (Красный). В наружной косметике GİMDES отклоняет (Красный), тогда как MUI (Фетва № 24/2012 для непищевого применения), Малайзия (Mufti Wilayah выпуск 188 / проверка JAKIM) и IFANCA требуют проверки чистоты и сертификации (Жёлтый).',
+      ur: 'خشکی کے گھونگھے کا لعاب (Snail Mucin): بطور غذا تمام اداروں کے نزدیک ناجائز (سرخ) ہے۔ بیرونی کاسمیٹک استعمال میں GİMDES اسے مسترد (سرخ) کرتا ہے، جبکہ انڈونیشیا MUI (فتویٰ 24/2012 برائے غیر غذائی استعمال)، ملائیشیا (مفتی ولایت سیریز 188 / JAKIM تصدیق) اور IFANCA اسے پاکیزگی اور سرٹیفکیٹ کی تصدیق سے مشروط (پیلا) قرار دیتے ہیں۔'
     },
     default: {
       tr: 'Bu bileşen için GİMDES, JAKIM, MUI ve IFANCA fıkıh kurulları arasında kaynak, istihale (kimyasal dönüşüm) veya çözücü eşiği açısından içtihat farkı bulunmaktadır.',
@@ -1862,6 +2026,80 @@ export function evaluateProduct({
       ur: 'اس جزو کے ماخذ یا محلول کے بارے میں حلال اتھارٹیز (GİMDES, JAKIM, MUI, IFANCA) کے فقہی معیارات میں فرق پایا جاتا ہے۔'
     }
   };
+
+  function resolveAuthorityRulingWithContext(rule, authKey, isExplicitPlantToken) {
+    let st = (rule.authority_rulings && rule.authority_rulings[authKey]) || rule.authority_rulings.general_cautious;
+    let resNote = null;
+    let isConflict = false;
+
+    if (rule.id === 'snail_mucin_halal' && productType === 'food') {
+      st = 'kirmizi';
+    }
+
+    if (rule.category === 'A_haram') {
+      if (
+        claims.halalCertified ||
+        (claims.veganStatus !== 'none' && !rule.vegan_compatible) ||
+        (claims.vegetarianStatus !== 'none' && rule.vegetarian_compatible === false)
+      ) {
+        isConflict = true;
+        st = 'conflict';
+        resNote = et.conflictHaram;
+      } else {
+        st = 'kirmizi';
+      }
+    } else if (rule.category === 'B_alkol') {
+      if (productType === 'food' && rule.id === 'ethanol_cosmetic_or_food') {
+        st = 'kirmizi';
+      }
+      if (claims.halalCertified) {
+        st = productType === 'food' && rule.id === 'ethanol_cosmetic_or_food' ? 'conflict' : 'sari';
+        if (st === 'conflict') isConflict = true;
+        resNote = et.conflictAlcohol;
+      } else if (claims.veganStatus !== 'none') {
+        resNote = et.veganNoteAlcohol;
+      }
+    } else if (rule.category === 'C_musbooh') {
+      if (
+        (!rule.vegan_compatible && claims.veganStatus !== 'none') ||
+        (rule.vegetarian_compatible === false && claims.vegetarianStatus !== 'none')
+      ) {
+        isConflict = true;
+        st = 'conflict';
+        resNote = et.conflictAnimalVegan;
+      } else if (isExplicitPlantToken) {
+        st = 'yesil';
+        resNote = et.plantSourceResolved;
+      } else if (claims.halalCertified) {
+        st = 'yesil';
+        resNote = et.halalCertResolved;
+      } else if (rule.vegan_claim_resolves && claims.veganStatus === 'verified') {
+        st = 'yesil';
+        resNote = et.verifiedVeganResolved;
+      } else if (rule.vegan_claim_resolves && claims.veganStatus === 'declared') {
+        st = 'sari_yesil';
+        resNote = et.declaredVeganNote;
+      } else if (rule.id === 'l_cysteine' && claims.veganStatus !== 'none') {
+        st = 'sari';
+        resNote = et.lCysteineNote;
+      }
+    } else if (rule.category === 'D_tartismali') {
+      if (
+        (!rule.vegan_compatible && claims.veganStatus !== 'none') ||
+        (rule.vegetarian_compatible === false && claims.vegetarianStatus !== 'none')
+      ) {
+        isConflict = true;
+        st = 'conflict';
+        resNote = et.conflictInsectVegan;
+      } else if (rule.id === 'snail_mucin_halal' && productType === 'food' && claims.halalCertified) {
+        isConflict = true;
+        st = 'conflict';
+        resNote = et.conflictHaram;
+      }
+    }
+
+    return { status: st, contextResolution: resNote, conflictDetected: isConflict };
+  }
 
   for (const obs of observations) {
     const rule = obs.halalRule;
@@ -1878,69 +2116,13 @@ export function evaluateProduct({
       continue;
     }
 
-    let statusForAuthority = rule.authority_rulings[halalAuthority] || rule.authority_rulings.general_cautious;
-    let contextResolution = null;
-    let conflictDetected = false;
-    const isExplicitPlantToken = rule.vegan_claim_resolves && explicitPlantRegex.test(obs.raw);
+    const isExplicitPlantToken = Boolean(rule.vegan_claim_resolves && explicitPlantRegex.test(obs.raw));
     obs.isExplicitPlantToken = isExplicitPlantToken;
 
-    if (rule.category === 'A_haram') {
-      if (
-        claims.halalCertified ||
-        (claims.veganStatus !== 'none' && !rule.vegan_compatible) ||
-        (claims.vegetarianStatus !== 'none' && rule.vegetarian_compatible === false)
-      ) {
-        conflictDetected = true;
-        statusForAuthority = 'conflict';
-        contextResolution = et.conflictHaram;
-      } else {
-        statusForAuthority = 'kirmizi';
-      }
-    } else if (rule.category === 'B_alkol') {
-      if (productType === 'food' && rule.id === 'ethanol_cosmetic_or_food') {
-        statusForAuthority = 'kirmizi';
-      }
-      if (claims.halalCertified) {
-        statusForAuthority = productType === 'food' && rule.id === 'ethanol_cosmetic_or_food' ? 'conflict' : 'sari';
-        if (statusForAuthority === 'conflict') conflictDetected = true;
-        contextResolution = et.conflictAlcohol;
-      } else if (claims.veganStatus !== 'none') {
-        contextResolution = et.veganNoteAlcohol;
-      }
-    } else if (rule.category === 'C_musbooh') {
-      if (
-        (!rule.vegan_compatible && claims.veganStatus !== 'none') ||
-        (rule.vegetarian_compatible === false && claims.vegetarianStatus !== 'none')
-      ) {
-        conflictDetected = true;
-        statusForAuthority = 'conflict';
-        contextResolution = et.conflictAnimalVegan;
-      } else if (isExplicitPlantToken) {
-        statusForAuthority = 'yesil';
-        contextResolution = et.plantSourceResolved;
-      } else if (claims.halalCertified) {
-        statusForAuthority = 'yesil';
-        contextResolution = et.halalCertResolved;
-      } else if (rule.vegan_claim_resolves && claims.veganStatus === 'verified') {
-        statusForAuthority = 'yesil';
-        contextResolution = et.verifiedVeganResolved;
-      } else if (rule.vegan_claim_resolves && claims.veganStatus === 'declared') {
-        statusForAuthority = 'sari_yesil';
-        contextResolution = et.declaredVeganNote;
-      } else if (rule.id === 'l_cysteine' && claims.veganStatus !== 'none') {
-        statusForAuthority = 'sari';
-        contextResolution = et.lCysteineNote;
-      }
-    } else if (rule.category === 'D_tartismali') {
-      if (
-        (!rule.vegan_compatible && claims.veganStatus !== 'none') ||
-        (rule.vegetarian_compatible === false && claims.vegetarianStatus !== 'none')
-      ) {
-        conflictDetected = true;
-        statusForAuthority = 'conflict';
-        contextResolution = et.conflictInsectVegan;
-      }
-    }
+    const selectedResolved = resolveAuthorityRulingWithContext(rule, halalAuthority, isExplicitPlantToken);
+    const statusForAuthority = selectedResolved.status;
+    const contextResolution = selectedResolved.contextResolution;
+    const conflictDetected = selectedResolved.conflictDetected;
 
     if (conflictDetected || statusForAuthority === 'conflict') {
       overallHalalStatus = 'conflict';
@@ -1959,18 +2141,10 @@ export function evaluateProduct({
         ? et.halalHaramDesc
         : et.halalMusboohDesc;
 
-    // Build 4-authority comparison matrix for this ingredient
+    // Build 4-authority comparison matrix using the exact same context resolver (guarantees invariant: authorityMatrix[halalAuthority] === statusForAuthority)
     const authorityMatrix = {};
     for (const authKey of ['GIMDES', 'JAKIM', 'MUI', 'IFANCA']) {
-      let authSt = (rule.authority_rulings && rule.authority_rulings[authKey]) || rule.authority_rulings.general_cautious;
-      if (conflictDetected) {
-        authSt = 'conflict';
-      } else if (rule.category === 'B_alkol' && productType === 'food' && rule.id === 'ethanol_cosmetic_or_food') {
-        authSt = 'kirmizi';
-      } else if (rule.category === 'C_musbooh' && (statusForAuthority === 'yesil' || statusForAuthority === 'sari_yesil')) {
-        authSt = statusForAuthority;
-      }
-      authorityMatrix[authKey] = authSt;
+      authorityMatrix[authKey] = resolveAuthorityRulingWithContext(rule, authKey, isExplicitPlantToken).status;
     }
     const hasAuthorityDifference = new Set(Object.values(authorityMatrix)).size > 1;
     const diffDict = AUTHORITY_DIFF_REASONS_10LANG[rule.id] || AUTHORITY_DIFF_REASONS_10LANG.default;
@@ -2109,6 +2283,89 @@ export function evaluateProduct({
   };
 }
 
+const COMPARE_STATUS_I18N = {
+  tr: { pending: 'OCR Teyidi Bekleniyor', lowCov: 'Kapsam Yetersiz', unknown: 'Veri Yok / Belirsiz' },
+  en: { pending: 'Awaiting OCR Confirm', lowCov: 'Low Coverage (<80%)', unknown: 'No Data / Uncertain' },
+  ar: { pending: 'بانتظار تأكيد القراءة', lowCov: 'تغطية غير كافية', unknown: 'بيانات غير متوفرة' },
+  de: { pending: 'OCR-Bestätigung offen', lowCov: 'Abdeckung <80%', unknown: 'Keine Daten / Unklar' },
+  fr: { pending: 'Confirmation OCR requise', lowCov: 'Couverture <80%', unknown: 'Données insuffisantes' },
+  id: { pending: 'Menunggu Konfirmasi OCR', lowCov: 'Cakupan Kurang (<80%)', unknown: 'Data Belum Cukup' },
+  ms: { pending: 'Menunggu Pengesahan OCR', lowCov: 'Liputan Kurang (<80%)', unknown: 'Tiada Data / Tidak Pasti' },
+  es: { pending: 'Confirmación OCR pendiente', lowCov: 'Cobertura <80%', unknown: 'Sin datos / Incierto' },
+  ru: { pending: 'Ожидает подтверждения OCR', lowCov: 'Охват <80%', unknown: 'Нет данных' },
+  ur: { pending: 'OCR تصدیق درکار ہے', lowCov: 'کوریج ناکافی (<80%)', unknown: 'ڈیٹا دستیاب نہیں' }
+};
+
+function summarizeProductForComparison(evalRes, locale, lang) {
+  const stI18n = COMPARE_STATUS_I18N[lang] || COMPARE_STATUS_I18N.en;
+  const reg = evalRes.cards.regulatoryCard;
+  const prof = evalRes.cards.profileCard;
+  const halal = evalRes.cards.halalCard;
+  const hasPendingOcr = Array.isArray(evalRes.unresolvedConfirmations) && evalRes.unresolvedConfirmations.length > 0;
+  const isLowCoverage = reg.coveragePercent < 80;
+
+  const hasRedProf = prof.alerts.some((a) => a.level === 'kirmizi');
+  const hasYellowProf = prof.alerts.some((a) => a.level === 'sari');
+  const profStValues = Object.values(prof.profileStatuses || {});
+
+  let profileStatus = 'Uygun';
+  let profileStatusCode = 'uygun';
+  let profileStatusLocalized = locale.badges.suitable;
+
+  if (hasRedProf || profStValues.includes('false')) {
+    profileStatus = 'Kaçın / Dikkat';
+    profileStatusCode = 'uygunsuz';
+    profileStatusLocalized = locale.badges.avoid;
+  } else if (hasPendingOcr) {
+    profileStatus = 'Teyit Bekleniyor';
+    profileStatusCode = 'teyit_bekliyor';
+    profileStatusLocalized = stI18n.pending;
+  } else if (isLowCoverage || profStValues.includes('kapsam_yetersiz')) {
+    profileStatus = 'Kapsam Yetersiz';
+    profileStatusCode = 'kapsam_yetersiz';
+    profileStatusLocalized = locale.badges.lowCoverage || stI18n.lowCov;
+  } else if (profStValues.includes('unknown')) {
+    profileStatus = 'Veri Yok / Belirsiz';
+    profileStatusCode = 'kaynak_belirsiz';
+    profileStatusLocalized = locale.badges.noData || stI18n.unknown;
+  } else if (hasYellowProf) {
+    profileStatus = 'Kaçın / Dikkat';
+    profileStatusCode = 'kaynak_belirsiz';
+    profileStatusLocalized = locale.badges.avoid;
+  }
+
+  let halalStatus = 'Uygun';
+  let halalStatusCode = 'uygun';
+  let halalStatusLocalized = locale.badges.halalOk;
+
+  if (halal.overallStatus === 'conflict' || halal.overallStatus === 'uygunsuz_bulgu') {
+    halalStatus = 'Uygunsuz / Çelişki';
+    halalStatusCode = halal.overallStatus === 'conflict' ? 'conflict' : 'uygunsuz';
+    halalStatusLocalized = locale.badges.halalRed;
+  } else if (halal.overallStatus === 'unknown' || hasPendingOcr) {
+    halalStatus = 'Teyit Bekleniyor';
+    halalStatusCode = 'teyit_bekliyor';
+    halalStatusLocalized = stI18n.pending;
+  } else if (halal.overallStatus === 'kapsam_yetersiz') {
+    halalStatus = 'Kapsam Yetersiz';
+    halalStatusCode = 'kapsam_yetersiz';
+    halalStatusLocalized = locale.badges.lowCoverage || stI18n.lowCov;
+  } else if (halal.overallStatus === 'kaynak_belirsiz_musbooh') {
+    halalStatus = 'Şüpheli';
+    halalStatusCode = 'kaynak_belirsiz';
+    halalStatusLocalized = locale.badges.musbooh;
+  }
+
+  return {
+    profileStatus,
+    profileStatusCode,
+    profileStatusLocalized,
+    halalStatus,
+    halalStatusCode,
+    halalStatusLocalized
+  };
+}
+
 /**
  * Compares two products side-by-side (Product A vs Product B) and deterministically extracts
  * the "Deciding Difference" (Farkı Yaratan Madde) without any LLM hallucination or token cost.
@@ -2132,29 +2389,41 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
   const warnCountB =
     regB.findings.filter((f) => f.severity !== 'bilgi').length + evalB.cards.profileCard.alerts.length;
 
-  const profConflictA = evalA.cards.profileCard.alerts.some((a) => a.level === 'kirmizi' || a.level === 'sari');
-  const profConflictB = evalB.cards.profileCard.alerts.some((a) => a.level === 'kirmizi' || a.level === 'sari');
-
   // Identify the single most significant differentiating substance between A and B
-  const idsA = new Set(regA.findings.map((f) => f.substanceId));
-  const idsB = new Set(regB.findings.map((f) => f.substanceId));
+  const mapA = new Map(regA.findings.map((f) => [f.substanceId, f]));
+  const mapB = new Map(regB.findings.map((f) => [f.substanceId, f]));
 
   const severityRank = { yuksek: 3, orta: 2, dusuk: 1, bilgi: 0 };
+  const statusRank = { yasak: 3, kisitli: 2, izinli: 1 };
   const uniqueFindings = [];
 
   for (const f of regB.findings) {
-    if (!idsA.has(f.substanceId) && f.severity !== 'bilgi') {
+    if (f.severity === 'bilgi') continue;
+    const fA = mapA.get(f.substanceId);
+    if (
+      !fA ||
+      (statusRank[f.euStatus] || 0) > (statusRank[fA.euStatus] || 0) ||
+      (severityRank[f.severity] || 0) > (severityRank[fA.severity] || 0)
+    ) {
       uniqueFindings.push({ side: 'B', productName: productB.name || 'Ürün B', finding: f });
     }
   }
   for (const f of regA.findings) {
-    if (!idsB.has(f.substanceId) && f.severity !== 'bilgi') {
+    if (f.severity === 'bilgi') continue;
+    const fB = mapB.get(f.substanceId);
+    if (
+      !fB ||
+      (statusRank[f.euStatus] || 0) > (statusRank[fB.euStatus] || 0) ||
+      (severityRank[f.severity] || 0) > (severityRank[fB.severity] || 0)
+    ) {
       uniqueFindings.push({ side: 'A', productName: productA.name || 'Ürün A', finding: f });
     }
   }
 
   uniqueFindings.sort(
-    (x, y) => (severityRank[y.finding.severity] || 0) - (severityRank[x.finding.severity] || 0)
+    (x, y) =>
+      (statusRank[y.finding.euStatus] || 0) - (statusRank[x.finding.euStatus] || 0) ||
+      (severityRank[y.finding.severity] || 0) - (severityRank[x.finding.severity] || 0)
   );
 
   let decidingDifference = null;
@@ -2171,7 +2440,73 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
       explanation: top.finding.legalText,
       sources: top.finding.sources || []
     };
+  } else {
+    // Fallback 1: Profile / Personal Watchlist differentiating alerts
+    const alertsA = evalA.cards.profileCard.alerts || [];
+    const alertsB = evalB.cards.profileCard.alerts || [];
+    const alertKeysA = new Set(alertsA.map((a) => `${a.profile}:${(a.substanceName || a.rawToken || '').toLowerCase()}`));
+    const alertKeysB = new Set(alertsB.map((a) => `${a.profile}:${(a.substanceName || a.rawToken || '').toLowerCase()}`));
+    const uniqueAlerts = [];
+    for (const a of alertsB) {
+      const k = `${a.profile}:${(a.substanceName || a.rawToken || '').toLowerCase()}`;
+      if (!alertKeysA.has(k)) uniqueAlerts.push({ side: 'B', productName: productB.name || 'Ürün B', alert: a });
+    }
+    for (const a of alertsA) {
+      const k = `${a.profile}:${(a.substanceName || a.rawToken || '').toLowerCase()}`;
+      if (!alertKeysB.has(k)) uniqueAlerts.push({ side: 'A', productName: productA.name || 'Ürün A', alert: a });
+    }
+    if (uniqueAlerts.length > 0) {
+      uniqueAlerts.sort((x, y) => (y.alert.level === 'kirmizi' ? 2 : 1) - (x.alert.level === 'kirmizi' ? 2 : 1));
+      const topA = uniqueAlerts[0];
+      const displaySubName = topA.alert.localizedName || topA.alert.substanceName || topA.alert.rawToken;
+      decidingDifference = {
+        onlyInSide: topA.side,
+        onlyInProductName: topA.productName,
+        substanceName: topA.alert.substanceName || displaySubName,
+        localizedSubstanceName: displaySubName,
+        severity: topA.alert.level === 'kirmizi' ? 'yuksek' : 'orta',
+        headline: `${locale.compareScreen.decidingTitle}: ${topA.productName} → ${displaySubName}`,
+        explanation: topA.alert.explanation,
+        sources: topA.alert.sources || []
+      };
+    } else {
+      // Fallback 2: Halal findings difference
+      const halalRank = { conflict: 4, kirmizi: 3, sari: 2, sari_yesil: 1, yesil: 0 };
+      const hMapA = new Map((evalA.cards.halalCard.findings || []).map((f) => [f.ruleId, f]));
+      const hMapB = new Map((evalB.cards.halalCard.findings || []).map((f) => [f.ruleId, f]));
+      const uniqueHalal = [];
+      for (const f of evalB.cards.halalCard.findings || []) {
+        const fA = hMapA.get(f.ruleId);
+        if ((halalRank[f.status] || 0) > (fA ? halalRank[fA.status] || 0 : 0)) {
+          uniqueHalal.push({ side: 'B', productName: productB.name || 'Ürün B', finding: f });
+        }
+      }
+      for (const f of evalA.cards.halalCard.findings || []) {
+        const fB = hMapB.get(f.ruleId);
+        if ((halalRank[f.status] || 0) > (fB ? halalRank[fB.status] || 0 : 0)) {
+          uniqueHalal.push({ side: 'A', productName: productA.name || 'Ürün A', finding: f });
+        }
+      }
+      if (uniqueHalal.length > 0) {
+        uniqueHalal.sort((x, y) => (halalRank[y.finding.status] || 0) - (halalRank[x.finding.status] || 0));
+        const topH = uniqueHalal[0];
+        const displaySubName = topH.finding.localizedName || topH.finding.canonical;
+        decidingDifference = {
+          onlyInSide: topH.side,
+          onlyInProductName: topH.productName,
+          substanceName: topH.finding.canonical,
+          localizedSubstanceName: displaySubName,
+          severity: topH.finding.status === 'kirmizi' || topH.finding.status === 'conflict' ? 'yuksek' : 'orta',
+          headline: `${locale.compareScreen.decidingTitle}: ${topH.productName} → ${displaySubName}`,
+          explanation: topH.finding.contextResolution || topH.finding.explanation,
+          sources: topH.finding.source ? [topH.finding.source] : []
+        };
+      }
+    }
   }
+
+  const sumA = summarizeProductForComparison(evalA, locale, langMeta.code);
+  const sumB = summarizeProductForComparison(evalB, locale, langMeta.code);
 
   return {
     brand: 'InciFact',
@@ -2184,24 +2519,12 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
       canShowScore: regA.canShowScore,
       hasBanned: bannedA.length > 0,
       attentionCount: warnCountA,
-      profileStatus: profConflictA ? 'Kaçın / Dikkat' : 'Uygun',
-      profileStatusLocalized: profConflictA ? locale.badges.avoid : locale.badges.suitable,
-      halalStatus:
-        evalA.cards.halalCard.overallStatus === 'uygun_gorunuyor'
-          ? 'Uygun'
-          : evalA.cards.halalCard.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? 'Şüpheli'
-          : evalA.cards.halalCard.overallStatus === 'kapsam_yetersiz'
-          ? 'Kapsam Yetersiz'
-          : 'Uygunsuz / Çelişki',
-      halalStatusLocalized:
-        evalA.cards.halalCard.overallStatus === 'uygun_gorunuyor'
-          ? locale.badges.halalOk
-          : evalA.cards.halalCard.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? locale.badges.musbooh
-          : evalA.cards.halalCard.overallStatus === 'kapsam_yetersiz'
-          ? (locale.badges.lowCoverage || 'Kapsam Yetersiz')
-          : locale.badges.halalRed,
+      profileStatus: sumA.profileStatus,
+      profileStatusCode: sumA.profileStatusCode,
+      profileStatusLocalized: sumA.profileStatusLocalized,
+      halalStatus: sumA.halalStatus,
+      halalStatusCode: sumA.halalStatusCode,
+      halalStatusLocalized: sumA.halalStatusLocalized,
       evaluation: evalA
     },
     productB: {
@@ -2210,24 +2533,12 @@ export function compareProducts(productA, productB, sharedOptions = {}) {
       canShowScore: regB.canShowScore,
       hasBanned: bannedB.length > 0,
       attentionCount: warnCountB,
-      profileStatus: profConflictB ? 'Kaçın / Dikkat' : 'Uygun',
-      profileStatusLocalized: profConflictB ? locale.badges.avoid : locale.badges.suitable,
-      halalStatus:
-        evalB.cards.halalCard.overallStatus === 'uygun_gorunuyor'
-          ? 'Uygun'
-          : evalB.cards.halalCard.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? 'Şüpheli'
-          : evalB.cards.halalCard.overallStatus === 'kapsam_yetersiz'
-          ? 'Kapsam Yetersiz'
-          : 'Uygunsuz / Çelişki',
-      halalStatusLocalized:
-        evalB.cards.halalCard.overallStatus === 'uygun_gorunuyor'
-          ? locale.badges.halalOk
-          : evalB.cards.halalCard.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? locale.badges.musbooh
-          : evalB.cards.halalCard.overallStatus === 'kapsam_yetersiz'
-          ? (locale.badges.lowCoverage || 'Kapsam Yetersiz')
-          : locale.badges.halalRed,
+      profileStatus: sumB.profileStatus,
+      profileStatusCode: sumB.profileStatusCode,
+      profileStatusLocalized: sumB.profileStatusLocalized,
+      halalStatus: sumB.halalStatus,
+      halalStatusCode: sumB.halalStatusCode,
+      halalStatusLocalized: sumB.halalStatusLocalized,
       evaluation: evalB
     },
     decidingDifference

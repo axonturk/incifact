@@ -140,7 +140,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Helal Fetva / Standart Otoritesi',
       claimsLabel: 'Ürün Üzerindeki Beyan / Sertifika',
       continueBtn: 'Devam et — Taramaya geç →',
-      privacyNote: 'Gizlilik: Sağlık ve inanç seçimlerin KVKK md. 6 ve GDPR md. 9 kapsamında özel nitelikli veridir. Hesap açtırmıyoruz, kaydetmiyoruz, buluta veya üçüncü taraflara göndermiyoruz.'
+      privacyNote: 'Gizlilik: Sağlık ve inanç seçimlerin KVKK md. 6 ve GDPR md. 9 kapsamında özel nitelikli veridir. Hesap açtırmıyoruz; uzak sunucuda/bulutta kaydetmiyoruz ve üçüncü taraflara göndermiyoruz (tercihlerin, özel kara listen ve son taramaların yalnızca bu cihazın yerel hafızasında tutulur ve istediğin an silinebilir).'
     },
     scanScreen: {
       title: 'İçindekiler Kısmını Hizala',
@@ -222,7 +222,7 @@ export const UI_STRINGS = {
       authorityLabel: 'Halal Standard Authority',
       claimsLabel: 'Product Label Claims / Certificates',
       continueBtn: 'Continue — Go to Scanner →',
-      privacyNote: 'Privacy: Health & faith preferences are special-category data under GDPR Art. 9. No account, no storage, nothing sent to the cloud or third parties.'
+      privacyNote: 'Privacy: Health & faith preferences are special-category data under GDPR Art. 9. No account, no cloud/server storage, nothing sent to third parties (your preferences, personal blacklist, and scan history are kept only in local device storage and can be cleared anytime).'
     },
     scanScreen: {
       title: 'Align the Ingredients List',

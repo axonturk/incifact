@@ -27,6 +27,111 @@ type ProductType = 'cosmetic' | 'food';
 type HalalAuthority = 'general_cautious' | 'GIMDES' | 'JAKIM' | 'MUI' | 'IFANCA';
 type LangCode = 'tr' | 'en' | 'ar' | 'de' | 'fr' | 'id' | 'ms' | 'es' | 'ru' | 'ur';
 
+interface CompareSlotItem {
+  name: string;
+  rawText: string;
+  productType: ProductType;
+  claims?: {
+    halalCertified: boolean;
+    veganStatus: 'none' | 'declared' | 'verified';
+    vegetarianStatus: 'none' | 'declared' | 'verified';
+  };
+  userConfirmations?: Record<string, string>;
+}
+
+const MOBILE_FEAT_I18N: Record<
+  LangCode,
+  {
+    watchlistTitle: string;
+    shareCardBtn: string;
+    recentScansTitle: string;
+    scannedLabel: (slot: string) => string;
+    pendingOcr: string;
+    lowCoverage: string;
+  }
+> = {
+  tr: {
+    watchlistTitle: 'Kişisel Kara Listem (Özel Madde Ekle)',
+    shareCardBtn: 'Sonuç Özeti Paylaş',
+    recentScansTitle: 'Son Tarananlar (Tek Tıkla A / B Karşılaştır)',
+    scannedLabel: (s) => `Taranan Ürün (${s})`,
+    pendingOcr: 'OCR Teyidi Bekliyor',
+    lowCoverage: 'Kapsam Yetersiz (<%80)'
+  },
+  en: {
+    watchlistTitle: 'My Personal Watchlist (Custom Ingredients)',
+    shareCardBtn: 'Share Result Summary',
+    recentScansTitle: 'Recent Scans (1-Click Compare A / B)',
+    scannedLabel: (s) => `Scanned Product (${s})`,
+    pendingOcr: 'Awaiting OCR Confirmation',
+    lowCoverage: 'Low Coverage (<80%)'
+  },
+  ar: {
+    watchlistTitle: 'قائمتي السوداء الشخصية (إضافة مكونات خاصة)',
+    shareCardBtn: 'مشاركة ملخص النتيجة',
+    recentScansTitle: 'عمليات الفحص الأخيرة (مقارنة بنقرة أ / ب)',
+    scannedLabel: (s) => `المنتج الممسوح (${s})`,
+    pendingOcr: 'بانتظار تأكيد القراءة',
+    lowCoverage: 'التغطية غير كافية (<80%)'
+  },
+  de: {
+    watchlistTitle: 'Persönliche Sperrliste (Eigene Stoffe)',
+    shareCardBtn: 'Ergebnis teilen',
+    recentScansTitle: 'Letzte Scans (1-Klick Vergleich A / B)',
+    scannedLabel: (s) => `Gescanntes Produkt (${s})`,
+    pendingOcr: 'OCR-Bestätigung ausstehend',
+    lowCoverage: 'Abdeckung unzureichend (<80%)'
+  },
+  fr: {
+    watchlistTitle: 'Ma Liste Noire Personnelle (Ingrédients)',
+    shareCardBtn: 'Partager le résumé',
+    recentScansTitle: 'Scans récents (Comparer A / B en 1 clic)',
+    scannedLabel: (s) => `Produit scanné (${s})`,
+    pendingOcr: 'Confirmation OCR requise',
+    lowCoverage: 'Couverture insuffisante (<80%)'
+  },
+  id: {
+    watchlistTitle: 'Daftar Hitam Pribadi (Bahan Khusus)',
+    shareCardBtn: 'Bagikan Ringkasan Hasil',
+    recentScansTitle: 'Pindaian Terakhir (1-Klik Bandingkan A / B)',
+    scannedLabel: (s) => `Produk Dipindai (${s})`,
+    pendingOcr: 'Menunggu Konfirmasi OCR',
+    lowCoverage: 'Cakupan Kurang (<80%)'
+  },
+  ms: {
+    watchlistTitle: 'Senarai Hitam Peribadi (Bahan Khas)',
+    shareCardBtn: 'Kongsi Ringkasan Keputusan',
+    recentScansTitle: 'Imbasan Terkini (1-Klik Banding A / B)',
+    scannedLabel: (s) => `Produk Diimbas (${s})`,
+    pendingOcr: 'Menunggu Pengesahan OCR',
+    lowCoverage: 'Liputan Tidak Mencukupi (<80%)'
+  },
+  es: {
+    watchlistTitle: 'Mi Lista Negra Personal (Ingredientes)',
+    shareCardBtn: 'Compartir Resumen',
+    recentScansTitle: 'Escaneos Recientes (Comparar A / B)',
+    scannedLabel: (s) => `Producto Escaneado (${s})`,
+    pendingOcr: 'Confirmación OCR pendiente',
+    lowCoverage: 'Cobertura insuficiente (<80%)'
+  },
+  ru: {
+    watchlistTitle: 'Мой черный список (Свои компоненты)',
+    shareCardBtn: 'Поделиться результатом',
+    recentScansTitle: 'Недавние сканы (Сравнить A / B)',
+    scannedLabel: (s) => `Проверенный продукт (${s})`,
+    pendingOcr: 'Ожидает подтверждения OCR',
+    lowCoverage: 'Недостаточный охват (<80%)'
+  },
+  ur: {
+    watchlistTitle: 'میری ذاتی بلیک لسٹ (مخصوص اجزاء)',
+    shareCardBtn: 'نتیجہ شیئر کریں',
+    recentScansTitle: 'حالیہ اسکینز (موازنہ A / B)',
+    scannedLabel: (s) => `اسکین شدہ پروڈکٹ (${s})`,
+    pendingOcr: 'OCR تصدیق درکار ہے',
+    lowCoverage: 'کوریج ناکافی (<80%)'
+  }
+};
+
 function formatDigits(val: any, lang: string): string {
   if (val === null || val === undefined) return '';
   const s = String(val);
@@ -85,7 +190,9 @@ export default function InciFactMobileApp() {
   const [confirmations, setConfirmations] = useState<Record<string, string>>({});
   const [paywallVisible, setPaywallVisible] = useState(false);
   const [ocrStatusMsg, setOcrStatusMsg] = useState<string | null>(null);
-  const [scanHistory, setScanHistory] = useState<{ name: string; rawText: string; productType: ProductType; score: number | null }[]>([
+  const [scanHistory, setScanHistory] = useState<
+    (CompareSlotItem & { score: number | null })[]
+  >([
     {
       name: 'CeraVe Nemlendirici Krem',
       rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Caprylic/Capric Triglyceride, Cetyl Alcohol, Ceteareth-20, Petrolatum, Ceramide NP, Ceramide AP, Ceramide EOP, Carbomer, Dimethicone, Sodium Hyaluronate, Cholesterol, Phenoxyethanol, Tocopherol',
@@ -100,15 +207,19 @@ export default function InciFactMobileApp() {
     }
   ]);
 
-  // Side-by-side comparison state
-  const [compNameA, setCompNameA] = useState('CeraVe Nemlendirici Krem (A)');
-  const [compTextA, setCompTextA] = useState(
-    'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Caprylic/Capric Triglyceride, Cetyl Alcohol, Ceteareth-20, Petrolatum, Ceramide NP, Ceramide AP, Ceramide EOP, Carbomer, Dimethicone, Sodium Hyaluronate, Cholesterol, Phenoxyethanol, Tocopherol'
-  );
-  const [compNameB, setCompNameB] = useState('Klasik Gece Kremi (B)');
-  const [compTextB, setCompTextB] = useState(
-    'Ingredients: Aqua, Glycerin, Isopropyl Myristate, Cetearyl Alcohol, Propylparaben, Butylphenyl Methylpropional, Methylisothiazolinone, Parfum, Linalool'
-  );
+  // Side-by-side comparison state (preserves productType, claims & confirmations per slot)
+  const [slotA, setSlotA] = useState<CompareSlotItem>({
+    name: 'CeraVe Nemlendirici Krem (A)',
+    rawText:
+      'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Caprylic/Capric Triglyceride, Cetyl Alcohol, Ceteareth-20, Petrolatum, Ceramide NP, Ceramide AP, Ceramide EOP, Carbomer, Dimethicone, Sodium Hyaluronate, Cholesterol, Phenoxyethanol, Tocopherol',
+    productType: 'cosmetic'
+  });
+  const [slotB, setSlotB] = useState<CompareSlotItem>({
+    name: 'Klasik Gece Kremi (B)',
+    rawText:
+      'Ingredients: Aqua, Glycerin, Isopropyl Myristate, Cetearyl Alcohol, Propylparaben, Butylphenyl Methylpropional, Methylisothiazolinone, Parfum, Linalool',
+    productType: 'cosmetic'
+  });
 
   const langMeta = useMemo(
     () => SUPPORTED_LANGUAGES.find((l: any) => l.code === lang) || SUPPORTED_LANGUAGES[0],
@@ -116,6 +227,7 @@ export default function InciFactMobileApp() {
   );
   const isRtl = langMeta.dir === 'rtl';
   const t = useMemo(() => getLocaleStrings(lang), [lang]);
+  const ft = useMemo(() => MOBILE_FEAT_I18N[lang] || MOBILE_FEAT_I18N.en, [lang]);
 
   const applyRegionStructure = (mode: 'auto' | LangCode) => {
     setRegionMode(mode);
@@ -149,17 +261,18 @@ export default function InciFactMobileApp() {
 
   const comparison = useMemo(
     () =>
-      compareProducts(
-        { name: compNameA, rawText: compTextA, productType },
-        { name: compNameB, rawText: compTextB, productType },
-        { userProfiles: selectedProfiles, customWatchlist, halalAuthority, lang }
-      ),
-    [compNameA, compTextA, compNameB, compTextB, productType, selectedProfiles, customWatchlist, halalAuthority, lang]
+      compareProducts(slotA, slotB, {
+        userProfiles: selectedProfiles,
+        customWatchlist,
+        halalAuthority,
+        lang
+      }),
+    [slotA, slotB, selectedProfiles, customWatchlist, halalAuthority, lang]
   );
 
   const addWatchTerm = (term?: string) => {
     const val = (term ?? watchInput).trim();
-    if (val.length < 2) return;
+    if (val.length < 2 || customWatchlist.length >= 50) return;
     if (!customWatchlist.some((w) => w.toLowerCase() === val.toLowerCase())) {
       setCustomWatchlist((prev) => [...prev, val]);
     }
@@ -170,29 +283,63 @@ export default function InciFactMobileApp() {
     setCustomWatchlist((prev) => prev.filter((w) => w !== term));
   };
 
+  const formatHalalSummaryStatus = () => {
+    const halal = evalMain.cards.halalCard;
+    if ((evalMain.unresolvedConfirmations || []).length > 0 || halal.overallStatus === 'unknown') {
+      return `🟡 ${ft.pendingOcr}`;
+    }
+    if (halal.overallStatus === 'kapsam_yetersiz' || evalMain.coveragePercent < 80) {
+      return `🟡 ${ft.lowCoverage}`;
+    }
+    if (halal.overallStatus === 'uygun_gorunuyor') return `🟢 ${t.badges.halalOk}`;
+    if (halal.overallStatus === 'uygunsuz_bulgu' || halal.overallStatus === 'conflict') {
+      return `🔴 ${t.badges.halalRed}`;
+    }
+    return `🟡 ${t.badges.musbooh}`;
+  };
+
   const handleShareResultCard = async () => {
     const reg = evalMain.cards.regulatoryCard;
     const halal = evalMain.cards.halalCard;
-    const scoreTxt = reg.canShowScore ? `${reg.score}/100` : '—';
-    const msg = `🛡️ INCIFACT — ${t.resultScreen.scoreLabel}: ${scoreTxt}\n🌙 ${t.resultScreen.halalSummaryLabel} (${halal.selectedAuthority}): ${halal.overallStatus}\n⚖️ ${t.halalScreen.legalDisclaimerMicro || ''}`;
+    const scoreTxt = reg.canShowScore ? `${reg.score}/100` : `— (${evalMain.coveragePercent}%)`;
+    const msg = `🛡️ INCIFACT — ${t.resultScreen.scoreLabel}: ${scoreTxt}\n🌙 ${t.resultScreen.halalSummaryLabel} (${halal.selectedAuthority}): ${formatHalalSummaryStatus()}\n⚖️ ${t.halalScreen.legalDisclaimerMicro || ''}`;
     try {
       await Share.share({ message: msg });
     } catch {}
   };
 
-  const assignCurrentToCompare = (slot: 'A' | 'B') => {
-    const labelName = lang === 'tr' ? `Taranan Ürün (${slot})` : `Scanned Product (${slot})`;
-    if (slot === 'A') {
-      setCompNameA(labelName);
-      setCompTextA(rawText);
-    } else {
-      setCompNameB(labelName);
-      setCompTextB(rawText);
-    }
+  const recordScanToHistory = (customLabel?: string) => {
+    const firstTokens = rawText
+      .replace(/^[\s\S]*?ingredients\s*:\s*/i, '')
+      .split(/[,;\n]+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(0, 2)
+      .join(', ');
+    const derivedName = customLabel || (firstTokens ? `Analiz: ${firstTokens}` : ft.scannedLabel('1'));
+    const entry: CompareSlotItem & { score: number | null } = {
+      name: derivedName,
+      rawText,
+      productType,
+      claims: { halalCertified: halalCert, veganStatus, vegetarianStatus: 'none' },
+      userConfirmations: { ...confirmations },
+      score: evalMain.cards.regulatoryCard.score
+    };
     setScanHistory((prev) => [
-      { name: labelName, rawText, productType, score: evalMain.cards.regulatoryCard.score },
-      ...prev.filter((p) => p.rawText !== rawText).slice(0, 7)
+      entry,
+      ...prev.filter((p) => !(p.rawText === rawText && p.productType === productType)).slice(0, 7)
     ]);
+    return entry;
+  };
+
+  const assignCurrentToCompare = (slot: 'A' | 'B') => {
+    const labelName = ft.scannedLabel(slot);
+    const entry = recordScanToHistory(labelName);
+    if (slot === 'A') {
+      setSlotA(entry);
+    } else {
+      setSlotB(entry);
+    }
     setActiveTab('compare');
   };
 
@@ -200,24 +347,26 @@ export default function InciFactMobileApp() {
     () =>
       darkMode
         ? {
-            bg: '#070C18',
-            card: '#0B132B',
-            subtle: '#131F3F',
-            text: '#F1F5F9',
-            muted: '#94A3B8',
-            border: '#1F2E52',
-            accent: '#D4AF37',
-            accentSoft: '#1F2A44'
+            bg: '#08120E',
+            card: '#0F221A',
+            subtle: '#163025',
+            text: '#F3EFE6',
+            muted: '#B5AEA0',
+            border: '#254235',
+            accent: '#D4B26A',
+            onAccent: '#0F291E',
+            accentSoft: '#1D352B'
           }
         : {
-            bg: '#F8F9FA',
+            bg: '#F7F4EF',
             card: '#FFFFFF',
-            subtle: '#EEF2F6',
-            text: '#0B132B',
-            muted: '#4A5568',
-            border: '#E2E8F0',
-            accent: '#0B132B',
-            accentSoft: '#E9ECEF'
+            subtle: '#EFECE6',
+            text: '#14261D',
+            muted: '#4A5950',
+            border: '#DCD6CA',
+            accent: '#0F291E',
+            onAccent: '#F7F4EF',
+            accentSoft: '#E8EFEA'
           },
     [darkMode]
   );
@@ -232,12 +381,12 @@ export default function InciFactMobileApp() {
       setRawText(res.extractedText);
       setConfirmations({});
       if (typeof res.confidence === 'number') {
-        setOcrStatusMsg(`OCR metni başarıyla okundu (%${Math.round(res.confidence * 100)} güven).`);
+        setOcrStatusMsg(`OCR (${Math.round(res.confidence * 100)}%)`);
       } else {
-        setOcrStatusMsg('OCR metni başarıyla okundu.');
+        setOcrStatusMsg('OCR OK');
       }
     } else if (res.error === 'NO_NATIVE_OCR') {
-      setOcrStatusMsg('⚠️ Yerel OCR motoru bu simülatörde bulunamadı. Lütfen metni yapıştırarak analiz ediniz.');
+      setOcrStatusMsg('⚠️ OCR text input mode');
     } else if (res.error) {
       setOcrStatusMsg(res.error);
     }
@@ -247,7 +396,7 @@ export default function InciFactMobileApp() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
-      {/* Top Bar (No main-screen language bar; auto-detects device locale and provides Settings shortcut) */}
+      {/* Top Bar */}
       <View
         style={[
           styles.topBar,
@@ -255,7 +404,7 @@ export default function InciFactMobileApp() {
         ]}
       >
         <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }}>
-          <View style={[styles.brandMark, { backgroundColor: theme.accent }]}>
+          <View style={[styles.brandMark, { backgroundColor: '#0F291E' }]}>
             <Text style={styles.brandMarkText}>IF</Text>
           </View>
           <View>
@@ -280,7 +429,7 @@ export default function InciFactMobileApp() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setPaywallVisible(true)}
-            style={[styles.proBtn, { backgroundColor: '#D4AF37' }]}
+            style={[styles.proBtn, { backgroundColor: '#C5A059' }]}
           >
             <Text style={styles.proBtnText}>Pro</Text>
           </TouchableOpacity>
@@ -376,9 +525,14 @@ export default function InciFactMobileApp() {
                 borderColor: theme.border
               }}
             >
-              <Text style={{ fontSize: 12.5, fontWeight: '800', color: theme.text, marginBottom: 4, textAlign: isRtl ? 'right' : 'left' }}>
-                🧬 {lang === 'tr' ? 'Kişisel Kara Listem (Özel Madde Ekle)' : 'My Personal Blacklist (Custom Ingredients)'}
-              </Text>
+              <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <Text style={{ fontSize: 12.5, fontWeight: '800', color: theme.text, textAlign: isRtl ? 'right' : 'left' }}>
+                  🧬 {ft.watchlistTitle}
+                </Text>
+                <Text style={{ fontSize: 11, fontWeight: '800', color: theme.muted }}>
+                  {formatDigits(customWatchlist.length, lang)}/50
+                </Text>
+              </View>
               <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', gap: 6, marginTop: 4 }}>
                 <TextInput
                   value={watchInput}
@@ -387,7 +541,7 @@ export default function InciFactMobileApp() {
                   placeholderTextColor={theme.muted}
                   style={{
                     flex: 1,
-                    height: 36,
+                    height: 38,
                     borderRadius: 8,
                     borderWidth: 1,
                     borderColor: theme.border,
@@ -399,9 +553,9 @@ export default function InciFactMobileApp() {
                 />
                 <TouchableOpacity
                   onPress={() => addWatchTerm()}
-                  style={{ backgroundColor: theme.accent, paddingHorizontal: 12, justifyContent: 'center', borderRadius: 8 }}
+                  style={{ backgroundColor: theme.accent, paddingHorizontal: 14, justifyContent: 'center', borderRadius: 8 }}
                 >
-                  <Text style={{ color: '#FFF', fontWeight: '800', fontSize: 12 }}>+</Text>
+                  <Text style={{ color: theme.onAccent, fontWeight: '800', fontSize: 12 }}>+</Text>
                 </TouchableOpacity>
               </View>
               {customWatchlist.length > 0 && (
@@ -411,22 +565,23 @@ export default function InciFactMobileApp() {
                       key={term}
                       onPress={() => removeWatchTerm(term)}
                       style={{
+                        maxWidth: '100%',
                         paddingHorizontal: 10,
-                        paddingVertical: 4,
-                        borderRadius: 99,
-                        backgroundColor: '#FEE2E2',
+                        paddingVertical: 5,
+                        borderRadius: 12,
+                        backgroundColor: '#FCE8E6',
                         borderWidth: 1,
-                        borderColor: '#DC2626'
+                        borderColor: '#991B1B'
                       }}
                     >
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: '#B91C1C' }}>🧬 {term} ✕</Text>
+                      <Text style={{ fontSize: 11.5, fontWeight: '800', color: '#991B1B' }}>🧬 {term} ✕</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
               )}
             </View>
 
-            {/* Region, Country Structure & Language Settings (Inside Settings/Profile, not on main header) */}
+            {/* Region, Country Structure & Language Settings */}
             <View
               style={{
                 marginTop: 14,
@@ -502,26 +657,13 @@ export default function InciFactMobileApp() {
                   );
                 })}
               </ScrollView>
-              <Text
-                style={{
-                  fontSize: 11,
-                  lineHeight: 15,
-                  color: theme.muted,
-                  marginTop: 8,
-                  textAlign: isRtl ? 'right' : 'left'
-                }}
-              >
-                {lang === 'tr'
-                  ? `🌍 Seçilen ülkeye göre (${langMeta.flag} ${langMeta.nativeName}) dil ve ${halalAuthority} helal kriteri otomatik eşleşir. Ülke veya kurum değiştirdiğinizde aynı ürünün sonucu değişebilir (ör. E120 Karmin veya Salyangoz Müsini GİMDES'te uygunsuzken diğer ülke standartlarında farklı değerlendirilir). Kurum adları yalnızca kamuya açık standartlarıyla bilgi amaçlı karşılaştırma içindir.`
-                  : `🌍 Language and the ${halalAuthority} Halal standard are automatically matched to the selected region (${langMeta.flag} ${langMeta.nativeName}). Switching country or authority can change a product's verdict. Institution names are referenced strictly for informational comparison against their public standards.`}
-              </Text>
             </View>
 
             <TouchableOpacity
               onPress={() => setActiveTab('scan')}
               style={[styles.primaryBtn, { backgroundColor: theme.accent }]}
             >
-              <Text style={styles.primaryBtnText}>{t.profileScreen.continueBtn}</Text>
+              <Text style={[styles.primaryBtnText, { color: theme.onAccent }]}>{t.profileScreen.continueBtn}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -530,26 +672,26 @@ export default function InciFactMobileApp() {
         {activeTab === 'scan' && (
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <View style={styles.viewfinder}>
-              <Text style={{ color: '#9FF3DF', fontWeight: '700', marginBottom: 4 }}>{t.scanScreen.title}</Text>
-              <Text style={{ color: '#D1DFD8', fontSize: 12, textAlign: 'center', marginBottom: 10 }}>
+              <Text style={{ color: '#EAD39C', fontWeight: '700', marginBottom: 4 }}>{t.scanScreen.title}</Text>
+              <Text style={{ color: '#D8D2C5', fontSize: 12, textAlign: 'center', marginBottom: 10 }}>
                 {t.scanScreen.subtitle}
               </Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <TouchableOpacity
                   onPress={() => handleCameraScan('camera')}
-                  style={[styles.cameraActionBtn, { backgroundColor: '#10B981' }]}
+                  style={[styles.cameraActionBtn, { backgroundColor: '#C5A059' }]}
                 >
-                  <Text style={{ color: '#052E24', fontWeight: '800', fontSize: 12 }}>{t.scanScreen.cameraBtn}</Text>
+                  <Text style={{ color: '#0F291E', fontWeight: '800', fontSize: 12 }}>{t.scanScreen.cameraBtn}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleCameraScan('gallery')}
-                  style={[styles.cameraActionBtn, { backgroundColor: '#1E2924', borderWidth: 1, borderColor: '#34D399' }]}
+                  style={[styles.cameraActionBtn, { backgroundColor: '#163025', borderWidth: 1, borderColor: '#C5A059' }]}
                 >
-                  <Text style={{ color: '#A7F3D0', fontWeight: '700', fontSize: 12 }}>🖼️ OCR</Text>
+                  <Text style={{ color: '#EAD39C', fontWeight: '700', fontSize: 12 }}>🖼️ OCR</Text>
                 </TouchableOpacity>
               </View>
               {ocrStatusMsg && (
-                <Text style={{ color: '#A7F3D0', fontSize: 11, marginTop: 6 }}>{ocrStatusMsg}</Text>
+                <Text style={{ color: '#EAD39C', fontSize: 11, marginTop: 6 }}>{ocrStatusMsg}</Text>
               )}
             </View>
 
@@ -624,10 +766,13 @@ export default function InciFactMobileApp() {
             />
 
             <TouchableOpacity
-              onPress={() => setActiveTab('result')}
+              onPress={() => {
+                recordScanToHistory();
+                setActiveTab('result');
+              }}
               style={[styles.primaryBtn, { backgroundColor: theme.accent }]}
             >
-              <Text style={styles.primaryBtnText}>{t.scanScreen.analyzeBtn}</Text>
+              <Text style={[styles.primaryBtnText, { color: theme.onAccent }]}>{t.scanScreen.analyzeBtn}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -660,7 +805,7 @@ export default function InciFactMobileApp() {
               {t.resultScreen.scoreLabel}: {evalMain.cards.regulatoryCard.canShowScore ? `${formatDigits(evalMain.cards.regulatoryCard.score, lang)} / ${formatDigits(100, lang)}` : `— (${formatDigits(evalMain.coveragePercent, lang)}%)`}
             </Text>
             <Text style={[styles.sectionSub, { color: theme.muted, textAlign: isRtl ? 'right' : 'left' }]}>
-              {t.resultScreen.coverageLabel}: {lang === 'ar' || lang === 'ur' ? '٪' + formatDigits(evalMain.coveragePercent, lang) : '%' + evalMain.coveragePercent} • {t.halalScreen.veganSugarTitle}: {formatDigits(evalMain.cards.veganSugarCard.freeSugarCount, lang)}
+              {t.resultScreen.coverageLabel}: {lang === 'ar' || lang === 'ur' ? '٪' + formatDigits(evalMain.coveragePercent, lang) : '%' + evalMain.coveragePercent} • {formatHalalSummaryStatus()}
             </Text>
             {evalMain.cards.regulatoryCard.findings.map((f: any, idx: number) => (
               <Text
@@ -685,8 +830,8 @@ export default function InciFactMobileApp() {
                 onPress={handleShareResultCard}
                 style={[styles.chip, { flex: 1, backgroundColor: theme.accent, borderColor: theme.accent, alignItems: 'center' }]}
               >
-                <Text style={{ color: '#FFF', fontWeight: '800', fontSize: 12 }}>
-                  📤 {lang === 'tr' ? 'Sonuç Kartını Paylaş' : 'Share Result Card'}
+                <Text style={{ color: theme.onAccent, fontWeight: '800', fontSize: 12 }}>
+                  📤 {ft.shareCardBtn}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -739,42 +884,69 @@ export default function InciFactMobileApp() {
                   key={idx}
                   style={{ color: theme.text, fontSize: 13, lineHeight: 20, marginBottom: 6, textAlign: isRtl ? 'right' : 'left' }}
                 >
-                  • {hf.canonical} ({hf.rawToken}):{' '}
+                  • {hf.localizedName || hf.canonical} ({hf.rawToken}):{' '}
                   {hf.status === 'kirmizi'
                     ? `🔴 ${t.badges.halalRed}`
                     : hf.status === 'yesil'
                     ? `🟢 ${t.badges.halalOk}`
                     : hf.status === 'conflict'
-                    ? `⚠️ ${t.badges.conflict || 'Çelişki'}`
+                    ? `⚠️ ${t.badges.conflict || 'Conflict'}`
                     : `🟡 ${t.badges.musbooh}`}
                 </Text>
               ))
             ) : (
               <Text style={{ color: theme.muted, fontSize: 13, lineHeight: 20, textAlign: isRtl ? 'right' : 'left' }}>
-                {evalMain.cards.halalCard.overallStatus === 'uygun_gorunuyor'
-                  ? `🟢 ${t.badges.halalOk} — ${t.badges.none}`
-                  : evalMain.cards.halalCard.overallStatus === 'kapsam_yetersiz'
-                  ? `🟡 ${t.badges.musbooh} — ${t.badges.lowCoverage || 'Kapsam <%80'}`
-                  : `— ${t.badges.none}`}
+                {formatHalalSummaryStatus()}
               </Text>
             )}
-            {/* 4-Authority Comparison Matrix & Fıkhi Difference Explanation */}
+            {/* 4-Authority Interactive 2x2 Comparison Matrix & Fıkhi Difference Explanation */}
             {(evalMain.cards.halalCard.authorityComparison || []).map((ac: any, idx: number) => (
               <View
                 key={`ac-${idx}`}
                 style={{
                   marginTop: 10,
-                  padding: 10,
-                  borderRadius: 10,
+                  padding: 12,
+                  borderRadius: 12,
                   backgroundColor: theme.subtle,
                   borderWidth: 1,
                   borderColor: theme.accent
                 }}
               >
-                <Text style={{ fontSize: 12, fontWeight: '800', color: theme.accent, marginBottom: 4, textAlign: isRtl ? 'right' : 'left' }}>
-                  ⚖️ {ac.localizedName || ac.canonical} (GİMDES · JAKIM · MUI · IFANCA)
+                <Text style={{ fontSize: 13, fontWeight: '800', color: theme.accent, marginBottom: 8, textAlign: isRtl ? 'right' : 'left' }}>
+                  🔎 {ac.localizedName || ac.canonical}
                 </Text>
-                <Text style={{ fontSize: 11.5, color: theme.text, lineHeight: 17, textAlign: isRtl ? 'right' : 'left' }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
+                  {(['GIMDES', 'JAKIM', 'MUI', 'IFANCA'] as HalalAuthority[]).map((ak) => {
+                    const st = ac.authorityMatrix ? ac.authorityMatrix[ak] : 'sari';
+                    const isCurr = halalAuthority === ak;
+                    const cellBg = st === 'yesil' ? '#E4F2EA' : st === 'kirmizi' || st === 'conflict' ? '#FCE8E6' : '#FDF0DF';
+                    const cellFg = st === 'yesil' ? '#145A32' : st === 'kirmizi' || st === 'conflict' ? '#991B1B' : '#8A3B08';
+                    const stWord = st === 'yesil' ? t.badges.halalOk : st === 'kirmizi' || st === 'conflict' ? t.badges.halalRed : t.badges.musbooh;
+                    return (
+                      <TouchableOpacity
+                        key={ak}
+                        onPress={() => setHalalAuthority(ak)}
+                        style={{
+                          width: '47%',
+                          minHeight: 46,
+                          padding: 8,
+                          borderRadius: 10,
+                          backgroundColor: cellBg,
+                          borderWidth: isCurr ? 2 : 1,
+                          borderColor: isCurr ? theme.accent : cellFg
+                        }}
+                      >
+                        <Text style={{ fontSize: 12, fontWeight: '800', color: '#14261D' }}>
+                          {ak}{isCurr ? ' ✓' : ''}
+                        </Text>
+                        <Text style={{ fontSize: 11.5, fontWeight: '700', color: cellFg }}>
+                          {stWord}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <Text style={{ fontSize: 12, color: theme.text, lineHeight: 17, textAlign: isRtl ? 'right' : 'left' }}>
                   {ac.reason}
                 </Text>
               </View>
@@ -790,7 +962,7 @@ export default function InciFactMobileApp() {
 
             <View style={{ marginTop: 12, padding: 10, borderRadius: 10, backgroundColor: theme.subtle, borderWidth: 1, borderColor: theme.border }}>
               <Text style={{ fontSize: 11, color: theme.muted, lineHeight: 16, textAlign: isRtl ? 'right' : 'left' }}>
-                ⚖️ {t.halalScreen.legalDisclaimerMicro || 'Bu analiz seçilen kurumların kamuya açık standartlarına dayalı bağımsız bir algoritmik ön incelemedir. Resmi tescil niteliğinde değildir.'}
+                ⚖️ {t.halalScreen.legalDisclaimerMicro || ''}
               </Text>
             </View>
           </View>
@@ -809,7 +981,7 @@ export default function InciFactMobileApp() {
             <View style={{ flexDirection: isRtl ? 'row-reverse' : 'row', gap: 10, marginBottom: 12 }}>
               <View style={[styles.compareCol, { backgroundColor: theme.subtle, borderColor: comparison.productA.score !== null && comparison.productA.score >= (comparison.productB.score || 0) ? theme.accent : theme.border }]}>
                 <Text style={{ fontWeight: '800', color: theme.accent }}>{comparison.productA.name}</Text>
-                <Text style={{ fontSize: 22, fontWeight: '800', color: comparison.productA.hasBanned ? '#B42318' : '#1F6F50', marginVertical: 4 }}>
+                <Text style={{ fontSize: 22, fontWeight: '800', color: comparison.productA.hasBanned ? '#991B1B' : '#145A32', marginVertical: 4 }}>
                   {comparison.productA.canShowScore ? `${formatDigits(comparison.productA.score, lang)} / ${formatDigits(100, lang)}` : '—'}
                 </Text>
                 <Text style={{ fontSize: 12, color: theme.muted }}>
@@ -822,7 +994,7 @@ export default function InciFactMobileApp() {
               </View>
               <View style={[styles.compareCol, { backgroundColor: theme.subtle, borderColor: comparison.productB.score !== null && comparison.productB.score > (comparison.productA.score || 0) ? theme.accent : theme.border }]}>
                 <Text style={{ fontWeight: '800', color: theme.text }}>{comparison.productB.name}</Text>
-                <Text style={{ fontSize: 22, fontWeight: '800', color: comparison.productB.hasBanned ? '#B42318' : '#1F6F50', marginVertical: 4 }}>
+                <Text style={{ fontSize: 22, fontWeight: '800', color: comparison.productB.hasBanned ? '#991B1B' : '#145A32', marginVertical: 4 }}>
                   {comparison.productB.canShowScore ? `${formatDigits(comparison.productB.score, lang)} / ${formatDigits(100, lang)}` : '—'}
                 </Text>
                 <Text style={{ fontSize: 12, color: theme.muted }}>
@@ -837,10 +1009,10 @@ export default function InciFactMobileApp() {
 
             {comparison.decidingDifference && (
               <View style={styles.diffBox}>
-                <Text style={{ fontWeight: '800', color: '#8F4B00', marginBottom: 4 }}>
-                  {comparison.decidingDifference.headline}
+                <Text style={{ fontWeight: '800', color: '#8A3B08', marginBottom: 4 }}>
+                  ⚡ {comparison.decidingDifference.headline}
                 </Text>
-                <Text style={{ fontSize: 12, color: '#8F4B00', lineHeight: 18 }}>
+                <Text style={{ fontSize: 12, color: '#8A3B08', lineHeight: 18 }}>
                   {comparison.decidingDifference.explanation}
                 </Text>
               </View>
@@ -849,7 +1021,7 @@ export default function InciFactMobileApp() {
             {/* Recent Scans History with 1-Click A/B Assignment */}
             <View style={{ marginTop: 14 }}>
               <Text style={{ fontSize: 13, fontWeight: '800', color: theme.text, marginBottom: 8, textAlign: isRtl ? 'right' : 'left' }}>
-                🕘 {lang === 'tr' ? 'Son Tarananlar (Tek Tıkla A / B Karşılaştır)' : 'Recent Scans (1-Click Compare A / B)'}
+                🕘 {ft.recentScansTitle}
               </Text>
               {scanHistory.map((item, idx) => (
                 <View
@@ -868,22 +1040,16 @@ export default function InciFactMobileApp() {
                   </Text>
                   <View style={{ flexDirection: 'row', gap: 6 }}>
                     <TouchableOpacity
-                      onPress={() => {
-                        setCompNameA(item.name);
-                        setCompTextA(item.rawText);
-                      }}
-                      style={[styles.chip, { paddingVertical: 4, paddingHorizontal: 8, backgroundColor: theme.subtle, borderColor: theme.border }]}
+                      onPress={() => setSlotA(item)}
+                      style={[styles.chip, { paddingVertical: 5, paddingHorizontal: 10, backgroundColor: theme.subtle, borderColor: theme.border }]}
                     >
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: theme.text }}>A</Text>
+                      <Text style={{ fontSize: 11.5, fontWeight: '800', color: theme.text }}>A</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      onPress={() => {
-                        setCompNameB(item.name);
-                        setCompTextB(item.rawText);
-                      }}
-                      style={[styles.chip, { paddingVertical: 4, paddingHorizontal: 8, backgroundColor: theme.subtle, borderColor: theme.border }]}
+                      onPress={() => setSlotB(item)}
+                      style={[styles.chip, { paddingVertical: 5, paddingHorizontal: 10, backgroundColor: theme.subtle, borderColor: theme.border }]}
                     >
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: theme.text }}>B</Text>
+                      <Text style={{ fontSize: 11.5, fontWeight: '800', color: theme.text }}>B</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -905,7 +1071,7 @@ export default function InciFactMobileApp() {
               onPress={() => setPaywallVisible(false)}
               style={[styles.primaryBtn, { backgroundColor: theme.accent }]}
             >
-              <Text style={styles.primaryBtnText}>InciFact Pro ($29.99/yr)</Text>
+              <Text style={[styles.primaryBtnText, { color: theme.onAccent }]}>InciFact Pro ($29.99/yr)</Text>
             </TouchableOpacity>
           </View>
         </View>

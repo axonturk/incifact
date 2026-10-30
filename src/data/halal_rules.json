@@ -1095,13 +1095,13 @@
       "authority_rulings": {
         "general_cautious": "kirmizi",
         "GIMDES": "kirmizi",
-        "JAKIM": "kirmizi",
-        "MUI": "kirmizi",
+        "JAKIM": "sari",
+        "MUI": "sari",
         "IFANCA": "sari"
       },
       "source_id": "BPJPH_MUI_ID",
       "verification": "ikincil_kontrol",
-      "template_tr": "Kara salyangozu salgısı (Snail Mucin); Endonezya MUI, Malezya JAKIM ve GİMDES kriterlerinde kara haşaratı/yumuşakçası kapsamında kozmetik helal sertifikasyonuna uygun kabul edilmemektedir. Vegan değildir."
+      "template_tr": "Kara salyangozu salgısı (Snail Mucin): Gıda olarak tüketimi tüm otoritelerce uygunsuzdur (Kırmızı). Harici kozmetik kullanımında ise GİMDES sertifikasyona uygun görmezken (Kırmızı); Endonezya MUI (Fetva No. 24/2012 & LPPOM non-food rehberi), Malezya (Mufti Wilayah İrşad el-Fetva Seri 188 / JAKIM ürün teyidi) ve IFANCA saflık/üretim ve sertifika şartına bağlı (Sarı/Şüpheli) değerlendirir. Vegan değildir."
     },
     {
       "id": "animal_enzymes_pepsin_lipase",

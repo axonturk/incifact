@@ -333,14 +333,28 @@ runTest('22. Gerçek Dünya Ürünleri (CeraVe, Nutella %13 Fındık, COSRX Saly
   assert.equal(nutella.cards.regulatoryCard.coveragePercent, 100);
   assert.equal(nutella.cards.veganSugarCard.freeSugarCount, 1);
 
-  // COSRX Snail Mucin Halal check (Red in MUI / JAKIM / GIMDES)
-  const cosrx = evaluateProduct({
+  // COSRX Snail Mucin Halal check (GIMDES: kirmizi/uygunsuz_bulgu; MUI cosmetic: sari/kaynak_belirsiz_musbooh per Fatwa MUI 24/2012; MUI food: kirmizi)
+  const cosrxGimdes = evaluateProduct({
+    rawText: 'Ingredients: Snail Secretion Filtrate, Betaine, Butylene Glycol, 1,2-Hexanediol, Sodium Polyacrylate, Phenoxyethanol, Sodium Hyaluronate, Allantoin, Panthenol, Arginine, Aqua',
+    productType: 'cosmetic',
+    halalAuthority: 'GIMDES'
+  });
+  assert.equal(cosrxGimdes.cards.regulatoryCard.coveragePercent, 100);
+  assert.equal(cosrxGimdes.cards.halalCard.overallStatus, 'uygunsuz_bulgu');
+
+  const cosrxMuiCosmetic = evaluateProduct({
     rawText: 'Ingredients: Snail Secretion Filtrate, Betaine, Butylene Glycol, 1,2-Hexanediol, Sodium Polyacrylate, Phenoxyethanol, Sodium Hyaluronate, Allantoin, Panthenol, Arginine, Aqua',
     productType: 'cosmetic',
     halalAuthority: 'MUI'
   });
-  assert.equal(cosrx.cards.regulatoryCard.coveragePercent, 100);
-  assert.equal(cosrx.cards.halalCard.overallStatus, 'uygunsuz_bulgu');
+  assert.equal(cosrxMuiCosmetic.cards.halalCard.overallStatus, 'kaynak_belirsiz_musbooh');
+
+  const snailFoodMui = evaluateProduct({
+    rawText: 'Ingredients: Water, Sugar, Snail Secretion Filtrate, Citric Acid, Pectin',
+    productType: 'food',
+    halalAuthority: 'MUI'
+  });
+  assert.equal(snailFoodMui.cards.halalCard.overallStatus, 'uygunsuz_bulgu');
 
   // Gel Nail Polish with TPO (Sept 2025 EU Omnibus VII Ban -> Score Capped at 10)
   const gelNail = evaluateProduct({
@@ -828,10 +842,143 @@ runTest('41. Otoriteler arası görüş ayrılığı olan maddelerde (Karmin E12
   assert.ok(comp.authorityDiffReason && comp.authorityDiffReason.includes('GİMDES'));
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/41 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// 42. Hedefe Bağlı Negasyon (Target-Bound Negation): Sinensis, Lysine, Tyrosine, Freesia ve Parantez İçi Farklı Negasyon
+runTest('42. Hedefe bağlı negasyon: Camellia Sinensis, Lysine, Tyrosine, Freesia ve "Phenoxyethanol (Paraben-free)" kara listeden kaçmamalı', () => {
+  // A. "sin" or "free" inside botanical/amino names must NOT trigger negation
+  const resBotanicals = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Camellia Sinensis Leaf Extract, Citrus Sinensis Peel Oil, Lysine, Tyrosine, Freesia Refracta Extract',
+    productType: 'cosmetic',
+    customWatchlist: ['Camellia Sinensis', 'Lysine', 'Tyrosine', 'Freesia']
+  });
+  assert.equal(resBotanicals.cards.profileCard.profileStatuses.ozel_kara_liste, 'false');
+  assert.equal(resBotanicals.cards.profileCard.preferenceMatchScore, 0);
+  const botAlerts = resBotanicals.cards.profileCard.alerts.filter((a) => a.profile === 'ozel_kara_liste');
+  assert.ok(botAlerts.length >= 4, 'Tüm botanik ve amino asit kara liste maddeleri yakalanmalı');
 
+  // B. Parenthetical negation of a DIFFERENT substance ("Phenoxyethanol (Paraben-free)") must NOT exempt Phenoxyethanol!
+  const resCrossNeg = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Phenoxyethanol (Paraben-free), Parfum (alcohol-free), Panthenol',
+    productType: 'cosmetic',
+    customWatchlist: ['Phenoxyethanol', 'Parfum']
+  });
+  assert.equal(resCrossNeg.cards.profileCard.profileStatuses.ozel_kara_liste, 'false');
+  assert.equal(resCrossNeg.cards.profileCard.preferenceMatchScore, 0);
+  const crossAlerts = resCrossNeg.cards.profileCard.alerts.filter((a) => a.profile === 'ozel_kara_liste');
+  assert.equal(crossAlerts.length, 2, 'Phenoxyethanol ve Parfum farklı madde negasyonu nedeniyle muaf tutulmamalı');
+});
 
+// 43. Yağ Alkolü Koruması (Fatty Alcohol Guard) ve Kısa Hece ("ni", "in") Yanlış Pozitif Koruması
+runTest('43. Kara listedeki genel "Alcohol" Cetyl/Cetearyl Alcohol ü yakalamamalı; 2 harfli "ni"/"in" Niacinamide/Glycerin i yakalamamalı', () => {
+  // A. Generic 'Alcohol' in watchlist on CeraVe (Cetyl Alcohol, Cetearyl Alcohol) -> SAFE ('true')
+  const resFattySafe = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Panthenol',
+    productType: 'cosmetic',
+    customWatchlist: ['Alcohol']
+  });
+  assert.equal(resFattySafe.cards.profileCard.profileStatuses.ozel_kara_liste, 'true');
 
+  // B. Generic 'Alcohol' in watchlist on Alcohol Denat. -> FLAGGED ('false')
+  const resEthanolFlagged = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Alcohol Denat., Glycerin, Panthenol',
+    productType: 'cosmetic',
+    customWatchlist: ['Alcohol']
+  });
+  assert.equal(resEthanolFlagged.cards.profileCard.profileStatuses.ozel_kara_liste, 'false');
 
+  // C. Specific 'Cetyl Alcohol' in watchlist -> FLAGGED ('false')
+  const resSpecificFatty = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetyl Alcohol, Panthenol',
+    productType: 'cosmetic',
+    customWatchlist: ['Cetyl Alcohol']
+  });
+  assert.equal(resSpecificFatty.cards.profileCard.profileStatuses.ozel_kara_liste, 'false');
 
+  // D. 2-char terms ('ni', 'in') must NOT substring-match Niacinamide or Glycerin
+  const resShortTerms = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Panthenol',
+    productType: 'cosmetic',
+    customWatchlist: ['ni', 'in']
+  });
+  assert.equal(resShortTerms.cards.profileCard.profileStatuses.ozel_kara_liste, 'true');
+});
+
+// 44. 51. Kara Liste Maddesi Koruması ve OCR Bekleyen Üründe Kara Liste Belirsizlik ("unknown") Yayılımı
+runTest('44. 51. kara liste maddesi sessizce atlanmamalı ve OCR onayı bekleyen üründe kara liste "true" yerine "unknown" dönmeli', () => {
+  // A. 51st item is Niacinamide -> must still be caught and watchlistLimitExceeded must be true
+  const list51 = Array.from({ length: 50 }, (_, i) => `DummyIngredient${i + 1}`).concat(['Niacinamide']);
+  const res51 = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Panthenol',
+    productType: 'cosmetic',
+    customWatchlist: list51
+  });
+  assert.equal(res51.cards.profileCard.watchlistLimitExceeded, true);
+  assert.equal(res51.cards.profileCard.profileStatuses.ozel_kara_liste, 'false', '51. sıradaki Niacinamide sessizce güvenli sayılmamalı');
+
+  // B. Pending OCR confirmation ('Sodium Laur?l Sulfate') with watchlist ['SLS'] -> ozel_kara_liste must be 'unknown', NOT 'true'
+  const resOcrWatch = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Sodium Laur?l Sulfate, Panthenol, Tocopherol',
+    productType: 'cosmetic',
+    customWatchlist: ['SLS']
+  });
+  assert.ok(resOcrWatch.unresolvedConfirmations.length > 0);
+  assert.equal(resOcrWatch.cards.profileCard.profileStatuses.ozel_kara_liste, 'unknown');
+  assert.equal(resOcrWatch.cards.profileCard.preferenceMatchScore, null);
+});
+
+// 45. 4-Otorite Matrisi Değişmezi (authorityMatrix[halalAuthority] === status)
+runTest('45. Tüm otorite, ürün tipi ve sertifika kombinasyonlarında authorityMatrix[selectedAuthority] === finding.status değişmezi korunmalı', () => {
+  const authorities = ['GIMDES', 'JAKIM', 'MUI', 'IFANCA'];
+  for (const auth of authorities) {
+    // Case 1: Ethanol in cosmetic with halalCertified: true
+    const rEth = evaluateProduct({
+      rawText: 'Ingredients: Aqua, Glycerin, Alcohol Denat., Panthenol, Tocopherol',
+      productType: 'cosmetic',
+      halalAuthority: auth,
+      claims: { halalCertified: true, veganStatus: 'none', vegetarianStatus: 'none' }
+    });
+    const fEth = rEth.cards.halalCard.findings.find((f) => f.ruleId === 'ethanol_cosmetic_or_food');
+    assert.ok(fEth);
+    assert.equal(fEth.authorityMatrix[auth], fEth.status, `Ethanol + halalCertified invariant failed for ${auth}`);
+
+    // Case 2: L-Cysteine (E920) in food with verified vegan claim
+    const rCys = evaluateProduct({
+      rawText: 'Ingredients: Wheat Flour, Water, Salt, Yeast, E920',
+      productType: 'food',
+      halalAuthority: auth,
+      claims: { halalCertified: false, veganStatus: 'verified', vegetarianStatus: 'none' }
+    });
+    const fCys = rCys.cards.halalCard.findings.find((f) => f.ruleId === 'l_cysteine');
+    assert.ok(fCys);
+    assert.equal(fCys.authorityMatrix[auth], fCys.status, `E920 + verifiedVegan invariant failed for ${auth}`);
+  }
+});
+
+// 46. Karşılaştırma Motoru (compareProducts): Konsantrasyon Farkı (MI 20 ppm vs 10 ppm), Kara Liste Farkı ve Durum Kodları
+runTest('46. compareProducts: Aynı maddenin farklı konsantrasyonunu (MI 20 ppm vs 10 ppm) ve kişisel kara liste farkını decidingDifference olarak yakalamalı', () => {
+  // A. MI 20 ppm in Rinse-off Shampoo (Score 10, Banned >15 ppm) vs MI 10 ppm in Rinse-off Shampoo (Score 90, Restricted <=15 ppm)
+  const compMi = compareProducts(
+    { name: 'Yüz Yıkama Jeli A (20 ppm)', rawText: 'Shampoo: Aqua, Glycerin, Panthenol, Tocopherol, Methylisothiazolinone (20 ppm)', productType: 'cosmetic' },
+    { name: 'Yüz Yıkama Jeli B (10 ppm)', rawText: 'Shampoo: Aqua, Glycerin, Panthenol, Tocopherol, Methylisothiazolinone (10 ppm)', productType: 'cosmetic' },
+    { lang: 'tr' }
+  );
+  assert.equal(compMi.productA.score, 10);
+  assert.equal(compMi.productB.score, 90);
+  assert.ok(compMi.decidingDifference, 'MI 20 ppm vs 10 ppm karşılaştırmasında decidingDifference boş olmamalı');
+  assert.ok(compMi.decidingDifference.headline.includes('Yüz Yıkama Jeli A'));
+
+  // B. Same regulatory score (100 vs 100), but Product B contains a personal watchlist item ('Niacinamide')
+  const compWatch = compareProducts(
+    { name: 'Temiz Krem A', rawText: 'Aqua, Glycerin (Bitkisel), Panthenol, Tocopherol, Ceramide NP', productType: 'cosmetic' },
+    { name: 'Niacinamide Krem B', rawText: 'Aqua, Glycerin (Bitkisel), Panthenol, Tocopherol, Niacinamide', productType: 'cosmetic' },
+    { customWatchlist: ['Niacinamide'], lang: 'tr' }
+  );
+  assert.equal(compWatch.productA.profileStatusCode, 'uygun');
+  assert.equal(compWatch.productB.profileStatusCode, 'uygunsuz');
+  assert.ok(compWatch.decidingDifference, 'Kişisel kara liste farkında decidingDifference üretilmeli');
+
+  // C. Clean halal product has halalStatusCode === 'uygun'
+  assert.equal(compWatch.productA.halalStatusCode, 'uygun');
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/46 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
 

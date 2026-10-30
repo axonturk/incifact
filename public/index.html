@@ -8,44 +8,90 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" />
   <style>
     :root {
-      --bg: #F8F9FA;
+      --bg: #F7F4EF;
       --surface: #FFFFFF;
-      --surface2: #EEF2F6;
-      --ink: #0B132B;
+      --surface2: #EFECE6;
+      --ink: #0F291E;
       --muted: #4A5568;
-      --line: #E2E8F0;
-      --accent: #0B132B;
-      --accent-gold: #D4AF37;
+      --line: #DCD7CD;
+      --accent: #0F291E;
+      --accent-gold: #C5A059;
+      --gold-ink: #6E5015;
       --on-accent: #FFFFFF;
-      --soft: #E9ECEF;
-      --ok: #1B6E3F;
+      --soft: #E9EFEA;
+      --ok: #145A32;
       --ok-bg: #E6F4EA;
-      --warn: #B45309;
+      --warn: #8A3B08;
       --warn-bg: #FEF3C7;
-      --bad: #DC2626;
+      --bad: #991B1B;
       --bad-bg: #FEE2E2;
-      --info: #1E40AF;
+      --info: #1E3A8A;
       --info-bg: #EFF6FF;
     }
     body.dark {
-      --bg: #070C18;
-      --surface: #0B132B;
-      --surface2: #131F3F;
-      --ink: #F1F5F9;
-      --muted: #94A3B8;
-      --line: #1F2E52;
-      --accent: #D4AF37;
-      --accent-gold: #F3E5AB;
-      --on-accent: #070C18;
-      --soft: #162447;
-      --ok: #10B981;
+      --bg: #07120E;
+      --surface: #0F291E;
+      --surface2: #163829;
+      --ink: #F7F4EF;
+      --muted: #A3B8B0;
+      --line: #234B39;
+      --accent: #C5A059;
+      --accent-gold: #E6C98A;
+      --gold-ink: #E6C98A;
+      --on-accent: #07120E;
+      --soft: #183A2C;
+      --ok: #34D399;
       --ok-bg: #064E3B;
-      --warn: #F59E0B;
+      --warn: #FBBF24;
       --warn-bg: #451A03;
-      --bad: #EF4444;
+      --bad: #FCA5A5;
       --bad-bg: #450A0A;
-      --info: #60A5FA;
+      --info: #93C5FD;
       --info-bg: #172554;
+    }
+    .watch-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: var(--bad-bg);
+      color: var(--bad);
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid var(--bad);
+      max-width: 100%;
+      min-width: 0;
+    }
+    .watch-chip__label {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      line-height: 1.3;
+    }
+    .watch-chip__remove {
+      flex: 0 0 28px;
+      width: 28px;
+      min-height: 28px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(153, 27, 27, 0.12);
+      color: var(--bad);
+      font-weight: 900;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .authority-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    @media (max-width: 480px) {
+      body { padding-inline: 0; }
+      .phone-frame { width: 100%; max-width: 390px; border-radius: 0; }
     }
     * { box-sizing: border-box; }
     body {
@@ -182,7 +228,7 @@
       <div>
         <div style="font-weight: 800; font-size: 17px; letter-spacing: -0.01em; display:flex; align-items:center; gap:8px;">
           <span>InciFact</span>
-          <span style="font-size:10px; font-weight:800; color:#D4AF37; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.35); border-radius:6px; padding:1px 6px; letter-spacing:0.02em;">30K+ COSING</span>
+          <span style="font-size:10px; font-weight:800; color:var(--gold-ink); background:rgba(197,160,89,0.16); border:1px solid rgba(197,160,89,0.45); border-radius:6px; padding:1px 6px; letter-spacing:0.02em;">30K+ COSING</span>
         </div>
         <div id="brandTagline" style="font-size: 12px; color: var(--muted);">Kozmetik, Gıda & Helal İçerik Analizi · 10 Dil & Yan Yana Karşılaştırma</div>
       </div>
@@ -228,10 +274,14 @@
 
     <!-- Right Control & Live Scenario Panel -->
     <div class="side-inspector" id="sideInspector">
-      <img src="./assets/hero-shield-crest.jpg" style="width:100%; border-radius:14px; margin-bottom:14px; border:1px solid rgba(212,175,55,0.3); display:block; box-shadow: 0 4px 16px rgba(11, 19, 43, 0.2);" alt="InciFact 3D Shield Hero Crest" />
-      <div id="sideTitle" style="font-size: 16px; font-weight: 800;">Canlı Kural Motoru & 10 Dil Test Paneli</div>
-      <div id="sideDesc" style="font-size: 13px; color: var(--muted); line-height: 1.4;">
-        Sol taraftaki <b>InciFact</b> telefon ekranı <b>30.600+ AB CosIng resmi bileşen sözlüğüne</b> ve deterministik kural motoruna (<span class="mono">ruleEngine.mjs</span>) bağlıdır.
+      <div style="display:flex; align-items:center; gap:12px;">
+        <img src="./assets/hero-shield-crest.jpg" width="56" height="56" style="width:56px; height:56px; object-fit:cover; border-radius:12px; flex:none; border:1px solid rgba(197,160,89,0.45); display:block; box-shadow: 0 2px 8px rgba(15, 41, 30, 0.2);" alt="InciFact Shield Crest" />
+        <div style="display:flex; flex-direction:column; gap:3px;">
+          <div id="sideTitle" style="font-size: 15.5px; font-weight: 800;">Canlı Kural Motoru & 10 Dil Test Paneli</div>
+          <div id="sideDesc" style="font-size: 12.5px; color: var(--muted); line-height: 1.38;">
+            Sol taraftaki <b>InciFact</b> telefon ekranı <b>30.600+ AB CosIng resmi bileşen sözlüğüne</b> ve deterministik kural motoruna (<span class="mono">ruleEngine.mjs</span>) bağlıdır.
+          </div>
+        </div>
       </div>
 
       <div id="presetsHeader" style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase;">Hazır Gerçek Dünya Ürünleri & Senaryolar</div>
@@ -1108,72 +1158,102 @@
     const FEATURES_I18N = {
       tr: {
         watchlistTitle: '🧬 Kişisel Kara Listem (Özel Madde Ekle)',
-        watchlistSub: 'Doktorunuzun önermediği veya kişisel olarak kaçındığınız maddeleri ekleyin (🔒 Yalnızca bu cihazda saklanır).',
+        watchlistSub: 'Doktorunuzun önermediği veya kişisel olarak kaçındığınız maddeleri ekleyin (🔒 Yalnızca bu cihazın yerel hafızasında saklanır, sunucuya kaydedilmez).',
         watchlistPlaceholder: 'Örn: Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ Ekle',
         watchlistQuickLbl: 'Hızlı Ekle:',
         watchlistEmpty: 'Henüz özel yasaklı madde eklenmedi.',
         watchlistBadge: '🧬 Kişisel Kara Liste',
+        watchlistLimitMsg: '⚠️ En fazla 50 özel madde eklenebilir (50/50 sınırına ulaşıldı).',
         shareCardBtn: '📸 Sonuç Kartı (PNG / Paylaş)',
         shareTextBtn: '💬 Özeti Kopyala',
         shareCopiedToast: '✓ Analiz özeti panoya kopyalandı!',
         shareModalTitle: '📸 InciFact Analiz Kartı (WhatsApp / Instagram)',
         downloadPngBtn: '📥 Görseli İndir (PNG)',
         whatsappShareBtn: '📲 WhatsApp ile Gönder',
-        copySummaryBtn: '📋 Özet Metni Kopyala',
+        copySummaryBtn: '📋 Özet Metni Panoya Kopyala',
         setSlotABtn: '🅰️ 1. Ürün (A) Yap',
         setSlotBBtn: '🅱️ 2. Ürün (B) Yap',
         slotSetToast: (slot, name) => `✓ "${name}" karşılaştırma için ${slot}. Ürün olarak seçildi!`,
         authDiffTitle: '⚖️ Otoriteler Neden Farklı Karar Verdi? (4 Kurum Karşılaştırması)',
         authDiffSub: 'Aşağıdaki kurumlardan birine dokunarak analizi o kurumun standardına göre anında değiştirebilirsiniz:',
         clearHistoryBtn: 'Geçmişi Sıfırla',
-        resetCompareBtn: 'Varsayılan Çifte Dön'
+        resetCompareBtn: 'Varsayılan Çifte Dön',
+        customScanPrefix: 'Özel Analiz',
+        statusPendingOcr: 'OCR Teyidi Bekleniyor',
+        statusLowCoverage: 'Kapsam Yetersiz (<%80)',
+        statusNoData: 'Veri Yok / Belirsiz',
+        unrecognizedWhy: 'Bu bileşen resmi AB CosIng veya gıda veritabanında doğrudan eşleşmedi; resmi güvenlik veya helallik teyidi bulunmuyor.',
+        lowCovTileSub: 'Tanınan bileşen oranı <%80 olduğu için uygunluk doğrulanamadı.',
+        pendingOcrTileSub: 'Okuma belirsizliği var; karar için Tara sekmesinde onay bekleniyor.',
+        moreItemsFmt: (n) => `+${n} ek dikkat maddesi daha...`,
+        regIndexNote: 'Mevzuat Uyum Endeksi (Tıbbi sağlık puanı değildir)'
       },
       en: {
         watchlistTitle: '🧬 My Personal Blacklist (Custom Ingredients)',
-        watchlistSub: 'Add specific ingredients you personally avoid or were advised against (🔒 Stored on this device only).',
+        watchlistSub: 'Add specific ingredients you personally avoid or were advised against (🔒 Stored locally on this device only, never on servers).',
         watchlistPlaceholder: 'e.g. Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ Add',
         watchlistQuickLbl: 'Quick Add:',
         watchlistEmpty: 'No custom blacklisted ingredients added yet.',
         watchlistBadge: '🧬 Personal Blacklist',
+        watchlistLimitMsg: '⚠️ Maximum of 50 custom ingredients reached (50/50 limit).',
         shareCardBtn: '📸 Result Card (PNG / Share)',
         shareTextBtn: '💬 Copy Summary',
         shareCopiedToast: '✓ Analysis summary copied to clipboard!',
         shareModalTitle: '📸 InciFact Analysis Card (WhatsApp / Instagram)',
         downloadPngBtn: '📥 Download Image (PNG)',
         whatsappShareBtn: '📲 Share via WhatsApp',
-        copySummaryBtn: '📋 Copy Summary Text',
+        copySummaryBtn: '📋 Copy Summary Text to Clipboard',
         setSlotABtn: '🅰️ Set as Product A',
         setSlotBBtn: '🅱️ Set as Product B',
         slotSetToast: (slot, name) => `✓ "${name}" selected as Product ${slot} for comparison!`,
         authDiffTitle: '⚖️ Why Do Halal Authorities Differ? (4-Authority Matrix)',
-        authDiffSub: 'Tap any authority pill below to switch the live analysis to that institution\'s standard:',
+        authDiffSub: 'Tap any authority card below to switch the live analysis to that institution\'s standard:',
         clearHistoryBtn: 'Clear History',
-        resetCompareBtn: 'Reset Default Pair'
+        resetCompareBtn: 'Reset Default Pair',
+        customScanPrefix: 'Custom Scan',
+        statusPendingOcr: 'Awaiting OCR Confirm',
+        statusLowCoverage: 'Low Coverage (<80%)',
+        statusNoData: 'No Data / Uncertain',
+        unrecognizedWhy: 'This ingredient did not match the official EU CosIng or food additive database; safety and Halal status cannot be verified.',
+        lowCovTileSub: 'Cannot verify suitability because recognized ingredient coverage is below 80%.',
+        pendingOcrTileSub: 'Ambiguous label text; awaiting confirmation on the Scan tab.',
+        moreItemsFmt: (n) => `+${n} more flagged item(s)...`,
+        regIndexNote: 'Regulatory Compliance Index (Not a medical health score)'
       },
       ar: {
         watchlistTitle: '🧬 قائمتي السوداء الشخصية (إضافة مكون خاص)',
-        watchlistSub: 'أضف المكونات التي تتجنبها شخصياً أو بتوصية طبية (🔒 تُحفظ على هذا الجهاز فقط).',
+        watchlistSub: 'أضف المكونات التي تتجنبها شخصياً أو بتوصية طبية (🔒 تُحفظ محلياً على هذا الجهاز فقط).',
         watchlistPlaceholder: 'مثال: Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ إضافة',
         watchlistQuickLbl: 'إضافة سريعة:',
         watchlistEmpty: 'لم تتم إضافة مكونات خاصة بعد.',
         watchlistBadge: '🧬 القائمة الشخصية',
+        watchlistLimitMsg: '⚠️ تم الوصول إلى الحد الأقصى (50/50 مكوناً).',
         shareCardBtn: '📸 بطاقة النتيجة (صورة / مشاركة)',
         shareTextBtn: '💬 نسخ الملخص',
         shareCopiedToast: '✓ تم نسخ ملخص التحليل إلى الحافظة!',
         shareModalTitle: '📸 بطاقة تحليل InciFact (واتساب / إنستغرام)',
         downloadPngBtn: '📥 تنزيل البطاقة (PNG)',
         whatsappShareBtn: '📲 مشاركة عبر واتساب',
-        copySummaryBtn: '📋 نسخ النص',
+        copySummaryBtn: '📋 نسخ الملخص إلى الحافظة',
         setSlotABtn: '🅰️ تعيين كمنتج 1 (أ)',
         setSlotBBtn: '🅱️ تعيين كمنتج 2 (ب)',
         slotSetToast: (slot, name) => `✓ تم اختيار "${name}" كمنتج (${slot}) للمقارنة!`,
         authDiffTitle: '⚖️ لماذا تختلف قرارات هيئات الحلال؟ (مقارنة 4 هيئات)',
         authDiffSub: 'اضغط على أي هيئة أدناه لتطبيق معيارها فوراً:',
         clearHistoryBtn: 'مسح السجل',
-        resetCompareBtn: 'الوضع الافتراضي'
+        resetCompareBtn: 'الوضع الافتراضي',
+        customScanPrefix: 'تحليل مخصص',
+        statusPendingOcr: 'بانتظار تأكيد القراءة',
+        statusLowCoverage: 'تغطية غير كافية (<80%)',
+        statusNoData: 'بيانات غير متوفرة',
+        unrecognizedWhy: 'لم يتطابق هذا المكون مع قاعدة بيانات CosIng الأوروبية أو المضافات الغذائية المعتمدة؛ لم يتم التحقق من الأمان أو الحلال.',
+        lowCovTileSub: 'تعذر التحقق لأن نسبة المكونات المعروفة أقل من 80%.',
+        pendingOcrTileSub: 'يوجد غموض في القراءة؛ يرجى التأكيد في تبويب المسح.',
+        moreItemsFmt: (n) => `+${n} تنبيهات إضافية...`,
+        regIndexNote: 'مؤشر الامتثال التنظيمي (ليس تقييماً طبياً للصحة)'
       },
       de: {
         watchlistTitle: '🧬 Meine persönliche Sperrliste (Eigene Stoffe)',
@@ -1183,52 +1263,73 @@
         watchlistQuickLbl: 'Schnellwahl:',
         watchlistEmpty: 'Noch keine eigenen gesperrten Stoffe hinzugefügt.',
         watchlistBadge: '🧬 Eigene Sperrliste',
+        watchlistLimitMsg: '⚠️ Maximal 50 eigene Stoffe erreicht (50/50).',
         shareCardBtn: '📸 Ergebniskarte (PNG / Teilen)',
         shareTextBtn: '💬 Text kopieren',
         shareCopiedToast: '✓ Zusammenfassung in die Zwischenablage kopiert!',
         shareModalTitle: '📸 InciFact-Analysekarte (WhatsApp / Instagram)',
         downloadPngBtn: '📥 Bild herunterladen (PNG)',
         whatsappShareBtn: '📲 Per WhatsApp teilen',
-        copySummaryBtn: '📋 Zusammenfassung kopieren',
+        copySummaryBtn: '📋 Zusammenfassung in die Zwischenablage kopieren',
         setSlotABtn: '🅰️ Als Produkt A setzen',
         setSlotBBtn: '🅱️ Als Produkt B setzen',
         slotSetToast: (slot, name) => `✓ „${name}“ als Produkt ${slot} für den Vergleich gesetzt!`,
         authDiffTitle: '⚖️ Warum entscheiden Halal-Behörden unterschiedlich?',
         authDiffSub: 'Tippen Sie auf eine Behörde, um deren Standard direkt anzuwenden:',
         clearHistoryBtn: 'Verlauf löschen',
-        resetCompareBtn: 'Standardpaar'
+        resetCompareBtn: 'Standardpaar',
+        customScanPrefix: 'Eigene Analyse',
+        statusPendingOcr: 'OCR-Bestätigung offen',
+        statusLowCoverage: 'Abdeckung unzureichend (<80%)',
+        statusNoData: 'Keine Daten / Unklar',
+        unrecognizedWhy: 'Dieser Stoff wurde in der offiziellen EU-CosIng- oder Lebensmitteldatenbank nicht erkannt; keine bestätigte Bewertung möglich.',
+        lowCovTileSub: 'Eignung nicht prüfbar, da weniger als 80 % der Stoffe erkannt wurden.',
+        pendingOcrTileSub: 'Lesefehler/Mehrdeutigkeit; bitte im Scan-Tab bestätigen.',
+        moreItemsFmt: (n) => `+${n} weitere Hinweise...`,
+        regIndexNote: 'Regulierungs-Index (Kein medizinischer Gesundheitswert)'
       },
       fr: {
         watchlistTitle: '🧬 Ma Liste Noire Personnelle (Ingrédients à éviter)',
-        watchlistSub: 'Ajoutez les ingrédients que vous évitez personnellement (🔒 Stocké uniquement sur cet appareil).',
+        watchlistSub: 'Ajoutez les ingrédients que vous évitez personnellement (🔒 Stocké localement sur cet appareil uniquement).',
         watchlistPlaceholder: 'ex. Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ Ajouter',
         watchlistQuickLbl: 'Ajout rapide :',
         watchlistEmpty: 'Aucun ingrédient personnalisé ajouté.',
         watchlistBadge: '🧬 Liste Personnelle',
+        watchlistLimitMsg: '⚠️ Limite maximale de 50 ingrédients atteinte (50/50).',
         shareCardBtn: '📸 Carte Résultat (PNG / Partager)',
         shareTextBtn: '💬 Copier le résumé',
         shareCopiedToast: '✓ Résumé copié dans le presse-papiers !',
         shareModalTitle: '📸 Carte d\'analyse InciFact (WhatsApp / Instagram)',
-        downloadPngBtn: '📥 Télécharger (PNG)',
+        downloadPngBtn: '📥 Télécharger l\'image (PNG)',
         whatsappShareBtn: '📲 Partager sur WhatsApp',
-        copySummaryBtn: '📋 Copier le texte',
+        copySummaryBtn: '📋 Copier le résumé dans le presse-papiers',
         setSlotABtn: '🅰️ Définir Produit A',
         setSlotBBtn: '🅱️ Définir Produit B',
         slotSetToast: (slot, name) => `✓ « ${name} » défini comme Produit ${slot} !`,
         authDiffTitle: '⚖️ Pourquoi les autorités Halal diffèrent-elles ? (4 organismes)',
         authDiffSub: 'Touchez une autorité ci-dessous pour basculer sur sa norme :',
         clearHistoryBtn: 'Effacer l\'historique',
-        resetCompareBtn: 'Paire par défaut'
+        resetCompareBtn: 'Paire par défaut',
+        customScanPrefix: 'Analyse perso',
+        statusPendingOcr: 'Confirmation OCR requise',
+        statusLowCoverage: 'Couverture insuffisante (<80%)',
+        statusNoData: 'Données insuffisantes',
+        unrecognizedWhy: 'Cet ingrédient ne correspond pas directement à la base officielle UE CosIng ou alimentaire ; statut non vérifié.',
+        lowCovTileSub: 'Validation impossible car moins de 80 % des ingrédients sont reconnus.',
+        pendingOcrTileSub: 'Lecture ambiguë ; confirmation requise dans l\'onglet Scan.',
+        moreItemsFmt: (n) => `+${n} autre(s) alerte(s)...`,
+        regIndexNote: 'Indice Réglementaire (Non médical)'
       },
       id: {
         watchlistTitle: '🧬 Daftar Hitam Pribadi Saya (Bahan Kustom)',
-        watchlistSub: 'Tambahkan bahan yang Anda hindari secara pribadi atau atas saran dokter (🔒 Disimpan di perangkat ini saja).',
+        watchlistSub: 'Tambahkan bahan yang Anda hindari secara pribadi (🔒 Disimpan lokal di perangkat ini saja).',
         watchlistPlaceholder: 'Mis: Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ Tambah',
         watchlistQuickLbl: 'Tambah Cepat:',
         watchlistEmpty: 'Belum ada bahan daftar hitam pribadi.',
         watchlistBadge: '🧬 Daftar Hitam Pribadi',
+        watchlistLimitMsg: '⚠️ Batas maksimum 50 bahan tercapai (50/50).',
         shareCardBtn: '📸 Kartu Hasil (PNG / Bagikan)',
         shareTextBtn: '💬 Salin Ringkasan',
         shareCopiedToast: '✓ Ringkasan analisis berhasil disalin!',
@@ -1242,16 +1343,26 @@
         authDiffTitle: '⚖️ Mengapa Lembaga Halal Berbeda Pendapat? (Matriks 4 Lembaga)',
         authDiffSub: 'Ketuk salah satu lembaga di bawah untuk beralih ke standarnya:',
         clearHistoryBtn: 'Hapus Riwayat',
-        resetCompareBtn: 'Reset Pasangan'
+        resetCompareBtn: 'Reset Pasangan',
+        customScanPrefix: 'Analisis Kustom',
+        statusPendingOcr: 'Menunggu Konfirmasi OCR',
+        statusLowCoverage: 'Cakupan Kurang (<80%)',
+        statusNoData: 'Data Belum Cukup',
+        unrecognizedWhy: 'Bahan ini tidak ditemukan dalam basis data resmi CosIng UE atau aditif pangan; keamanan dan status Halal belum terverifikasi.',
+        lowCovTileSub: 'Tidak dapat diverifikasi karena cakupan bahan yang dikenali di bawah 80%.',
+        pendingOcrTileSub: 'Teks label ambigu; konfirmasi diperlukan di tab Pindai.',
+        moreItemsFmt: (n) => `+${n} peringatan lainnya...`,
+        regIndexNote: 'Indeks Kepatuhan Regulasi (Bukan skor medis)'
       },
       ms: {
         watchlistTitle: '🧬 Senarai Hitam Peribadi Saya (Ramuan Khas)',
-        watchlistSub: 'Tambah ramuan yang anda elakkan secara peribadi (🔒 Disimpan pada peranti ini sahaja).',
+        watchlistSub: 'Tambah ramuan yang anda elakkan secara peribadi (🔒 Disimpan secara tempatan pada peranti ini sahaja).',
         watchlistPlaceholder: 'Cth: Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ Tambah',
         watchlistQuickLbl: 'Tambah Pantas:',
         watchlistEmpty: 'Tiada ramuan senarai hitam peribadi lagi.',
         watchlistBadge: '🧬 Senarai Hitam Peribadi',
+        watchlistLimitMsg: '⚠️ Had maksimum 50 ramuan dicapai (50/50).',
         shareCardBtn: '📸 Kad Keputusan (PNG / Kongsi)',
         shareTextBtn: '💬 Salin Ringkasan',
         shareCopiedToast: '✓ Ringkasan analisis disalin ke papan keratan!',
@@ -1265,76 +1376,115 @@
         authDiffTitle: '⚖️ Mengapa Badan Halal Berbeza Keputusan? (4 Autoriti)',
         authDiffSub: 'Ketik mana-mana badan di bawah untuk menukar piawaian secara langsung:',
         clearHistoryBtn: 'Padam Sejarah',
-        resetCompareBtn: 'Tetapkan Semula'
+        resetCompareBtn: 'Tetapkan Semula',
+        customScanPrefix: 'Analisis Khas',
+        statusPendingOcr: 'Menunggu Pengesahan OCR',
+        statusLowCoverage: 'Liputan Kurang (<80%)',
+        statusNoData: 'Tiada Data / Tidak Pasti',
+        unrecognizedWhy: 'Ramuan ini tidak sepadan dengan pangkalan data rasmi CosIng EU atau aditif makanan; status belum disahkan.',
+        lowCovTileSub: 'Tidak dapat disahkan kerana liputan ramuan dikenali kurang daripada 80%.',
+        pendingOcrTileSub: 'Bacaan label kabur; sila sahkan pada tab Imbas.',
+        moreItemsFmt: (n) => `+${n} lagi item perhatian...`,
+        regIndexNote: 'Indeks Pematuhan Peraturan (Bukan skor kesihatan perubatan)'
       },
       es: {
         watchlistTitle: '🧬 Mi Lista Negra Personal (Ingredientes propios)',
-        watchlistSub: 'Añade ingredientes que evites personalmente (🔒 Guardado solo en este dispositivo).',
+        watchlistSub: 'Añade ingredientes que evites personalmente (🔒 Guardado localmente solo en este dispositivo).',
         watchlistPlaceholder: 'Ej. Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ Añadir',
         watchlistQuickLbl: 'Añadir rápido:',
         watchlistEmpty: 'Aún no has añadido ingredientes personalizados.',
         watchlistBadge: '🧬 Lista Negra Personal',
+        watchlistLimitMsg: '⚠️ Se alcanzó el límite máximo de 50 ingredientes (50/50).',
         shareCardBtn: '📸 Tarjeta de Resultado (PNG / Compartir)',
         shareTextBtn: '💬 Copiar resumen',
         shareCopiedToast: '✓ ¡Resumen copiado al portapapeles!',
         shareModalTitle: '📸 Tarjeta de Análisis InciFact (WhatsApp / Instagram)',
         downloadPngBtn: '📥 Descargar Imagen (PNG)',
         whatsappShareBtn: '📲 Enviar por WhatsApp',
-        copySummaryBtn: '📋 Copiar texto',
+        copySummaryBtn: '📋 Copiar resumen al portapapeles',
         setSlotABtn: '🅰️ Usar como Producto A',
         setSlotBBtn: '🅱️ Usar como Producto B',
         slotSetToast: (slot, name) => `✓ ¡"${name}" seleccionado como Producto ${slot}!`,
         authDiffTitle: '⚖️ ¿Por qué difieren las autoridades Halal? (4 Entidades)',
         authDiffSub: 'Toca cualquier entidad abajo para aplicar su estándar al instante:',
         clearHistoryBtn: 'Borrar historial',
-        resetCompareBtn: 'Par por defecto'
+        resetCompareBtn: 'Par por defecto',
+        customScanPrefix: 'Análisis propio',
+        statusPendingOcr: 'Confirmación OCR pendiente',
+        statusLowCoverage: 'Cobertura insuficiente (<80%)',
+        statusNoData: 'Sin datos / Incierto',
+        unrecognizedWhy: 'Este ingrediente no coincidió con la base oficial CosIng de la UE o de aditivos alimentarios; estado no verificado.',
+        lowCovTileSub: 'No se puede verificar la idoneidad porque la cobertura es inferior al 80%.',
+        pendingOcrTileSub: 'Lectura ambigua; confirma el ingrediente en la pestaña Escanear.',
+        moreItemsFmt: (n) => `+${n} advertencia(s) más...`,
+        regIndexNote: 'Índice Regulatorio (No es una puntuación médica)'
       },
       ru: {
         watchlistTitle: '🧬 Мой личный чёрный список (Свои вещества)',
-        watchlistSub: 'Добавьте компоненты, которых вы избегаете лично (🔒 Хранится только на этом устройстве).',
+        watchlistSub: 'Добавьте компоненты, которых вы избегаете лично (🔒 Хранится локально только на этом устройстве).',
         watchlistPlaceholder: 'Напр.: Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ Добавить',
         watchlistQuickLbl: 'Быстро добавить:',
         watchlistEmpty: 'Личный чёрный список пока пуст.',
         watchlistBadge: '🧬 Личный список',
+        watchlistLimitMsg: '⚠️ Достигнут лимит в 50 пользовательских веществ (50/50).',
         shareCardBtn: '📸 Карточка результата (PNG / Поделиться)',
         shareTextBtn: '💬 Копировать отчёт',
         shareCopiedToast: '✓ Краткий отчёт скопирован в буфер обмена!',
         shareModalTitle: '📸 Карточка анализа InciFact (WhatsApp / Instagram)',
         downloadPngBtn: '📥 Скачать карточку (PNG)',
         whatsappShareBtn: '📲 Отправить в WhatsApp',
-        copySummaryBtn: '📋 Скопировать текст',
+        copySummaryBtn: '📋 Скопировать текст в буфер обмена',
         setSlotABtn: '🅰️ Сделать Продуктом А',
         setSlotBBtn: '🅱️ Сделать Продуктом Б',
         slotSetToast: (slot, name) => `✓ «${name}» выбран как Продукт ${slot} для сравнения!`,
         authDiffTitle: '⚖️ Почему решения органов Халяль отличаются? (4 стандарта)',
         authDiffSub: 'Нажмите на любой орган ниже, чтобы применить его стандарт:',
         clearHistoryBtn: 'Очистить историю',
-        resetCompareBtn: 'Сбросить пару'
+        resetCompareBtn: 'Сбросить пару',
+        customScanPrefix: 'Свой анализ',
+        statusPendingOcr: 'Ожидает подтверждения OCR',
+        statusLowCoverage: 'Недостаточный охват (<80%)',
+        statusNoData: 'Нет данных / Неясно',
+        unrecognizedWhy: 'Этот компонент не найден в официальной базе ЕС CosIng или пищевых добавок; статус безопасности и Халяль не подтверждён.',
+        lowCovTileSub: 'Невозможно подтвердить совместимость при охвате состава менее 80%.',
+        pendingOcrTileSub: 'Неоднозначное распознавание; подтвердите компонент на вкладке Сканировать.',
+        moreItemsFmt: (n) => `+ещё ${n} предупреждений...`,
+        regIndexNote: 'Регуляторный индекс (Не является медицинской оценкой)'
       },
       ur: {
         watchlistTitle: '🧬 میری ذاتی بلیک لسٹ (مخصوص اجزاء شامل کریں)',
-        watchlistSub: 'وہ اجزاء شامل کریں جن سے آپ ذاتی طور پر پرہیز کرتے ہیں (🔒 صرف اسی ڈیوائس پر محفوظ رہتا ہے)۔',
+        watchlistSub: 'وہ اجزاء شامل کریں جن سے آپ ذاتی طور پر پرہیز کرتے ہیں (🔒 صرف اسی ڈیوائس پر مقامی طور پر محفوظ رہتا ہے)۔',
         watchlistPlaceholder: 'مثلاً: Niacinamide, Parfum, Salicylic Acid...',
         watchlistAddBtn: '+ شامل کریں',
         watchlistQuickLbl: 'فوری اضافہ:',
         watchlistEmpty: 'ابھی تک کوئی ذاتی ممنوع جزو شامل نہیں کیا گیا۔',
         watchlistBadge: '🧬 ذاتی بلیک لسٹ',
+        watchlistLimitMsg: '⚠️ زیادہ سے زیادہ 50 اجزاء کی حد مکمل ہو گئی (50/50)۔',
         shareCardBtn: '📸 نتیجہ کارڈ (PNG / شیئر کریں)',
         shareTextBtn: '💬 خلاصہ کاپی کریں',
         shareCopiedToast: '✓ تجزیے کا خلاصہ کاپی ہو گیا!',
         shareModalTitle: '📸 InciFact تجزیہ کارڈ (واٹس ایپ / انسٹاگرام)',
         downloadPngBtn: '📥 تصویر ڈاؤن لوڈ کریں (PNG)',
         whatsappShareBtn: '📲 واٹس ایپ پر بھیجیں',
-        copySummaryBtn: '📋 خلاصہ کاپی کریں',
+        copySummaryBtn: '📋 خلاصہ کلپ بورڈ پر کاپی کریں',
         setSlotABtn: '🅰️ پروڈکٹ 1 (الف) بنائیں',
         setSlotBBtn: '🅱️ پروڈکٹ 2 (ب) بنائیں',
         slotSetToast: (slot, name) => `✓ "${name}" کو موازنے کے لیے پروڈکٹ ${slot} منتخب کر لیا گیا!`,
         authDiffTitle: '⚖️ حلال اداروں کے فیصلوں میں فرق کیوں ہے؟ (4 اداروں کا موازنہ)',
         authDiffSub: 'کسی بھی ادارے پر کلک کر کے تجزیہ اس کے معیار کے مطابق دیکھیں:',
         clearHistoryBtn: 'تاریخچہ صاف کریں',
-        resetCompareBtn: 'ڈیفالٹ موازنہ'
+        resetCompareBtn: 'ڈیفالٹ موازنہ',
+        customScanPrefix: 'مخصوص تجزیہ',
+        statusPendingOcr: 'OCR تصدیق درکار ہے',
+        statusLowCoverage: 'کوریج ناکافی (<80%)',
+        statusNoData: 'ڈیٹا دستیاب نہیں',
+        unrecognizedWhy: 'یہ جزو سرکاری EU CosIng یا فوڈ ایڈیٹیو ڈیٹا بیس سے براہ راست مطابقت نہیں رکھتا؛ حلال یا حفاظتی تصدیق موجود نہیں۔',
+        lowCovTileSub: 'شناخت شدہ اجزاء کی شرح 80 فیصد سے کم ہونے کی وجہ سے مطابقت کی تصدیق ممکن نہیں۔',
+        pendingOcrTileSub: 'لیبل کی عبارت مبہم ہے؛ براہ کرم اسکین ٹیب میں تصدیق کریں۔',
+        moreItemsFmt: (n) => `+${n} مزید انتباہی اجزاء...`,
+        regIndexNote: 'ریگولیٹری اشاریہ (یہ طبی صحت کا اسکور نہیں ہے)'
       }
     };
 
@@ -1342,14 +1492,31 @@
       return FEATURES_I18N[lang] || FEATURES_I18N.en;
     }
 
+    function deriveCustomProductTitle(rawText, lang) {
+      const fTxt = getFeatText(lang);
+      const cleaned = String(rawText || '')
+        .replace(/^(?:ingredients|içindekiler|icindekiler|zutaten|ingrédients|ingredientes|komposisi|ramuan|состав|المكونات|اجزاء|اجزائے ترکیبی)\s*[:：\-]?\s*/iu, '')
+        .trim();
+      if (!cleaned) return fTxt.customScanPrefix;
+      const tokens = cleaned.split(/[,،;]/).map((s) => s.trim()).filter(Boolean);
+      const preview = tokens.slice(0, 2).join(', ');
+      const shortPreview = preview.length > 26 ? preview.slice(0, 25) + '…' : preview;
+      return `${fTxt.customScanPrefix}: ${shortPreview}`;
+    }
+
     function addWatchlistItem(term) {
       const inputEl = document.getElementById('customWatchInput');
       const rawVal = (term !== undefined && term !== null ? term : (inputEl ? inputEl.value : '')).trim();
       if (!rawVal || rawVal.length < 2) return;
       const parts = rawVal.split(',').map((s) => s.trim()).filter((s) => s.length >= 2);
+      state.watchlistLimitWarning = false;
       for (const p of parts) {
+        if (state.customWatchlist.length >= 50) {
+          state.watchlistLimitWarning = true;
+          break;
+        }
         if (!state.customWatchlist.some((x) => x.toLowerCase() === p.toLowerCase())) {
-          state.customWatchlist.push(p.slice(0, 60));
+          state.customWatchlist.push(p.slice(0, 80));
         }
       }
       saveJson('incifact_custom_watchlist_v1', state.customWatchlist);
@@ -1359,6 +1526,7 @@
 
     function removeWatchlistItem(idx) {
       state.customWatchlist.splice(idx, 1);
+      state.watchlistLimitWarning = false;
       saveJson('incifact_custom_watchlist_v1', state.customWatchlist);
       refreshAll();
     }
@@ -1369,12 +1537,17 @@
       const halal = evalData.cards.halalCard;
       const title = state.activeSampleIdx !== null
         ? getSampleTitle(state.activeSampleIdx, state.lang)
-        : (state.productTitle || (state.lang === 'tr' ? 'Özel Etiket Analizi' : 'Custom Label Scan'));
+        : deriveCustomProductTitle(rawText, state.lang);
+      const trimmedRaw = rawText.trim();
       const entry = {
+        id: `${productType || 'cosmetic'}|${state.jurisdiction || 'EU'}|${trimmedRaw.toLowerCase()}`,
         title,
         sampleIdx: state.activeSampleIdx,
-        rawText: rawText.trim(),
+        rawText: trimmedRaw,
         productType: productType || 'cosmetic',
+        jurisdiction: state.jurisdiction || 'EU',
+        claims: { ...(state.claims || { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'none' }) },
+        userConfirmations: { ...(state.userConfirmations || {}) },
         score: reg.score,
         canShowScore: reg.canShowScore,
         halalStatus: halal.overallStatus,
@@ -1382,9 +1555,9 @@
         ts: Date.now()
       };
       const filtered = (state.scanHistory || []).filter(
-        (h) => h.rawText !== entry.rawText && h.title !== entry.title
+        (h) => !(h.rawText === entry.rawText && h.productType === entry.productType && (h.jurisdiction || 'EU') === entry.jurisdiction)
       );
-      state.scanHistory = [entry, ...filtered].slice(0, 8);
+      state.scanHistory = [entry, ...filtered].slice(0, 10);
       saveJson('incifact_scan_history_v1', state.scanHistory);
     }
 
@@ -1393,11 +1566,25 @@
       let item;
       if (typeof fromHistoryIdx === 'number' && state.scanHistory[fromHistoryIdx]) {
         const h = state.scanHistory[fromHistoryIdx];
-        item = { name: h.title, productType: h.productType, rawText: h.rawText };
+        item = {
+          name: h.title,
+          productType: h.productType,
+          rawText: h.rawText,
+          jurisdiction: h.jurisdiction || state.jurisdiction || 'EU',
+          claims: h.claims ? { ...h.claims } : { ...state.claims },
+          userConfirmations: h.userConfirmations ? { ...h.userConfirmations } : {}
+        };
       } else {
         const rawText = document.getElementById('liveInput').value;
         const productType = document.getElementById('prodType').value;
-        item = { name: state.productTitle, productType, rawText };
+        item = {
+          name: state.productTitle || deriveCustomProductTitle(rawText, state.lang),
+          productType,
+          rawText,
+          jurisdiction: state.jurisdiction || 'EU',
+          claims: { ...state.claims },
+          userConfirmations: { ...(state.userConfirmations || {}) }
+        };
       }
       if (slot === 'A') {
         state.customCompareA = item;
@@ -1427,7 +1614,10 @@
         return;
       }
       state.activeSampleIdx = null;
-      state.productTitle = h.title;
+      state.productTitle = h.title || deriveCustomProductTitle(h.rawText, state.lang);
+      if (h.jurisdiction) state.jurisdiction = h.jurisdiction;
+      if (h.claims) state.claims = { ...h.claims };
+      if (h.userConfirmations) state.userConfirmations = { ...h.userConfirmations };
       document.getElementById('prodType').value = h.productType || 'cosmetic';
       document.getElementById('liveInput').value = h.rawText;
       state.screen = 'result';
@@ -1435,24 +1625,115 @@
       refreshAll();
     }
 
+    function getUnifiedStatusPresentation() {
+      const loc = state.evalData.locale;
+      const u = getUiText(state.lang);
+      const fTxt = getFeatText(state.lang);
+      const reg = state.evalData.cards.regulatoryCard;
+      const prof = state.evalData.cards.profileCard;
+      const halal = state.evalData.cards.halalCard;
+      const hasPendingOcr = Array.isArray(state.evalData.unresolvedConfirmations) && state.evalData.unresolvedConfirmations.length > 0;
+      const isLowCov = reg.coveragePercent < 80;
+      const profStValues = Object.values(prof.profileStatuses || {});
+      const hasRedProf = prof.alerts.some((a) => a.level === 'kirmizi') || profStValues.includes('false');
+      const hasYellowProf = prof.alerts.some((a) => a.level === 'sari');
+
+      // 1. Halal presentation
+      let halalText = loc.badges.halalOk;
+      let halalEmoji = '🟢';
+      let halalColorHex = '#10B981';
+      let halalTone = 'ok';
+      if (halal.overallStatus === 'conflict' || halal.overallStatus === 'uygunsuz_bulgu') {
+        halalText = loc.badges.halalRed;
+        halalEmoji = '🔴';
+        halalColorHex = '#EF4444';
+        halalTone = 'bad';
+      } else if (halal.overallStatus === 'unknown' || hasPendingOcr) {
+        halalText = fTxt.statusPendingOcr;
+        halalEmoji = '🟡';
+        halalColorHex = '#F59E0B';
+        halalTone = 'warn';
+      } else if (halal.overallStatus === 'kapsam_yetersiz') {
+        halalText = loc.badges.lowCoverage || fTxt.statusLowCoverage;
+        halalEmoji = '⚪';
+        halalColorHex = '#F59E0B';
+        halalTone = 'warn';
+      } else if (halal.overallStatus === 'kaynak_belirsiz_musbooh') {
+        halalText = loc.badges.musbooh;
+        halalEmoji = '🟡';
+        halalColorHex = '#F59E0B';
+        halalTone = 'warn';
+      }
+
+      // 2. Personal Profile presentation
+      let profText = u.fitsPrefs;
+      let profEmoji = '🟢';
+      let profColorHex = '#10B981';
+      let profTone = 'ok';
+      if (hasRedProf) {
+        profText = u.itemsAttentionFmt(prof.alerts.length || 1);
+        profEmoji = '🔴';
+        profColorHex = '#EF4444';
+        profTone = 'bad';
+      } else if (hasPendingOcr) {
+        profText = fTxt.statusPendingOcr;
+        profEmoji = '🟡';
+        profColorHex = '#F59E0B';
+        profTone = 'warn';
+      } else if (isLowCov || profStValues.includes('kapsam_yetersiz')) {
+        profText = loc.badges.lowCoverage || fTxt.statusLowCoverage;
+        profEmoji = '⚪';
+        profColorHex = '#F59E0B';
+        profTone = 'warn';
+      } else if (profStValues.includes('unknown')) {
+        profText = fTxt.statusNoData;
+        profEmoji = '🟡';
+        profColorHex = '#F59E0B';
+        profTone = 'warn';
+      } else if (hasYellowProf) {
+        profText = u.itemsAttentionFmt(prof.alerts.length);
+        profEmoji = '🟡';
+        profColorHex = '#F59E0B';
+        profTone = 'warn';
+      }
+
+      return {
+        hasPendingOcr,
+        isLowCov,
+        halalText,
+        halalEmoji,
+        halalColorHex,
+        halalTone,
+        profText,
+        profEmoji,
+        profColorHex,
+        profTone
+      };
+    }
+
     function generateShareSummaryText() {
       if (!state.evalData || !state.evalData.cards) return '';
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
+      const fTxt = getFeatText(state.lang);
       const reg = state.evalData.cards.regulatoryCard;
       const prof = state.evalData.cards.profileCard;
       const halal = state.evalData.cards.halalCard;
-      const scoreStr = reg.score !== null ? `${reg.score}/100` : (loc.badges.lowCoverage || '—');
-      const halalStr =
-        halal.overallStatus === 'uygun_gorunuyor'
-          ? `🟢 ${loc.badges.halalOk}`
-          : halal.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? `🟡 ${loc.badges.musbooh}`
-          : `🔴 ${loc.badges.halalRed}`;
-      const profStr = prof.alerts.length > 0 ? `⚠️ ${u.itemsAttentionFmt(prof.alerts.length)}` : `✅ ${u.fitsPrefs}`;
+      const pres = getUnifiedStatusPresentation();
+
+      const scoreStr =
+        reg.score !== null
+          ? `${formatDigits(reg.score, state.lang)}/${formatDigits(100, state.lang)}`
+          : pres.hasPendingOcr
+          ? fTxt.statusPendingOcr
+          : (loc.badges.lowCoverage || fTxt.statusLowCoverage);
+      const halalStr = `${pres.halalEmoji} ${pres.halalText}`;
+      const profStr = `${pres.profEmoji} ${pres.profText}`;
+
       const topFlags = [
         ...reg.findings.filter((f) => f.severity !== 'bilgi').map((f) => `• ${f.localizedName || f.name} (${f.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted})`),
-        ...prof.alerts.filter((a) => a.profile === 'ozel_kara_liste').map((a) => `• 🧬 ${a.localizedName}: ${a.explanation}`)
+        ...prof.alerts.filter((a) => a.profile === 'ozel_kara_liste').map((a) => `• 🧬 ${a.localizedName}: ${a.explanation}`),
+        ...halal.findings.filter((hf) => hf.status !== 'yesil').map((hf) => `• 🌙 ${hf.localizedName || hf.canonical} (${hf.status === 'kirmizi' || hf.status === 'conflict' ? loc.badges.halalRed : loc.badges.musbooh})`)
       ].slice(0, 4);
 
       return [
@@ -1487,16 +1768,81 @@
       window.open(url, '_blank', 'noopener,noreferrer');
     }
 
+    let _lastFocusedBeforeModal = null;
+
+    function syncShareModalI18n() {
+      const fTxt = getFeatText(state.lang);
+      const dir = (state.evalData && state.evalData.dir) || (state.lang === 'ar' || state.lang === 'ur' ? 'rtl' : 'ltr');
+      const modal = document.getElementById('shareCardModal');
+      if (modal) modal.setAttribute('dir', dir);
+      const tEl = document.getElementById('shareCardModalTitle');
+      if (tEl) tEl.textContent = fTxt.shareModalTitle;
+      const dBtn = document.getElementById('shareModalDownloadBtn');
+      if (dBtn) dBtn.textContent = fTxt.downloadPngBtn;
+      const wBtn = document.getElementById('shareModalWaBtn');
+      if (wBtn) wBtn.textContent = fTxt.whatsappShareBtn;
+      const cBtn = document.getElementById('shareModalCopyBtn');
+      if (cBtn) cBtn.textContent = fTxt.copySummaryBtn;
+    }
+
     function openShareCardModal() {
       const modal = document.getElementById('shareCardModal');
       if (!modal) return;
+      _lastFocusedBeforeModal = document.activeElement;
+      syncShareModalI18n();
       modal.style.display = 'flex';
       drawShareCardCanvas();
+      const closeBtn = document.getElementById('shareModalCloseBtn');
+      if (closeBtn) closeBtn.focus();
     }
 
     function closeShareCardModal() {
       const modal = document.getElementById('shareCardModal');
-      if (modal) modal.style.display = 'none';
+      if (modal && modal.style.display !== 'none') {
+        modal.style.display = 'none';
+        if (_lastFocusedBeforeModal && typeof _lastFocusedBeforeModal.focus === 'function') {
+          _lastFocusedBeforeModal.focus();
+        }
+      }
+    }
+
+    function fitCanvasText(ctx, text, maxWidth) {
+      const str = String(text || '');
+      if (ctx.measureText(str).width <= maxWidth) return str;
+      let lo = 0;
+      let hi = str.length;
+      while (lo < hi) {
+        const mid = Math.ceil((lo + hi) / 2);
+        if (ctx.measureText(str.slice(0, mid) + '…').width <= maxWidth) {
+          lo = mid;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      return str.slice(0, Math.max(1, lo)) + '…';
+    }
+
+    function wrapCanvasLines(ctx, text, maxWidth, maxLines) {
+      const words = String(text || '').split(/\s+/).filter(Boolean);
+      if (words.length === 0) return [''];
+      const lines = [];
+      let current = words[0];
+      for (let i = 1; i < words.length; i++) {
+        const cand = current + ' ' + words[i];
+        if (ctx.measureText(cand).width <= maxWidth) {
+          current = cand;
+        } else {
+          lines.push(current);
+          current = words[i];
+          if (lines.length === maxLines - 1) {
+            const rest = [current, ...words.slice(i + 1)].join(' ');
+            lines.push(fitCanvasText(ctx, rest, maxWidth));
+            return lines;
+          }
+        }
+      }
+      lines.push(fitCanvasText(ctx, current, maxWidth));
+      return lines.slice(0, maxLines);
     }
 
     function drawShareCardCanvas() {
@@ -1510,51 +1856,57 @@
 
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
+      const fTxt = getFeatText(state.lang);
       const reg = state.evalData.cards.regulatoryCard;
       const prof = state.evalData.cards.profileCard;
       const halal = state.evalData.cards.halalCard;
+      const pres = getUnifiedStatusPresentation();
+      const isRtl = state.lang === 'ar' || state.lang === 'ur';
+      ctx.direction = isRtl ? 'rtl' : 'ltr';
 
-      // 1. Royal Midnight Navy Gradient Background
+      // 1. Quiet Luxury Deep Emerald Gradient Background
       const grad = ctx.createLinearGradient(0, 0, W, H);
-      grad.addColorStop(0, '#070C18');
-      grad.addColorStop(0.5, '#0B132B');
-      grad.addColorStop(1, '#131F3F');
+      grad.addColorStop(0, '#07120E');
+      grad.addColorStop(0.5, '#0F291E');
+      grad.addColorStop(1, '#163829');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
 
-      // Gold outer border
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.55)';
+      // Champagne Gold outer border
+      ctx.strokeStyle = 'rgba(197, 160, 89, 0.65)';
       ctx.lineWidth = 4;
       ctx.strokeRect(36, 36, W - 72, H - 72);
 
       // Top Brand Header
-      ctx.fillStyle = '#D4AF37';
+      ctx.fillStyle = '#E6C98A';
       ctx.font = '800 44px system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('INCIFACT', W / 2, 118);
+      ctx.fillText('INCIFACT', W / 2, 114);
 
-      ctx.fillStyle = '#94A3B8';
+      ctx.fillStyle = '#CBD5E1';
       ctx.font = '700 20px system-ui, -apple-system, sans-serif';
-      ctx.fillText('COSMETIC • FOOD • HALAL · 10-LANGUAGE ENGINE', W / 2, 154);
+      ctx.fillText(fitCanvasText(ctx, loc.appTagline || 'COSMETIC • FOOD • HALAL ENGINE', W - 160), W / 2, 150);
 
-      // Product Title
+      // Product Title (pixel-measured, up to 2 lines)
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = '800 42px system-ui, -apple-system, sans-serif';
-      const titleStr = (state.productTitle || 'InciFact Analysis').slice(0, 38);
-      ctx.fillText(titleStr, W / 2, 235);
+      ctx.font = '800 38px system-ui, -apple-system, sans-serif';
+      const titleLines = wrapCanvasLines(ctx, state.productTitle || 'InciFact Analysis', W - 160, 2);
+      titleLines.forEach((ln, idx) => {
+        ctx.fillText(ln, W / 2, 212 + idx * 42);
+      });
 
       const struct = MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr;
-      ctx.fillStyle = '#D4AF37';
+      ctx.fillStyle = '#E6C98A';
       ctx.font = '700 22px system-ui, -apple-system, sans-serif';
-      ctx.fillText(`${struct.name.split('·')[0].trim()} · ${state.jurisdiction || 'EU'} · ${halal.selectedAuthority}`, W / 2, 278);
+      ctx.fillText(`${struct.name.split('·')[0].trim()} · ${state.jurisdiction || 'EU'} · ${halal.selectedAuthority}`, W / 2, titleLines.length > 1 ? 292 : 262);
 
       // Score Circle
       const cx = W / 2;
-      const cy = 445;
-      const r = 112;
+      const cy = 435;
+      const r = 106;
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.14)';
       ctx.lineWidth = 18;
       ctx.stroke();
 
@@ -1570,15 +1922,19 @@
       }
 
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = '800 72px system-ui, -apple-system, sans-serif';
-      ctx.fillText(scoreVal !== null ? String(scoreVal) : '—', cx, cy + 16);
-      ctx.fillStyle = '#94A3B8';
-      ctx.font = '700 24px system-ui, -apple-system, sans-serif';
-      ctx.fillText('/ 100', cx, cy + 54);
+      ctx.font = '800 68px system-ui, -apple-system, sans-serif';
+      ctx.fillText(scoreVal !== null ? formatDigits(scoreVal, state.lang) : '?', cx, cy + 16);
+      ctx.fillStyle = '#CBD5E1';
+      ctx.font = '700 23px system-ui, -apple-system, sans-serif';
+      ctx.fillText(scoreVal !== null ? `/ ${formatDigits(100, state.lang)}` : u.uncertainWord, cx, cy + 52);
 
-      // 3 Summary Cards (Halal, Profile, Coverage)
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '600 18px system-ui, -apple-system, sans-serif';
+      ctx.fillText(fitCanvasText(ctx, fTxt.regIndexNote, W - 160), cx, cy + 135);
+
+      // 2 Summary Pill Boxes (Halal & Personal Profile)
       const drawPillBox = (x, y, w, h, label, value, color) => {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
         ctx.strokeStyle = color;
         ctx.lineWidth = 2.5;
         ctx.beginPath();
@@ -1586,101 +1942,129 @@
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#94A3B8';
+        const padX = isRtl ? x + w - 28 : x + 28;
+        ctx.textAlign = isRtl ? 'right' : 'left';
+        ctx.fillStyle = '#CBD5E1';
         ctx.font = '700 20px system-ui, -apple-system, sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(label.toUpperCase(), x + 28, y + 42);
+        ctx.fillText(fitCanvasText(ctx, label.toUpperCase(), w - 56), padX, y + 40);
 
         ctx.fillStyle = color;
-        ctx.font = '800 28px system-ui, -apple-system, sans-serif';
-        ctx.fillText(value.slice(0, 42), x + 28, y + 84);
+        ctx.font = '800 27px system-ui, -apple-system, sans-serif';
+        ctx.fillText(fitCanvasText(ctx, value, w - 56), padX, y + 82);
       };
 
-      const halalText =
-        halal.overallStatus === 'uygun_gorunuyor'
-          ? loc.badges.halalOk
-          : halal.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? loc.badges.musbooh
-          : loc.badges.halalRed;
-      const halalCol =
-        halal.overallStatus === 'uygun_gorunuyor'
-          ? '#10B981'
-          : halal.overallStatus === 'kaynak_belirsiz_musbooh'
-          ? '#F59E0B'
-          : '#EF4444';
-
-      const profText = prof.alerts.length > 0 ? u.itemsAttentionFmt(prof.alerts.length) : u.fitsPrefs;
-      const profCol = prof.alerts.length > 0 ? '#F59E0B' : '#10B981';
-
-      drawPillBox(80, 610, W - 160, 112, `${u.halalCaps} (${halal.selectedAuthority})`, halalText, halalCol);
-      drawPillBox(80, 742, W - 160, 112, u.forYouCaps, profText, profCol);
+      drawPillBox(80, 598, W - 160, 108, `${u.halalCaps} (${halal.selectedAuthority})`, `${pres.halalEmoji} ${pres.halalText}`, pres.halalColorHex);
+      drawPillBox(80, 722, W - 160, 108, u.forYouCaps, `${pres.profEmoji} ${pres.profText}`, pres.profColorHex);
 
       // Key Findings List
-      ctx.fillStyle = '#D4AF37';
-      ctx.font = '800 24px system-ui, -apple-system, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText(`${u.ingredientsHeader.toUpperCase()} (${reg.recognizedCount}/${reg.totalCount} · %${reg.coveragePercent})`, 80, 912);
+      const headerX = isRtl ? W - 80 : 80;
+      ctx.textAlign = isRtl ? 'right' : 'left';
+      ctx.fillStyle = '#E6C98A';
+      ctx.font = '800 23px system-ui, -apple-system, sans-serif';
+      const covNum = `${formatDigits(reg.recognizedCount, state.lang)}/${formatDigits(reg.totalCount, state.lang)} · %${formatDigits(reg.coveragePercent, state.lang)}`;
+      ctx.fillText(`${u.ingredientsHeader.toUpperCase()} (${covNum})`, headerX, 878);
 
-      const flagged = [
+      const allFlagged = [
         ...prof.alerts.filter((a) => a.profile === 'ozel_kara_liste').map((a) => ({
           name: `🧬 ${a.localizedName}`,
-          tag: getFeatText(state.lang).watchlistBadge,
-          col: '#EF4444'
+          tag: fTxt.watchlistBadge,
+          col: '#FCA5A5'
         })),
         ...reg.findings.filter((f) => f.severity !== 'bilgi').map((f) => ({
           name: f.localizedName || f.name,
           tag: f.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted,
-          col: f.euStatus === 'yasak' ? '#EF4444' : '#F59E0B'
+          col: f.euStatus === 'yasak' ? '#FCA5A5' : '#FBBF24'
         })),
-        ...halal.findings.map((hf) => ({
+        ...halal.findings.filter((hf) => hf.status !== 'yesil').map((hf) => ({
           name: hf.localizedName || hf.canonical,
-          tag: hf.status === 'yesil' ? loc.badges.halalOk : hf.status === 'kirmizi' ? loc.badges.halalRed : loc.badges.musbooh,
-          col: hf.status === 'yesil' ? '#10B981' : hf.status === 'kirmizi' ? '#EF4444' : '#F59E0B'
+          tag: hf.status === 'kirmizi' || hf.status === 'conflict' ? loc.badges.halalRed : loc.badges.musbooh,
+          col: hf.status === 'kirmizi' || hf.status === 'conflict' ? '#FCA5A5' : '#FBBF24'
         }))
-      ].slice(0, 4);
+      ];
+      const flagged = allFlagged.slice(0, 3);
+      const extraCount = Math.max(0, allFlagged.length - flagged.length);
 
       if (flagged.length === 0) {
-        ctx.fillStyle = '#10B981';
-        ctx.font = '700 26px system-ui, -apple-system, sans-serif';
-        ctx.fillText(`✓ ${u.noRestrictedFound}`, 80, 970);
+        if (pres.hasPendingOcr) {
+          ctx.fillStyle = '#FBBF24';
+          ctx.font = '700 24px system-ui, -apple-system, sans-serif';
+          ctx.fillText(fitCanvasText(ctx, `⚠️ ${fTxt.pendingOcrTileSub}`, W - 160), headerX, 935);
+        } else if (pres.isLowCov) {
+          ctx.fillStyle = '#FBBF24';
+          ctx.font = '700 24px system-ui, -apple-system, sans-serif';
+          ctx.fillText(fitCanvasText(ctx, `⚠️ ${fTxt.lowCovTileSub}`, W - 160), headerX, 935);
+        } else {
+          ctx.fillStyle = '#34D399';
+          ctx.font = '700 25px system-ui, -apple-system, sans-serif';
+          ctx.fillText(fitCanvasText(ctx, `✓ ${u.noRestrictedFound}`, W - 160), headerX, 935);
+        }
       } else {
         flagged.forEach((item, idx) => {
-          const fy = 945 + idx * 66;
-          ctx.fillStyle = 'rgba(255,255,255,0.04)';
+          const fy = 930 + idx * 64;
+          ctx.fillStyle = 'rgba(255,255,255,0.06)';
           ctx.beginPath();
-          ctx.roundRect(80, fy - 34, W - 160, 54, 12);
+          ctx.roundRect(80, fy - 34, W - 160, 52, 12);
           ctx.fill();
 
+          const leftX = isRtl ? W - 100 : 100;
+          const rightX = isRtl ? 100 : W - 100;
+
           ctx.fillStyle = '#F8FAFC';
-          ctx.font = '700 23px system-ui, -apple-system, sans-serif';
-          ctx.textAlign = 'left';
-          ctx.fillText(item.name.slice(0, 34), 100, fy);
+          ctx.font = '700 22px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = isRtl ? 'right' : 'left';
+          ctx.fillText(fitCanvasText(ctx, item.name, 520), leftX, fy);
 
           ctx.fillStyle = item.col;
-          ctx.font = '800 21px system-ui, -apple-system, sans-serif';
-          ctx.textAlign = 'right';
-          ctx.fillText(item.tag.slice(0, 26), W - 100, fy);
+          ctx.font = '800 20px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = isRtl ? 'left' : 'right';
+          ctx.fillText(fitCanvasText(ctx, item.tag, 310), rightX, fy);
         });
+        if (extraCount > 0) {
+          ctx.fillStyle = '#E6C98A';
+          ctx.font = '700 20px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = isRtl ? 'right' : 'left';
+          ctx.fillText(fTxt.moreItemsFmt(formatDigits(extraCount, state.lang)), headerX, 930 + flagged.length * 64 - 8);
+        }
       }
 
-      // Footer Legal Note
-      ctx.fillStyle = '#64748B';
-      ctx.font = '600 17px system-ui, -apple-system, sans-serif';
+      // High-Contrast Readable Footer Legal Note (2 lines, 21px font)
+      ctx.fillStyle = '#CBD5E1';
+      ctx.font = '600 20px system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText((u.legalDisclaimerMicro || '').slice(0, 95), W / 2, H - 96);
-      ctx.fillStyle = '#D4AF37';
-      ctx.font = '700 19px system-ui, -apple-system, sans-serif';
-      ctx.fillText('incifact.app · Deterministic 30,594 CosIng & Halal Verification Engine', W / 2, H - 62);
+      const legalLines = wrapCanvasLines(ctx, u.legalDisclaimerMicro || '', W - 140, 2);
+      legalLines.forEach((ln, idx) => {
+        ctx.fillText(ln, W / 2, H - 118 + idx * 25);
+      });
+      ctx.fillStyle = '#E6C98A';
+      ctx.font = '700 20px system-ui, -apple-system, sans-serif';
+      ctx.fillText('incifact.app · Deterministic 30,594 CosIng & Halal Verification Engine', W / 2, H - 56);
     }
 
     function downloadShareCardPng() {
       const canvas = document.getElementById('shareCardCanvas');
       if (!canvas) return;
-      const link = document.createElement('a');
       const safeName = (state.productTitle || 'incifact').replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 30);
-      link.download = `InciFact-${safeName || 'Analiz'}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      const filename = `InciFact-${safeName || 'Analiz'}.png`;
+      if (typeof canvas.toBlob === 'function') {
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = filename;
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }, 'image/png');
+      } else {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     }
 
     async function refreshAll() {
@@ -1691,8 +2075,18 @@
       const rawText = document.getElementById('liveInput').value;
       const productType = document.getElementById('prodType').value;
       const halalAuthority = document.getElementById('halalAuth').value;
+
+      // Ensure manual edits to rawText never keep a stale preset sample title
+      if (state.activeSampleIdx !== null) {
+        const expectedSampleText = getSampleText(state.activeSampleIdx, state.lang);
+        if (rawText.trim() !== expectedSampleText.trim()) {
+          state.activeSampleIdx = null;
+        }
+      }
       if (state.activeSampleIdx !== null) {
         state.productTitle = getSampleTitle(state.activeSampleIdx, state.lang);
+      } else {
+        state.productTitle = deriveCustomProductTitle(rawText, state.lang);
       }
 
       const evalRes = await fetch('/api/evaluate', {
@@ -1722,10 +2116,17 @@
         body: JSON.stringify({
           productA: prodA,
           productB: prodB,
-          sharedOptions: { userProfiles: activeProfiles, customWatchlist: state.customWatchlist || [], halalAuthority, lang: state.lang }
+          sharedOptions: {
+            jurisdiction: state.jurisdiction || 'EU',
+            userProfiles: activeProfiles,
+            customWatchlist: state.customWatchlist || [],
+            halalAuthority,
+            lang: state.lang
+          }
         })
       });
       state.compareData = await compRes.json();
+      syncShareModalI18n();
 
       // Update top tabs, bottom nav, right studio panel & phone frame direction for RTL (Arabic / Urdu)
       if (state.evalData && state.evalData.locale) {
@@ -2641,36 +3042,42 @@
 
         <!-- ÖZELLİK 3: Kişisel Özel Hassasiyet / Kara Liste Ekleme ("Benim Yasaklılarım") -->
         <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:9px;">
-          <div style="display:flex; flex-direction:column; gap:2px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
             <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${getFeatText(state.lang).watchlistTitle}</span>
-            <span style="font-size:11.5px; line-height:1.38; color:var(--muted);">${getFeatText(state.lang).watchlistSub}</span>
+            <span class="mono" style="font-size:11px; font-weight:800; color:${(state.customWatchlist || []).length >= 50 ? 'var(--bad)' : 'var(--muted)'};">${formatDigits((state.customWatchlist || []).length, state.lang)}/50</span>
           </div>
+          <span style="font-size:11.5px; line-height:1.38; color:var(--muted); margin-top:-4px;">${getFeatText(state.lang).watchlistSub}</span>
           <div style="display:flex; gap:6px;">
-            <input id="customWatchInput" type="text" placeholder="${escapeHtml(getFeatText(state.lang).watchlistPlaceholder)}" onkeydown="if(event.key==='Enter'){event.preventDefault();addWatchlistItem();}" style="flex:1; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12px;" />
-            <button type="button" onclick="addWatchlistItem()" style="height:36px; padding:0 12px; border-radius:10px; border:none; background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; flex:none;">${getFeatText(state.lang).watchlistAddBtn}</button>
+            <input id="customWatchInput" type="text" maxlength="80" placeholder="${escapeHtml(getFeatText(state.lang).watchlistPlaceholder)}" onkeydown="if(event.key==='Enter'){event.preventDefault();addWatchlistItem();}" style="flex:1; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12px;" />
+            <button type="button" onclick="addWatchlistItem()" style="height:38px; padding:0 14px; border-radius:10px; border:none; background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; flex:none;">${getFeatText(state.lang).watchlistAddBtn}</button>
           </div>
+          ${
+            state.watchlistLimitWarning || (state.evalData && state.evalData.cards && state.evalData.cards.profileCard && state.evalData.cards.profileCard.watchlistLimitExceeded)
+              ? `<div style="background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn); border-radius:10px; padding:6px 10px; font-size:11.5px; font-weight:700;">⚠️ ${escapeHtml(getFeatText(state.lang).watchlistLimitMsg)}</div>`
+              : ''
+          }
           <div style="display:flex; flex-wrap:wrap; align-items:center; gap:5px;">
             <span style="font-size:10.5px; font-weight:700; color:var(--muted);">${getFeatText(state.lang).watchlistQuickLbl}</span>
-            ${['Niacinamide', 'Parfum', 'Phenoxyethanol', 'Salicylic Acid', 'Alcohol']
+            ${['Niacinamide', 'Parfum', 'Phenoxyethanol', 'Salicylic Acid', 'Alcohol Denat.']
               .map(
                 (q) =>
-                  `<button type="button" onclick="addWatchlistItem('${q}')" style="border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:10px; padding:2px 8px; font-size:10.5px; font-weight:700;">+ ${q}</button>`
+                  `<button type="button" onclick="addWatchlistItem('${q}')" style="border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:10px; padding:3px 9px; font-size:11px; font-weight:700;">+ ${q}</button>`
               )
               .join('')}
           </div>
-          <div style="display:flex; flex-wrap:wrap; gap:6px; padding-top:2px;">
+          <div style="display:flex; flex-wrap:wrap; gap:6px; padding-top:2px; max-width:100%;">
             ${
               (state.customWatchlist || []).length > 0
                 ? state.customWatchlist
                     .map(
                       (item, i) => `
-                  <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:12px; background:var(--bad-bg); color:var(--bad); font-size:11.5px; font-weight:800; border:1px solid var(--bad);">
-                    <span>🧬 ${escapeHtml(item)}</span>
-                    <button type="button" onclick="removeWatchlistItem(${i})" style="border:none; background:transparent; color:var(--bad); font-weight:900; padding:0 2px; font-size:12px;">✕</button>
+                  <span class="watch-chip" title="${escapeHtml(item)}">
+                    <span class="watch-chip__label">🧬 ${escapeHtml(item)}</span>
+                    <button type="button" class="watch-chip__remove" aria-label="Remove ${escapeHtml(item)}" onclick="removeWatchlistItem(${i})">✕</button>
                   </span>`
                     )
                     .join('')
-                : `<span style="font-size:11px; color:var(--muted); font-style:italic;">${getFeatText(state.lang).watchlistEmpty}</span>`
+                : `<span style="font-size:11.5px; color:var(--muted); font-style:italic;">${getFeatText(state.lang).watchlistEmpty}</span>`
             }
           </div>
         </div>
@@ -2683,7 +3090,7 @@
               <span style="font-size:11.5px; color:var(--muted);">${struct.flag} ${struct.name} · ${currentAuth}</span>
             </div>
             <span style="font-size:11px; font-weight:700; padding:4px 8px; border-radius:10px; background:var(--soft); color:var(--accent); flex:none;">
-              ${state.autoDetected ? st.autoBadge : st.manualBadge} ▾
+              ${state.autoDetected ? st.autoBadge : st.manualBadge} ${state.settingsExpanded ? '▴' : '▾'}
             </span>
           </div>
 
@@ -2721,7 +3128,10 @@
               </div>
             </div>
 
-            <!-- Ülke ve Dil Değişikliği Açıklama Kutusu -->
+            ${
+              state.settingsExpanded
+                ? `
+            <!-- Ülke ve Dil Değişikliği Açıklama Kutusu (Daraltılabilir) -->
             <div style="background:var(--soft); border:1px solid var(--accent); border-radius:12px; padding:10px 12px; display:flex; flex-direction:column; gap:5px; margin-top:2px;">
               <span style="font-size:12px; font-weight:800; color:var(--accent);">${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyTitle}</span>
               <span style="font-size:11.5px; line-height:1.42; color:var(--ink);">
@@ -2730,7 +3140,9 @@
               <span style="font-size:10.5px; line-height:1.35; color:var(--muted);">
                 ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).legalNote}
               </span>
-            </div>
+            </div>`
+                : ''
+            }
           </div>
         </div>
 
@@ -2757,9 +3169,12 @@
             </span>
           </div>
 
-          <img src="./assets/banner-ar-scan-landscape.jpg" alt="InciFact AR Scan Preview" style="width:100%; border-radius:14px; border:1px solid rgba(212,175,55,0.35); margin-top:10px; display:block; box-shadow:0 8px 24px rgba(0,0,0,0.4);" />
+          <div style="margin-top:10px; padding:10px 14px; border-radius:14px; border:1px dashed rgba(197,160,89,0.55); background:rgba(15,41,30,0.65); display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <span style="font-size:12px; font-weight:700; color:#EAD39C;">📷 ${escapeHtml(state.productTitle)}</span>
+            <span class="mono" style="font-size:11.5px; color:#D8D2C5;">${u.recognizedCountFmt(recCount, obs.length)}</span>
+          </div>
 
-          <div style="position:relative; margin:16px auto; width:100%; background:#EEEBE2; border-radius:12px; padding:16px; color:#2A2A26; font-size:13px; line-height:1.75; transform:rotate(-1deg); box-shadow:0 12px 30px rgba(0,0,0,0.35);">
+          <div style="position:relative; margin:14px auto; width:100%; background:#EEEBE2; border-radius:14px; padding:16px; color:#2A2A26; font-size:13px; line-height:1.75; box-shadow:0 12px 30px rgba(0,0,0,0.35); border:1.5px solid rgba(197,160,89,0.4);">
             <span style="font-weight:800; letter-spacing:0.04em;">${u.ingredientsHeader.toUpperCase()}: </span>
             ${obs
               .map((o) => {
@@ -2770,12 +3185,6 @@
                 return `<span style="outline:2px dashed #D9901A; background:rgba(242,177,52,0.32); border-radius:4px; padding:1px 4px; font-weight:700;">${disp}</span>`;
               })
               .join(', ')}
-          </div>
-
-          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:8px;">
-            <div style="display:flex; align-items:center; gap:10px; padding:8px 14px; border-radius:20px; background:rgba(0,0,0,0.6);">
-              <span style="font-size:14px; font-weight:700;">${u.recognizedCountFmt(recCount, obs.length)}</span>
-            </div>
           </div>
 
           <div style="background:var(--surface); color:var(--ink); border-radius:26px; padding:18px; display:flex; flex-direction:column; gap:10px;">
@@ -2826,10 +3235,12 @@
     function renderResultScreen() {
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
+      const ft = getFeatText(state.lang);
       const reg = state.evalData.cards.regulatoryCard;
       const prof = state.evalData.cards.profileCard;
       const halal = state.evalData.cards.halalCard;
       const obs = state.evalData.observations || [];
+      const unified = getUnifiedStatusPresentation(state.evalData, state.lang);
 
       const score = reg.score;
       const circumference = 238.8;
@@ -2853,8 +3264,8 @@
 
         if (o.status === 'unrecognized' || (!o.substance && !o.halalRule && !o.hiddenSugar && !o.rapidCarb)) {
           kind = 'unknown';
-          levelText = (loc.badges && loc.badges.unrecognized) || 'Bilinmeyen / Doğrulanmadı';
-          whyText = 'Bu bileşen resmi AB CosIng veya gıda veritabanında doğrudan eşleşmedi; resmi güvenlik veya helallik teyidi bulunmuyor.';
+          levelText = (loc.badges && loc.badges.unrecognized) || 'Unrecognized';
+          whyText = ft.unrecognizedWhy || u.stdIngredientDesc;
         } else if (regFind && (regFind.severity === 'yuksek' || regFind.severity === 'orta' || regFind.severity === 'dusuk')) {
           kind = 'warn';
           levelText = regFind.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted;
@@ -2863,7 +3274,7 @@
           kind = profAlert.profile === 'ozel_kara_liste' ? 'warn' : 'info';
           const profName =
             profAlert.profile === 'ozel_kara_liste'
-              ? getFeatText(state.lang).watchlistBadge
+              ? ft.watchlistBadge
               : loc.profileScreen.profiles[profAlert.profile]
               ? loc.profileScreen.profiles[profAlert.profile].name
               : profAlert.profile;
@@ -2895,13 +3306,13 @@
             <span style="font-weight:800; font-size:16px;">InciFact</span>
           </div>
           <div style="display:flex; gap:6px;">
-            <button type="button" onclick="switchScreen('compare')" style="height:34px; padding:0 12px; border-radius:17px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.compareBtnTop}</button>
-            <button type="button" onclick="switchScreen('main')" style="height:34px; padding:0 12px; border-radius:17px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.myPrefsBtnTop}</button>
+            <button type="button" onclick="switchScreen('compare')" style="height:36px; padding:0 12px; border-radius:18px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.compareBtnTop}</button>
+            <button type="button" onclick="switchScreen('main')" style="height:36px; padding:0 12px; border-radius:18px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.myPrefsBtnTop}</button>
           </div>
         </div>
 
         <div>
-          <h1 style="margin:0; font-size:21px; font-weight:800; letter-spacing:-0.01em;">${state.productTitle}</h1>
+          <h1 style="margin:0; font-size:21px; font-weight:800; letter-spacing:-0.01em;">${escapeHtml(state.productTitle)}</h1>
           <span style="font-size:13px; color:var(--muted);">
             ${state.evalData.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${formatDigits(reg.totalCount, state.lang)} ${u.ingredientWord} · ${state.lang === 'ar' || state.lang === 'ur' ? '٪' + formatDigits(reg.coveragePercent, state.lang) : '%' + reg.coveragePercent} ${u.recognizedWord}
           </span>
@@ -2937,7 +3348,7 @@
             </div>
           </div>
 
-          <div style="display:flex; flex-direction:column; gap:5px; flex:1; min-width:0;">
+          <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:0;">
             <span style="font-size:15px; font-weight:800; color:${reg.capApplied === 10 ? 'var(--bad)' : (score !== null && score >= 75 ? 'var(--ok)' : 'var(--warn)')};">
               ${
                 reg.capApplied === 10
@@ -2949,6 +3360,7 @@
                   : u.goodNoBanned
               }
             </span>
+            <span style="font-size:11px; color:var(--muted); font-weight:600;">${escapeHtml(ft.regIndexNote || '')}</span>
             ${
               penaltyItems.length > 0
                 ? `<span style="font-size:12px; color:var(--muted); font-weight:600;">${u.scoreReducers}</span>` +
@@ -2959,24 +3371,24 @@
                         `<div style="display:flex; align-items:center; gap:8px; font-size:13px;"><span class="mono" dir="ltr" style="color:var(--warn); width:28px;">${formatDigits(p.severity === 'yuksek' ? '−25' : p.severity === 'orta' ? '−10' : '−3', state.lang)}</span><span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(p.localizedName || p.name)}</span></div>`
                     )
                     .join('')
-                : `<span style="font-size:12.5px; color:var(--muted);">${u.noRestrictedFound}</span>`
+                : `<span style="font-size:12px; color:var(--muted);">${u.noRestrictedFound}</span>`
             }
           </div>
         </div>
 
-        <!-- 2x1 Personal & Halal Summary Tiles + Ethanol Row -->
+        <!-- 2x1 Personal & Halal Summary Tiles (Unified 6-State Model) -->
         <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px;">
-          <div onclick="switchScreen('main')" style="cursor:pointer; background:${(reg.score === null || reg.coveragePercent < 80 || prof.preferenceMatchScore === null || Object.values(prof.profileStatuses).includes('kapsam_yetersiz')) ? 'var(--surface)' : prof.alerts.length > 0 ? 'var(--warn-bg)' : 'var(--ok-bg)'}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px;">
-            <span style="font-size:11.5px; font-weight:800; color:${(reg.score === null || reg.coveragePercent < 80 || prof.preferenceMatchScore === null || Object.values(prof.profileStatuses).includes('kapsam_yetersiz')) ? 'var(--muted)' : prof.alerts.length > 0 ? 'var(--warn)' : 'var(--ok)'};">${u.forYouCaps}</span>
-            <span style="font-size:13.5px; font-weight:800;">${(reg.score === null || reg.coveragePercent < 80 || prof.preferenceMatchScore === null || Object.values(prof.profileStatuses).includes('kapsam_yetersiz')) ? (loc.badges.lowCoverage || 'Kapsam Yetersiz') : prof.alerts.length > 0 ? u.itemsAttentionFmt(prof.alerts.length) : u.fitsPrefs}</span>
+          <div onclick="switchScreen('${unified.hasPendingOcr ? 'scan' : 'main'}')" style="cursor:pointer; background:${unified.profileBg}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px;">
+            <span style="font-size:11.5px; font-weight:800; color:${unified.profileFg};">${u.forYouCaps}</span>
+            <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${escapeHtml(unified.profileTitle)}</span>
             <span style="font-size:12px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-              ${(reg.score === null || reg.coveragePercent < 80 || prof.preferenceMatchScore === null || Object.values(prof.profileStatuses).includes('kapsam_yetersiz')) ? 'İçerik kapsamı yetersiz olduğu için doğrulanamadı' : prof.alerts.length > 0 ? escapeHtml((prof.alerts[0].localizedName || prof.alerts[0].substanceName) + ' (#' + formatDigits(prof.alerts[0].position, state.lang) + ')') : u.compatibleWithFilters}
+              ${escapeHtml(unified.profileSub)}
             </span>
           </div>
 
-          <div onclick="switchScreen('halal')" style="cursor:pointer; background:${halal.overallStatus === 'uygun_gorunuyor' ? 'var(--ok-bg)' : halal.overallStatus === 'kaynak_belirsiz_musbooh' || halal.overallStatus === 'kapsam_yetersiz' ? 'var(--warn-bg)' : 'var(--bad-bg)'}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px;">
-            <span style="font-size:11.5px; font-weight:800; color:${halal.overallStatus === 'uygun_gorunuyor' ? 'var(--ok)' : halal.overallStatus === 'kaynak_belirsiz_musbooh' || halal.overallStatus === 'kapsam_yetersiz' ? 'var(--warn)' : 'var(--bad)'};">${u.halalCaps} · ${halal.selectedAuthority}</span>
-            <span style="font-size:13.5px; font-weight:800;">${halal.overallStatus === 'uygun_gorunuyor' ? u.noIssueSeen : halal.overallStatus === 'kaynak_belirsiz_musbooh' ? u.musboohInspect : halal.overallStatus === 'kapsam_yetersiz' ? (loc.badges.lowCoverage || u.lowCoverage) : u.halalRedShort}</span>
+          <div onclick="switchScreen('${unified.hasPendingOcr ? 'scan' : 'halal'}')" style="cursor:pointer; background:${unified.halalBg}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px;">
+            <span style="font-size:11.5px; font-weight:800; color:${unified.halalFg};">${u.halalCaps} · ${halal.selectedAuthority}</span>
+            <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${escapeHtml(unified.halalTitle)}</span>
             <span style="font-size:12px; color:var(--ink);">${u.tapForDetail}</span>
           </div>
         </div>
@@ -2992,24 +3404,24 @@
         <!-- ÖZELLİK 1 & 4: Tek Tıkla Sonuç Kartı Paylaşımı (WhatsApp / Instagram PNG) & Karşılaştırma A/B Seçimi -->
         <div style="display:flex; flex-direction:column; gap:6px;">
           <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:8px;">
-            <button type="button" onclick="openShareCardModal()" style="height:40px; border-radius:14px; border:1.5px solid var(--accent); background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
-              <span>${getFeatText(state.lang).shareCardBtn}</span>
+            <button type="button" onclick="openShareCardModal(this)" style="height:40px; border-radius:14px; border:1.5px solid var(--accent); background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span>${ft.shareCardBtn}</span>
             </button>
             <button type="button" onclick="copyShareSummaryText()" style="height:40px; border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;">
-              <span>${getFeatText(state.lang).shareTextBtn}</span>
+              <span>${ft.shareTextBtn}</span>
             </button>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <button type="button" onclick="setCompareSlot('A')" style="height:34px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
-              ${getFeatText(state.lang).setSlotABtn}
+            <button type="button" onclick="setCompareSlot('A')" style="height:36px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
+              ${ft.setSlotABtn}
             </button>
-            <button type="button" onclick="setCompareSlot('B')" style="height:34px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
-              ${getFeatText(state.lang).setSlotBBtn}
+            <button type="button" onclick="setCompareSlot('B')" style="height:36px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
+              ${ft.setSlotBBtn}
             </button>
           </div>
           ${
             state.shareToast
-              ? `<div style="background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:800; text-align:center;">${getFeatText(state.lang).shareCopiedToast}</div>`
+              ? `<div style="background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:800; text-align:center;">${ft.shareCopiedToast}</div>`
               : ''
           }
           ${
@@ -3032,7 +3444,7 @@
           </div>
         </div>
 
-        <!-- Ingredient Cards -->
+        <!-- Ingredient Cards (DOM XSS Escaped) -->
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${visibleRows
             .map((it) => {
@@ -3044,19 +3456,19 @@
                   ${it.kind === 'warn' ? '!' : it.kind === 'info' ? 'i' : it.kind === 'unknown' ? '?' : '✓'}
                 </span>
                 <div style="display:flex; flex-direction:column; gap:4px; min-width:0; flex:1;">
-                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px;">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px; flex-wrap:wrap;">
                     <div style="display:flex; align-items:baseline; gap:6px; min-width:0;">
                       <span style="font-size:14px; font-weight:700;">${escapeHtml(it.name)}</span>
                       <span class="mono" dir="ltr" style="font-size:11px; color:var(--muted);">#${formatDigits(it.pos, state.lang)}</span>
                     </div>
-                    <span style="font-size:11.5px; font-weight:700; color:${fg}; flex:none;">${it.levelText}</span>
+                    <span style="font-size:11.5px; font-weight:700; color:${fg}; flex:none;">${escapeHtml(it.levelText)}</span>
                   </div>
-                  <span style="font-size:12.5px; line-height:1.38; color:var(--muted);">${it.whyText}</span>
+                  <span style="font-size:12.5px; line-height:1.38; color:var(--muted);">${escapeHtml(it.whyText)}</span>
                   <div style="display:flex; flex-wrap:wrap; gap:5px;">
                     ${it.sources
                       .map(
                         (s) =>
-                          `<span class="mono" dir="ltr" style="font-size:10.5px; padding:2px 8px; border-radius:10px; border:1px solid var(--line); color:var(--ink);">${s} ↗</span>`
+                          `<span class="mono" dir="ltr" style="font-size:10.5px; padding:2px 8px; border-radius:10px; border:1px solid var(--line); color:var(--ink);">${escapeHtml(s)} ↗</span>`
                       )
                       .join('')}
                   </div>
@@ -3076,26 +3488,44 @@
     function renderHalalScreen() {
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
+      const ft = getFeatText(state.lang);
       const halal = state.evalData.cards.halalCard;
       const isOk = halal.overallStatus === 'uygun_gorunuyor';
       const isBad = halal.overallStatus === 'uygunsuz_bulgu' || halal.overallStatus === 'conflict';
       const isLowCov = halal.overallStatus === 'kapsam_yetersiz';
-      const statusLabel = isOk ? loc.badges.halalOk : isBad ? loc.badges.halalRed : isLowCov ? (loc.badges.lowCoverage || 'Kapsam Yetersiz (<%80)') : loc.badges.musbooh;
-      const subLabel = isOk ? u.halalSubOk : isBad ? u.halalSubBad : isLowCov ? (loc.badges.lowCoverage || u.lowCoverage) : u.halalSubWarn;
+      const isPendingOcr = halal.overallStatus === 'unknown' || (state.evalData.unresolvedConfirmations || []).length > 0;
+      const statusLabel = isPendingOcr
+        ? ft.statusPendingOcr
+        : isLowCov
+        ? ft.statusLowCoverage
+        : isOk
+        ? loc.badges.halalOk
+        : isBad
+        ? loc.badges.halalRed
+        : loc.badges.musbooh;
+      const subLabel = isPendingOcr
+        ? ft.statusPendingOcrSub
+        : isLowCov
+        ? ft.statusLowCoverageSub
+        : isOk
+        ? u.halalSubOk
+        : isBad
+        ? u.halalSubBad
+        : u.halalSubWarn;
 
       return `
         <div style="display:flex; align-items:center; gap:10px;">
           <button type="button" onclick="switchScreen('result')" style="width:40px; height:40px; border-radius:20px; border:none; background:var(--surface); color:var(--ink); font-weight:800;">←</button>
           <div>
             <div style="font-size:17px; font-weight:800;">${u.halalEvalTitle}</div>
-            <div style="font-size:12.5px; color:var(--muted);">${state.productTitle} · ${u.authorityWord}: ${halal.selectedAuthority}</div>
+            <div style="font-size:12.5px; color:var(--muted);">${escapeHtml(state.productTitle)} · ${u.authorityWord}: ${halal.selectedAuthority}</div>
           </div>
         </div>
 
         <div style="background:${isOk ? 'var(--ok-bg)' : isBad ? 'var(--bad-bg)' : 'var(--warn-bg)'}; border-radius:22px; padding:16px; display:flex; flex-direction:column; gap:12px;">
           <div>
-            <div style="font-size:21px; font-weight:800;">${statusLabel}</div>
-            <div style="font-size:13px; font-weight:600; color:${isOk ? 'var(--ok)' : isBad ? 'var(--bad)' : 'var(--warn)'};">${subLabel}</div>
+            <div style="font-size:20px; font-weight:800;">${escapeHtml(statusLabel)}</div>
+            <div style="font-size:13px; font-weight:600; color:${isOk ? 'var(--ok)' : isBad ? 'var(--bad)' : 'var(--warn)'};">${escapeHtml(subLabel)}</div>
           </div>
 
           <!-- 3-State Scale: Helal / Şüpheli / Haram -->
@@ -3121,27 +3551,27 @@
             <span style="font-size:13px; line-height:1.2;">⚖️</span>
             <span style="font-size:11.5px; line-height:1.45; color:var(--muted);">${u.legalDisclaimerMicro}</span>
           </div>
-          <button type="button" onclick="openMethodologyModal()" style="align-self:flex-end; border:none; background:transparent; color:var(--accent); font-size:11.5px; font-weight:700; cursor:pointer; padding:2px 4px; text-decoration:underline;">
+          <button type="button" onclick="openMethodologyModal(this)" style="align-self:flex-end; border:none; background:transparent; color:var(--accent); font-size:11.5px; font-weight:700; cursor:pointer; padding:2px 4px; text-decoration:underline;">
             ${u.methodologyLink} →
           </button>
         </div>
 
-        <!-- ÖZELLİK 2: "Otoriteler Neden Farklı Karar Verdi?" 4 Kurum Karşılaştırma İpucu -->
+        <!-- ÖZELLİK 2: "Otoriteler Neden Farklı Karar Verdi?" 2×2 Kurum Karşılaştırma Matrisi (Ergonomik 48px dokunma alanı) -->
         ${
           halal.authorityComparison && halal.authorityComparison.length > 0
             ? `
           <div style="background:var(--soft); border:1.5px solid var(--accent); border-radius:18px; padding:13px 14px; display:flex; flex-direction:column; gap:10px;">
             <div style="display:flex; flex-direction:column; gap:3px;">
-              <span style="font-size:13.5px; font-weight:800; color:var(--accent);">${getFeatText(state.lang).authDiffTitle}</span>
-              <span style="font-size:11.5px; line-height:1.38; color:var(--muted);">${getFeatText(state.lang).authDiffSub}</span>
+              <span style="font-size:13.5px; font-weight:800; color:var(--accent);">${ft.authDiffTitle}</span>
+              <span style="font-size:11.5px; line-height:1.38; color:var(--muted);">${ft.authDiffSub}</span>
             </div>
             ${halal.authorityComparison
               .map((ac) => {
                 const auths = ['GIMDES', 'JAKIM', 'MUI', 'IFANCA'];
                 return `
-                <div style="background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:8px;">
-                  <span style="font-size:13px; font-weight:800; color:var(--ink);">🔎 ${escapeHtml(ac.localizedName || ac.canonical)}</span>
-                  <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:5px;">
+                <div style="background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:11px 12px; display:flex; flex-direction:column; gap:9px;">
+                  <span style="font-size:13.5px; font-weight:800; color:var(--ink);">🔎 ${escapeHtml(ac.localizedName || ac.canonical)}</span>
+                  <div class="authority-grid">
                     ${auths
                       .map((ak) => {
                         const st = ac.authorityMatrix[ak];
@@ -3150,14 +3580,14 @@
                         const pillCol = st === 'yesil' ? 'var(--ok)' : st === 'kirmizi' || st === 'conflict' ? 'var(--bad)' : 'var(--warn)';
                         const stWord = st === 'yesil' ? u.scaleHalal : st === 'kirmizi' || st === 'conflict' ? u.scaleHaram : u.scaleMusbooh;
                         return `
-                        <button type="button" onclick="changeAuthorityFromSettings('${ak}')" style="padding:6px 4px; border-radius:10px; border:${isCurr ? '2px solid var(--accent)' : '1px solid var(--line)'}; background:${pillBg}; color:${pillCol}; display:flex; flex-direction:column; align-items:center; gap:2px;">
-                          <span style="font-size:10.5px; font-weight:900; color:var(--ink);">${ak}${isCurr ? ' ✓' : ''}</span>
-                          <span style="font-size:10px; font-weight:800; text-align:center;">${escapeHtml(stWord)}</span>
+                        <button type="button" onclick="changeAuthorityFromSettings('${ak}')" style="min-height:48px; padding:8px 10px; border-radius:12px; border:${isCurr ? '2px solid var(--accent)' : '1px solid var(--line)'}; background:${pillBg}; color:${pillCol}; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:2px; text-align:start;">
+                          <span style="font-size:12.5px; font-weight:900; color:var(--ink);">${ak}${isCurr ? ' ✓' : ''}</span>
+                          <span style="font-size:12px; font-weight:800;">${escapeHtml(stWord)}</span>
                         </button>`;
                       })
                       .join('')}
                   </div>
-                  <span style="font-size:11.5px; line-height:1.42; color:var(--ink);">${escapeHtml(ac.reason || '')}</span>
+                  <span style="font-size:12px; line-height:1.45; color:var(--ink);">${escapeHtml(ac.reason || '')}</span>
                 </div>`;
               })
               .join('')}
@@ -3180,8 +3610,8 @@
               <div style="padding:12px 14px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:4px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                   <span style="font-size:14px; font-weight:700;">${escapeHtml(f.localizedName || f.canonical)}</span>
-                  <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:${f.status === 'yesil' ? 'var(--ok-bg)' : f.status === 'kirmizi' || f.status === 'conflict' ? 'var(--bad-bg)' : 'var(--warn-bg)'}; color:${f.status === 'yesil' ? 'var(--ok)' : f.status === 'kirmizi' || f.status === 'conflict' ? 'var(--bad)' : 'var(--warn)'};">
-                    ${badgeTxt}
+                  <span style="font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:10px; background:${f.status === 'yesil' ? 'var(--ok-bg)' : f.status === 'kirmizi' || f.status === 'conflict' ? 'var(--bad-bg)' : 'var(--warn-bg)'}; color:${f.status === 'yesil' ? 'var(--ok)' : f.status === 'kirmizi' || f.status === 'conflict' ? 'var(--bad)' : 'var(--warn)'};">
+                    ${escapeHtml(badgeTxt)}
                   </span>
                 </div>
                 <span style="font-size:12.5px; line-height:1.4; color:var(--muted);">${escapeHtml(expTxt)}</span>
@@ -3195,7 +3625,7 @@
               <div style="padding:12px 14px; border-bottom:1px solid var(--line); display:flex; flex-direction:column; gap:4px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                   <span style="font-size:14px; font-weight:700;">${escapeHtml(s.localizedName || s.rawToken)}</span>
-                  <span style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:var(--ok-bg); color:var(--ok);">${u.notEthanolBadge}</span>
+                  <span style="font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:10px; background:var(--ok-bg); color:var(--ok);">${u.notEthanolBadge}</span>
                 </div>
                 <span style="font-size:12.5px; line-height:1.4; color:var(--muted);">${escapeHtml(s.explanation || u.shieldDesc)}</span>
               </div>`
@@ -3206,7 +3636,7 @@
         <h2 style="margin:4px 0 0; font-size:15.5px; font-weight:800;">${u.howToClarify}</h2>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <!-- 1. Paketteki Helal Logosunu Doğrula (Simülasyon Toggle) -->
-          <button type="button" onclick="toggleHalalCertified()" style="min-height:50px; border-radius:16px; border:${state.claims.halalCertified ? 'none' : '1.5px solid var(--accent)'}; background:${state.claims.halalCertified ? 'var(--ok)' : 'var(--surface)'}; color:${state.claims.halalCertified ? '#FFFFFF' : 'var(--ink)'}; padding:0 16px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:all 0.2s; box-shadow:${state.claims.halalCertified ? '0 4px 14px rgba(27,110,63,0.25)' : 'none'};">
+          <button type="button" onclick="toggleHalalCertified()" style="min-height:50px; border-radius:16px; border:${state.claims.halalCertified ? 'none' : '1.5px solid var(--accent)'}; background:${state.claims.halalCertified ? 'var(--ok)' : 'var(--surface)'}; color:${state.claims.halalCertified ? '#FFFFFF' : 'var(--ink)'}; padding:0 16px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:all 0.2s; box-shadow:${state.claims.halalCertified ? '0 4px 14px rgba(20,90,50,0.25)' : 'none'};">
             <span style="display:flex; align-items:center; gap:8px;">
               <span>${state.claims.halalCertified ? '✓' : '🏷️'}</span>
               <span>${u.verifyHalalLogoBtn}</span>
@@ -3250,14 +3680,21 @@
       if (!comp) return '';
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
+      const ft = getFeatText(state.lang);
       const a = comp.productA;
       const b = comp.productB;
       const diff = comp.decidingDifference;
 
-      const aScore = Number(a.score) || 0;
-      const bScore = Number(b.score) || 0;
-      const aBetter = aScore > bScore || (aScore === bScore && !a.hasBanned && b.hasBanned);
-      const bBetter = bScore > aScore || (aScore === bScore && !b.hasBanned && a.hasBanned);
+      const aScore = a.score !== null && a.score !== undefined ? Number(a.score) : null;
+      const bScore = b.score !== null && b.score !== undefined ? Number(b.score) : null;
+      const aBetter =
+        (aScore !== null && bScore !== null && aScore > bScore) ||
+        (aScore === bScore && !a.hasBanned && b.hasBanned) ||
+        (aScore !== null && bScore === null && !a.hasBanned);
+      const bBetter =
+        (aScore !== null && bScore !== null && bScore > aScore) ||
+        (aScore === bScore && !b.hasBanned && a.hasBanned) ||
+        (bScore !== null && aScore === null && !b.hasBanned);
 
       const aBg = a.hasBanned ? 'var(--bad-bg)' : aBetter ? 'var(--ok-bg)' : bBetter ? 'var(--warn-bg)' : 'var(--surface2)';
       const aColor = a.hasBanned ? 'var(--bad)' : aBetter ? 'var(--ok)' : bBetter ? 'var(--warn)' : 'var(--ink)';
@@ -3271,11 +3708,30 @@
       const aAttnColor = a.attentionCount > 0 ? 'var(--warn)' : 'var(--muted)';
       const bAttnColor = b.attentionCount > 0 ? 'var(--warn)' : 'var(--muted)';
 
-      const aProfileColor = (a.profileStatus === 'Kaçın / Dikkat' || a.hasBanned) ? 'var(--bad)' : (a.attentionCount > 0 ? 'var(--warn)' : 'var(--ok)');
-      const bProfileColor = (b.profileStatus === 'Kaçın / Dikkat' || b.hasBanned) ? 'var(--bad)' : (b.attentionCount > 0 ? 'var(--warn)' : 'var(--ok)');
+      function mapStatusColor(code, rawStr) {
+        const c = code || rawStr || '';
+        if (c === 'uygun' || c === 'uygun_gorunuyor' || c === 'halal') return 'var(--ok)';
+        if (c === 'uygunsuz' || c === 'uygunsuz_bulgu' || c === 'conflict' || c === 'haram' || c === 'Kaçın / Dikkat') return 'var(--bad)';
+        return 'var(--warn)';
+      }
 
-      const aHalalColor = (a.halalStatus === 'uygun' || a.halalStatus === 'halal') ? 'var(--ok)' : (a.halalStatus === 'haram' || a.halalStatus === 'conflict') ? 'var(--bad)' : 'var(--warn)';
-      const bHalalColor = (b.halalStatus === 'uygun' || b.halalStatus === 'halal') ? 'var(--ok)' : (b.halalStatus === 'haram' || b.halalStatus === 'conflict') ? 'var(--bad)' : 'var(--warn)';
+      const aProfileColor = mapStatusColor(a.profileStatusCode, a.profileStatus);
+      const bProfileColor = mapStatusColor(b.profileStatusCode, b.profileStatus);
+
+      const aHalalColor = mapStatusColor(a.halalStatusCode, a.halalStatus);
+      const bHalalColor = mapStatusColor(b.halalStatusCode, b.halalStatus);
+
+      function mapProfileLabel(prod) {
+        if (prod.profileStatusCode === 'teyit_bekliyor') return ft.statusPendingOcr;
+        if (prod.profileStatusCode === 'kapsam_yetersiz') return ft.statusLowCoverage;
+        return prod.profileStatusLocalized || prod.profileStatus;
+      }
+
+      function mapHalalLabel(prod) {
+        if (prod.halalStatusCode === 'teyit_bekliyor') return ft.statusPendingOcr;
+        if (prod.halalStatusCode === 'kapsam_yetersiz') return ft.statusLowCoverage;
+        return prod.halalStatusLocalized || prod.halalStatus;
+      }
 
       const histList =
         state.scanHistory && state.scanHistory.length > 0
@@ -3294,14 +3750,13 @@
           <h1 style="margin:0; font-size:22px; font-weight:800; letter-spacing:-0.02em;">${loc.compareScreen.title}</h1>
           ${
             state.customCompareA || state.customCompareB
-              ? `<button type="button" onclick="resetCustomCompare()" style="height:30px; padding:0 10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--accent); font-size:11px; font-weight:800;">↺ ${getFeatText(state.lang).resetCompareBtn}</button>`
+              ? `<button type="button" onclick="resetCustomCompare()" style="height:32px; padding:0 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--accent); font-size:11.5px; font-weight:800;">↺ ${ft.resetCompareBtn}</button>`
               : ''
           }
         </div>
 
-        <img src="./assets/banner-clean-comparison.jpg" alt="InciFact Clean Comparison" style="width:100%; border-radius:16px; border:1px solid rgba(212,175,55,0.3); display:block; box-shadow:0 4px 14px rgba(11,19,43,0.18);" />
-
-        <div style="background:var(--surface); border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:10px;">
+        <!-- Gerçek A vs B Karşılaştırma Kartı İlk Ekranda (Above the fold) -->
+        <div style="background:var(--surface); border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:10px; border:1px solid var(--line);">
           <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
             <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${aBg}; border:1.5px solid ${aBetter ? 'var(--ok)' : a.hasBanned ? 'var(--bad)' : 'transparent'};">
               <span style="font-size:30px; font-weight:800; line-height:1; color:${aColor};">${a.score !== null ? formatDigits(a.score, state.lang) : '—'}</span>
@@ -3314,25 +3769,25 @@
           </div>
 
           <div style="display:flex; flex-direction:column;">
-            <div style="display:grid; grid-template-columns:1fr 84px 84px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
+            <div style="display:grid; grid-template-columns:1fr 90px 90px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
               <span style="color:var(--muted);">${loc.compareScreen.euBanRow}</span>
               <span style="text-align:center; font-weight:700; color:${aBannedColor};">${a.hasBanned ? loc.badges.present : loc.badges.none}</span>
               <span style="text-align:center; font-weight:700; color:${bBannedColor};">${b.hasBanned ? loc.badges.present : loc.badges.none}</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 84px 84px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
+            <div style="display:grid; grid-template-columns:1fr 90px 90px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
               <span style="color:var(--muted);">${loc.compareScreen.attentionRow}</span>
               <span style="text-align:center; font-weight:700; color:${aAttnColor};">${formatDigits(a.attentionCount, state.lang)}</span>
               <span style="text-align:center; font-weight:700; color:${bAttnColor};">${formatDigits(b.attentionCount, state.lang)}</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 84px 84px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
+            <div style="display:grid; grid-template-columns:1fr 90px 90px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:12.5px;">
               <span style="color:var(--muted);">${loc.compareScreen.profileRow}</span>
-              <span style="text-align:center; font-weight:700; color:${aProfileColor};">${a.profileStatusLocalized || a.profileStatus}</span>
-              <span style="text-align:center; font-weight:700; color:${bProfileColor};">${b.profileStatusLocalized || b.profileStatus}</span>
+              <span style="text-align:center; font-weight:700; color:${aProfileColor};">${escapeHtml(mapProfileLabel(a))}</span>
+              <span style="text-align:center; font-weight:700; color:${bProfileColor};">${escapeHtml(mapProfileLabel(b))}</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 84px 84px; align-items:center; padding:8px 2px; font-size:13px;">
+            <div style="display:grid; grid-template-columns:1fr 90px 90px; align-items:center; padding:8px 2px; font-size:12.5px;">
               <span style="color:var(--muted);">${loc.compareScreen.halalRow}</span>
-              <span style="text-align:center; font-weight:700; color:${aHalalColor};">${a.halalStatusLocalized || a.halalStatus}</span>
-              <span style="text-align:center; font-weight:700; color:${bHalalColor};">${b.halalStatusLocalized || b.halalStatus}</span>
+              <span style="text-align:center; font-weight:700; color:${aHalalColor};">${escapeHtml(mapHalalLabel(a))}</span>
+              <span style="text-align:center; font-weight:700; color:${bHalalColor};">${escapeHtml(mapHalalLabel(b))}</span>
             </div>
           </div>
 
@@ -3340,13 +3795,13 @@
             diff
               ? `
             <div style="border-radius:14px; background:var(--bad-bg); padding:12px; display:flex; flex-direction:column; gap:5px;">
-              <span style="font-size:13px; font-weight:800; color:var(--bad);">⚡ ${diff.headline}</span>
-              <span style="font-size:12px; line-height:1.4; color:var(--ink);">${diff.explanation || u.restrictedDesc}</span>
-              <div style="display:flex; gap:6px; margin-top:2px;">
+              <span style="font-size:13px; font-weight:800; color:var(--bad);">⚡ ${escapeHtml(diff.headline)}</span>
+              <span style="font-size:12px; line-height:1.4; color:var(--ink);">${escapeHtml(diff.explanation || u.restrictedDesc)}</span>
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:2px;">
                 ${(diff.sources || [])
                   .map(
                     (s) =>
-                      `<span class="mono" dir="ltr" style="font-size:11px; padding:2px 8px; border-radius:10px; background:var(--surface); border:1px solid var(--line);">${s.id}</span>`
+                      `<span class="mono" dir="ltr" style="font-size:11px; padding:2px 8px; border-radius:10px; background:var(--surface); border:1px solid var(--line);">${escapeHtml(s.id || s)}</span>`
                   )
                   .join('')}
               </div>
@@ -3359,8 +3814,8 @@
         <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px;">
           <h2 style="margin:0; font-size:16px; font-weight:800;">🕘 ${u.recentScans}</h2>
           ${
-            state.scanHistory && state.scanHistory.length > 1
-              ? `<button type="button" onclick="state.scanHistory=[]; saveJson('incifact_scan_history_v1', []); refreshAll();" style="border:none; background:transparent; color:var(--muted); font-size:11px; font-weight:700;">${getFeatText(state.lang).clearHistoryBtn}</button>`
+            state.scanHistory && state.scanHistory.length > 0
+              ? `<button type="button" onclick="state.scanHistory=[]; saveJson('incifact_scan_history_v1', []); refreshAll();" style="border:none; background:transparent; color:var(--muted); font-size:11.5px; font-weight:700;">${ft.clearHistoryBtn}</button>`
               : ''
           }
         </div>
@@ -3388,9 +3843,9 @@
                     <div style="font-size:11.5px; color:var(--muted);">${h.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${u.tapToInspect}</div>
                   </div>
                 </button>
-                <div style="display:flex; gap:4px; flex:none;">
-                  <button type="button" onclick="setCompareSlot('A', ${i})" title="Product A" style="height:28px; padding:0 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:11px; font-weight:800;">A</button>
-                  <button type="button" onclick="setCompareSlot('B', ${i})" title="Product B" style="height:28px; padding:0 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:11px; font-weight:800;">B</button>
+                <div style="display:flex; gap:6px; flex:none;">
+                  <button type="button" onclick="setCompareSlot('A', ${i})" title="Product A" style="min-width:34px; height:34px; padding:0 10px; border-radius:10px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:800;">A</button>
+                  <button type="button" onclick="setCompareSlot('B', ${i})" title="Product B" style="min-width:34px; height:34px; padding:0 10px; border-radius:10px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:800;">B</button>
                 </div>
               </div>`;
             })
@@ -3399,15 +3854,43 @@
       `;
     }
 
-    function openMethodologyModal() {
+    let lastMethodologyTriggerEl = null;
+
+    function openMethodologyModal(triggerEl) {
+      lastMethodologyTriggerEl = triggerEl || document.activeElement;
       const modal = document.getElementById('methodologyModal');
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        const u = getUiText(state.lang);
+        const titleEl = document.getElementById('methodologyModalTitle');
+        const closeBtn = document.getElementById('methodologyModalOkBtn');
+        if (titleEl) titleEl.textContent = '⚖️ ' + u.methodologyTitle;
+        if (closeBtn) closeBtn.textContent = u.methodologyClose;
+        modal.style.display = 'flex';
+        const xBtn = document.getElementById('methodologyModalCloseBtn');
+        if (xBtn) xBtn.focus();
+      }
     }
 
     function closeMethodologyModal() {
       const modal = document.getElementById('methodologyModal');
       if (modal) modal.style.display = 'none';
+      if (lastMethodologyTriggerEl && typeof lastMethodologyTriggerEl.focus === 'function') {
+        lastMethodologyTriggerEl.focus();
+      }
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const shareModal = document.getElementById('shareCardModal');
+        if (shareModal && shareModal.style.display === 'flex') {
+          closeShareCardModal();
+        }
+        const methModal = document.getElementById('methodologyModal');
+        if (methModal && methModal.style.display === 'flex') {
+          closeMethodologyModal();
+        }
+      }
+    });
 
     const initLive = document.getElementById('liveInput');
     if (initLive) {
@@ -3416,47 +3899,47 @@
     refreshAll();
   </script>
 
-  <!-- ÖZELLİK 1: WhatsApp / Instagram Sonuç Özeti Kartı Paylaşım Modalı -->
-  <div id="shareCardModal" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.72); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+  <!-- ÖZELLİK 1: WhatsApp / Instagram Sonuç Özeti Kartı Paylaşım Modalı (A11y Dialog + 10-Language Localized) -->
+  <div id="shareCardModal" role="dialog" aria-modal="true" aria-labelledby="shareCardModalTitle" onclick="if(event.target===this)closeShareCardModal();" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.72); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
     <div style="background:var(--surface); border:1.5px solid var(--accent); border-radius:24px; max-width:430px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 48px rgba(0,0,0,0.5);">
       <div style="padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
-        <span style="font-weight:800; font-size:14.5px; color:var(--ink);">📸 InciFact · WhatsApp / Instagram Kartı</span>
-        <button type="button" onclick="closeShareCardModal()" style="border:none; background:var(--surface2); width:32px; height:32px; border-radius:16px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+        <span id="shareCardModalTitle" style="font-weight:800; font-size:14.5px; color:var(--ink);">📸 InciFact · WhatsApp / Instagram Kartı</span>
+        <button id="shareModalCloseBtn" type="button" aria-label="Close" onclick="closeShareCardModal()" style="border:none; background:var(--surface2); width:36px; height:36px; border-radius:18px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
       </div>
       <div style="padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; gap:12px;">
-        <canvas id="shareCardCanvas" width="1080" height="1350" style="width:100%; max-width:320px; height:auto; border-radius:16px; box-shadow:0 12px 28px rgba(11,19,43,0.45); border:1px solid rgba(212,175,55,0.4);"></canvas>
+        <canvas id="shareCardCanvas" width="1080" height="1350" style="width:100%; max-width:320px; height:auto; border-radius:16px; box-shadow:0 12px 28px rgba(11,19,43,0.45); border:1px solid rgba(197,160,89,0.45);"></canvas>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%;">
-          <button type="button" onclick="downloadShareCardPng()" style="height:42px; border-radius:12px; border:none; background:var(--accent); color:var(--on-accent); font-size:12.5px; font-weight:800; cursor:pointer;">📥 PNG İndir</button>
-          <button type="button" onclick="shareViaWhatsApp()" style="height:42px; border-radius:12px; border:none; background:#1E7A45; color:#FFFFFF; font-size:12.5px; font-weight:800; cursor:pointer;">📲 WhatsApp</button>
+          <button id="shareModalDownloadBtn" type="button" onclick="downloadShareCardPng()" style="height:44px; border-radius:12px; border:none; background:var(--accent); color:var(--on-accent); font-size:12.5px; font-weight:800; cursor:pointer;">📥 PNG İndir</button>
+          <button id="shareModalWaBtn" type="button" onclick="shareViaWhatsApp()" style="height:44px; border-radius:12px; border:none; background:#145A32; color:#FFFFFF; font-size:12.5px; font-weight:800; cursor:pointer;">📲 WhatsApp</button>
         </div>
-        <button type="button" onclick="copyShareSummaryText(); closeShareCardModal();" style="height:38px; width:100%; border-radius:12px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:700; cursor:pointer;">📋 Özet Metni Panoya Kopyala</button>
+        <button id="shareModalCopyBtn" type="button" onclick="copyShareSummaryText(); closeShareCardModal();" style="height:40px; width:100%; border-radius:12px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:700; cursor:pointer;">📋 Özet Metni Panoya Kopyala</button>
       </div>
     </div>
   </div>
 
-  <!-- Hukuki Metodoloji & Kaynak Beyanı Modalı (P0 Legal) -->
-  <div id="methodologyModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+  <!-- Hukuki Metodoloji & Kaynak Beyanı Modalı (P0 Legal + A11y Dialog) -->
+  <div id="methodologyModal" role="dialog" aria-modal="true" aria-labelledby="methodologyModalTitle" onclick="if(event.target===this)closeMethodologyModal();" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
     <div style="background:var(--surface); border:1px solid var(--line); border-radius:24px; max-width:440px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.4);">
       <div style="padding:16px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
-        <span style="font-weight:800; font-size:15px; color:var(--ink);">⚖️ Fıkhi Metodoloji & Kaynak Beyanı</span>
-        <button type="button" onclick="closeMethodologyModal()" style="border:none; background:var(--surface2); width:32px; height:32px; border-radius:16px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+        <span id="methodologyModalTitle" style="font-weight:800; font-size:15px; color:var(--ink);">⚖️ Fıkhi Metodoloji & Kaynak Beyanı</span>
+        <button id="methodologyModalCloseBtn" type="button" aria-label="Close" onclick="closeMethodologyModal()" style="border:none; background:var(--surface2); width:36px; height:36px; border-radius:18px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
       </div>
       <div style="padding:16px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; font-size:12.5px; line-height:1.5; color:var(--ink);">
         <div style="display:flex; align-items:center; gap:12px; background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
-          <img src="./assets/incifact-corporate-seal.jpg" alt="InciFact Corporate Seal" width="54" height="54" style="border-radius:10px; flex:none; border:1px solid rgba(212,175,55,0.4);" />
+          <img src="./assets/incifact-corporate-seal.jpg" alt="InciFact Corporate Seal" width="54" height="54" style="border-radius:10px; flex:none; border:1px solid rgba(197,160,89,0.4);" />
           <span>InciFact, bağımsız bir bilimsel ve algoritmik tarama motorudur. Adı geçen kurumlarla herhangi bir organik, resmi veya ticari bağı bulunmamaktadır.</span>
         </div>
         <div>
           <strong style="color:var(--accent);">1. GİMDES (Türkiye):</strong><br>
-          <span style="color:var(--muted);">Helal Gıda ve İhtiyaç Maddeleri Standardı Madde 4.2 gereği böcek kaynaklı katkılar (E120 Karmin, Şellak) ve hayvansal şüpheli emülgatörler sertifikasız kabul edilmez.</span>
+          <span style="color:var(--muted);">Helal Gıda ve İhtiyaç Maddeleri Standardı Madde 4.2 gereği böcek kaynaklı katkılar (E120 Karmin, Şellak, Salyangoz Müsini) ve hayvansal şüpheli emülgatörler sertifikasız kabul edilmez.</span>
         </div>
         <div>
           <strong style="color:var(--accent);">2. JAKIM (Malezya):</strong><br>
-          <span style="color:var(--muted);">Muzakarah Jawatankuasa Fatwa Majlis Kebangsaan (Fetva Bülteni No: 100/2012) uyarınca Karmin (E120) renklendiricisi gıdada ve kozmetikte helal kabul edilmektedir.</span>
+          <span style="color:var(--muted);">Muzakarah Jawatankuasa Fatwa Majlis Kebangsaan (Fetva Bülteni No: 100/2012) uyarınca Karmin (E120) renklendiricisi caizdir; harici kozmetikte salyangoz müsini (Irsyad Al-Fatwa Serisi 188) işkencesiz üretim ve temizlik şartına bağlıdır.</span>
         </div>
         <div>
           <strong style="color:var(--accent);">3. MUI / BPJPH (Endonezya):</strong><br>
-          <span style="color:var(--muted);">Fatwa MUI No. 33 Tahun 2011 (Pewarna Makanan Cochineal) gereği košenil böceğinden elde edilen Karmin temiz ve caizdir.</span>
+          <span style="color:var(--muted);">Fatwa MUI No. 33 Tahun 2011 uyarınca košenil böceğinden elde edilen Karmin caizdir; Fatwa MUI No. 24 Tahun 2012 uyarınca salyangoz tüketimi haram olup harici kozmetik kullanımı üretim ve arındırma denetimine tabidir.</span>
         </div>
         <div>
           <strong style="color:var(--accent);">4. IFANCA (ABD / Global):</strong><br>
@@ -3464,7 +3947,7 @@
         </div>
       </div>
       <div style="padding:12px 18px; border-top:1px solid var(--line); display:flex; justify-content:flex-end;">
-        <button type="button" onclick="closeMethodologyModal()" style="background:var(--ok); color:#FFFFFF; border:none; border-radius:12px; padding:8px 18px; font-weight:700; font-size:13px; cursor:pointer;">Anladım</button>
+        <button id="methodologyModalOkBtn" type="button" onclick="closeMethodologyModal()" style="background:var(--ok); color:#FFFFFF; border:none; border-radius:12px; padding:8px 18px; font-weight:700; font-size:13px; cursor:pointer;">Anladım</button>
       </div>
     </div>
   </div>

@@ -240,10 +240,11 @@
     },
     "BPJPH_MUI_ID": {
       "id": "BPJPH_MUI_ID",
-      "title": "BPJPH / LPPOM MUI Indonesia Halal Product Assurance Standards (SJPH HAS 23000)",
+      "institution": "Majelis Ulama Indonesia (MUI) / LPPOM MUI & Mufti Wilayah Malaysia",
+      "title": "MUI Fatwa No. 24 Tahun 2012 (Penggunaan Binatang untuk Bahan Kosmetika dan Obat-obatan — Non-Food External Cosmetic vs Oral Distinction) & Mufti Wilayah Irsyad Al-Fatwa Series 188",
       "jurisdiction": "ID",
       "type": "halal_standard",
-      "url": "https://halalmui.org/"
+      "url": "https://halalmui.org/mengenal-bahan-kosmetika-dan-obat-obatan/"
     },
     "EU_2024_197": {
       "id": "EU_2024_197",
