@@ -3,15 +3,15 @@
 > **Tarih:** 14 Ekim 2026  
 > **Konum:** `C:\Projeler\clean-halal-scanner`  
 > **Canlı Servis:** `http://localhost:3456`  
-> **Mevcut Durum:** `npm test` tamamen geçiyor (39/39 kabul + 32/32 regresyon + 15/15 canlı parite) · Son **bağımsız** denetim: **100/100 · GO** — *denetlenen kural motoru ve yerel API regresyon kapsamı için* (6. denetim, commit `cdaf95cdeb489f1de5cb7d9843968c046e0aea81`; rapor `docs/handover/audit-6_100-100_GO_rapor.md`). Puan geçmişi: 56 → 68 → 80 → 92 → 94 → **100 (GO)**.
+> **Mevcut Durum:** `npm test` tamamen geçiyor (41/41 kabul + 32/32 regresyon + 15/15 canlı parite) · Son **bağımsız** denetim: **100/100 · GO** — *denetlenen kural motoru ve yerel API regresyon kapsamı için* (6. denetim, commit `cdaf95cdeb489f1de5cb7d9843968c046e0aea81`; rapor `docs/handover/audit-6_100-100_GO_rapor.md`). Puan geçmişi: 56 → 68 → 80 → 92 → 94 → **100 (GO)**.
 >
 > **Ek belgeler:** `docs/handover/` klasöründe tüm bağımsız denetim raporları (`56/100`, `68/100`, `80/100`, `92/100`, `94/100`, `100/100 GO`), yol haritası, App Store gelir analizi, barkod/OFF mimarisi, marka/renk raporları ve görsel üretim promptları duruyor.
 
 ## 0. YENİ OTURUMDA İLK YAPILACAKLAR
 1. Bu dosyayı ve `docs/handover/audit-6_100-100_GO_rapor.md` dosyasını baştan sona oku.
-2. `npm test` çalıştır; sonuçların 39/39 kabul, 32/32 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
+2. `npm test` çalıştır; sonuçların 41/41 kabul, 32/32 regresyon, 80 yerel örnekte 0 bilinmeyen (70/80 %100 kapsam + 10/80 %86 kasıtlı SLS/SLES OCR teyit örneği) ve 0 çakışma olduğunu doğrula.
 3. `node server.mjs` ile servisi başlat (port 3456) ve `node tests/audit3_live_parity.mjs` ile 15/15 canlı/disk eşitliğini doğrula.
-4. Aşağıdaki **Bölüm 7: Güncel Durum ve Nihai Teknik Denetim (100/100 GO) Kapsamı** bölümünü incele.
+4. Aşağıdaki **Bölüm 7: Güncel Durum ve Nihai Teknik Denetim (100/100 GO) Kapsamı** ve **Bölüm 8: Kullanıcı Odaklı 4 Ek Özellik (10 Dilde)** bölümlerini incele.
 
 ---
 
@@ -160,4 +160,21 @@ Kaynak: `docs/handover/audit-6_100-100_GO_rapor.md` (Hedef commit: `cdaf95cdeb48
   - Bu **100/100 · GO** kararı, **denetlenen kural motoru ve yerel API regresyon kapsamı** içindir.
   - Gerçek iOS/Android fiziksel cihaz derlemesi (`npm install` + EAS build), gerçek cihazda mobil OCR performansı, tam ekran tıklama testi ve App Store mağaza kabulü bu teknik denetimin kapsamı dışındadır.
   - Bu teknik GO kararı, mobil mağaza yayını onayı veya resmi toksikoloji / helal / mevzuat sertifikası olarak sunulmamalıdır.
+
+---
+
+## 8. KULLANICI ODAKLI 4 EK ÖZELLİK (10 DİLDE & HEM WEB HEM MOBİL)
+
+1. **📸 WhatsApp / Instagram için Tek Tıkla "Sonuç Özeti Kartı" Paylaşımı:**
+   - Web stüdyosunda (`public/index.html`) 3. Sonuç ekranında **📸 Sonuç Kartı (PNG / Paylaş)** ve **💬 Özeti Kopyala** butonları; `1080×1350` yüksek çözünürlüklü HTML5 `<canvas>` lüks paylaşım kartı üretimi, PNG indirme ve doğrudan WhatsApp paylaşımı.
+   - Mobil istemcide (`src/mobile/ScannerApp.tsx`) React Native `Share.share` ile yerel paylaşım menüsü.
+2. **⚖️ "Otoriteler Neden Farklı Karar Verdi?" Karşılaştırma İpucu (4 Kurum Matrisi):**
+   - `src/engine/ruleEngine.mjs` içinde `halalCard.authorityComparison` ve her bulguda `authorityMatrix` (`GIMDES`, `JAKIM`, `MUI`, `IFANCA`), `hasAuthorityDifference` ve 10 dilde fıkhi fark açıklaması (`authorityDiffReason` — Karmin E120, Etanol, Şellak E904, Salyangoz Müsini vb.).
+   - 4. Helal ekranında 4 kurumun kararını yan yana gösteren ve tıklandığında ilgili otoriteye geçiş yapan etkileşimli matris.
+3. **🧬 Kişisel Özel Hassasiyet / Kara Liste Ekleme ("Benim Yasaklılarım" / `customWatchlist`):**
+   - `evaluateProduct({ ..., customWatchlist })` içinde negasyon korumalı (`free`/`siz`/`ohne` muafiyetli) deterministik eşleşme (`profileStatuses.ozel_kara_liste` ve `'kirmizi'` uyarı).
+   - 1. Profil ekranında serbest metin + hızlı öneri çipleri (`Niacinamide`, `Phenoxyethanol`, `Parfum`, `SLS`, `Palm Oil`, `MSG E621`, `Silicones`) ve cihaz içi kalıcı depolama (`incifact_custom_watchlist_v1`).
+4. **🔄 Son Tarananlar Geçmişi & Tek Tıkla Karşılaştırmaya Aktarma (`scanHistory` & `A`/`B` Atama):**
+   - Taranan ürünlerin cihaz içinde (`incifact_scan_history_v1`) otomatik saklanması; 3. Sonuç ekranından veya 5. Karşılaştır ekranındaki **🕘 Son Tarananlar** listesinden tek tıkla **🅰️ 1. Ürün (A) Yap** / **🅱️ 2. Ürün (B) Yap** ataması ve canlı yan yana karşılaştırma.
+
 

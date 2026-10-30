@@ -788,7 +788,48 @@ runTest('39. Gıdada Cetearyl Alcohol haram olmamalı, Gelatin (pork-free) domuz
   assert.equal(resLowCov.cards.veganSugarCard.veganCompatibility, 'kapsam_yetersiz');
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/39 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// 40. Kişisel Özel Hassasiyet / Kara Liste (customWatchlist) Deterministik Eşleşme ve Negasyon Koruması
+runTest('40. Kişisel Özel Kara Liste (customWatchlist) seçili maddeyi "ozel_kara_liste" kırmızı uyarı olarak yakalamalı, negasyonu (free/siz) muaf tutmalı', () => {
+  const resMatch = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Niacinamide, Panthenol',
+    productType: 'cosmetic',
+    customWatchlist: ['Niacinamide', 'Parfum']
+  });
+  assert.equal(resMatch.cards.profileCard.profileStatuses.ozel_kara_liste, 'false');
+  const wlAlert = resMatch.cards.profileCard.alerts.find((a) => a.profile === 'ozel_kara_liste');
+  assert.ok(wlAlert, 'Kişisel kara liste uyarısı üretilmeli');
+  assert.equal(wlAlert.level, 'kirmizi');
+
+  // Negation ("Niacinamide-free") should NOT trigger personal watchlist false alarm
+  const resNegated = evaluateProduct({
+    rawText: 'Ingredients: Aqua, Glycerin, Cetyl Alcohol, Panthenol, Niacinamide-free',
+    productType: 'cosmetic',
+    customWatchlist: ['Niacinamide']
+  });
+  assert.equal(resNegated.cards.profileCard.profileStatuses.ozel_kara_liste, 'true');
+});
+
+// 41. 4 Otorite Karşılaştırma Matrisi (authorityComparison: GİMDES, JAKIM, MUI, IFANCA) ve Fıkhi Fark Açıklaması
+runTest('41. Otoriteler arası görüş ayrılığı olan maddelerde (Karmin E120, Etil Alkol, Şellak) 4 otorite matrisi ve 10 dilde fıkhi açıklama dönmeli', () => {
+  const resCarmine = evaluateProduct({
+    rawText: 'İçindekiler: Sugar, Water, Citric Acid, Carmine (E120)',
+    productType: 'food',
+    halalAuthority: 'GIMDES',
+    lang: 'tr'
+  });
+  assert.ok(Array.isArray(resCarmine.cards.halalCard.authorityComparison));
+  assert.equal(resCarmine.cards.halalCard.authorityComparison.length, 1);
+  const comp = resCarmine.cards.halalCard.authorityComparison[0];
+  assert.equal(comp.ruleId, 'carmine_e120');
+  assert.equal(comp.authorityMatrix.GIMDES, 'kirmizi');
+  assert.equal(comp.authorityMatrix.IFANCA, 'kirmizi');
+  assert.equal(comp.authorityMatrix.JAKIM, 'yesil');
+  assert.equal(comp.authorityMatrix.MUI, 'yesil');
+  assert.ok(comp.authorityDiffReason && comp.authorityDiffReason.includes('GİMDES'));
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/41 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+
 
 
 

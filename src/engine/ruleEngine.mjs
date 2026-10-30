@@ -952,6 +952,7 @@ export function evaluateProduct({
   productType = 'cosmetic',
   jurisdiction = 'EU',
   userProfiles = [],
+  customWatchlist = [],
   halalAuthority = 'general_cautious',
   claims = { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'none' },
   userConfirmations = {},
@@ -1685,10 +1686,87 @@ export function evaluateProduct({
     }
   }
 
+  // Personal Custom Watchlist / Blacklist ("Benim Yasaklılarım" — Device-Local Custom Sensitivities)
+  let sanitizedWatchlist = [];
+  if (typeof customWatchlist === 'string') {
+    sanitizedWatchlist = customWatchlist.split(',').map((s) => s.trim()).filter(Boolean);
+  } else if (Array.isArray(customWatchlist)) {
+    sanitizedWatchlist = customWatchlist.map((s) => String(s || '').trim()).filter(Boolean);
+  }
+  sanitizedWatchlist = Array.from(
+    new Set(
+      sanitizedWatchlist
+        .map((s) => s.slice(0, 80))
+        .filter((s) => s.length >= 2)
+    )
+  ).slice(0, 50);
+
+  const WATCHLIST_ALERT_I18N = {
+    tr: (term, item) => `Kişisel Kara Listeniz ("${term}") ile eşleşti: Ürün içeriğinde "${item}" tespit edildi.`,
+    en: (term, item) => `Matched your Personal Blacklist ("${term}"): "${item}" was detected in this formula.`,
+    ar: (term, item) => `تطابق مع قائمتك السوداء الشخصية ("${term}"): تم رصد "${item}" في المكونات.`,
+    de: (term, item) => `Treffer auf Ihrer persönlichen Sperrliste („${term}“): „${item}“ im Produkt erkannt.`,
+    fr: (term, item) => `Correspond à votre liste noire personnelle (« ${term} ») : « ${item} » détecté.`,
+    id: (term, item) => `Cocok dengan Daftar Hitam Pribadi Anda ("${term}"): "${item}" terdeteksi pada komposisi.`,
+    ms: (term, item) => `Sepadan dengan Senarai Hitam Peribadi anda ("${term}"): "${item}" dikesan dalam kandungan.`,
+    es: (term, item) => `Coincide con tu Lista Negra Personal ("${term}"): se detectó "${item}" en la fórmula.`,
+    ru: (term, item) => `Совпадение с вашим личным чёрным списком («${term}»): обнаружен компонент «${item}».`,
+    ur: (term, item) => `آپ کی ذاتی بلیک لسٹ ("${term}") سے مطابقت: اجزاء میں "${item}" پایا گیا۔`
+  };
+
+  if (sanitizedWatchlist.length > 0) {
+    profileStatuses['ozel_kara_liste'] = 'true';
+    for (const obs of observations) {
+      const rawLower = (obs.raw || '').toLowerCase();
+      const isNegatedRaw = /(?:free|frei|siz|sız|suz|süz|ohne|sans|sin|tanpa|bebas|içermez|icermez|بدون|بغیر|без)/iu.test(rawLower);
+      if (isNegatedRaw) continue;
+
+      const normRaw = normalizeToken(obs.raw || '');
+      const foldedRaw = foldTurkish(obs.raw || '');
+      const locLower = (obs.localizedName || '').toLowerCase();
+      const subNameLower = obs.substance ? (obs.substance.name || '').toLowerCase() : '';
+      const subAliases = obs.substance && Array.isArray(obs.substance.aliases) ? obs.substance.aliases : [];
+
+      for (const watchTerm of sanitizedWatchlist) {
+        const normWatch = normalizeToken(watchTerm);
+        const foldWatch = foldTurkish(watchTerm);
+        const lowerWatch = watchTerm.toLowerCase();
+        if (!normWatch) continue;
+
+        const matched =
+          normRaw === normWatch ||
+          foldedRaw === foldWatch ||
+          normRaw.includes(normWatch) ||
+          foldedRaw.includes(foldWatch) ||
+          locLower.includes(lowerWatch) ||
+          subNameLower.includes(lowerWatch) ||
+          subAliases.some((al) => al === lowerWatch || foldTurkish(al) === foldWatch);
+
+        if (matched) {
+          profileStatuses['ozel_kara_liste'] = 'false';
+          const msgFn = WATCHLIST_ALERT_I18N[lang] || WATCHLIST_ALERT_I18N.en;
+          profileAlerts.push({
+            profile: 'ozel_kara_liste',
+            watchTerm,
+            substanceName: obs.substance ? obs.substance.name : watchTerm,
+            localizedName: obs.localizedName || obs.raw,
+            rawToken: obs.raw,
+            position: obs.position,
+            level: 'kirmizi',
+            explanation: msgFn(watchTerm, obs.localizedName || obs.raw),
+            sources: []
+          });
+          break;
+        }
+      }
+    }
+  }
+
+  const effectiveProfileCount = userProfiles.length + (sanitizedWatchlist.length > 0 ? 1 : 0);
   let preferenceMatchScore = null;
-  if (userProfiles.length > 0 && unresolvedConfirmations.length === 0) {
+  if (effectiveProfileCount > 0 && unresolvedConfirmations.length === 0) {
     if (coverageRatio < 0.8) {
-      for (const prof of userProfiles) {
+      for (const prof of Object.keys(profileStatuses)) {
         if (profileStatuses[prof] === 'true') {
           profileStatuses[prof] = 'kapsam_yetersiz';
         }
@@ -1698,7 +1776,7 @@ export function evaluateProduct({
       const hasUnknown = Object.values(profileStatuses).some((st) => st === 'unknown');
       if (!hasUnknown) {
         const matchCount = Object.values(profileStatuses).filter((st) => st === 'true').length;
-        preferenceMatchScore = Math.round((100 * matchCount) / userProfiles.length);
+        preferenceMatchScore = Math.round((100 * matchCount) / effectiveProfileCount);
       }
     }
   }
@@ -1706,6 +1784,7 @@ export function evaluateProduct({
   const profileCard = {
     cardTitle: et.profCardTitle,
     selectedProfiles: userProfiles,
+    ...(sanitizedWatchlist.length > 0 ? { customWatchlist: sanitizedWatchlist } : {}),
     profileStatuses,
     preferenceMatchScore,
     alerts: profileAlerts,
@@ -1717,8 +1796,72 @@ export function evaluateProduct({
   // ============================================================================
   const halalFindings = [];
   const falsePositiveShields = [];
+  const authorityComparison = [];
   let overallHalalStatus = unresolvedConfirmations.length > 0 ? 'unknown' : 'uygun_gorunuyor';
   const explicitPlantRegex = /\b(soya|soy|soja|kedelai|sunflower|ayçiçek|aycicek|tournesol|sonnenblumen|vegetable|bitkisel|végétale|vegetale|pflanzlich|nabati|plant)\b|صويا|نباتي|عباد الشمس|подсолнечн|соев/iu;
+
+  const AUTHORITY_DIFF_REASONS_10LANG = {
+    carmine_e120: {
+      tr: 'Karmin (E120) koşnil böceğinden elde edilir. GİMDES ve IFANCA böcek kaynaklı boyaları uygunsuz (Kırmızı) kabul ederken; Malezya JAKIM (2012) ve Endonezya MUI (Fetva 33/2011) akıcı kanı olmayan böcek kategorisinde değerlendirerek Helal (Yeşil) saymaktadır.',
+      en: 'Carmine (E120) is derived from cochineal insects. GİMDES and IFANCA reject insect-derived colorants (Red), whereas Malaysia JAKIM (2012) and Indonesia MUI (Fatwa 33/2011) classify non-flowing-blood insects as Halal-permissible (Green).',
+      ar: 'يُستخرج الكارمين (E120) من حشرة الكوشينيل. ترفضه GİMDES وIFANCA، بينما تجيزه JAKIM الماليزية وMUI الإندونيسية (فتوى 33/2011) لكونها حشرة لا دم لها سائل.',
+      de: 'Karmin (E120) stammt aus Cochenilleschildläusen. GİMDES und IFANCA stufen es als unzulässig (Rot) ein, während JAKIM und MUI (Fatwa 33/2011) es als Halal (Grün) anerkennen.',
+      fr: 'Le Carmin (E120) est issu de la cochenille. GİMDES et IFANCA le refusent (Rouge), tandis que JAKIM et MUI (Fatwa 33/2011) l\'autorisent comme Halal (Vert).',
+      id: 'Karmin (E120) berasal dari serangga cochineal. MUI (Fatwa No. 33/2011) dan JAKIM menyatakan Halal (Hijau), sedangkan GİMDES dan IFANCA menolaknya (Merah).',
+      ms: 'Karmin (E120) diperoleh daripada serangga cochineal. JAKIM (MKI 2012) dan MUI mengesahkannya Halal (Hijau), manakala GİMDES dan IFANCA menolaknya (Merah).',
+      es: 'El Carmín (E120) proviene del insecto cochinilla. GİMDES e IFANCA lo rechazan (Rojo), mientras que JAKIM y MUI (Fatwa 33/2011) lo consideran Halal (Verde).',
+      ru: 'Кармин (E120) получают из кошенили. GİMDES и IFANCA считают его недопустимым (Красный), тогда как JAKIM и MUI (Фетва 33/2011) разрешают как Халяль (Зелёный).',
+      ur: 'کارمین (E120) کوشینیل کیڑے سے حاصل ہوتا ہے۔ GİMDES اور IFANCA اسے ناجائز (سرخ) قرار دیتے ہیں، جبکہ ملائیشیا JAKIM اور انڈونیشیا MUI (فتویٰ 33/2011) اسے حلال (سبز) مانتے ہیں۔'
+    },
+    ethanol_cosmetic_or_food: {
+      tr: 'Etil alkol (Etanol / Alcohol Denat.) kozmetikte harici çözücü olarak kullanıldığında; GİMDES her oranda uygunsuz (Kırmızı) sayarken, JAKIM, MUI ve IFANCA içki (hamr) kaynaklı olmamak şartıyla sentetik/endüstriyel etanolü kaynağa bağlı (Sarı) değerlendirir.',
+      en: 'For topical cosmetic Ethanol (Alcohol Denat.), GİMDES rejects it at any concentration (Red), whereas JAKIM, MUI, and IFANCA evaluate non-beverage synthetic/industrial ethanol as conditional/source-dependent (Yellow).',
+      ar: 'الإيثانول في مستحضرات التجميل الخارجية: ترفضه GİMDES مطلقاً (أحمر)، بينما تصنفه JAKIM وMUI وIFANCA كمشبوه/مشروط (أصفر) إذا كان صناعياً وغير مشتق من الخمر.',
+      de: 'Bei kosmetischem Ethanol (Alcohol Denat.) lehnt GİMDES jede Konzentration ab (Rot), während JAKIM, MUI und IFANCA synthetisches, nicht aus Getränken stammendes Ethanol als bedingt/prüfbedürftig (Gelb) einstufen.',
+      fr: 'Pour l\'éthanol cosmétique (Alcohol Denat.), GİMDES le refuse (Rouge), tandis que JAKIM, MUI et IFANCA évaluent l\'éthanol synthétique non issu de boissons alcoolisées au cas par cas (Jaune).',
+      id: 'Untuk Etanol kosmetik luar, GİMDES menolak sepenuhnya (Merah), sedangkan MUI, JAKIM, dan IFANCA menilai etanol sintetis non-khamr sebagai bersyarat/perlu verifikasi (Kuning).',
+      ms: 'Bagi Etanol kosmetik luaran, GİMDES menolak sepenuhnya (Merah), manakala JAKIM, MUI dan IFANCA menilai etanol sintetik bukan khamr sebagai bersyarat/perlu semakan (Kuning).',
+      es: 'En etanol cosmético (Alcohol Denat.), GİMDES lo rechaza (Rojo), mientras que JAKIM, MUI e IFANCA evalúan el etanol sintético no procedente de bebidas como condicional (Amarillo).',
+      ru: 'Этиловый спирт в косметике: GİMDES отклоняет в любой концентрации (Красный), а JAKIM, MUI и IFANCA допускают проверку синтетического непитьевого спирта (Жёлтый).',
+      ur: 'کاسمیٹکس میں ایتھانول (Alcohol Denat.) کو GİMDES مکمل طور پر مسترد (سرخ) کرتا ہے، جبکہ JAKIM، MUI اور IFANCA غیر مشروباتی مصنوعی ایتھانول کو مشروط/قابلِ تصدیق (پیلا) قرار دیتے ہیں۔'
+    },
+    shellac_e904: {
+      tr: 'Şellak (E904) lak böceğinin doğal reçine salgısıdır. JAKIM, MUI ve IFANCA böceğin kendisi değil salgısı olduğu için Helal (Yeşil) kabul ederken, GİMDES sertifikasyon standardında uygunsuz/kısıtlı (Kırmızı) saymaktadır.',
+      en: 'Shellac (E904) is a resin secreted by the lac insect. JAKIM, MUI, and IFANCA permit it as Halal (Green) since it is a secretion rather than insect flesh, whereas GİMDES rejects it (Red).',
+      ar: 'الشيلاك (E904) إفراز راتنجي لحشرة اللاك. تجيزه JAKIM وMUI وIFANCA كحلال (أخضر)، بينما تتحفظ عليه GİMDES (أحمر).',
+      de: 'Schellack (E904) ist ein Harzsekret der Lackschildlaus. JAKIM, MUI und IFANCA stufen es als Halal (Grün) ein, während GİMDES es ablehnt (Rot).',
+      fr: 'Le Shellac (E904) est une résine sécrétée par la cochenille asiatique. JAKIM, MUI et IFANCA l\'autorisent (Vert), tandis que GİMDES le refuse (Rouge).',
+      id: 'Syelak (E904) adalah sekresi resin kutu lak. MUI, JAKIM, dan IFANCA menghalalkannya (Hijau), sedangkan GİMDES menolaknya (Merah).',
+      ms: 'Syelak (E904) ialah rembesan resin serangga lak. JAKIM, MUI dan IFANCA menghalalkannya (Hijau), manakala GİMDES menolaknya (Merah).',
+      es: 'La goma laca (E904) es una secreción resinosa del insecto lac. JAKIM, MUI e IFANCA la consideran Halal (Verde), mientras que GİMDES la rechaza (Rojo).',
+      ru: 'Шеллак (E904) — смолистый секрет лакового червеца. JAKIM, MUI и IFANCA считают его Халяль (Зелёный), а GİMDES отклоняет (Красный).',
+      ur: 'شیلاک (E904) لاکھ کیڑے کی رال ہے۔ JAKIM، MUI اور IFANCA اسے حلال (سبز) مانتے ہیں جبکہ GİMDES اسے مسترد (سرخ) کرتا ہے۔'
+    },
+    snail_mucin_halal: {
+      tr: 'Kara salyangozu salgısı (Snail Mucin); GİMDES, JAKIM ve MUI kriterlerinde kara haşaratı/yumuşakçası kapsamında kozmetik helal sertifikasyonuna uygun görülmezken (Kırmızı), IFANCA üretim/arıtma yöntemine göre şüpheli (Sarı) kategorisinde inceler.',
+      en: 'Land Snail Mucin is rejected (Red) by GİMDES, JAKIM, and MUI under land mollusc/pest rulings, while IFANCA evaluates it as source/process-dependent (Yellow).',
+      ar: 'مستخلص الحلزون البري مرفوض (أحمر) لدى GİMDES وJAKIM وMUI ضمن الحشرات والرخويات البرية، بينما تصنفه IFANCA كمشبوه يحتاج فحصاً (أصفر).',
+      de: 'Schneckenschleim (Snail Mucin) wird von GİMDES, JAKIM und MUI abgelehnt (Rot), während IFANCA ihn als prüfbedürftig (Gelb) einstuft.',
+      fr: 'La mucine d\'escargot terrestre est refusée (Rouge) par GİMDES, JAKIM et MUI, tandis qu\'IFANCA la classe comme douteuse à vérifier (Jaune).',
+      id: 'Lendir siput darat (Snail Mucin) ditolak (Merah) oleh MUI, JAKIM, dan GİMDES, sementara IFANCA mengkategorikannya syubhat/perlu verifikasi (Kuning).',
+      ms: 'Mucin siput darat ditolak (Merah) oleh JAKIM, MUI dan GİMDES, manakala IFANCA mengklasifikasikannya sebagai syubhah/perlu semakan (Kuning).',
+      es: 'La mucina de caracol terrestre es rechazada (Rojo) por GİMDES, JAKIM y MUI, mientras que IFANCA la evalúa como dudosa (Amarillo).',
+      ru: 'Муцин сухопутной улитки отклоняется (Красный) GİMDES, JAKIM и MUI, тогда как IFANCA относит его к сомнительным (Жёлтый).',
+      ur: 'خشکی کے گھونگھے کا لعاب (Snail Mucin) GİMDES، JAKIM اور MUI کے نزدیک نامناسب (سرخ) ہے جبکہ IFANCA اسے مشکوک (پیلا) شمار کرتا ہے۔'
+    },
+    default: {
+      tr: 'Bu bileşen için GİMDES, JAKIM, MUI ve IFANCA fıkıh kurulları arasında kaynak, istihale (kimyasal dönüşüm) veya çözücü eşiği açısından içtihat farkı bulunmaktadır.',
+      en: 'Halal authorities (GİMDES, JAKIM, MUI, IFANCA) apply different juristic criteria regarding origin verification, chemical transformation (istihalah), or carrier thresholds for this ingredient.',
+      ar: 'تختلف المعايير الفقهية بين الهيئات (GİMDES وJAKIM وMUI وIFANCA) حول هذا المكون من حيث التحقق من المصدر أو الاستحالة أو نسبة المذيب.',
+      de: 'Zwischen den Halal-Zertifizierern (GİMDES, JAKIM, MUI, IFANCA) bestehen bei diesem Stoff unterschiedliche Bewertungskriterien hinsichtlich Herkunft oder Trägerstoffen.',
+      fr: 'Les autorités Halal (GİMDES, JAKIM, MUI, IFANCA) appliquent des critères différents concernant l\'origine ou le solvant de cet ingrédient.',
+      id: 'Terdapat perbedaan kriteria fikih di antara lembaga Halal (MUI, JAKIM, GİMDES, IFANCA) terkait sumber bahan atau batas pelarut komponen ini.',
+      ms: 'Terdapat perbezaan kriteria fiqh antara badan Halal (JAKIM, MUI, GİMDES, IFANCA) mengenai pengesahan sumber atau pelarut ramuan ini.',
+      es: 'Las autoridades Halal (GİMDES, JAKIM, MUI, IFANCA) aplican criterios distintos sobre el origen o disolvente de este ingrediente.',
+      ru: 'Органы сертификации Халяль (GİMDES, JAKIM, MUI, IFANCA) применяют разные критерии оценки происхождения или растворителя для этого компонента.',
+      ur: 'اس جزو کے ماخذ یا محلول کے بارے میں حلال اتھارٹیز (GİMDES, JAKIM, MUI, IFANCA) کے فقہی معیارات میں فرق پایا جاتا ہے۔'
+    }
+  };
 
   for (const obs of observations) {
     const rule = obs.halalRule;
@@ -1816,6 +1959,35 @@ export function evaluateProduct({
         ? et.halalHaramDesc
         : et.halalMusboohDesc;
 
+    // Build 4-authority comparison matrix for this ingredient
+    const authorityMatrix = {};
+    for (const authKey of ['GIMDES', 'JAKIM', 'MUI', 'IFANCA']) {
+      let authSt = (rule.authority_rulings && rule.authority_rulings[authKey]) || rule.authority_rulings.general_cautious;
+      if (conflictDetected) {
+        authSt = 'conflict';
+      } else if (rule.category === 'B_alkol' && productType === 'food' && rule.id === 'ethanol_cosmetic_or_food') {
+        authSt = 'kirmizi';
+      } else if (rule.category === 'C_musbooh' && (statusForAuthority === 'yesil' || statusForAuthority === 'sari_yesil')) {
+        authSt = statusForAuthority;
+      }
+      authorityMatrix[authKey] = authSt;
+    }
+    const hasAuthorityDifference = new Set(Object.values(authorityMatrix)).size > 1;
+    const diffDict = AUTHORITY_DIFF_REASONS_10LANG[rule.id] || AUTHORITY_DIFF_REASONS_10LANG.default;
+    const authorityDiffReason = hasAuthorityDifference ? (diffDict[lang] || diffDict.en) : null;
+
+    if (hasAuthorityDifference) {
+      authorityComparison.push({
+        ruleId: rule.id,
+        canonical: rule.canonical,
+        localizedName: obs.localizedName || rule.canonical,
+        rawToken: obs.raw,
+        authorityMatrix,
+        reason: authorityDiffReason,
+        authorityDiffReason
+      });
+    }
+
     halalFindings.push({
       ruleId: rule.id,
       canonical: rule.canonical,
@@ -1827,6 +1999,9 @@ export function evaluateProduct({
       conflictDetected,
       explanation: localizedRuleExplanation,
       contextResolution,
+      authorityMatrix,
+      hasAuthorityDifference,
+      authorityDiffReason,
       source: sourcesData.sources[rule.source_id]
     });
   }
@@ -1842,6 +2017,7 @@ export function evaluateProduct({
     selectedAuthority: halalAuthority,
     overallStatus: overallHalalStatus,
     findings: halalFindings,
+    authorityComparison,
     falsePositiveShields,
     disclaimer: et.halalDisclaimer(halalAuthority)
   };

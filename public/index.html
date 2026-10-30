@@ -539,6 +539,23 @@
     const initialDeviceLang = detectDeviceLang();
     const initialStruct = MARKET_STRUCTURES[initialDeviceLang] || MARKET_STRUCTURES.tr;
 
+    function loadSavedJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return parsed !== null && parsed !== undefined ? parsed : fallback;
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    function saveJson(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (_) {}
+    }
+
     let state = {
       screen: 'result',
       lang: initialDeviceLang,
@@ -558,6 +575,12 @@
         vegan: false,
         halal: true
       },
+      customWatchlist: loadSavedJson('incifact_custom_watchlist_v1', []),
+      scanHistory: loadSavedJson('incifact_scan_history_v1', []),
+      customCompareA: null,
+      customCompareB: null,
+      compareSlotToast: null,
+      shareToast: false,
       claims: { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'none' },
       userConfirmations: {},
       evalData: null,
@@ -1082,6 +1105,584 @@
       }));
     }
 
+    const FEATURES_I18N = {
+      tr: {
+        watchlistTitle: '🧬 Kişisel Kara Listem (Özel Madde Ekle)',
+        watchlistSub: 'Doktorunuzun önermediği veya kişisel olarak kaçındığınız maddeleri ekleyin (🔒 Yalnızca bu cihazda saklanır).',
+        watchlistPlaceholder: 'Örn: Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ Ekle',
+        watchlistQuickLbl: 'Hızlı Ekle:',
+        watchlistEmpty: 'Henüz özel yasaklı madde eklenmedi.',
+        watchlistBadge: '🧬 Kişisel Kara Liste',
+        shareCardBtn: '📸 Sonuç Kartı (PNG / Paylaş)',
+        shareTextBtn: '💬 Özeti Kopyala',
+        shareCopiedToast: '✓ Analiz özeti panoya kopyalandı!',
+        shareModalTitle: '📸 InciFact Analiz Kartı (WhatsApp / Instagram)',
+        downloadPngBtn: '📥 Görseli İndir (PNG)',
+        whatsappShareBtn: '📲 WhatsApp ile Gönder',
+        copySummaryBtn: '📋 Özet Metni Kopyala',
+        setSlotABtn: '🅰️ 1. Ürün (A) Yap',
+        setSlotBBtn: '🅱️ 2. Ürün (B) Yap',
+        slotSetToast: (slot, name) => `✓ "${name}" karşılaştırma için ${slot}. Ürün olarak seçildi!`,
+        authDiffTitle: '⚖️ Otoriteler Neden Farklı Karar Verdi? (4 Kurum Karşılaştırması)',
+        authDiffSub: 'Aşağıdaki kurumlardan birine dokunarak analizi o kurumun standardına göre anında değiştirebilirsiniz:',
+        clearHistoryBtn: 'Geçmişi Sıfırla',
+        resetCompareBtn: 'Varsayılan Çifte Dön'
+      },
+      en: {
+        watchlistTitle: '🧬 My Personal Blacklist (Custom Ingredients)',
+        watchlistSub: 'Add specific ingredients you personally avoid or were advised against (🔒 Stored on this device only).',
+        watchlistPlaceholder: 'e.g. Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ Add',
+        watchlistQuickLbl: 'Quick Add:',
+        watchlistEmpty: 'No custom blacklisted ingredients added yet.',
+        watchlistBadge: '🧬 Personal Blacklist',
+        shareCardBtn: '📸 Result Card (PNG / Share)',
+        shareTextBtn: '💬 Copy Summary',
+        shareCopiedToast: '✓ Analysis summary copied to clipboard!',
+        shareModalTitle: '📸 InciFact Analysis Card (WhatsApp / Instagram)',
+        downloadPngBtn: '📥 Download Image (PNG)',
+        whatsappShareBtn: '📲 Share via WhatsApp',
+        copySummaryBtn: '📋 Copy Summary Text',
+        setSlotABtn: '🅰️ Set as Product A',
+        setSlotBBtn: '🅱️ Set as Product B',
+        slotSetToast: (slot, name) => `✓ "${name}" selected as Product ${slot} for comparison!`,
+        authDiffTitle: '⚖️ Why Do Halal Authorities Differ? (4-Authority Matrix)',
+        authDiffSub: 'Tap any authority pill below to switch the live analysis to that institution\'s standard:',
+        clearHistoryBtn: 'Clear History',
+        resetCompareBtn: 'Reset Default Pair'
+      },
+      ar: {
+        watchlistTitle: '🧬 قائمتي السوداء الشخصية (إضافة مكون خاص)',
+        watchlistSub: 'أضف المكونات التي تتجنبها شخصياً أو بتوصية طبية (🔒 تُحفظ على هذا الجهاز فقط).',
+        watchlistPlaceholder: 'مثال: Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ إضافة',
+        watchlistQuickLbl: 'إضافة سريعة:',
+        watchlistEmpty: 'لم تتم إضافة مكونات خاصة بعد.',
+        watchlistBadge: '🧬 القائمة الشخصية',
+        shareCardBtn: '📸 بطاقة النتيجة (صورة / مشاركة)',
+        shareTextBtn: '💬 نسخ الملخص',
+        shareCopiedToast: '✓ تم نسخ ملخص التحليل إلى الحافظة!',
+        shareModalTitle: '📸 بطاقة تحليل InciFact (واتساب / إنستغرام)',
+        downloadPngBtn: '📥 تنزيل البطاقة (PNG)',
+        whatsappShareBtn: '📲 مشاركة عبر واتساب',
+        copySummaryBtn: '📋 نسخ النص',
+        setSlotABtn: '🅰️ تعيين كمنتج 1 (أ)',
+        setSlotBBtn: '🅱️ تعيين كمنتج 2 (ب)',
+        slotSetToast: (slot, name) => `✓ تم اختيار "${name}" كمنتج (${slot}) للمقارنة!`,
+        authDiffTitle: '⚖️ لماذا تختلف قرارات هيئات الحلال؟ (مقارنة 4 هيئات)',
+        authDiffSub: 'اضغط على أي هيئة أدناه لتطبيق معيارها فوراً:',
+        clearHistoryBtn: 'مسح السجل',
+        resetCompareBtn: 'الوضع الافتراضي'
+      },
+      de: {
+        watchlistTitle: '🧬 Meine persönliche Sperrliste (Eigene Stoffe)',
+        watchlistSub: 'Fügen Sie Inhaltsstoffe hinzu, die Sie persönlich meiden möchten (🔒 Nur lokal auf diesem Gerät gespeichert).',
+        watchlistPlaceholder: 'z. B. Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ Hinzufügen',
+        watchlistQuickLbl: 'Schnellwahl:',
+        watchlistEmpty: 'Noch keine eigenen gesperrten Stoffe hinzugefügt.',
+        watchlistBadge: '🧬 Eigene Sperrliste',
+        shareCardBtn: '📸 Ergebniskarte (PNG / Teilen)',
+        shareTextBtn: '💬 Text kopieren',
+        shareCopiedToast: '✓ Zusammenfassung in die Zwischenablage kopiert!',
+        shareModalTitle: '📸 InciFact-Analysekarte (WhatsApp / Instagram)',
+        downloadPngBtn: '📥 Bild herunterladen (PNG)',
+        whatsappShareBtn: '📲 Per WhatsApp teilen',
+        copySummaryBtn: '📋 Zusammenfassung kopieren',
+        setSlotABtn: '🅰️ Als Produkt A setzen',
+        setSlotBBtn: '🅱️ Als Produkt B setzen',
+        slotSetToast: (slot, name) => `✓ „${name}“ als Produkt ${slot} für den Vergleich gesetzt!`,
+        authDiffTitle: '⚖️ Warum entscheiden Halal-Behörden unterschiedlich?',
+        authDiffSub: 'Tippen Sie auf eine Behörde, um deren Standard direkt anzuwenden:',
+        clearHistoryBtn: 'Verlauf löschen',
+        resetCompareBtn: 'Standardpaar'
+      },
+      fr: {
+        watchlistTitle: '🧬 Ma Liste Noire Personnelle (Ingrédients à éviter)',
+        watchlistSub: 'Ajoutez les ingrédients que vous évitez personnellement (🔒 Stocké uniquement sur cet appareil).',
+        watchlistPlaceholder: 'ex. Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ Ajouter',
+        watchlistQuickLbl: 'Ajout rapide :',
+        watchlistEmpty: 'Aucun ingrédient personnalisé ajouté.',
+        watchlistBadge: '🧬 Liste Personnelle',
+        shareCardBtn: '📸 Carte Résultat (PNG / Partager)',
+        shareTextBtn: '💬 Copier le résumé',
+        shareCopiedToast: '✓ Résumé copié dans le presse-papiers !',
+        shareModalTitle: '📸 Carte d\'analyse InciFact (WhatsApp / Instagram)',
+        downloadPngBtn: '📥 Télécharger (PNG)',
+        whatsappShareBtn: '📲 Partager sur WhatsApp',
+        copySummaryBtn: '📋 Copier le texte',
+        setSlotABtn: '🅰️ Définir Produit A',
+        setSlotBBtn: '🅱️ Définir Produit B',
+        slotSetToast: (slot, name) => `✓ « ${name} » défini comme Produit ${slot} !`,
+        authDiffTitle: '⚖️ Pourquoi les autorités Halal diffèrent-elles ? (4 organismes)',
+        authDiffSub: 'Touchez une autorité ci-dessous pour basculer sur sa norme :',
+        clearHistoryBtn: 'Effacer l\'historique',
+        resetCompareBtn: 'Paire par défaut'
+      },
+      id: {
+        watchlistTitle: '🧬 Daftar Hitam Pribadi Saya (Bahan Kustom)',
+        watchlistSub: 'Tambahkan bahan yang Anda hindari secara pribadi atau atas saran dokter (🔒 Disimpan di perangkat ini saja).',
+        watchlistPlaceholder: 'Mis: Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ Tambah',
+        watchlistQuickLbl: 'Tambah Cepat:',
+        watchlistEmpty: 'Belum ada bahan daftar hitam pribadi.',
+        watchlistBadge: '🧬 Daftar Hitam Pribadi',
+        shareCardBtn: '📸 Kartu Hasil (PNG / Bagikan)',
+        shareTextBtn: '💬 Salin Ringkasan',
+        shareCopiedToast: '✓ Ringkasan analisis berhasil disalin!',
+        shareModalTitle: '📸 Kartu Analisis InciFact (WhatsApp / Instagram)',
+        downloadPngBtn: '📥 Unduh Gambar (PNG)',
+        whatsappShareBtn: '📲 Kirim via WhatsApp',
+        copySummaryBtn: '📋 Salin Teks Ringkasan',
+        setSlotABtn: '🅰️ Jadikan Produk A',
+        setSlotBBtn: '🅱️ Jadikan Produk B',
+        slotSetToast: (slot, name) => `✓ "${name}" dipilih sebagai Produk ${slot} untuk perbandingan!`,
+        authDiffTitle: '⚖️ Mengapa Lembaga Halal Berbeda Pendapat? (Matriks 4 Lembaga)',
+        authDiffSub: 'Ketuk salah satu lembaga di bawah untuk beralih ke standarnya:',
+        clearHistoryBtn: 'Hapus Riwayat',
+        resetCompareBtn: 'Reset Pasangan'
+      },
+      ms: {
+        watchlistTitle: '🧬 Senarai Hitam Peribadi Saya (Ramuan Khas)',
+        watchlistSub: 'Tambah ramuan yang anda elakkan secara peribadi (🔒 Disimpan pada peranti ini sahaja).',
+        watchlistPlaceholder: 'Cth: Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ Tambah',
+        watchlistQuickLbl: 'Tambah Pantas:',
+        watchlistEmpty: 'Tiada ramuan senarai hitam peribadi lagi.',
+        watchlistBadge: '🧬 Senarai Hitam Peribadi',
+        shareCardBtn: '📸 Kad Keputusan (PNG / Kongsi)',
+        shareTextBtn: '💬 Salin Ringkasan',
+        shareCopiedToast: '✓ Ringkasan analisis disalin ke papan keratan!',
+        shareModalTitle: '📸 Kad Analisis InciFact (WhatsApp / Instagram)',
+        downloadPngBtn: '📥 Muat Turun Imej (PNG)',
+        whatsappShareBtn: '📲 Kongsi melalui WhatsApp',
+        copySummaryBtn: '📋 Salin Teks Ringkasan',
+        setSlotABtn: '🅰️ Jadikan Produk A',
+        setSlotBBtn: '🅱️ Jadikan Produk B',
+        slotSetToast: (slot, name) => `✓ "${name}" dipilih sebagai Produk ${slot} untuk perbandingan!`,
+        authDiffTitle: '⚖️ Mengapa Badan Halal Berbeza Keputusan? (4 Autoriti)',
+        authDiffSub: 'Ketik mana-mana badan di bawah untuk menukar piawaian secara langsung:',
+        clearHistoryBtn: 'Padam Sejarah',
+        resetCompareBtn: 'Tetapkan Semula'
+      },
+      es: {
+        watchlistTitle: '🧬 Mi Lista Negra Personal (Ingredientes propios)',
+        watchlistSub: 'Añade ingredientes que evites personalmente (🔒 Guardado solo en este dispositivo).',
+        watchlistPlaceholder: 'Ej. Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ Añadir',
+        watchlistQuickLbl: 'Añadir rápido:',
+        watchlistEmpty: 'Aún no has añadido ingredientes personalizados.',
+        watchlistBadge: '🧬 Lista Negra Personal',
+        shareCardBtn: '📸 Tarjeta de Resultado (PNG / Compartir)',
+        shareTextBtn: '💬 Copiar resumen',
+        shareCopiedToast: '✓ ¡Resumen copiado al portapapeles!',
+        shareModalTitle: '📸 Tarjeta de Análisis InciFact (WhatsApp / Instagram)',
+        downloadPngBtn: '📥 Descargar Imagen (PNG)',
+        whatsappShareBtn: '📲 Enviar por WhatsApp',
+        copySummaryBtn: '📋 Copiar texto',
+        setSlotABtn: '🅰️ Usar como Producto A',
+        setSlotBBtn: '🅱️ Usar como Producto B',
+        slotSetToast: (slot, name) => `✓ ¡"${name}" seleccionado como Producto ${slot}!`,
+        authDiffTitle: '⚖️ ¿Por qué difieren las autoridades Halal? (4 Entidades)',
+        authDiffSub: 'Toca cualquier entidad abajo para aplicar su estándar al instante:',
+        clearHistoryBtn: 'Borrar historial',
+        resetCompareBtn: 'Par por defecto'
+      },
+      ru: {
+        watchlistTitle: '🧬 Мой личный чёрный список (Свои вещества)',
+        watchlistSub: 'Добавьте компоненты, которых вы избегаете лично (🔒 Хранится только на этом устройстве).',
+        watchlistPlaceholder: 'Напр.: Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ Добавить',
+        watchlistQuickLbl: 'Быстро добавить:',
+        watchlistEmpty: 'Личный чёрный список пока пуст.',
+        watchlistBadge: '🧬 Личный список',
+        shareCardBtn: '📸 Карточка результата (PNG / Поделиться)',
+        shareTextBtn: '💬 Копировать отчёт',
+        shareCopiedToast: '✓ Краткий отчёт скопирован в буфер обмена!',
+        shareModalTitle: '📸 Карточка анализа InciFact (WhatsApp / Instagram)',
+        downloadPngBtn: '📥 Скачать карточку (PNG)',
+        whatsappShareBtn: '📲 Отправить в WhatsApp',
+        copySummaryBtn: '📋 Скопировать текст',
+        setSlotABtn: '🅰️ Сделать Продуктом А',
+        setSlotBBtn: '🅱️ Сделать Продуктом Б',
+        slotSetToast: (slot, name) => `✓ «${name}» выбран как Продукт ${slot} для сравнения!`,
+        authDiffTitle: '⚖️ Почему решения органов Халяль отличаются? (4 стандарта)',
+        authDiffSub: 'Нажмите на любой орган ниже, чтобы применить его стандарт:',
+        clearHistoryBtn: 'Очистить историю',
+        resetCompareBtn: 'Сбросить пару'
+      },
+      ur: {
+        watchlistTitle: '🧬 میری ذاتی بلیک لسٹ (مخصوص اجزاء شامل کریں)',
+        watchlistSub: 'وہ اجزاء شامل کریں جن سے آپ ذاتی طور پر پرہیز کرتے ہیں (🔒 صرف اسی ڈیوائس پر محفوظ رہتا ہے)۔',
+        watchlistPlaceholder: 'مثلاً: Niacinamide, Parfum, Salicylic Acid...',
+        watchlistAddBtn: '+ شامل کریں',
+        watchlistQuickLbl: 'فوری اضافہ:',
+        watchlistEmpty: 'ابھی تک کوئی ذاتی ممنوع جزو شامل نہیں کیا گیا۔',
+        watchlistBadge: '🧬 ذاتی بلیک لسٹ',
+        shareCardBtn: '📸 نتیجہ کارڈ (PNG / شیئر کریں)',
+        shareTextBtn: '💬 خلاصہ کاپی کریں',
+        shareCopiedToast: '✓ تجزیے کا خلاصہ کاپی ہو گیا!',
+        shareModalTitle: '📸 InciFact تجزیہ کارڈ (واٹس ایپ / انسٹاگرام)',
+        downloadPngBtn: '📥 تصویر ڈاؤن لوڈ کریں (PNG)',
+        whatsappShareBtn: '📲 واٹس ایپ پر بھیجیں',
+        copySummaryBtn: '📋 خلاصہ کاپی کریں',
+        setSlotABtn: '🅰️ پروڈکٹ 1 (الف) بنائیں',
+        setSlotBBtn: '🅱️ پروڈکٹ 2 (ب) بنائیں',
+        slotSetToast: (slot, name) => `✓ "${name}" کو موازنے کے لیے پروڈکٹ ${slot} منتخب کر لیا گیا!`,
+        authDiffTitle: '⚖️ حلال اداروں کے فیصلوں میں فرق کیوں ہے؟ (4 اداروں کا موازنہ)',
+        authDiffSub: 'کسی بھی ادارے پر کلک کر کے تجزیہ اس کے معیار کے مطابق دیکھیں:',
+        clearHistoryBtn: 'تاریخچہ صاف کریں',
+        resetCompareBtn: 'ڈیفالٹ موازنہ'
+      }
+    };
+
+    function getFeatText(lang) {
+      return FEATURES_I18N[lang] || FEATURES_I18N.en;
+    }
+
+    function addWatchlistItem(term) {
+      const inputEl = document.getElementById('customWatchInput');
+      const rawVal = (term !== undefined && term !== null ? term : (inputEl ? inputEl.value : '')).trim();
+      if (!rawVal || rawVal.length < 2) return;
+      const parts = rawVal.split(',').map((s) => s.trim()).filter((s) => s.length >= 2);
+      for (const p of parts) {
+        if (!state.customWatchlist.some((x) => x.toLowerCase() === p.toLowerCase())) {
+          state.customWatchlist.push(p.slice(0, 60));
+        }
+      }
+      saveJson('incifact_custom_watchlist_v1', state.customWatchlist);
+      if (inputEl) inputEl.value = '';
+      refreshAll();
+    }
+
+    function removeWatchlistItem(idx) {
+      state.customWatchlist.splice(idx, 1);
+      saveJson('incifact_custom_watchlist_v1', state.customWatchlist);
+      refreshAll();
+    }
+
+    function recordCurrentScanToHistory(evalData, rawText, productType) {
+      if (!evalData || !evalData.cards || !rawText || !rawText.trim()) return;
+      const reg = evalData.cards.regulatoryCard;
+      const halal = evalData.cards.halalCard;
+      const title = state.activeSampleIdx !== null
+        ? getSampleTitle(state.activeSampleIdx, state.lang)
+        : (state.productTitle || (state.lang === 'tr' ? 'Özel Etiket Analizi' : 'Custom Label Scan'));
+      const entry = {
+        title,
+        sampleIdx: state.activeSampleIdx,
+        rawText: rawText.trim(),
+        productType: productType || 'cosmetic',
+        score: reg.score,
+        canShowScore: reg.canShowScore,
+        halalStatus: halal.overallStatus,
+        halalAuthority: halal.selectedAuthority,
+        ts: Date.now()
+      };
+      const filtered = (state.scanHistory || []).filter(
+        (h) => h.rawText !== entry.rawText && h.title !== entry.title
+      );
+      state.scanHistory = [entry, ...filtered].slice(0, 8);
+      saveJson('incifact_scan_history_v1', state.scanHistory);
+    }
+
+    function setCompareSlot(slot, fromHistoryIdx) {
+      const fTxt = getFeatText(state.lang);
+      let item;
+      if (typeof fromHistoryIdx === 'number' && state.scanHistory[fromHistoryIdx]) {
+        const h = state.scanHistory[fromHistoryIdx];
+        item = { name: h.title, productType: h.productType, rawText: h.rawText };
+      } else {
+        const rawText = document.getElementById('liveInput').value;
+        const productType = document.getElementById('prodType').value;
+        item = { name: state.productTitle, productType, rawText };
+      }
+      if (slot === 'A') {
+        state.customCompareA = item;
+      } else {
+        state.customCompareB = item;
+      }
+      state.compareSlotToast = fTxt.slotSetToast(slot, item.name);
+      if (window._slotTimer) clearTimeout(window._slotTimer);
+      window._slotTimer = setTimeout(() => {
+        state.compareSlotToast = null;
+        renderScreen();
+      }, 3200);
+      refreshAll();
+    }
+
+    function resetCustomCompare() {
+      state.customCompareA = null;
+      state.customCompareB = null;
+      refreshAll();
+    }
+
+    function loadHistoryItem(idx) {
+      const h = state.scanHistory && state.scanHistory[idx];
+      if (!h) return;
+      if (h.sampleIdx !== null && h.sampleIdx !== undefined && SAMPLES[h.sampleIdx]) {
+        loadSample(h.sampleIdx);
+        return;
+      }
+      state.activeSampleIdx = null;
+      state.productTitle = h.title;
+      document.getElementById('prodType').value = h.productType || 'cosmetic';
+      document.getElementById('liveInput').value = h.rawText;
+      state.screen = 'result';
+      switchScreen('result');
+      refreshAll();
+    }
+
+    function generateShareSummaryText() {
+      if (!state.evalData || !state.evalData.cards) return '';
+      const loc = state.evalData.locale;
+      const u = getUiText(state.lang);
+      const reg = state.evalData.cards.regulatoryCard;
+      const prof = state.evalData.cards.profileCard;
+      const halal = state.evalData.cards.halalCard;
+      const scoreStr = reg.score !== null ? `${reg.score}/100` : (loc.badges.lowCoverage || '—');
+      const halalStr =
+        halal.overallStatus === 'uygun_gorunuyor'
+          ? `🟢 ${loc.badges.halalOk}`
+          : halal.overallStatus === 'kaynak_belirsiz_musbooh'
+          ? `🟡 ${loc.badges.musbooh}`
+          : `🔴 ${loc.badges.halalRed}`;
+      const profStr = prof.alerts.length > 0 ? `⚠️ ${u.itemsAttentionFmt(prof.alerts.length)}` : `✅ ${u.fitsPrefs}`;
+      const topFlags = [
+        ...reg.findings.filter((f) => f.severity !== 'bilgi').map((f) => `• ${f.localizedName || f.name} (${f.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted})`),
+        ...prof.alerts.filter((a) => a.profile === 'ozel_kara_liste').map((a) => `• 🧬 ${a.localizedName}: ${a.explanation}`)
+      ].slice(0, 4);
+
+      return [
+        `🛡️ *INCIFACT — ${state.productTitle}*`,
+        `📊 ${loc.resultScreen.scoreLabel}: *${scoreStr}* (${state.jurisdiction || 'EU'})`,
+        `🌙 ${loc.resultScreen.halalSummaryLabel} (${halal.selectedAuthority}): *${halalStr}*`,
+        `👤 ${loc.resultScreen.profileStatusLabel}: *${profStr}*`,
+        topFlags.length > 0 ? `\n🔍 *${u.attentionTab}:*\n${topFlags.join('\n')}` : '',
+        `\n⚖️ _${u.legalDisclaimerMicro}_`
+      ].filter(Boolean).join('\n');
+    }
+
+    function copyShareSummaryText() {
+      const txt = generateShareSummaryText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).catch(() => fallbackCopy(txt));
+      } else {
+        fallbackCopy(txt);
+      }
+      state.shareToast = true;
+      renderScreen();
+      if (window._shareToastTimer) clearTimeout(window._shareToastTimer);
+      window._shareToastTimer = setTimeout(() => {
+        state.shareToast = false;
+        renderScreen();
+      }, 3000);
+    }
+
+    function shareViaWhatsApp() {
+      const txt = generateShareSummaryText();
+      const url = 'https://wa.me/?text=' + encodeURIComponent(txt);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    function openShareCardModal() {
+      const modal = document.getElementById('shareCardModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      drawShareCardCanvas();
+    }
+
+    function closeShareCardModal() {
+      const modal = document.getElementById('shareCardModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function drawShareCardCanvas() {
+      const canvas = document.getElementById('shareCardCanvas');
+      if (!canvas || !state.evalData || !state.evalData.cards) return;
+      const ctx = canvas.getContext('2d');
+      const W = 1080;
+      const H = 1350;
+      canvas.width = W;
+      canvas.height = H;
+
+      const loc = state.evalData.locale;
+      const u = getUiText(state.lang);
+      const reg = state.evalData.cards.regulatoryCard;
+      const prof = state.evalData.cards.profileCard;
+      const halal = state.evalData.cards.halalCard;
+
+      // 1. Royal Midnight Navy Gradient Background
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, '#070C18');
+      grad.addColorStop(0.5, '#0B132B');
+      grad.addColorStop(1, '#131F3F');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Gold outer border
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.55)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(36, 36, W - 72, H - 72);
+
+      // Top Brand Header
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = '800 44px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('INCIFACT', W / 2, 118);
+
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '700 20px system-ui, -apple-system, sans-serif';
+      ctx.fillText('COSMETIC • FOOD • HALAL · 10-LANGUAGE ENGINE', W / 2, 154);
+
+      // Product Title
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '800 42px system-ui, -apple-system, sans-serif';
+      const titleStr = (state.productTitle || 'InciFact Analysis').slice(0, 38);
+      ctx.fillText(titleStr, W / 2, 235);
+
+      const struct = MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr;
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = '700 22px system-ui, -apple-system, sans-serif';
+      ctx.fillText(`${struct.name.split('·')[0].trim()} · ${state.jurisdiction || 'EU'} · ${halal.selectedAuthority}`, W / 2, 278);
+
+      // Score Circle
+      const cx = W / 2;
+      const cy = 445;
+      const r = 112;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.lineWidth = 18;
+      ctx.stroke();
+
+      const scoreVal = reg.score;
+      const scoreColor = reg.capApplied === 10 ? '#EF4444' : scoreVal !== null && scoreVal >= 75 ? '#10B981' : '#F59E0B';
+      if (scoreVal !== null) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * scoreVal) / 100);
+        ctx.strokeStyle = scoreColor;
+        ctx.lineWidth = 18;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '800 72px system-ui, -apple-system, sans-serif';
+      ctx.fillText(scoreVal !== null ? String(scoreVal) : '—', cx, cy + 16);
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '700 24px system-ui, -apple-system, sans-serif';
+      ctx.fillText('/ 100', cx, cy + 54);
+
+      // 3 Summary Cards (Halal, Profile, Coverage)
+      const drawPillBox = (x, y, w, h, label, value, color) => {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, 22);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '700 20px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(label.toUpperCase(), x + 28, y + 42);
+
+        ctx.fillStyle = color;
+        ctx.font = '800 28px system-ui, -apple-system, sans-serif';
+        ctx.fillText(value.slice(0, 42), x + 28, y + 84);
+      };
+
+      const halalText =
+        halal.overallStatus === 'uygun_gorunuyor'
+          ? loc.badges.halalOk
+          : halal.overallStatus === 'kaynak_belirsiz_musbooh'
+          ? loc.badges.musbooh
+          : loc.badges.halalRed;
+      const halalCol =
+        halal.overallStatus === 'uygun_gorunuyor'
+          ? '#10B981'
+          : halal.overallStatus === 'kaynak_belirsiz_musbooh'
+          ? '#F59E0B'
+          : '#EF4444';
+
+      const profText = prof.alerts.length > 0 ? u.itemsAttentionFmt(prof.alerts.length) : u.fitsPrefs;
+      const profCol = prof.alerts.length > 0 ? '#F59E0B' : '#10B981';
+
+      drawPillBox(80, 610, W - 160, 112, `${u.halalCaps} (${halal.selectedAuthority})`, halalText, halalCol);
+      drawPillBox(80, 742, W - 160, 112, u.forYouCaps, profText, profCol);
+
+      // Key Findings List
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = '800 24px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${u.ingredientsHeader.toUpperCase()} (${reg.recognizedCount}/${reg.totalCount} · %${reg.coveragePercent})`, 80, 912);
+
+      const flagged = [
+        ...prof.alerts.filter((a) => a.profile === 'ozel_kara_liste').map((a) => ({
+          name: `🧬 ${a.localizedName}`,
+          tag: getFeatText(state.lang).watchlistBadge,
+          col: '#EF4444'
+        })),
+        ...reg.findings.filter((f) => f.severity !== 'bilgi').map((f) => ({
+          name: f.localizedName || f.name,
+          tag: f.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted,
+          col: f.euStatus === 'yasak' ? '#EF4444' : '#F59E0B'
+        })),
+        ...halal.findings.map((hf) => ({
+          name: hf.localizedName || hf.canonical,
+          tag: hf.status === 'yesil' ? loc.badges.halalOk : hf.status === 'kirmizi' ? loc.badges.halalRed : loc.badges.musbooh,
+          col: hf.status === 'yesil' ? '#10B981' : hf.status === 'kirmizi' ? '#EF4444' : '#F59E0B'
+        }))
+      ].slice(0, 4);
+
+      if (flagged.length === 0) {
+        ctx.fillStyle = '#10B981';
+        ctx.font = '700 26px system-ui, -apple-system, sans-serif';
+        ctx.fillText(`✓ ${u.noRestrictedFound}`, 80, 970);
+      } else {
+        flagged.forEach((item, idx) => {
+          const fy = 945 + idx * 66;
+          ctx.fillStyle = 'rgba(255,255,255,0.04)';
+          ctx.beginPath();
+          ctx.roundRect(80, fy - 34, W - 160, 54, 12);
+          ctx.fill();
+
+          ctx.fillStyle = '#F8FAFC';
+          ctx.font = '700 23px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(item.name.slice(0, 34), 100, fy);
+
+          ctx.fillStyle = item.col;
+          ctx.font = '800 21px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(item.tag.slice(0, 26), W - 100, fy);
+        });
+      }
+
+      // Footer Legal Note
+      ctx.fillStyle = '#64748B';
+      ctx.font = '600 17px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText((u.legalDisclaimerMicro || '').slice(0, 95), W / 2, H - 96);
+      ctx.fillStyle = '#D4AF37';
+      ctx.font = '700 19px system-ui, -apple-system, sans-serif';
+      ctx.fillText('incifact.app · Deterministic 30,594 CosIng & Halal Verification Engine', W / 2, H - 62);
+    }
+
+    function downloadShareCardPng() {
+      const canvas = document.getElementById('shareCardCanvas');
+      if (!canvas) return;
+      const link = document.createElement('a');
+      const safeName = (state.productTitle || 'incifact').replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 30);
+      link.download = `InciFact-${safeName || 'Analiz'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
     async function refreshAll() {
       const activeProfiles = Object.entries(state.profiles)
         .filter(([k, v]) => v && k !== 'vegan' && k !== 'halal')
@@ -1090,7 +1691,9 @@
       const rawText = document.getElementById('liveInput').value;
       const productType = document.getElementById('prodType').value;
       const halalAuthority = document.getElementById('halalAuth').value;
-      state.productTitle = getSampleTitle(state.activeSampleIdx, state.lang);
+      if (state.activeSampleIdx !== null) {
+        state.productTitle = getSampleTitle(state.activeSampleIdx, state.lang);
+      }
 
       const evalRes = await fetch('/api/evaluate', {
         method: 'POST',
@@ -1100,6 +1703,7 @@
           productType,
           jurisdiction: state.jurisdiction || 'EU',
           userProfiles: activeProfiles,
+          customWatchlist: state.customWatchlist || [],
           halalAuthority,
           claims: state.claims,
           userConfirmations: state.userConfirmations,
@@ -1107,15 +1711,18 @@
         })
       });
       state.evalData = await evalRes.json();
+      recordCurrentScanToHistory(state.evalData, rawText, productType);
 
       const cNames = COMPARE_NAMES[state.lang] || COMPARE_NAMES.en;
+      const prodA = state.customCompareA || { ...COMPARE_PAIR.productA, name: cNames[0] };
+      const prodB = state.customCompareB || { ...COMPARE_PAIR.productB, name: cNames[1] };
       const compRes = await fetch('/api/compare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          productA: { ...COMPARE_PAIR.productA, name: cNames[0] },
-          productB: { ...COMPARE_PAIR.productB, name: cNames[1] },
-          sharedOptions: { userProfiles: activeProfiles, halalAuthority, lang: state.lang }
+          productA: prodA,
+          productB: prodB,
+          sharedOptions: { userProfiles: activeProfiles, customWatchlist: state.customWatchlist || [], halalAuthority, lang: state.lang }
         })
       });
       state.compareData = await compRes.json();
@@ -2032,6 +2639,42 @@
           }
         </button>
 
+        <!-- ÖZELLİK 3: Kişisel Özel Hassasiyet / Kara Liste Ekleme ("Benim Yasaklılarım") -->
+        <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:9px;">
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${getFeatText(state.lang).watchlistTitle}</span>
+            <span style="font-size:11.5px; line-height:1.38; color:var(--muted);">${getFeatText(state.lang).watchlistSub}</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <input id="customWatchInput" type="text" placeholder="${escapeHtml(getFeatText(state.lang).watchlistPlaceholder)}" onkeydown="if(event.key==='Enter'){event.preventDefault();addWatchlistItem();}" style="flex:1; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12px;" />
+            <button type="button" onclick="addWatchlistItem()" style="height:36px; padding:0 12px; border-radius:10px; border:none; background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; flex:none;">${getFeatText(state.lang).watchlistAddBtn}</button>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; align-items:center; gap:5px;">
+            <span style="font-size:10.5px; font-weight:700; color:var(--muted);">${getFeatText(state.lang).watchlistQuickLbl}</span>
+            ${['Niacinamide', 'Parfum', 'Phenoxyethanol', 'Salicylic Acid', 'Alcohol']
+              .map(
+                (q) =>
+                  `<button type="button" onclick="addWatchlistItem('${q}')" style="border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:10px; padding:2px 8px; font-size:10.5px; font-weight:700;">+ ${q}</button>`
+              )
+              .join('')}
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; padding-top:2px;">
+            ${
+              (state.customWatchlist || []).length > 0
+                ? state.customWatchlist
+                    .map(
+                      (item, i) => `
+                  <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:12px; background:var(--bad-bg); color:var(--bad); font-size:11.5px; font-weight:800; border:1px solid var(--bad);">
+                    <span>🧬 ${escapeHtml(item)}</span>
+                    <button type="button" onclick="removeWatchlistItem(${i})" style="border:none; background:transparent; color:var(--bad); font-weight:900; padding:0 2px; font-size:12px;">✕</button>
+                  </span>`
+                    )
+                    .join('')
+                : `<span style="font-size:11px; color:var(--muted); font-style:italic;">${getFeatText(state.lang).watchlistEmpty}</span>`
+            }
+          </div>
+        </div>
+
         <!-- AYARLAR: Bölge, Dil ve Ülke Yapısı Seçimi (Varsayılan: İndirilen Ülke / Cihaz Dili) -->
         <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:10px;">
           <div onclick="state.settingsExpanded = !state.settingsExpanded; renderScreen();" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:8px;">
@@ -2217,11 +2860,14 @@
           levelText = regFind.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted;
           whyText = regFind.legalText || localizeItemExplanation('warn', regFind.euStatus, '', state.lang);
         } else if (profAlert) {
-          kind = 'info';
-          const profName = loc.profileScreen.profiles[profAlert.profile]
-            ? loc.profileScreen.profiles[profAlert.profile].name
-            : profAlert.profile;
-          levelText = `${u.infoBadge} · ${profName}`;
+          kind = profAlert.profile === 'ozel_kara_liste' ? 'warn' : 'info';
+          const profName =
+            profAlert.profile === 'ozel_kara_liste'
+              ? getFeatText(state.lang).watchlistBadge
+              : loc.profileScreen.profiles[profAlert.profile]
+              ? loc.profileScreen.profiles[profAlert.profile].name
+              : profAlert.profile;
+          levelText = profAlert.profile === 'ozel_kara_liste' ? profName : `${u.infoBadge} · ${profName}`;
           whyText = profAlert.explanation;
         } else if (shield) {
           kind = 'ok';
@@ -2343,6 +2989,36 @@
           </span>
         </div>
 
+        <!-- ÖZELLİK 1 & 4: Tek Tıkla Sonuç Kartı Paylaşımı (WhatsApp / Instagram PNG) & Karşılaştırma A/B Seçimi -->
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:8px;">
+            <button type="button" onclick="openShareCardModal()" style="height:40px; border-radius:14px; border:1.5px solid var(--accent); background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span>${getFeatText(state.lang).shareCardBtn}</span>
+            </button>
+            <button type="button" onclick="copyShareSummaryText()" style="height:40px; border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span>${getFeatText(state.lang).shareTextBtn}</span>
+            </button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button type="button" onclick="setCompareSlot('A')" style="height:34px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
+              ${getFeatText(state.lang).setSlotABtn}
+            </button>
+            <button type="button" onclick="setCompareSlot('B')" style="height:34px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
+              ${getFeatText(state.lang).setSlotBBtn}
+            </button>
+          </div>
+          ${
+            state.shareToast
+              ? `<div style="background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:800; text-align:center;">${getFeatText(state.lang).shareCopiedToast}</div>`
+              : ''
+          }
+          ${
+            state.compareSlotToast
+              ? `<div style="background:var(--soft); color:var(--accent); border:1px solid var(--accent); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:800; text-align:center;">${escapeHtml(state.compareSlotToast)}</div>`
+              : ''
+          }
+        </div>
+
         <!-- Ingredients Filter Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; margin-top:2px;">
           <h2 style="margin:0; font-size:16px; font-weight:800;">${u.ingredientsHeader}</h2>
@@ -2449,6 +3125,45 @@
             ${u.methodologyLink} →
           </button>
         </div>
+
+        <!-- ÖZELLİK 2: "Otoriteler Neden Farklı Karar Verdi?" 4 Kurum Karşılaştırma İpucu -->
+        ${
+          halal.authorityComparison && halal.authorityComparison.length > 0
+            ? `
+          <div style="background:var(--soft); border:1.5px solid var(--accent); border-radius:18px; padding:13px 14px; display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; flex-direction:column; gap:3px;">
+              <span style="font-size:13.5px; font-weight:800; color:var(--accent);">${getFeatText(state.lang).authDiffTitle}</span>
+              <span style="font-size:11.5px; line-height:1.38; color:var(--muted);">${getFeatText(state.lang).authDiffSub}</span>
+            </div>
+            ${halal.authorityComparison
+              .map((ac) => {
+                const auths = ['GIMDES', 'JAKIM', 'MUI', 'IFANCA'];
+                return `
+                <div style="background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:8px;">
+                  <span style="font-size:13px; font-weight:800; color:var(--ink);">🔎 ${escapeHtml(ac.localizedName || ac.canonical)}</span>
+                  <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:5px;">
+                    ${auths
+                      .map((ak) => {
+                        const st = ac.authorityMatrix[ak];
+                        const isCurr = halal.selectedAuthority === ak;
+                        const pillBg = st === 'yesil' ? 'var(--ok-bg)' : st === 'kirmizi' || st === 'conflict' ? 'var(--bad-bg)' : 'var(--warn-bg)';
+                        const pillCol = st === 'yesil' ? 'var(--ok)' : st === 'kirmizi' || st === 'conflict' ? 'var(--bad)' : 'var(--warn)';
+                        const stWord = st === 'yesil' ? u.scaleHalal : st === 'kirmizi' || st === 'conflict' ? u.scaleHaram : u.scaleMusbooh;
+                        return `
+                        <button type="button" onclick="changeAuthorityFromSettings('${ak}')" style="padding:6px 4px; border-radius:10px; border:${isCurr ? '2px solid var(--accent)' : '1px solid var(--line)'}; background:${pillBg}; color:${pillCol}; display:flex; flex-direction:column; align-items:center; gap:2px;">
+                          <span style="font-size:10.5px; font-weight:900; color:var(--ink);">${ak}${isCurr ? ' ✓' : ''}</span>
+                          <span style="font-size:10px; font-weight:800; text-align:center;">${escapeHtml(stWord)}</span>
+                        </button>`;
+                      })
+                      .join('')}
+                  </div>
+                  <span style="font-size:11.5px; line-height:1.42; color:var(--ink);">${escapeHtml(ac.reason || '')}</span>
+                </div>`;
+              })
+              .join('')}
+          </div>`
+            : ''
+        }
 
         <h2 style="margin:2px 0 0; font-size:15.5px; font-weight:800;">${u.whyThisResult}</h2>
         <div style="background:var(--surface); border-radius:20px; display:flex; flex-direction:column;">
@@ -2562,19 +3277,38 @@
       const aHalalColor = (a.halalStatus === 'uygun' || a.halalStatus === 'halal') ? 'var(--ok)' : (a.halalStatus === 'haram' || a.halalStatus === 'conflict') ? 'var(--bad)' : 'var(--warn)';
       const bHalalColor = (b.halalStatus === 'uygun' || b.halalStatus === 'halal') ? 'var(--ok)' : (b.halalStatus === 'haram' || b.halalStatus === 'conflict') ? 'var(--bad)' : 'var(--warn)';
 
+      const histList =
+        state.scanHistory && state.scanHistory.length > 0
+          ? state.scanHistory
+          : SAMPLES.slice(0, 3).map((s, i) => ({
+              title: getSampleTitle(i, state.lang),
+              sampleIdx: i,
+              rawText: getSampleText(i, state.lang),
+              productType: s.type,
+              score: i === 0 ? 87 : null,
+              halalStatus: i === 1 ? 'kaynak_belirsiz_musbooh' : 'uygun_gorunuyor'
+            }));
+
       return `
-        <h1 style="margin:0; font-size:24px; font-weight:800; letter-spacing:-0.02em;">${loc.compareScreen.title}</h1>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <h1 style="margin:0; font-size:22px; font-weight:800; letter-spacing:-0.02em;">${loc.compareScreen.title}</h1>
+          ${
+            state.customCompareA || state.customCompareB
+              ? `<button type="button" onclick="resetCustomCompare()" style="height:30px; padding:0 10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--accent); font-size:11px; font-weight:800;">↺ ${getFeatText(state.lang).resetCompareBtn}</button>`
+              : ''
+          }
+        </div>
 
         <img src="./assets/banner-clean-comparison.jpg" alt="InciFact Clean Comparison" style="width:100%; border-radius:16px; border:1px solid rgba(212,175,55,0.3); display:block; box-shadow:0 4px 14px rgba(11,19,43,0.18);" />
 
         <div style="background:var(--surface); border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:10px;">
           <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
             <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${aBg}; border:1.5px solid ${aBetter ? 'var(--ok)' : a.hasBanned ? 'var(--bad)' : 'transparent'};">
-              <span style="font-size:30px; font-weight:800; line-height:1; color:${aColor};">${formatDigits(a.score, state.lang)}</span>
+              <span style="font-size:30px; font-weight:800; line-height:1; color:${aColor};">${a.score !== null ? formatDigits(a.score, state.lang) : '—'}</span>
               <span style="font-size:13px; font-weight:700; text-align:center;">${escapeHtml(a.name)}</span>
             </div>
             <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${bBg}; border:1.5px solid ${bBetter ? 'var(--ok)' : b.hasBanned ? 'var(--bad)' : 'transparent'};">
-              <span style="font-size:30px; font-weight:800; line-height:1; color:${bColor};">${formatDigits(b.score, state.lang)}</span>
+              <span style="font-size:30px; font-weight:800; line-height:1; color:${bColor};">${b.score !== null ? formatDigits(b.score, state.lang) : '—'}</span>
               <span style="font-size:13px; font-weight:700; text-align:center;">${escapeHtml(b.name)}</span>
             </div>
           </div>
@@ -2621,22 +3355,45 @@
           }
         </div>
 
-        <h2 style="margin:4px 0 0; font-size:16px; font-weight:800;">${u.recentScans}</h2>
+        <!-- ÖZELLİK 4: Son Tarananlar Geçmişi & Tek Tıkla Karşılaştırmaya (A / B) Aktarma -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px;">
+          <h2 style="margin:0; font-size:16px; font-weight:800;">🕘 ${u.recentScans}</h2>
+          ${
+            state.scanHistory && state.scanHistory.length > 1
+              ? `<button type="button" onclick="state.scanHistory=[]; saveJson('incifact_scan_history_v1', []); refreshAll();" style="border:none; background:transparent; color:var(--muted); font-size:11px; font-weight:700;">${getFeatText(state.lang).clearHistoryBtn}</button>`
+              : ''
+          }
+        </div>
+        ${
+          state.compareSlotToast
+            ? `<div style="background:var(--soft); color:var(--accent); border:1px solid var(--accent); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:800; text-align:center;">${escapeHtml(state.compareSlotToast)}</div>`
+            : ''
+        }
         <div style="background:var(--surface); border-radius:20px; display:flex; flex-direction:column;">
-          ${SAMPLES.slice(0, 3)
-            .map(
-              (s, i) => `
-              <button type="button" onclick="loadSample(${i})" style="border:none; background:transparent; text-align:start; display:flex; align-items:center; gap:12px; padding:12px 14px; border-bottom:${i < 2 ? '1px solid var(--line)' : 'none'}; color:var(--ink);">
-                <span style="width:40px; height:40px; border-radius:12px; background:${i === 0 ? 'var(--ok-bg)' : 'var(--warn-bg)'}; color:${i === 0 ? 'var(--ok)' : 'var(--warn)'}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;">
-                  ${i === 0 ? formatDigits('87', state.lang) : i === 1 ? 'M' : '?'}
-                </span>
-                <div style="flex:1;">
-                  <div style="font-size:14px; font-weight:700;">${getSampleTitle(i, state.lang)}</div>
-                  <div style="font-size:12px; color:var(--muted);">${s.type === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${u.tapToInspect}</div>
+          ${histList
+            .map((h, i) => {
+              const sc = h.score;
+              const isGood = sc !== null && sc >= 75;
+              const isBadSc = sc !== null && sc <= 25;
+              const badgeBg = sc === null ? 'var(--warn-bg)' : isGood ? 'var(--ok-bg)' : isBadSc ? 'var(--bad-bg)' : 'var(--warn-bg)';
+              const badgeCol = sc === null ? 'var(--warn)' : isGood ? 'var(--ok)' : isBadSc ? 'var(--bad)' : 'var(--warn)';
+              return `
+              <div style="display:flex; align-items:center; gap:10px; padding:11px 12px; border-bottom:${i < histList.length - 1 ? '1px solid var(--line)' : 'none'}; color:var(--ink);">
+                <button type="button" onclick="loadHistoryItem(${i})" style="border:none; background:transparent; text-align:start; display:flex; align-items:center; gap:10px; flex:1; padding:0; color:var(--ink);">
+                  <span style="width:38px; height:38px; border-radius:12px; background:${badgeBg}; color:${badgeCol}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13.5px; flex:none;">
+                    ${sc !== null && sc !== undefined ? formatDigits(sc, state.lang) : '?'}
+                  </span>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(h.title)}</div>
+                    <div style="font-size:11.5px; color:var(--muted);">${h.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${u.tapToInspect}</div>
+                  </div>
+                </button>
+                <div style="display:flex; gap:4px; flex:none;">
+                  <button type="button" onclick="setCompareSlot('A', ${i})" title="Product A" style="height:28px; padding:0 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:11px; font-weight:800;">A</button>
+                  <button type="button" onclick="setCompareSlot('B', ${i})" title="Product B" style="height:28px; padding:0 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:11px; font-weight:800;">B</button>
                 </div>
-                <span style="color:var(--muted);">→</span>
-              </button>`
-            )
+              </div>`;
+            })
             .join('')}
         </div>
       `;
@@ -2658,6 +3415,24 @@
     }
     refreshAll();
   </script>
+
+  <!-- ÖZELLİK 1: WhatsApp / Instagram Sonuç Özeti Kartı Paylaşım Modalı -->
+  <div id="shareCardModal" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.72); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--surface); border:1.5px solid var(--accent); border-radius:24px; max-width:430px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 48px rgba(0,0,0,0.5);">
+      <div style="padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-weight:800; font-size:14.5px; color:var(--ink);">📸 InciFact · WhatsApp / Instagram Kartı</span>
+        <button type="button" onclick="closeShareCardModal()" style="border:none; background:var(--surface2); width:32px; height:32px; border-radius:16px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+      </div>
+      <div style="padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; gap:12px;">
+        <canvas id="shareCardCanvas" width="1080" height="1350" style="width:100%; max-width:320px; height:auto; border-radius:16px; box-shadow:0 12px 28px rgba(11,19,43,0.45); border:1px solid rgba(212,175,55,0.4);"></canvas>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%;">
+          <button type="button" onclick="downloadShareCardPng()" style="height:42px; border-radius:12px; border:none; background:var(--accent); color:var(--on-accent); font-size:12.5px; font-weight:800; cursor:pointer;">📥 PNG İndir</button>
+          <button type="button" onclick="shareViaWhatsApp()" style="height:42px; border-radius:12px; border:none; background:#1E7A45; color:#FFFFFF; font-size:12.5px; font-weight:800; cursor:pointer;">📲 WhatsApp</button>
+        </div>
+        <button type="button" onclick="copyShareSummaryText(); closeShareCardModal();" style="height:38px; width:100%; border-radius:12px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:700; cursor:pointer;">📋 Özet Metni Panoya Kopyala</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Hukuki Metodoloji & Kaynak Beyanı Modalı (P0 Legal) -->
   <div id="methodologyModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
