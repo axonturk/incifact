@@ -804,8 +804,8 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
   const lowerRaw = rawToken.toLowerCase();
 
   // 1. Check direct table for specific entities
-  if (entity.id === 'ceramide_np' && /\bceramide\s+(ap|eop|ns|eos|ng)\b/i.test(lowerRaw)) {
-    const suffix = lowerRaw.match(/\bceramide\s+(ap|eop|ns|eos|ng)\b/i)[1].toUpperCase();
+  if ((entity.id === 'ceramide_np' || entity.id === 'ceramides_family') && /\b(ceramide|seramid)\s+(ap|eop|ns|eos|ng)\b/i.test(lowerRaw)) {
+    const suffix = lowerRaw.match(/\b(?:ceramide|seramid)\s+(ap|eop|ns|eos|ng)\b/i)[1].toUpperCase();
     const map = { tr: `Seramid ${suffix}`, en: `Ceramide ${suffix}`, ar: `سيراميد ${suffix}`, de: `Ceramid ${suffix}`, fr: `Céramide ${suffix}`, id: `Seramida ${suffix}`, ms: `Seramida ${suffix}`, es: `Ceramida ${suffix}`, ru: `Керамид ${suffix}`, ur: `سیرامائیڈ ${suffix}` };
     return map[lang] || `Ceramide ${suffix}`;
   }
@@ -1957,7 +1957,17 @@ export function evaluateProduct({
     const crossContactMatch = fullCrossContactText.match(/(?:may\s+contain|traces?\s+of|eser\s+miktarda\s+(?:içerebilir|bulunabilir)|kann\s+spuren\s+von|peut\s+contenir\s+des\s+traces|puede\s+contener\s+trazas|قد\s+يحتوي\s+على|может\s+содержать\s+следы|میں\s+شامل\s+ہو\s+سکتا\s+ہے)\s*[:\-–]?\s*([^.,;\n]+)/iu);
     if (crossContactMatch) {
       profileStatuses['astim_alerji'] = 'false';
-      const traceTarget = crossContactMatch[1].trim();
+      const rawTraceTarget = crossContactMatch[1].trim();
+      const matchedTraceAllergens = MAJOR_FOOD_ALLERGENS.filter((a) => a.names.test(rawTraceTarget));
+      const traceTarget =
+        matchedTraceAllergens.length > 0
+          ? matchedTraceAllergens
+              .map((a) => {
+                const aLabels = ALLERGEN_I18N[a.id] || {};
+                return aLabels[lang] || aLabels.en || a.tr;
+              })
+              .join(', ')
+          : rawTraceTarget;
       const traceRaw = crossContactMatch[0].trim();
       const traceI18n = {
         tr: { name: 'Çapraz Bulaşma Uyarısı', loc: `Eser Miktarda: ${traceTarget}`, exp: `Ambalajda çapraz bulaşma (eser miktarda) uyarısı bulunmaktadır: "${traceRaw}". Alerjik bireyler için çapraz temas riski taşır.` },

@@ -1259,12 +1259,35 @@ runTest('54. Hibrit Barkod Okuyucu: EAN-13 (Arapça/Urduca rakamlar dahil), 10 d
       !wrongFlourRegex.test(soyAlert.explanation),
       `Dil=${lang} Soya alerjen uyarısında yanlış un adı geçti: "${soyAlert.explanation}"`
     );
+
+    const oreo = lookupBarcodeProduct({
+      barcode: '7622210449283',
+      lang,
+      evaluationOptions: { userProfiles: ['astim_alerji'] }
+    });
+    const traceAlert = oreo.evaluation.cards.profileCard.alerts.find((a) => a.level === 'sari');
+    assert.ok(traceAlert, `Dil=${lang} Oreo eser miktar uyarısı bulunmalı`);
+    if (lang !== 'en') {
+      assert.ok(
+        !/: milk$/i.test(traceAlert.localizedName),
+        `Dil=${lang} Oreo eser miktar uyarısında "milk" çevrilmemiş: "${traceAlert.localizedName}"`
+      );
+    }
   }
 
-  const cerave = lookupBarcodeProduct({ barcode: '3337875597388', lang: 'en' });
+  const cerave = lookupBarcodeProduct({ barcode: '3337875597388', lang: 'tr' });
   assert.equal(cerave.found, true);
   assert.equal(cerave.evaluation.cards.regulatoryCard.score, 100);
   assert.equal(cerave.requiresOcrFallback, false);
+  const cerNP = cerave.evaluation.observations.find((o) => o.raw === 'Ceramide NP');
+  const cerAP = cerave.evaluation.observations.find((o) => o.raw === 'Ceramide AP');
+  const cerEOP = cerave.evaluation.observations.find((o) => o.raw === 'Ceramide EOP');
+  assert.equal(cerNP.substance.id, 'ceramide_np');
+  assert.equal(cerAP.substance.id, 'ceramides_family');
+  assert.equal(cerEOP.substance.id, 'ceramides_family');
+  assert.equal(cerNP.localizedName, 'Seramid NP');
+  assert.equal(cerAP.localizedName, 'Seramid AP');
+  assert.equal(cerEOP.localizedName, 'Seramid EOP');
 
   // 3) <%80 kapsamlı gönüllü kaydı (0000000000017) requiresOcrFallback = true dönmeli
   const lowCov = lookupBarcodeProduct({ barcode: '0000000000017', lang: 'en' });

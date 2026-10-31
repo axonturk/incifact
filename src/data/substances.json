@@ -386,11 +386,9 @@
     },
     {
       "id": "ceramide_np",
-      "name": "Ceramides (Ceramide NP / AP / EOP)",
+      "name": "Ceramide NP (Ceramide 3)",
       "aliases": [
         "ceramide np",
-        "ceramide ap",
-        "ceramide eop",
         "ceramide 3",
         "seramid",
         "سيراميد",
@@ -2001,8 +1999,12 @@
     },
     {
       "id": "ceramides_family",
-      "name": "Ceramides (Ceramide NP / AP / EOP / NS / EOS)",
+      "name": "Ceramides (Ceramide AP / EOP / NS / EOS)",
       "aliases": [
+        "ceramide ap",
+        "ceramide eop",
+        "seramid ap",
+        "seramid eop",
         "ceramide ns",
         "ceramide eos",
         "ceramide ng",

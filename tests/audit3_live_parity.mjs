@@ -31,8 +31,9 @@ for (const c of cases) {
   console.log(res.status, same ? 'EQUAL' : 'DIFF ', expectOk ? 'OK ' : 'BAD', 'score=' + r.score, 'cap=' + r.capApplied, al.length ? 'allergens=' + al.join('|') : '', '<-', input.rawText.slice(0, 70));
 }
 
-const barcodeCodes = ['3017620422003', '3337875597388', '0000000000017'];
+const barcodeCodes = ['3017620422003', '3337875597388', '7622210449283', '0000000000017'];
 const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+const totalBarcodeChecks = barcodeCodes.length * langs.length;
 let barcodeOk = 0;
 for (const code of barcodeCodes) {
   for (const lang of langs) {
@@ -43,5 +44,5 @@ for (const code of barcodeCodes) {
   }
 }
 
-console.log(`\n${ok}/${cases.length} live==disk | ${barcodeOk}/30 barcode live==disk`);
-process.exit(ok === cases.length && barcodeOk === 30 ? 0 : 1);
+console.log(`\n${ok}/${cases.length} live==disk | ${barcodeOk}/${totalBarcodeChecks} barcode live==disk`);
+process.exit(ok === cases.length && barcodeOk === totalBarcodeChecks ? 0 : 1);
