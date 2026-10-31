@@ -1403,11 +1403,11 @@ export function evaluateProduct({
       if (isStrictFutureOrPost2027) {
         effectiveEuStatus = 'yasak';
         effectiveSeverity = 'yuksek';
-        effectiveDetail = '(AB) 2026/909 ile Ek II Doğrudan Yasaklılar listesine alınmıştır (1 Ocak 2027 itibarıyla piyasaya arzı yasaktır).';
+        effectiveDetail = '(AB) 2026/909 ile Ek II Doğrudan Yasaklılar listesine alınmıştır (1 Ocak 2027 itibarıyla piyasaya arzı, 1 Temmuz 2028 itibarıyla piyasada bulundurulması yasaktır).';
       } else {
         effectiveEuStatus = 'kisitli';
         effectiveSeverity = 'orta';
-        effectiveDetail = 'Geçiş Dönemi Uyarısı (AB 2026/909): SCCS genotoksisite ve endokrin verisi eksikliği gerekçesiyle Ek II listesine eklenmiştir. 1 Ocak 2027\'den itibaren piyasaya arzı yasaktır (Ekim 2026 itibarıyla geçiş dönemindedir).';
+        effectiveDetail = 'Geçiş Dönemi Uyarısı (AB 2026/909): SCCS genotoksisite ve endokrin verisi eksikliği gerekçesiyle Ek II listesine eklenmiştir. 1 Ocak 2027\'den itibaren piyasaya arzı, 1 Temmuz 2028\'den itibaren piyasada bulundurulması yasaktır (Ekim 2026 itibarıyla geçiş dönemindedir).';
       }
     } else if (sub.id === 'hydroquinone_banned') {
       const isNailContext = /\b(nail|artificial_nails|artificial\s+nail|tırnak|yapay\s+tırnak)\b/i.test(rawText) ||
@@ -4773,7 +4773,7 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 4 Katmanlı Mevzuat Güncellik & Doğrulama Mimarisi',
     freshnessPillars: [
       '1. Resmi Kaynak Son Teyit Mührü (checked_at): Her hüküm EUR-Lex, CosIng, EFSA, SCCS ve Helal kurum bültenlerinin son resmi doğrulama tarihiyle mühürlenir.',
-      '2. Yürürlük & Geçiş Takvimi Motoru: AB Omnibus tüzüklerindeki (ör. AB 2025/877 TPO yasağı, AB 2026/909 TPHP 2027 geçiş takvimi, AB 2024/996 Retinol/Arbutin) yürürlük tarihleri dinamik takip edilir.',
+      '2. Yürürlük & Geçiş Takvimi Motoru: AB Omnibus tüzüklerindeki (ör. AB 2025/877 TPO yasağı, AB 2026/909 TPHP 2027-01-01 arz / 2028-07-01 bulundurma yasağı, AB 2024/996 Retinol/Kojik Asit/Arbutin) yürürlük tarihleri dinamik takip edilir.',
       '3. Doğrudan Resmi Gazete (EUR-Lex / EFSA) Bağlantıları: Rapordaki her kaynak kodu resmi mevzuat metnine doğrudan bağlantı içerir.',
       '4. Sıfır Statik Metin: Rapor şablonu sabit metin kullanmaz; tüm hükümler merkezi mevzuat veri tabanından (sources.json & substances.json) anlık üretilir.'
     ],
@@ -4789,7 +4789,7 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 4-Layer Regulatory Freshness & Verification Architecture',
     freshnessPillars: [
       '1. Official Source Verification Seal (checked_at): Every rule is stamped with the last verification date against EUR-Lex, CosIng, EFSA, SCCS, and Halal authority bulletins.',
-      '2. Effective-Date & Transition Calendar Engine: Dynamically tracks EU Omnibus enforcement cutoffs (e.g., EU 2025/877 TPO ban, EU 2026/909 TPHP 2027 deadline, EU 2024/996 Retinol/Arbutin limits).',
+      '2. Effective-Date & Transition Calendar Engine: Dynamically tracks EU Omnibus enforcement cutoffs (e.g., EU 2025/877 TPO ban, EU 2026/909 TPHP 2027-01-01 placing / 2028-07-01 withdrawal, EU 2024/996 Retinol/Kojic Acid/Arbutin limits).',
       '3. Direct Official Gazette Links (EUR-Lex / EFSA): Every cited source includes its canonical official URL for live inspection.',
       '4. Zero Hardcoded Claims: Generated dynamically from the synchronized regulatory manifest (sources.json & substances.json).'
     ],
@@ -4805,9 +4805,9 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 بنية ضمان حداثة اللوائح والتحقق من 4 طبقات',
     freshnessPillars: [
       '1. ختم تاريخ التحقق الرسمي (checked_at): كل قاعدة مرتبطة بتاريخ آخر تدقيق رسمي من EUR-Lex وCosIng وEFSA وهيئات الحلال.',
-      '2. محرك تقويم النفاذ والفترات الانتقالية: يتتبع تواريخ سريان لوائح الاتحاد الأوروبي (مثل حظر TPO 2025/877، والمهلة الانتقالية لمادة TPHP 2026/909 حتى 2027).',
+      '2. محرك تقويم النفاذ والفترات الانتقالية: يتتبع تواريخ سريان لوائح الاتحاد الأوروبي (مثل حظر TPO 2025/877، ومواعيد TPHP 2026/909 في 2027-01-01 / 2028-07-01، وحدود 2024/996).',
       '3. روابط مباشرة للجريدة الرسمية (EUR-Lex / EFSA): يتضمن كل مصدر رابطاً رسمياً للتحقق الفوري.',
-      '4. توليد ديناميكي مباشر من قاعدة البيانات التنظيمية الموحدة.'
+      '4. توليد ديناميكي بدون نصوص ثابتة: يُنشأ التقرير مباشرة من قاعدة البيانات التنظيمية الموحدة (sources.json وsubstances.json).'
     ],
     allergenSectionTitle: 'بيان مسببات الحساسية (لائحة الاتحاد الأوروبي 1169/2011 الملحق II)',
     transitionSectionTitle: 'تقويم النفاذ والفترات الانتقالية الأوروبية',
@@ -4821,9 +4821,9 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 4-Stufen-Architektur für Regulierungsaktualität',
     freshnessPillars: [
       '1. Offizielles Prüfdatum (checked_at): Jede Regel trägt das letzte Abgleichdatum mit EUR-Lex, CosIng, EFSA, SCCS und Halal-Standards.',
-      '2. Stichtags- & Übergangsfristen-Engine: Verfolgt dynamisch EU-Omnibus-Stichtage (z. B. EU 2025/877 TPO-Verbot, EU 2026/909 TPHP-Frist 2027, EU 2024/996 Retinol).',
+      '2. Stichtags- & Übergangsfristen-Engine: Verfolgt dynamisch EU-Omnibus-Stichtage (z. B. EU 2025/877 TPO-Verbot, EU 2026/909 TPHP 2027-01-01 / 2028-07-01, EU 2024/996 Retinol/Kojisäure).',
       '3. Direkte Amtsblatt-Links (EUR-Lex / EFSA): Jede Quelle enthält den offiziellen Link zur Live-Prüfung.',
-      '4. Dynamische Erzeugung aus dem synchronisierten Regulierungs-Manifest.'
+      '4. Keine statischen Vorlagen: Alle Angaben werden dynamisch aus dem synchronisierten Regulierungs-Manifest erzeugt.'
     ],
     allergenSectionTitle: 'EU 1169/2011 Anhang II & Kosmetik-Allergendeklaration',
     transitionSectionTitle: 'EU-Omnibus Geltungs- & Übergangsfristen',
@@ -4837,9 +4837,9 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 Architecture de Mise à Jour Réglementaire en 4 Niveaux',
     freshnessPillars: [
       '1. Sceau de vérification officielle (checked_at) : Chaque règle indique la date du dernier contrôle EUR-Lex, CosIng, EFSA et normes Halal.',
-      '2. Moteur de calendrier d\'application : Suit les échéances Omnibus UE (ex. interdiction TPO UE 2025/877, échéance TPHP UE 2026/909 en 2027, Rétinol UE 2024/996).',
-      '3. Liens directs vers le Journal Officiel (EUR-Lex / EFSA) pour vérification immédiate.',
-      '4. Génération dynamique sans texte figé depuis la base réglementaire.'
+      '2. Moteur de calendrier d\'application : Suit les échéances Omnibus UE (ex. interdiction TPO UE 2025/877, TPHP UE 2026/909 2027-01-01 / 2028-07-01, Rétinol/Acide kojique UE 2024/996).',
+      '3. Liens directs vers le Journal Officiel (EUR-Lex / EFSA) : Chaque source citée inclut son lien officiel pour vérification immédiate.',
+      '4. Zéro texte statique : Génération dynamique en temps réel depuis la base réglementaire synchronisée.'
     ],
     allergenSectionTitle: 'Déclaration des Allergènes (UE 1169/2011 Annexe II & Cosmétique)',
     transitionSectionTitle: 'Calendrier d\'Application & Transitions Omnibus UE',
@@ -4853,9 +4853,9 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 Arsitektur Pembaruan Regulasi 4 Lapis',
     freshnessPillars: [
       '1. Segel Tanggal Verifikasi Resmi (checked_at): Setiap aturan mencatat tanggal verifikasi terakhir terhadap EUR-Lex, CosIng, EFSA, dan standar Halal.',
-      '2. Mesin Kalender Transisi Regulasi: Melacak tanggal berlaku regulasi Omnibus UE (mis. larangan TPO UE 2025/877, batas transisi TPHP UE 2026/909 tahun 2027).',
-      '3. Tautan Langsung Lembaran Resmi (EUR-Lex / EFSA) untuk verifikasi langsung.',
-      '4. Dihasilkan secara dinamis dari manifes regulasi tersinkronisasi.'
+      '2. Mesin Kalender Transisi Regulasi: Melacak tanggal berlaku regulasi Omnibus UE (mis. larangan TPO UE 2025/877, batas transisi TPHP UE 2026/909 2027-01-01 / 2028-07-01, UE 2024/996).',
+      '3. Tautan Langsung Lembaran Resmi (EUR-Lex / EFSA): Setiap sumber dilengkapi tautan resmi untuk verifikasi langsung.',
+      '4. Tanpa Teks Statis: Dihasilkan secara dinamis dari manifes regulasi tersinkronisasi.'
     ],
     allergenSectionTitle: 'Deklarasi Alergen (Lampiran II UE 1169/2011 & Sensitizer Kosmetik)',
     transitionSectionTitle: 'Kalender Berlaku & Masa Transisi Omnibus UE',
@@ -4869,9 +4869,9 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 Seni Bina Kemas Kini Regulasi 4 Lapisan',
     freshnessPillars: [
       '1. Cop Tarikh Pengesahan Rasmi (checked_at): Setiap peraturan direkodkan dengan tarikh semakan terakhir EUR-Lex, CosIng, EFSA dan piawaian Halal.',
-      '2. Enjin Takwim Peralihan: Menjejaki tarikh kuat kuasa Omnibus EU (cth. pengharaman TPO EU 2025/877, tarikh akhir TPHP EU 2026/909 pada 2027).',
-      '3. Pautan Terus Warta Rasmi (EUR-Lex / EFSA) untuk semakan segera.',
-      '4. Dijana secara dinamik daripada pangkalan data peraturan berpusat.'
+      '2. Enjin Takwim Peralihan: Menjejaki tarikh kuat kuasa Omnibus EU (cth. pengharaman TPO EU 2025/877, tarikh akhir TPHP EU 2026/909 2027-01-01 / 2028-07-01, EU 2024/996).',
+      '3. Pautan Terus Warta Rasmi (EUR-Lex / EFSA): Setiap sumber menyertakan pautan rasmi untuk semakan segera.',
+      '4. Tiada Teks Statik: Dijana secara dinamik daripada pangkalan data peraturan berpusat.'
     ],
     allergenSectionTitle: 'Pengisytiharan Alergen (Lampiran II EU 1169/2011 & Kosmetik)',
     transitionSectionTitle: 'Takwim Kuat Kuasa & Peralihan Omnibus EU',
@@ -4885,9 +4885,9 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 Arquitectura de Actualización Regulatoria de 4 Capas',
     freshnessPillars: [
       '1. Sello de Verificación Oficial (checked_at): Cada regla incluye la fecha de última verificación frente a EUR-Lex, CosIng, EFSA y normas Halal.',
-      '2. Motor de Calendario de Vigencia: Rastrea fechas límite Omnibus UE (p. ej., prohibición de TPO UE 2025/877, transición de TPHP UE 2026/909 hasta 2027).',
-      '3. Enlaces directos al Diario Oficial (EUR-Lex / EFSA) para comprobación en vivo.',
-      '4. Generación dinámica desde el manifiesto regulatorio sincronizado.'
+      '2. Motor de Calendario de Vigencia: Rastrea fechas límite Omnibus UE (p. ej., prohibición de TPO UE 2025/877, transición de TPHP UE 2026/909 2027-01-01 / 2028-07-01, UE 2024/996).',
+      '3. Enlaces Directos al Diario Oficial (EUR-Lex / EFSA): Cada fuente citada incluye su enlace oficial para comprobación en vivo.',
+      '4. Cero Texto Estático: Generación dinámica desde el manifiesto regulatorio sincronizado.'
     ],
     allergenSectionTitle: 'Declaración de Alérgenos (UE 1169/2011 Anexo II y Cosmética)',
     transitionSectionTitle: 'Calendario de Vigencia y Transición Omnibus UE',
@@ -4901,9 +4901,9 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 4-уровневая архитектура актуальности нормативной базы',
     freshnessPillars: [
       '1. Штамп последней проверки (checked_at): Каждое правило содержит дату сверки с официальными базами EUR-Lex, CosIng, EFSA и стандартами Халяль.',
-      '2. Контроль сроков вступления в силу: Автоматический учет переходных периодов ЕС (запрет TPO ЕС 2025/877, переходный период TPHP ЕС 2026/909 до 2027 г.).',
-      '3. Прямые ссылки на Официальный журнал ЕС (EUR-Lex / EFSA).',
-      '4. Динамическая генерация без устаревших статических шаблонов.'
+      '2. Контроль сроков вступления в силу: Автоматический учет переходных периодов ЕС (запрет TPO ЕС 2025/877, даты TPHP ЕС 2026/909 2027-01-01 / 2028-07-01, ЕС 2024/996).',
+      '3. Прямые ссылки на Официальный журнал (EUR-Lex / EFSA): Каждый источник содержит прямую ссылку на официальный документ.',
+      '4. Без статических шаблонов: Динамическая генерация из единой синхронизированной базы нормативов.'
     ],
     allergenSectionTitle: 'Декларация аллергенов (Регламент ЕС 1169/2011 Приложение II и косметика)',
     transitionSectionTitle: 'График вступления в силу и переходные периоды ЕС',
@@ -4917,9 +4917,9 @@ const REGULATORY_REPORT_I18N = {
     freshnessTitle: '🔄 قوانین کی تازہ کاری اور تصدیق کا 4 سطحی نظام',
     freshnessPillars: [
       '1. سرکاری تصدیق کی تاریخ (checked_at): ہر اصول کے ساتھ EUR-Lex، CosIng، EFSA اور حلال اتھارٹیز سے آخری تصدیق کی تاریخ درج ہوتی ہے۔',
-      '2. نفاذ اور عبوری مدت کا انجن: یورپی یونین کے نئے قوانین (جیسے EU 2025/877 TPO پابندی اور EU 2026/909 TPHP کی 2027 مہلت) کی تاریخوں کو خودکار مانیٹر کرتا ہے۔',
-      '3. سرکاری گزٹ (EUR-Lex / EFSA) کے براہِ راست لنکس۔',
-      '4. مرکزی ریگولیٹری ڈیٹا بیس سے براہِ راست ڈائنامک رپورٹنگ۔'
+      '2. نفاذ اور عبوری مدت کا انجن: یورپی یونین کے نئے قوانین (جیسے EU 2025/877 TPO پابندی، EU 2026/909 TPHP کی 2027-01-01 / 2028-07-01 مہلت، اور EU 2024/996) کی تاریخوں کو خودکار مانیٹر کرتا ہے۔',
+      '3. سرکاری گزٹ کے براہِ راست لنکس (EUR-Lex / EFSA): ہر حوالے کے ساتھ براہِ راست تصدیقی لنک موجود ہے۔',
+      '4. کوئی جامد عبارت نہیں: تمام معلومات مرکزی ریگولیٹری ڈیٹا بیس سے براہِ راست تیار کی جاتی ہیں۔'
     ],
     allergenSectionTitle: 'الرجن کا بیان (EU 1169/2011 ضمیمہ II اور کاسمیٹک الرجن)',
     transitionSectionTitle: 'یورپی یونین قوانین کے نفاذ اور عبوری مدت کا شیڈول',
@@ -4948,47 +4948,135 @@ function buildRegulatoryReportCard({
   const transitionCalendarItems = [];
   for (const obs of observations || []) {
     const subId = obs.substance ? obs.substance.id : '';
+    const rawStr = String(obs.raw || '');
     const itemName = obs.localizedName || (obs.substance ? obs.substance.name : obs.raw);
-    if (subId === 'tpo_nail_initiator_eu2025' || /\btrimethylbenzoyl\s+diphenylphosphine\s+oxide\b/iu.test(obs.raw)) {
-      transitionCalendarItems.push({
-        name: itemName,
-        substance: itemName,
-        regulation: 'EU 2025/877 (Omnibus VII — Annex II)',
-        deadline: '2025-09-01',
-        effectiveDate: '2025-09-01',
-        status: 'enforced_ban'
-      });
-    } else if (subId === 'tphp_triphenyl_phosphate_eu2026_909' || /\btriphenyl\s+phosphate\b/iu.test(obs.raw)) {
-      transitionCalendarItems.push({
-        name: itemName,
-        substance: itemName,
-        regulation: 'EU 2026/909 (Annex II Entry)',
-        deadline: '2027-11-01',
-        effectiveDate: '2027-11-01',
-        status: 'transition_period_until_2027_11_01'
-      });
-    } else if (
-      subId === 'retinoids_vitamin_a_eu2024_996' ||
-      subId === 'retinol_retinoids' ||
-      (obs.substance && Array.isArray(obs.substance.sources) && obs.substance.sources.includes('EU_2024_996')) ||
-      /(?:^|[^\p{L}\p{N}])(retinol|retinyl\s+palmitate|retinyl\s+acetate|alpha[\s\-]*arbutin|arbutin|kojic\s+acid|4[\s\-]*methylbenzylidene\s+camphor|triclosan|triclocarban)(?=[^\p{L}\p{N}]|$)/iu.test(obs.raw)
+    if (
+      subId === 'tpo_nail_banned_2025' ||
+      subId === 'tpo_nail_initiator_eu2025' ||
+      /\btrimethylbenzoyl\s+diphenylphosphine\s+oxide\b/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
         name: itemName,
         substance: itemName,
-        regulation: 'EU 2024/996 (Annex III — 0.3% Face / 0.05% Body Limit)',
-        deadline: '2027-05-01',
-        effectiveDate: '2027-05-01',
-        status: 'transition_market_withdrawal_2027_05_01'
+        regulation: 'EU 2025/877 (Omnibus VII — Annex II CMR 1B Ban)',
+        placingOnMarketDate: '2025-09-01',
+        makingAvailableDate: '2025-09-01',
+        deadline: '2025-09-01',
+        effectiveDate: '2025-09-01',
+        status: 'enforced_ban_2025_09_01'
       });
     } else if (
+      subId === 'tphp_triphenyl_phosphate_banned' ||
+      subId === 'tphp_triphenyl_phosphate_eu2026_909' ||
+      /\btriphenyl\s+phosphate\b/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2026/909 (Annex II — Prohibited in Cosmetics)',
+        placingOnMarketDate: '2027-01-01',
+        makingAvailableDate: '2028-07-01',
+        deadline: '2027-01-01 (Placing) / 2028-07-01 (Withdrawal)',
+        effectiveDate: '2027-01-01',
+        status: 'placing_ban_2027_01_01_market_withdrawal_2028_07_01'
+      });
+    } else if (
+      subId === 'retinol' ||
+      subId === 'retinoids_vitamin_a_eu2024_996' ||
+      subId === 'retinol_retinoids' ||
+      /(?:^|[^\p{L}\p{N}])(retinol|retinyl\s+palmitate|retinyl\s+acetate|retinyl\s+propionate|vitamin\s+a)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex III/375 — Max 0.05% Body Lotion / 0.3% Face & Other)',
+        placingOnMarketDate: '2025-11-01',
+        makingAvailableDate: '2027-05-01',
+        deadline: '2025-11-01 (Placing) / 2027-05-01 (Withdrawal)',
+        effectiveDate: '2027-05-01',
+        status: 'transition_placing_2025_11_01_withdrawal_2027_05_01'
+      });
+    } else if (
+      subId === 'kojic_acid' ||
+      /(?:^|[^\p{L}\p{N}])(kojic\s+acid|kojik\s+asit|kojisäure|acide\s+kojique|ácido\s+kójico|койевая\s+кислота|حمض\s+الكوجيك|کوجک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex III/372 — Max 1.0% in Face & Hand Products)',
+        placingOnMarketDate: '2025-02-01',
+        makingAvailableDate: '2025-11-01',
+        deadline: '2025-02-01 (Placing) / 2025-11-01 (Withdrawal)',
+        effectiveDate: '2025-11-01',
+        status: 'enforced_limit_1pct_face_hand_placing_2025_02_01_withdrawal_2025_11_01'
+      });
+    } else if (
+      /(?:^|[^\p{L}\p{N}])(alpha[\s\-]*arbutin|alfa[\s\-]*arbutin|ألفا[\s\-]*أربوتين|альфа[\s\-]*арбутин|الفا[\s\-]*اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex III/373 — Max 2.0% Face Cream / 0.5% Body Lotion)',
+        placingOnMarketDate: '2025-02-01',
+        makingAvailableDate: '2025-11-01',
+        deadline: '2025-02-01 (Placing) / 2025-11-01 (Withdrawal)',
+        effectiveDate: '2025-11-01',
+        status: 'enforced_limit_2pct_face_0_5pct_body_placing_2025_02_01_withdrawal_2025_11_01'
+      });
+    } else if (
+      /(?:^|[^\p{L}\p{N}])(arbutin|beta[\s\-]*arbutin|أربوتين|арбутин|اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex III/374 — Max 7.0% Face Cream)',
+        placingOnMarketDate: '2025-02-01',
+        makingAvailableDate: '2025-11-01',
+        deadline: '2025-02-01 (Placing) / 2025-11-01 (Withdrawal)',
+        effectiveDate: '2025-11-01',
+        status: 'enforced_limit_7pct_face_placing_2025_02_01_withdrawal_2025_11_01'
+      });
+    } else if (
+      subId === '4_mbc' ||
+      subId === '4_mbc_uv_filter' ||
+      /(?:^|[^\p{L}\p{N}])(4[\s\-]*methylbenzylidene\s+camphor|4[\s\-]*mbc|enzacamene)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex II/1730 — Prohibited UV Filter)',
+        placingOnMarketDate: '2025-05-01',
+        makingAvailableDate: '2026-05-01',
+        deadline: '2025-05-01 (Placing) / 2026-05-01 (Withdrawal)',
+        effectiveDate: '2026-05-01',
+        status: 'enforced_ban_placing_2025_05_01_withdrawal_2026_05_01'
+      });
+    } else if (
+      subId === 'triclosan_triclocarban' ||
+      /(?:^|[^\p{L}\p{N}])(triclosan|triclocarban|triklosan|triklokarban|триклозан|триклокарбан|تريكلوسان|تريكلوكاربان|ٹرائیکلوسان)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex V/25 & V/23 — Max 0.3% Triclosan / 0.2% Triclocarban)',
+        placingOnMarketDate: '2024-12-31',
+        makingAvailableDate: '2025-10-31',
+        deadline: '2024-12-31 (Placing) / 2025-10-31 (Withdrawal)',
+        effectiveDate: '2025-10-31',
+        status: 'enforced_limit_placing_2024_12_31_withdrawal_2025_10_31'
+      });
+    } else if (
+      subId === 'cyclosiloxanes_d5_d6' ||
+      subId === 'cyclotetrasiloxane_d4' ||
       subId === 'cyclic_siloxanes_d4_d5_d6' ||
-      /(?:^|[^\p{L}\p{N}])(cyclopentasiloxane|cyclohexasiloxane|cyclotetrasiloxane)(?=[^\p{L}\p{N}]|$)/iu.test(obs.raw)
+      /(?:^|[^\p{L}\p{N}])(cyclopentasiloxane|cyclohexasiloxane|cyclotetrasiloxane)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
         name: itemName,
         substance: itemName,
         regulation: 'REACH Regulation (EU) 2024/1328',
+        placingOnMarketDate: '2027-06-06',
+        makingAvailableDate: '2027-06-06',
         deadline: '2027-06-06',
         effectiveDate: '2027-06-06',
         status: 'leave_on_restriction_2027_06_06'
@@ -5128,16 +5216,16 @@ function buildRegulatoryReportCard({
 
   const citedOfficialSources = Array.from(sourceMap.values());
   const btnLabels = {
-    tr: { open: '📄 Resmi Raporu Aç (A4)', print: 'Yazdır / PDF', copy: 'Raporu Kopyala', checked: 'Son Teyit' },
-    en: { open: '📄 Open Official Report (A4)', print: 'Print / PDF', copy: 'Copy Report', checked: 'Verified' },
-    ar: { open: '📄 فتح التقرير الرسمي (A4)', print: 'طباعة / PDF', copy: 'نسخ التقرير', checked: 'تاريخ التدقيق' },
-    de: { open: '📄 Offiziellen Bericht öffnen (A4)', print: 'Drucken / PDF', copy: 'Bericht kopieren', checked: 'Geprüft am' },
-    fr: { open: '📄 Ouvrir le Rapport Officiel (A4)', print: 'Imprimer / PDF', copy: 'Copier le rapport', checked: 'Vérifié le' },
-    id: { open: '📄 Buka Laporan Resmi (A4)', print: 'Cetak / PDF', copy: 'Salin Laporan', checked: 'Diverifikasi' },
-    ms: { open: '📄 Buka Laporan Rasmi (A4)', print: 'Cetak / PDF', copy: 'Salin Laporan', checked: 'Disahkan' },
-    es: { open: '📄 Abrir Informe Oficial (A4)', print: 'Imprimir / PDF', copy: 'Copiar Informe', checked: 'Verificado' },
-    ru: { open: '📄 Открыть официальный отчет (A4)', print: 'Печать / PDF', copy: 'Копировать отчет', checked: 'Проверено' },
-    ur: { open: '📄 سرکاری رپورٹ کھولیں (A4)', print: 'پرنٹ / PDF', copy: 'رپورٹ کاپی کریں', checked: 'تصدیق شدہ' }
+    tr: { open: '📄 Resmi Raporu Aç (A4)', print: 'Yazdır / PDF', copy: 'Raporu Kopyala', checked: 'Son Teyit', sourcesBadge: 'Resmi Kaynak', allergensBadge: 'Alerjen', calendarBadge: 'Omnibus Takvim' },
+    en: { open: '📄 Open Official Report (A4)', print: 'Print / PDF', copy: 'Copy Report', checked: 'Verified', sourcesBadge: 'Official Sources', allergensBadge: 'Allergens', calendarBadge: 'Omnibus Deadlines' },
+    ar: { open: '📄 فتح التقرير الرسمي (A4)', print: 'طباعة / PDF', copy: 'نسخ التقرير', checked: 'تاريخ التدقيق', sourcesBadge: 'مصدر رسمي', allergensBadge: 'مسببات الحساسية', calendarBadge: 'مواعيد النفاذ' },
+    de: { open: '📄 Offiziellen Bericht öffnen (A4)', print: 'Drucken / PDF', copy: 'Bericht kopieren', checked: 'Geprüft am', sourcesBadge: 'Offizielle Quellen', allergensBadge: 'Allergene', calendarBadge: 'Omnibus-Fristen' },
+    fr: { open: '📄 Ouvrir le Rapport Officiel (A4)', print: 'Imprimer / PDF', copy: 'Copier le rapport', checked: 'Vérifié le', sourcesBadge: 'Sources Officielles', allergensBadge: 'Allergènes', calendarBadge: 'Échéances Omnibus' },
+    id: { open: '📄 Buka Laporan Resmi (A4)', print: 'Cetak / PDF', copy: 'Salin Laporan', checked: 'Diverifikasi', sourcesBadge: 'Sumber Resmi', allergensBadge: 'Alergen', calendarBadge: 'Jadwal Omnibus' },
+    ms: { open: '📄 Buka Laporan Rasmi (A4)', print: 'Cetak / PDF', copy: 'Salin Laporan', checked: 'Disahkan', sourcesBadge: 'Sumber Rasmi', allergensBadge: 'Alergen', calendarBadge: 'Takwim Omnibus' },
+    es: { open: '📄 Abrir Informe Oficial (A4)', print: 'Imprimir / PDF', copy: 'Copiar Informe', checked: 'Verificado', sourcesBadge: 'Fuentes Oficiales', allergensBadge: 'Alérgenos', calendarBadge: 'Plazos Omnibus' },
+    ru: { open: '📄 Открыть официальный отчет (A4)', print: 'Печать / PDF', copy: 'Копировать отчет', checked: 'Проверено', sourcesBadge: 'Офиц. источники', allergensBadge: 'Аллергены', calendarBadge: 'Сроки Omnibus' },
+    ur: { open: '📄 سرکاری رپورٹ کھولیں (A4)', print: 'پرنٹ / PDF', copy: 'رپورٹ کاپی کریں', checked: 'تصدیق شدہ', sourcesBadge: 'سرکاری ماخذ', allergensBadge: 'الرجن', calendarBadge: 'نفاذ کا شیڈول' }
   };
   const bLoc = btnLabels[lang] || btnLabels.en;
 
@@ -5174,6 +5262,9 @@ function buildRegulatoryReportCard({
     printReportBtn: bLoc.print,
     copyReportBtn: bLoc.copy,
     checkedAtLabel: bLoc.checked,
+    sourcesBadgeLabel: bLoc.sourcesBadge,
+    allergensBadgeLabel: bLoc.allergensBadge,
+    calendarBadgeLabel: bLoc.calendarBadge,
     datasetManifest: {
       datasetVersion: '2026.10-omnibus',
       sourcesSnapshotDate: sourcesData.version || '2026-10-12',

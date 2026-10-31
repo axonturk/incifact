@@ -1540,17 +1540,42 @@ runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 ka
     assert.equal(rr.datasetManifest.activeJurisdiction, 'EU');
     assert.equal(rr.datasetManifest.selectedHalalAuthority, 'GIMDES');
     assert.equal(rr.freshnessPillars.length, 4, `Dil=${lang} 4 katmanlı güncellik mimarisi bulunmalı`);
+    for (const p of rr.freshnessPillars) {
+      assert.ok(p.title && !/^Pillar\s+\d+/i.test(p.title), `Dil=${lang} pillar başlığı İngilizce fallback ('Pillar N') olmamalı: ${p.title}`);
+      assert.ok(p.detail && p.detail.length > 10, `Dil=${lang} pillar açıklaması dolu olmalı`);
+    }
+    assert.ok(rr.sourcesBadgeLabel && rr.allergensBadgeLabel && rr.calendarBadgeLabel, `Dil=${lang} rozet etiketleri mevcut olmalı`);
+    if (lang !== 'tr') {
+      assert.notEqual(rr.sourcesBadgeLabel, 'Resmi Kaynak', `Dil=${lang} sourcesBadgeLabel Türkçe sızdırmamalı`);
+      assert.notEqual(rr.allergensBadgeLabel, 'Alerjen', `Dil=${lang} allergensBadgeLabel Türkçe sızdırmamalı`);
+      assert.notEqual(rr.calendarBadgeLabel, 'Omnibus Takvim', `Dil=${lang} calendarBadgeLabel Türkçe sızdırmamalı`);
+    }
     assert.ok(
       rr.transitionCalendarItems.some((t) => /2025-09-01/.test(t.deadline) && /2025\/877/.test(t.regulation)),
       `Dil=${lang} TPO için EU 2025/877 (2025-09-01) takvim maddesi bulunmalı`
     );
     assert.ok(
-      rr.transitionCalendarItems.some((t) => /2027-11-01/.test(t.deadline) && /2026\/909/.test(t.regulation)),
-      `Dil=${lang} TPHP için EU 2026/909 (2027-11-01) takvim maddesi bulunmalı`
+      rr.transitionCalendarItems.some(
+        (t) =>
+          t.placingOnMarketDate === '2027-01-01' &&
+          t.makingAvailableDate === '2028-07-01' &&
+          /2027-01-01/.test(t.deadline) &&
+          /2028-07-01/.test(t.deadline) &&
+          /2026\/909/.test(t.regulation)
+      ),
+      `Dil=${lang} TPHP için EU 2026/909 (2027-01-01 piyasaya arz / 2028-07-01 bulundurma) takvim maddesi bulunmalı`
     );
     assert.ok(
-      rr.transitionCalendarItems.some((t) => /2027-05-01/.test(t.deadline) && /2024\/996/.test(t.regulation)),
-      `Dil=${lang} Retinol için EU 2024/996 (2027-05-01) takvim maddesi bulunmalı`
+      rr.transitionCalendarItems.some(
+        (t) =>
+          t.placingOnMarketDate === '2025-11-01' &&
+          t.makingAvailableDate === '2027-05-01' &&
+          /2027-05-01/.test(t.deadline) &&
+          /0\.05%/.test(t.regulation) &&
+          /0\.3%/.test(t.regulation) &&
+          /2024\/996/.test(t.regulation)
+      ),
+      `Dil=${lang} Retinol için EU 2024/996 (0.05%/0.3%, 2025-11-01 / 2027-05-01) takvim maddesi bulunmalı`
     );
     assert.ok(rr.detectedAllergens.length >= 2, `Dil=${lang} Linalool ve Limonene alerjen olarak listelenmeli`);
     assert.ok(rr.citedOfficialSources.length >= 3, `Dil=${lang} en az 3 resmi kaynak (checkedAt ve url ile) listelenmeli`);
@@ -1558,7 +1583,48 @@ runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 ka
       assert.ok(src.id && src.checkedAt && src.url, `Dil=${lang} resmi kaynakta id, checkedAt ve url bulunmalı`);
     }
 
-    // 2) Gıda (Nutella barkodu) -> Fındık, Süt, Soya alerjenleri EU_1169_2011 altında raporlanmalı
+    // 2) Kojic Acid, Alpha-Arbutin ve Azelaic Acid ayrımı (EU 2024/996 madde bazlı doğru limit ve tarih)
+    const kojicEval = evaluateProduct({
+      rawText: 'Aqua, Kojic Acid, Alpha-Arbutin',
+      productType: 'cosmetic',
+      lang
+    });
+    const kojicItems = kojicEval.cards.regulatoryReportCard.transitionCalendarItems;
+    assert.equal(kojicItems.length, 2, `Dil=${lang} Kojic Acid + Alpha-Arbutin 2 ayrı takvim maddesi üretmeli`);
+    assert.ok(
+      kojicItems.some(
+        (t) =>
+          /1\.0%/.test(t.regulation) &&
+          t.placingOnMarketDate === '2025-02-01' &&
+          t.makingAvailableDate === '2025-11-01' &&
+          !/0\.3%/.test(t.regulation) &&
+          !/2027-05-01/.test(t.deadline)
+      ),
+      `Dil=${lang} Kojic Acid için %1.0 yüz/el sınırı ve 2025-02-01 / 2025-11-01 tarihleri üretilmeli (Retinol bilgisi karışmamalı)`
+    );
+    assert.ok(
+      kojicItems.some(
+        (t) =>
+          /2\.0%/.test(t.regulation) &&
+          /0\.5%/.test(t.regulation) &&
+          t.placingOnMarketDate === '2025-02-01' &&
+          t.makingAvailableDate === '2025-11-01'
+      ),
+      `Dil=${lang} Alpha-Arbutin için %2.0 yüz / %0.5 vücut sınırı ve 2025-02-01 / 2025-11-01 tarihleri üretilmeli`
+    );
+
+    const azelaicEval = evaluateProduct({
+      rawText: 'Aqua, Azelaic Acid, Tranexamic Acid',
+      productType: 'cosmetic',
+      lang
+    });
+    assert.equal(
+      azelaicEval.cards.regulatoryReportCard.transitionCalendarItems.length,
+      0,
+      `Dil=${lang} Azelaic Acid ve Tranexamic Acid için EU 2024/996 takvim maddesi üretilmemeli`
+    );
+
+    // 3) Gıda (Nutella barkodu) -> Fındık, Süt, Soya alerjenleri EU_1169_2011 altında raporlanmalı
     const nutella = lookupBarcodeProduct({ barcode: '3017620422003', lang });
     const nutRr = nutella.evaluation.cards.regulatoryReportCard;
     assert.ok(nutRr.detectedAllergens.length >= 3, `Dil=${lang} Nutella'da en az 3 gıda alerjeni (fındık, süt, soya) raporlanmalı`);

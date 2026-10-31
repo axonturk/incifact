@@ -1101,7 +1101,9 @@
     function onInputChanged() {
       state.activeSampleIdx = null;
       state.activeBarcodeMeta = null;
-      state.barcodeStatusBanner = null;
+      if (!(state.barcodeStatusBanner && state.barcodeStatusBanner.canSaveCustom)) {
+        state.barcodeStatusBanner = null;
+      }
       state.userConfirmations = {};
       if (window._liveInputDebounce) clearTimeout(window._liveInputDebounce);
       window._liveInputDebounce = setTimeout(() => {
@@ -1895,7 +1897,7 @@
           return data;
         }
 
-        // Save to 7-day local barcode cache (LRU max 50)
+        // Save to 7-day local barcode cache (LRU max 50) ONLY if >=80% coverage (no OCR fallback required)
         try {
           const cacheList = loadSavedJson('incifact_barcode_cache_v1', []);
           const nowMs = Date.now();
@@ -1903,17 +1905,19 @@
           const validCache = Array.isArray(cacheList)
             ? cacheList.filter((c) => c && c.barcode !== data.barcode && nowMs - (c.cachedAt || 0) < ttlMs)
             : [];
-          validCache.unshift({
-            barcode: data.barcode,
-            productName: data.productName,
-            productType: data.productType,
-            applicationType: data.applicationType || null,
-            rawText: data.rawText,
-            allergenStatement: data.allergenStatement || '',
-            source: data.source,
-            updatedAt: data.updatedAt,
-            cachedAt: nowMs
-          });
+          if (!data.requiresOcrFallback && (typeof data.coveragePercent !== 'number' || data.coveragePercent >= 80)) {
+            validCache.unshift({
+              barcode: data.barcode,
+              productName: data.productName,
+              productType: data.productType,
+              applicationType: data.applicationType || null,
+              rawText: data.rawText,
+              allergenStatement: data.allergenStatement || '',
+              source: data.source,
+              updatedAt: data.updatedAt,
+              cachedAt: nowMs
+            });
+          }
           saveJson('incifact_barcode_cache_v1', validCache.slice(0, 50));
         } catch (_) {}
 
@@ -1965,8 +1969,18 @@
     async function saveCustomBarcodeToDevice(barcodeToSave) {
       const bUi = BARCODE_UI_I18N[state.lang] || BARCODE_UI_I18N.en;
       const code = String(barcodeToSave || state.barcodeInputVal || '').trim();
+      if (window._liveInputDebounce) {
+        clearTimeout(window._liveInputDebounce);
+        window._liveInputDebounce = null;
+      }
+      await refreshAll();
+      const rawText = document.getElementById('liveInput').value.trim();
       const reg = state.evalData && state.evalData.cards && state.evalData.cards.regulatoryCard;
-      if (!reg || reg.coveragePercent < 80) {
+      const hasPendingOcr =
+        state.evalData &&
+        Array.isArray(state.evalData.unresolvedConfirmations) &&
+        state.evalData.unresolvedConfirmations.length > 0;
+      if (!rawText || !reg || reg.coveragePercent < 80 || hasPendingOcr) {
         state.barcodeStatusBanner = {
           tone: 'warn',
           barcode: code,
@@ -1976,7 +1990,6 @@
         renderScreen();
         return null;
       }
-      const rawText = document.getElementById('liveInput').value.trim();
       const productType = document.getElementById('prodType').value || 'cosmetic';
       const resolvedTitle = state.productTitle || deriveCustomProductTitle(rawText, state.lang) || `EAN ${code}`;
       const customCatalog = loadSavedJson('incifact_custom_barcodes_v1', {});
@@ -4208,11 +4221,11 @@
                 </div>
                 <div style="display:flex; flex-wrap:wrap; gap:5px;">
                   <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:8px; background:var(--bg); border:1px solid var(--line); color:var(--ink);">🏛️ ${escapeHtml(regReport.datasetManifest.activeJurisdiction)} · ${escapeHtml(regReport.datasetManifest.selectedHalalAuthority)}</span>
-                  <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:8px; background:var(--bg); border:1px solid var(--line); color:var(--ink);">📚 ${formatDigits((regReport.citedOfficialSources || []).length, state.lang)} Resmi Kaynak</span>
-                  <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:8px; background:${(regReport.detectedAllergens || []).length > 0 ? 'var(--warn-bg)' : 'var(--ok-bg)'}; color:${(regReport.detectedAllergens || []).length > 0 ? 'var(--warn)' : 'var(--ok)'};">⚠️ ${formatDigits((regReport.detectedAllergens || []).length, state.lang)} Alerjen</span>
+                  <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:8px; background:var(--bg); border:1px solid var(--line); color:var(--ink);">📚 ${formatDigits((regReport.citedOfficialSources || []).length, state.lang)} ${escapeHtml(regReport.sourcesBadgeLabel)}</span>
+                  <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:8px; background:${(regReport.detectedAllergens || []).length > 0 ? 'var(--warn-bg)' : 'var(--ok-bg)'}; color:${(regReport.detectedAllergens || []).length > 0 ? 'var(--warn)' : 'var(--ok)'};">⚠️ ${formatDigits((regReport.detectedAllergens || []).length, state.lang)} ${escapeHtml(regReport.allergensBadgeLabel)}</span>
                   ${
                     (regReport.transitionCalendarItems || []).length > 0
-                      ? `<span style="font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:8px; background:var(--bad-bg); color:var(--bad);">⏳ ${formatDigits(regReport.transitionCalendarItems.length, state.lang)} Omnibus Takvim</span>`
+                      ? `<span style="font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:8px; background:var(--bad-bg); color:var(--bad);">⏳ ${formatDigits(regReport.transitionCalendarItems.length, state.lang)} ${escapeHtml(regReport.calendarBadgeLabel)}</span>`
                       : ''
                   }
                 </div>
