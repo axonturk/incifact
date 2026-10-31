@@ -3832,7 +3832,7 @@
             alertLevel: extraAlert.level || (extraKind === 'bad' ? 'kirmizi' : extraKind === 'warn' ? 'sari' : 'veri_yok'),
             levelText: extraAlert.profile === 'ozel_kara_liste' ? profName : `${levelPrefix} · ${profName}`,
             whyText: extraAlert.explanation,
-            sources: extraAlert.sources || []
+            sources: (extraAlert.sources || []).map((s) => (typeof s === 'string' ? s : (s && (s.id || s.short_label || s.title)) || '')).filter(Boolean)
           });
         }
       }
@@ -4119,10 +4119,12 @@
                   <span style="font-size:12.5px; line-height:1.38; color:var(--muted);">${escapeHtml(it.whyText)}</span>
                   <div style="display:flex; flex-wrap:wrap; gap:5px;">
                     ${it.sources
-                      .map(
-                        (s) =>
-                          `<span class="mono" dir="ltr" style="font-size:10.5px; padding:2px 8px; border-radius:10px; border:1px solid var(--line); color:var(--ink);">${escapeHtml(s)} ↗</span>`
-                      )
+                      .map((s) => {
+                        const sText = typeof s === 'string' ? s : (s && (s.id || s.short_label || s.title)) || '';
+                        return sText
+                          ? `<span class="mono" dir="ltr" style="font-size:10.5px; padding:2px 8px; border-radius:10px; border:1px solid var(--line); color:var(--ink);">${escapeHtml(sText)} ↗</span>`
+                          : '';
+                      })
                       .join('')}
                   </div>
                 </div>
