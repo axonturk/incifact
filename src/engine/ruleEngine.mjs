@@ -1942,6 +1942,7 @@ export function evaluateProduct({
         const itemLabel = obs.localizedName || obs.raw;
         profileAlerts.push({
           profile: 'astim_alerji',
+          allergenId: matchedAllergen.id,
           substanceName: aName,
           localizedName: itemLabel,
           rawToken: obs.raw,
@@ -1983,6 +1984,8 @@ export function evaluateProduct({
       }[lang] || { name: 'Cross-Contact Trace Warning', loc: `May Contain Traces: ${traceTarget}`, exp: `Packaging declares a cross-contact trace warning: "${traceRaw}". Poses a cross-contamination risk for allergic individuals.` };
       profileAlerts.push({
         profile: 'astim_alerji',
+        allergenId: matchedTraceAllergens.length === 1 ? matchedTraceAllergens[0].id : undefined,
+        allergenIds: matchedTraceAllergens.map((a) => a.id),
         substanceName: traceI18n.name,
         localizedName: traceI18n.loc,
         rawToken: traceRaw,
@@ -2629,6 +2632,8 @@ export function evaluateProduct({
   const swapGuideCard = buildSwapGuideCard({
     lang,
     productType,
+    rawText,
+    allergenStatement,
     observations,
     regulatoryCard,
     profileCard,
@@ -3673,44 +3678,44 @@ const SWAP_RULES_10LANG = {
   swap_added_sugar_syrup: {
     category: 'sugar_nutrition',
     tr: {
-      lookFor: '%100 Hurma Özü / Meyve Püresi, Stevia (E960), Eritritol (E968), Ksilitol (E967) veya "İlave Şekersiz / Glukoz-Fruktoz Şurupsuz" Etiketli Ürünler',
-      why: 'Rafine şeker, glukoz-fruktoz şurubu ve maltodekstrin ani kan şekeri dalgalanması yaratır; lifli meyve özleri veya doğal stevia/poliol alternatifleri glisemik yükü düşürür.'
+      lookFor: '"İlave Şekersiz / Şurupsuz" Etiketli Ürünler, Lif Bütünlüğü Korunmuş Tam Meyve/Hurma Ezmesi veya Stevia (E960) / Eritritol (E968)',
+      why: 'Rafine şeker, glukoz-fruktoz şurubu ve maltodekstrin hızlı emilen karbonhidratlardır. Not: EFSA ve DSÖ tanımlarına göre şuruplar ve meyve suyu konsantreleri de "serbest şeker" sayılır; glisemik etki tek başına "meyve/hurma" adına değil, lif bütünlüğüne, porsiyon miktarına ve ürünün toplam karbonhidrat bileşimine bağlıdır.'
     },
     en: {
-      lookFor: '100% Date/Fruit Puree, Stevia (E960), Erythritol (E968), Xylitol (E967), or products labeled "No Added Sugar / Glucose-Fructose Syrup-Free"',
-      why: 'Refined sucrose, glucose-fructose syrup, and maltodextrin spike blood glucose rapidly; whole-fruit purees or stevia/polyols lower glycemic load.'
+      lookFor: '"No Added Sugar / Syrup-Free" products, whole fruit/date paste with intact fiber, or Stevia (E960) / Erythritol (E968)',
+      why: 'Refined sucrose, glucose-fructose syrup, and maltodextrin are rapidly absorbed carbohydrates. Note: Under EFSA and WHO definitions, syrups and fruit juice concentrates also count as "free sugars"; glycemic impact depends on intact fiber, portion size, and total product composition rather than a "fruit/date" label alone.'
     },
     ar: {
-      lookFor: 'خلاصة التمر أو الفاكهة الطبيعية 100%، ستيفيا (E960)، إريثريتول (E968)، أو المنتجات التي تحمل عبارة "بدون سكر مضاف / خالٍ من شراب الجلوكوز والفركتوز"',
-      why: 'السكر المكرر وشراب الجلوكوز والفركتوز والمالتوديكسترين ترفع سكر الدم بسرعة؛ بدائل الفاكهة الكاملة أو الستيفيا تخفض المؤشر الجلايسيمي.'
+      lookFor: 'المنتجات التي تحمل عبارة "بدون سكر أو شراب مضاف"، معجون الفاكهة/التمر الكامل المحتفظ بالألياف، أو ستيفيا (E960) / إريثريتول (E968)',
+      why: 'السكر المكرر وشراب الجلوكوز والفركتوز والمالتوديكسترين كربوهيدرات سريعة الامتصاص. ملاحظة: وفق تعريفات EFSA ومنظمة الصحة العالمية، تُعد العصائر المركزة والشراب "سكريات حرة" أيضاً؛ لذا يعتمد الأثر الجلايسيمي على الألياف الكاملة وحجم الحصة والتركيبة الكلية للمنتج وليس مجرد اسم الفاكهة/التمر.'
     },
     de: {
-      lookFor: '100 % Dattel-/Fruchtmark, Stevia (E960), Erythrit (E968), Xylit (E967) oder Produkte mit „Ohne Zuckerzusatz / Ohne Glukose-Fruktose-Sirup“',
-      why: 'Raffinierter Zucker, Glukose-Fruktose-Sirup und Maltodextrin lassen den Blutzucker stark ansteigen; Fruchtmark oder Stevia/Erythrit senken die glykämische Last.'
+      lookFor: 'Produkte mit „Ohne Zuckerzusatz / Ohne Glukose-Fruktose-Sirup“, ballaststoffreiches Vollfrucht-/Dattelmus oder Stevia (E960) / Erythrit (E968)',
+      why: 'Raffinierter Zucker, Glukose-Fruktose-Sirup und Maltodextrin sind schnell resorbierbare Kohlenhydrate. Hinweis: Laut EFSA und WHO zählen auch Sirupe und Fruchtsaftkonzentrate zu den „freien Zuckern“; die glykämische Wirkung hängt von Ballaststoffgehalt, Portionsgröße und Gesamtrezeptur ab.'
     },
     fr: {
-      lookFor: 'Purée de dattes/fruits 100 %, Stévia (E960), Érythritol (E968) ou mention « Sans sucres ajoutés / Sans sirop de glucose-fructose »',
-      why: 'Le sucre raffiné, le sirop de glucose-fructose et la maltodextrine provoquent des pics glycémiques ; les purées de fruits ou la stévia réduisent la charge glycémique.'
+      lookFor: 'Produits « Sans sucres ajoutés / Sans sirop de glucose-fructose », pâte de fruits/dattes entiers riche en fibres ou Stévia (E960) / Érythritol (E968)',
+      why: 'Le sucre raffiné, le sirop de glucose-fructose et la maltodextrine sont des glucides rapides. Note : selon l’EFSA et l’OMS, les sirops et jus concentrés comptent aussi comme « sucres libres » ; l’impact glycémique dépend des fibres intactes, de la portion et de la composition globale du produit.'
     },
     id: {
-      lookFor: 'Sari Kurma / Puree Buah 100%, Stevia (E960), Eritritol (E968), atau produk berlabel "Tanpa Gula Tambahan / Bebas Sirup Glukosa-Fruktosa"',
-      why: 'Gula rafinasi, sirup glukosa-fruktosa, dan maltodekstrin memicu lonjakan gula darah; sari buah utuh atau stevia memiliki beban glikemik lebih rendah.'
+      lookFor: 'Produk berlabel "Tanpa Gula Tambahan / Bebas Sirup Glukosa-Fruktosa", pasta buah/kurma utuh berserat, atau Stevia (E960) / Eritritol (E968)',
+      why: 'Gula rafinasi, sirup glukosa-fruktosa, dan maltodekstrin diserap cepat. Catatan: Menurut definisi EFSA dan WHO, sirup serta konsentrat jus buah juga termasuk "gula bebas"; dampak glikemik bergantung pada keutuhan serat, ukuran porsi, dan komposisi total produk.'
     },
     ms: {
-      lookFor: 'Puri Kurma / Buah 100%, Stevia (E960), Eritritol (E968) atau produk berlabel "Tanpa Gula Tambahan / Bebas Sirap Glukosa-Fruktosa"',
-      why: 'Gula bertapis, sirap glukosa-fruktosa dan maltodekstrin meningkatkan gula darah secara mendadak; puri buah atau stevia merendahkan beban glisemik.'
+      lookFor: 'Produk berlabel "Tanpa Gula Tambahan / Bebas Sirap Glukosa-Fruktosa", pes buah/kurma penuh berserat atau Stevia (E960) / Eritritol (E968)',
+      why: 'Gula bertapis, sirap glukosa-fruktosa dan maltodekstrin diserap dengan cepat. Nota: Menurut takrifan EFSA dan WHO, sirap dan pati jus buah juga dikira sebagai "gula bebas"; kesan glisemik bergantung pada serat utuh, saiz hidangan dan komposisi keseluruhan produk.'
     },
     es: {
-      lookFor: 'Puré de dátiles/fruta 100 %, Estevia (E960), Eritritol (E968) o productos «Sin azúcares añadidos / Sin jarabe de glucosa-fructosa»',
-      why: 'El azúcar refinado, el jarabe de glucosa-fructosa y la maltodextrina elevan rápido la glucosa; la fruta entera o la estevia reducen la carga glucémica.'
+      lookFor: 'Productos «Sin azúcares añadidos / Sin jarabe de glucosa-fructosa», pasta de fruta/dátil entero con fibra o Estevia (E960) / Eritritol (E968)',
+      why: 'El azúcar refinado, el jarabe de glucosa-fructosa y la maltodextrina son carbohidratos de absorción rápida. Nota: según la EFSA y la OMS, los jarabes y concentrados de zumo también son «azúcares libres»; el impacto glucémico depende de la fibra intacta, la porción y la composición total.'
     },
     ru: {
-      lookFor: '100% финиковая/фруктовая паста, стевия (E960), эритрит (E968) или маркировка «Без добавленного сахара и глюкозно-фруктозного сиропа»',
-      why: 'Рафинированный сахар, глюкозно-фруктозный сироп и мальтодекстрин вызывают скачки глюкозы; фруктовое пюре и стевия снижают гликемическую нагрузку.'
+      lookFor: 'Продукты с маркировкой «Без добавленного сахара и сиропов», паста из цельных фруктов/фиников с клетчаткой или стевия (E960) / эритрит (E968)',
+      why: 'Рафинированный сахар, глюкозно-фруктозный сироп и мальтодекстрин быстро усваиваются. Примечание: по определениям EFSA и ВОЗ сиропы и концентраты соков также относятся к «свободным сахарам»; гликемический ответ зависит от сохранности клетчатки, размера порции и общего состава продукта.'
     },
     ur: {
-      lookFor: '100% کھجور یا پھلوں کا گودا، اسٹیویا (E960)، ایرتھریٹول (E968) یا "بغیر اضافی چینی / گلوکوز فرکٹوز سیرپ سے پاک" مصنوعات',
-      why: 'ریفائنڈ چینی، گلوکوز فرکٹوز سیرپ اور مالٹوڈیکسٹرین خون میں شوگر کو تیزی سے بڑھاتے ہیں؛ کھجور/پھلوں کا عرق یا اسٹیویا گلائسیمک بوجھ کم کرتے ہیں۔'
+      lookFor: '"بغیر اضافی چینی / گلوکوز فرکٹوز سیرپ سے پاک" مصنوعات، فائبر سے بھرپور مکمل پھل/کھجور کا پیسٹ، یا اسٹیویا (E960) / ایرتھریٹول (E968)',
+      why: 'ریفائنڈ چینی، گلوکوز فرکٹوز سیرپ اور مالٹوڈیکسٹرین تیزی سے جذب ہونے والے کاربوہائیڈریٹس ہیں۔ نوٹ: EFSA اور WHO کے مطابق سیرپ اور پھلوں کے جوس کنسنٹریٹ بھی "فری شوگر" میں شمار ہوتے ہیں؛ گلائسیمک اثر صرف پھل/کھجور کے نام پر نہیں بلکہ فائبر، مقدار (پورشن) اور پروڈکٹ کی مجموعی ترکیب پر منحصر ہے۔'
     }
   },
   swap_custom_watchlist: {
@@ -3801,7 +3806,47 @@ function resolveHalalRuleSwapKey(ruleId) {
   }
 }
 
-function resolveSubstanceSwapKey(substanceId) {
+function resolveAllergenSwapKey(allergenId) {
+  switch (allergenId) {
+    case 'soy':
+    case 'allergen_soy':
+      return 'swap_allergen_soy_lecithin';
+    case 'milk':
+    case 'allergen_milk_dairy':
+      return 'swap_allergen_dairy_milk';
+    case 'gluten':
+    case 'allergen_gluten_wheat':
+      return 'swap_allergen_gluten_wheat';
+    case 'peanut':
+    case 'allergen_peanuts':
+    case 'tree_nuts':
+    case 'allergen_tree_nuts':
+    case 'egg':
+    case 'allergen_egg':
+    case 'sesame':
+    case 'allergen_sesame':
+    case 'mustard':
+    case 'allergen_mustard':
+    case 'celery':
+    case 'allergen_celery':
+    case 'lupin':
+    case 'allergen_lupin':
+    case 'fish':
+    case 'allergen_fish':
+    case 'crustaceans':
+    case 'allergen_crustaceans':
+    case 'molluscs':
+    case 'allergen_molluscs':
+    case 'sulphites':
+    case 'sulfites_e220_e228':
+    case 'lysozyme_e1105_egg':
+    case 'cross_contact_trace_allergen':
+    default:
+      return 'swap_allergen_nuts_other';
+  }
+}
+
+function resolveSubstanceSwapKey(substanceId, productType = 'cosmetic') {
   switch (substanceId) {
     case 'mi_mci':
     case 'formaldehyde_releasers':
@@ -3852,7 +3897,14 @@ function resolveSubstanceSwapKey(substanceId) {
     case 'msg_e621':
     case 'phosphates_e338_e452':
     case 'artificial_sweeteners_aspartame_acesulfame_sucralose':
+    case 'flavor_enhancers_nucleotides_e627_e635':
       return 'swap_food_dyes_additives';
+    case 'e471_mono_and_diglycerides':
+    case 'food_emulsifiers_lecithin_pgpr':
+      return 'swap_emulsifier_e471';
+    case 'food_flavourings_aroma':
+    case 'vanilla_extract_alcoholic_carrier':
+      return 'swap_aroma_vanilla_carrier';
     case 'alcohol_denat':
     case 'isopropyl_alcohol':
       return 'swap_ethanol_alcohol';
@@ -3876,16 +3928,30 @@ function resolveSubstanceSwapKey(substanceId) {
     case 'lysozyme_e1105_egg':
     case 'cross_contact_trace_allergen':
       return 'swap_allergen_nuts_other';
+    case 'common_whole_food_ingredients':
+    case 'expanded_whole_foods_meats_spices_vitamins':
+      return null;
     default:
-      return 'swap_uv_filters_silicones_nail';
+      return productType === 'food' ? 'swap_food_dyes_additives' : 'swap_uv_filters_silicones_nail';
   }
 }
 
-function buildSwapGuideCard({ lang, productType, observations, regulatoryCard, profileCard, halalCard, veganSugarCard }) {
+function buildSwapGuideCard({
+  lang,
+  productType,
+  rawText = '',
+  allergenStatement = '',
+  observations,
+  regulatoryCard,
+  profileCard,
+  halalCard,
+  veganSugarCard
+}) {
   const ui = SWAP_GUIDE_UI_I18N[lang] || SWAP_GUIDE_UI_I18N.en;
   const grouped = new Map();
 
   function addSwapTrigger(swapKey, detectedName, severity) {
+    if (!swapKey) return;
     const ruleDef = SWAP_RULES_10LANG[swapKey];
     if (!ruleDef) return;
     const locRule = ruleDef[lang] || ruleDef.en;
@@ -3925,7 +3991,7 @@ function buildSwapGuideCard({ lang, productType, observations, regulatoryCard, p
   // 2. Regulatory & Safety findings (Banned, Restricted, Warning)
   for (const f of regulatoryCard.findings || []) {
     if (f.euStatus !== 'izinli' && f.euStatus !== 'serbest' && f.severity !== 'bilgi') {
-      const key = resolveSubstanceSwapKey(f.substanceId);
+      const key = resolveSubstanceSwapKey(f.substanceId, productType);
       const sev = f.euStatus === 'yasak' || f.severity === 'yuksek' ? 'kirmizi' : 'sari';
       addSwapTrigger(key, f.localizedName || f.name || f.rawToken, sev);
     }
@@ -3933,33 +3999,84 @@ function buildSwapGuideCard({ lang, productType, observations, regulatoryCard, p
 
   // 3. Active Profile & Custom Watchlist Alerts
   for (const a of profileCard.alerts || []) {
+    const sev = a.level === 'kirmizi' ? 'kirmizi' : 'sari';
+    const label = a.localizedName || a.substanceName || a.rawToken;
     if (a.profile === 'ozel_kara_liste') {
       addSwapTrigger('swap_custom_watchlist', a.localizedName || a.watchTerm || a.rawToken, 'kirmizi');
+    } else if (Array.isArray(a.allergenIds) && a.allergenIds.length > 0) {
+      for (const aid of a.allergenIds) {
+        addSwapTrigger(resolveAllergenSwapKey(aid), label, sev);
+      }
+    } else if (a.allergenId) {
+      addSwapTrigger(resolveAllergenSwapKey(a.allergenId), label, sev);
+    } else if (a.rawToken === 'Caffeine' || a.rawToken === 'Taurine/Inositol') {
+      addSwapTrigger('swap_food_dyes_additives', label, sev);
     } else {
       const obs = (observations || []).find((o) => o.position === a.position);
       const subId = obs && obs.substance ? obs.substance.id : '';
-      const key = subId ? resolveSubstanceSwapKey(subId) : 'swap_allergen_nuts_other';
-      addSwapTrigger(key, a.localizedName || a.substanceName || a.rawToken, a.level === 'kirmizi' ? 'kirmizi' : 'sari');
+      const key = subId ? resolveSubstanceSwapKey(subId, productType) : null;
+      if (key) {
+        addSwapTrigger(key, label, sev);
+      }
     }
   }
 
-  // 4. Major Food Allergens & Cross-Contact Trace Allergens present in observations (even when no profile is toggled)
+  // 4. Major Food Allergens & Cross-Contact Trace Allergens present in observations or allergenStatement (even when no profile is toggled)
   if (productType === 'food') {
+    const TRACE_ALLERGEN_I18N = {
+      gluten: { tr: 'Gluten / Buğday', en: 'Gluten / Wheat', ar: 'الغلوتين / القمح', de: 'Gluten / Weizen', fr: 'Gluten / Blé', id: 'Gluten / Gandum', ms: 'Gluten / Gandum', es: 'Gluten / Trigo', ru: 'Глютен / Пшеница', ur: 'گلوٹین / گندم' },
+      crustaceans: { tr: 'Kabuklular', en: 'Crustaceans', ar: 'القشريات', de: 'Krebstiere', fr: 'Crustacés', id: 'Krustasea', ms: 'Krustasea', es: 'Crustáceos', ru: 'Ракообразные', ur: 'کرسٹیشینز' },
+      egg: { tr: 'Yumurta', en: 'Egg', ar: 'البيض', de: 'Ei', fr: 'Œuf', id: 'Telur', ms: 'Telur', es: 'Huevo', ru: 'Яйцо', ur: 'انڈہ' },
+      fish: { tr: 'Balık', en: 'Fish', ar: 'السمك', de: 'Fisch', fr: 'Poisson', id: 'Ikan', ms: 'Ikan', es: 'Pescado', ru: 'Рыба', ur: 'مچھلی' },
+      peanut: { tr: 'Yer Fıstığı', en: 'Peanuts', ar: 'الفول السوداني', de: 'Erdnüsse', fr: 'Arachides', id: 'Kacang Tanah', ms: 'Kacang Tanah', es: 'Cacahuetes', ru: 'Арахис', ur: 'مونگ پھلی' },
+      soy: { tr: 'Soya', en: 'Soy / Soya', ar: 'الصويا', de: 'Soja', fr: 'Soja', id: 'Kedelai (Soya)', ms: 'Soya', es: 'Soja', ru: 'Соя', ur: 'سویا' },
+      milk: { tr: 'Süt / Süt Ürünleri', en: 'Milk / Dairy', ar: 'الحليب / الألبان', de: 'Milch / Laktose', fr: 'Lait / Produits laitiers', id: 'Susu / Produk Susu', ms: 'Susu / Produk Tenusu', es: 'Leche / Lácteos', ru: 'Молоко / Лактоза', ur: 'دودھ / ڈیری' },
+      tree_nuts: { tr: 'Sert Kabuklu Yemişler (Fındık/Badem)', en: 'Tree Nuts (Hazelnuts/Almonds)', ar: 'المكسرات (بندق/لوز)', de: 'Schalenfrüchte (Haselnüsse/Mandeln)', fr: 'Fruits à coque (Noisettes/Amandes)', id: 'Kacang Pohon (Hazel/Almond)', ms: 'Kekacang Pokok (Hazel/Badam)', es: 'Frutos de cáscara (Avellanas/Almendras)', ru: 'Орехи (Фундук/Миндаль)', ur: 'میوہ جات (ہیزل نٹ/بادام)' },
+      celery: { tr: 'Kereviz', en: 'Celery', ar: 'الكرفس', de: 'Sellerie', fr: 'Céleri', id: 'Seledri', ms: 'Saderi', es: 'Apio', ru: 'Сельдерей', ur: 'اجوائن / سیلری' },
+      mustard: { tr: 'Hardal', en: 'Mustard', ar: 'الخردل', de: 'Senf', fr: 'Moutarde', id: 'Mustar', ms: 'Biji Sawi (Mustard)', es: 'Mostaza', ru: 'Горчица', ur: 'رائی (مسٹرڈ)' },
+      sesame: { tr: 'Susam', en: 'Sesame', ar: 'السمسم', de: 'Sesam', fr: 'Sésame', id: 'Wijen', ms: 'Bijan', es: 'Sésamo', ru: 'Кунжут', ur: 'تل (سیسم)' },
+      sulphites: { tr: 'Sülfitler', en: 'Sulphites', ar: 'الكبريتيت', de: 'Sulfite', fr: 'Sulfites', id: 'Sulfit', ms: 'Sulfit', es: 'Sulfitos', ru: 'Сульфиты', ur: 'سلفائٹس' },
+      lupin: { tr: 'Acıbakla (Lüpen)', en: 'Lupin', ar: 'الترمس', de: 'Lupinen', fr: 'Lupin', id: 'Lupin', ms: 'Lupin', es: 'Altramuces', ru: 'Люпин', ur: 'لوپن' },
+      molluscs: { tr: 'Yumuşakçalar', en: 'Molluscs', ar: 'الرخويات', de: 'Weichtiere', fr: 'Mollusques', id: 'Moluska', ms: 'Moluska', es: 'Moluscos', ru: 'Моллюски', ur: 'مولسکس' }
+    };
+    const TRACE_PREFIX_I18N = {
+      tr: (t) => `Eser Miktarda: ${t}`,
+      en: (t) => `May Contain Traces: ${t}`,
+      ar: (t) => `قد يحتوي على آثار: ${t}`,
+      de: (t) => `Spuren möglich: ${t}`,
+      fr: (t) => `Traces possibles : ${t}`,
+      id: (t) => `Jejak Alergen: ${t}`,
+      ms: (t) => `Mungkin Mengandungi: ${t}`,
+      es: (t) => `Posibles trazas: ${t}`,
+      ru: (t) => `Возможны следы: ${t}`,
+      ur: (t) => `معمولی ذرات ممکن: ${t}`
+    };
+    const TRACE_PATTERNS = [
+      { id: 'milk', re: /(?:^|[^\p{L}\p{N}])(milk|süt|sut|dairy|lactose|laktoz|milch|lait|leche|latte|susu|молок[а-я]*|حليب|لبن|دودھ|whey|casein|kazein)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'soy', re: /(?:^|[^\p{L}\p{N}])(soy|soya|soja|kedelai|соя|соев[а-я]*|صويا|سویا|sojalecithin|soybean[s]?)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'gluten', re: /(?:^|[^\p{L}\p{N}])(wheat|buğday|bugday|gluten|weizen|blé|ble|trigo|gandum|пшениц[а-я]*|دقيق|قمح|گندم|arpa|barley|çavdar|rye|oats|yulaf|spelt|kamut)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'tree_nuts', re: /(?:^|[^\p{L}\p{N}])(nut[s]?|hazelnut[s]?|haseln[üu]ss[e]?|fındık|findik|noisette[s]?|avellana[s]?|фундук|بندق|ہیزل|almond[s]?|badem|mandel[n]?|amande[s]?|almendra[s]?|миндаль|لوز|بادام|walnut[s]?|ceviz|cashew[s]?|kaju|pistachio[s]?|fıstık|fistik|pecan[s]?|macadamia)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'peanut', re: /(?:^|[^\p{L}\p{N}])(peanut[s]?|yer\s*fıst[ıi]ğ[ıi]|arachide[s]?|erdnuss|erdnüsse|cacahuete[s]?|арахис|فول\s+سوداني|مونگ\s*پھلی)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'egg', re: /(?:^|[^\p{L}\p{N}])(egg[s]?|yumurta|oeuf[s]?|ei|eier|huevo[s]?|яйц[а-я]*|بيض|انڈہ|انڈے)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'sesame', re: /(?:^|[^\p{L}\p{N}])(sesame|susam|tahin|tahini|sésame|sesam|sésamo|кунжут|سمسم|تل)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'mustard', re: /(?:^|[^\p{L}\p{N}])(mustard|hardal|senf|moutarde|mostaza|горчиц[а-я]*|خردل|رائی)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'celery', re: /(?:^|[^\p{L}\p{N}])(celery|kereviz|sellerie|céleri|apio|сельдерей|كرفس|اجوائن)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'lupin', re: /(?:^|[^\p{L}\p{N}])(lupin[e]?|ac[ıi]\s*bakla|lüpen|altramuz|люпин|ترمس|لوپن)(?=[^\p{L}\p{N}]|$)/iu },
+      { id: 'sulphites', re: /(?:^|[^\p{L}\p{N}])(sulphite[s]?|sulfite[s]?|sülfit|sulfit|schwefeldioxid|كبريتيت|سلفائٹ|e220|e221|e222|e223|e224|e226|e227|e228)(?=[^\p{L}\p{N}]|$)/iu }
+    ];
+
     for (const obs of observations || []) {
       const rawStr = String(obs.raw || '');
       const isCrossContactToken = /(?:may\s+contain|traces?\s+of|eser\s+miktarda|kann\s+spuren|peut\s+contenir|puede\s+contener|قد\s+يحتوي|может\s+содержать|میں\s+شامل)/iu.test(rawStr);
       if (isCrossContactToken) {
-        const isMilkTrace = /\b(milk|süt|sut|dairy|lactose|laktoz|milch|lait|leche|susu)\b|حليب|لبن|دودھ|молоко/iu.test(rawStr);
-        const isSoyTrace = /\b(soy|soya|soja|kedelai)\b|صويا|سویا|соя/iu.test(rawStr);
-        const isGlutenTrace = /\b(wheat|gluten|buğday|bugday|weizen|blé|trigo|gandum)\b|قمح|غلوتين|گندم|пшениц/iu.test(rawStr);
-        const key = isMilkTrace
-          ? 'swap_allergen_dairy_milk'
-          : isSoyTrace
-          ? 'swap_allergen_soy_lecithin'
-          : isGlutenTrace
-          ? 'swap_allergen_gluten_wheat'
-          : 'swap_allergen_nuts_other';
-        addSwapTrigger(key, obs.localizedName || obs.raw, 'sari');
+        const matchedTrace = TRACE_PATTERNS.filter((p) => p.re.test(rawStr));
+        if (matchedTrace.length > 0) {
+          for (const mt of matchedTrace) {
+            addSwapTrigger(resolveAllergenSwapKey(mt.id), obs.localizedName || obs.raw, 'sari');
+          }
+        } else {
+          addSwapTrigger('swap_allergen_nuts_other', obs.localizedName || obs.raw, 'sari');
+        }
         continue;
       }
 
@@ -3984,6 +4101,24 @@ function buildSwapGuideCard({ lang, productType, observations, regulatoryCard, p
       }
       if (/(?:^|[^\p{L}\p{N}])(hazelnut[s]?|haseln[üu]ss[e]?|fındık|findik|noisette[s]?|avellana[s]?|фундук|بندق|ہیزل|almond[s]?|badem|mandel[n]?|amande[s]?|almendra[s]?|миндаль|لوز|بادام|walnut[s]?|ceviz|walnuss|noix|nuez|nueces|cashew[s]?|kaju|pistachio[s]?|fıstık|fistik|peanut[s]?|arachide[s]?|erdnuss|erdnüsse|cacahuete[s]?|арахис|مونگ\s*پھلی|egg[s]?|yumurta|oeuf[s]?|huevo[s]?|яйц[а-я]*|بيض|انڈہ|sesame|susam|tahin|tahini|кунжут|سمسم|تل|sulphite[s]?|sulfite[s]?|sülfit|sulfit|e220|e221|e222|e223|e224)(?=[^\p{L}\p{N}]|$)/iu.test(scanText)) {
         addSwapTrigger('swap_allergen_nuts_other', obs.localizedName || obs.raw, 'sari');
+      }
+    }
+
+    // Check cross-contact trace warnings across rawText + allergenStatement even when astim_alerji profile is off
+    const fullCrossContact = `${rawText || ''} ${allergenStatement || ''}`;
+    const ccMatch = fullCrossContact.match(/(?:may\s+contain|traces?\s+of|eser\s+miktarda\s+(?:içerebilir|bulunabilir)|kann\s+spuren\s+von|peut\s+contenir\s+des\s+traces|puede\s+contener\s+trazas|قد\s+يحتوي\s+على|может\s+содержать\s+следы|میں\s+شامل\s+ہو\s+سکتا\s+ہے)\s*[:\-–]?\s*([^.,;\n]+)/iu);
+    if (ccMatch) {
+      const rawTarget = ccMatch[1].trim();
+      const matchedTraces = TRACE_PATTERNS.filter((p) => p.re.test(rawTarget));
+      const prefixFn = TRACE_PREFIX_I18N[lang] || TRACE_PREFIX_I18N.en;
+      if (matchedTraces.length > 0) {
+        for (const mt of matchedTraces) {
+          const aMap = TRACE_ALLERGEN_I18N[mt.id] || {};
+          const aLoc = aMap[lang] || aMap.en || rawTarget;
+          addSwapTrigger(resolveAllergenSwapKey(mt.id), prefixFn(aLoc), 'sari');
+        }
+      } else {
+        addSwapTrigger('swap_allergen_nuts_other', prefixFn(rawTarget), 'sari');
       }
     }
   }
@@ -4580,10 +4715,12 @@ export function lookupBarcodeProduct({
   const applicationType = entry.applicationType || evaluationOptions.applicationType || null;
   const rawText = String(entry.rawText).trim();
 
+  const allergenStatement = entry.allergenStatement || evaluationOptions.allergenStatement || '';
+
   const evaluation = evaluateProduct({
     ...evaluationOptions,
     rawText,
-    allergenStatement: entry.allergenStatement || evaluationOptions.allergenStatement || '',
+    allergenStatement,
     productType,
     applicationType,
     lang
@@ -4603,6 +4740,7 @@ export function lookupBarcodeProduct({
     productType,
     applicationType,
     rawText,
+    allergenStatement,
     source: entry.source || 'Open Food / Beauty Facts (ODbL)',
     updatedAt: entry.updatedAt || '2026-10-30',
     coveragePercent,

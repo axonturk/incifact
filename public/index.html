@@ -1867,7 +1867,9 @@
             barcode: data.barcode,
             productName: data.productName,
             productType: data.productType,
+            applicationType: data.applicationType || null,
             rawText: data.rawText,
+            allergenStatement: data.allergenStatement || '',
             source: data.source,
             updatedAt: data.updatedAt,
             cachedAt: nowMs
@@ -1881,7 +1883,9 @@
           barcode: data.barcode,
           productName: data.productName,
           productType: data.productType,
+          applicationType: data.applicationType || null,
           rawText: data.rawText,
+          allergenStatement: data.allergenStatement || '',
           source: data.source,
           updatedAt: data.updatedAt,
           requiresOcrFallback: Boolean(data.requiresOcrFallback),
@@ -2460,6 +2464,8 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           rawText,
+          allergenStatement: (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '',
+          applicationType: (state.activeBarcodeMeta && state.activeBarcodeMeta.applicationType) || undefined,
           productType,
           jurisdiction: state.jurisdiction || 'EU',
           userProfiles: activeProfiles,
@@ -3786,6 +3792,25 @@
           sources
         };
       });
+
+      for (const extraAlert of prof.alerts || []) {
+        if (!obs.some((o) => o.position === extraAlert.position)) {
+          const profName =
+            extraAlert.profile === 'ozel_kara_liste'
+              ? ft.watchlistBadge
+              : loc.profileScreen.profiles[extraAlert.profile]
+              ? loc.profileScreen.profiles[extraAlert.profile].name
+              : extraAlert.profile;
+          allRows.push({
+            pos: extraAlert.position,
+            name: extraAlert.localizedName || extraAlert.substanceName || extraAlert.rawToken,
+            kind: extraAlert.profile === 'ozel_kara_liste' || extraAlert.level === 'kirmizi' ? 'warn' : 'info',
+            levelText: extraAlert.profile === 'ozel_kara_liste' ? profName : `${u.infoBadge} · ${profName}`,
+            whyText: extraAlert.explanation,
+            sources: extraAlert.sources || []
+          });
+        }
+      }
 
       const flaggedRows = allRows.filter((r) => r.kind !== 'ok');
       const visibleRows = state.showAllIngredients ? allRows : flaggedRows;

@@ -298,6 +298,8 @@ export default function InciFactMobileApp() {
       evaluateProduct({
         rawText,
         productType,
+        applicationType: barcodeMeta?.applicationType || undefined,
+        allergenStatement: barcodeMeta?.allergenStatement || '',
         userProfiles: selectedProfiles,
         customWatchlist,
         halalAuthority,
@@ -309,7 +311,7 @@ export default function InciFactMobileApp() {
         userConfirmations: confirmations,
         lang
       }),
-    [rawText, productType, selectedProfiles, customWatchlist, halalAuthority, halalCert, veganStatus, confirmations, lang]
+    [rawText, productType, barcodeMeta, selectedProfiles, customWatchlist, halalAuthority, halalCert, veganStatus, confirmations, lang]
   );
 
   const comparison = useMemo(
@@ -933,6 +935,20 @@ export default function InciFactMobileApp() {
                 style={{ color: theme.text, fontSize: 12, lineHeight: 19, marginBottom: 6, textAlign: isRtl ? 'right' : 'left' }}
               >
                 • <Text style={{ fontWeight: '700' }}>{f.localizedName || f.name}</Text>: {f.status === 'yasak' || f.effectiveStatus === 'yasak' ? t.badges.banned : t.badges.restricted}
+              </Text>
+            ))}
+            {(evalMain.cards.profileCard?.alerts || []).map((pa: any, idx: number) => (
+              <Text
+                key={`pa-${idx}`}
+                style={{
+                  color: (pa.level || pa.severity) === 'kirmizi' ? '#DC2626' : '#D97706',
+                  fontSize: 12,
+                  lineHeight: 19,
+                  marginBottom: 6,
+                  textAlign: isRtl ? 'right' : 'left'
+                }}
+              >
+                {(pa.level || pa.severity) === 'kirmizi' ? '🔴' : '🟡'} <Text style={{ fontWeight: '700' }}>{pa.localizedName || pa.rawToken}</Text>: {pa.explanation || pa.reason}
               </Text>
             ))}
             {evalMain.cards.halalCard.falsePositiveShields.map((sh: any, idx: number) => (

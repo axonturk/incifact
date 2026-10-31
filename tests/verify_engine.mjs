@@ -1324,6 +1324,8 @@ runTest('55. Marka bağımsız Temiz & Helal Etiket Rehberi (swapGuideCard) 10 d
     assert.ok(sg.items.some((x) => x.swapId === 'swap_gelatin'), `Dil=${lang} Jelatin alternatifi (Pektin E440 / Agar E406) üretilmeli`);
     assert.ok(sg.items.some((x) => x.swapId === 'swap_emulsifier_e471'), `Dil=${lang} E471 alternatifi (E322 / Bitkisel) üretilmeli`);
     assert.ok(sg.items.some((x) => x.swapId === 'swap_added_sugar_syrup'), `Dil=${lang} Şeker/Şurup alternatifi üretilmeli`);
+    const sugarSwap = sg.items.find((x) => x.swapId === 'swap_added_sugar_syrup');
+    assert.ok(/EFSA/i.test(sugarSwap.whySwap), `Dil=${lang} şeker alternatifi açıklaması EFSA serbest şeker nüansını içermeli`);
     for (const item of sg.items) {
       assert.ok(item.lookForInstead && item.lookForInstead.length > 10, `Dil=${lang} lookForInstead boş olmamalı`);
       assert.ok(item.whySwap && item.whySwap.length > 10, `Dil=${lang} whySwap boş olmamalı`);
@@ -1335,8 +1337,38 @@ runTest('55. Marka bağımsız Temiz & Helal Etiket Rehberi (swapGuideCard) 10 d
     const nutSg = nutella.evaluation.cards.swapGuideCard;
     assert.ok(nutSg.items.some((x) => x.swapId === 'swap_allergen_soy_lecithin'), `Dil=${lang} Nutella soya lesitini için ayçiçek lesitini önermeli`);
     assert.ok(nutSg.items.some((x) => x.swapId === 'swap_added_sugar_syrup'), `Dil=${lang} Nutella ilave şeker alternatifi önermeli`);
+    assert.ok(!nutSg.items.some((x) => x.swapId === 'swap_uv_filters_silicones_nail'), `Dil=${lang} gıdada kozmetik alternatifi çıkmamalı`);
 
-    // 3) Tamamen temiz/uyumlu ürün (Aqua, Panthenol, Niacinamide) -> 0 swap ve allCleanMessage
+    // 3) Barkod (Oreo 7622210449283) -> allergenStatement taşımalı, süt çapraz teması + soya + buğday + şeker önermeli (profil kapalıyken ve açıkken)
+    const oreo = lookupBarcodeProduct({ barcode: '7622210449283', lang });
+    assert.equal(oreo.allergenStatement, 'May contain milk', `Dil=${lang} Oreo allergenStatement korunmalı`);
+    const oreoSg = oreo.evaluation.cards.swapGuideCard;
+    assert.ok(oreoSg.items.some((x) => x.swapId === 'swap_allergen_dairy_milk'), `Dil=${lang} Oreo süt alternatifi (swap_allergen_dairy_milk) üretmeli`);
+    assert.ok(oreoSg.items.some((x) => x.swapId === 'swap_allergen_soy_lecithin'), `Dil=${lang} Oreo soya lesitini alternatifi üretmeli`);
+    assert.ok(oreoSg.items.some((x) => x.swapId === 'swap_allergen_gluten_wheat'), `Dil=${lang} Oreo buğday/gluten alternatifi üretmeli`);
+    assert.ok(oreoSg.items.some((x) => x.swapId === 'swap_added_sugar_syrup'), `Dil=${lang} Oreo birleşik şeker alternatifi üretmeli`);
+    assert.ok(!oreoSg.items.some((x) => x.swapId === 'swap_uv_filters_silicones_nail'), `Dil=${lang} Oreo'da kozmetik alternatifi (Zinc Oxide/Tinosorb) çıkmamalı`);
+
+    // Alerji profili (astim_alerji) açıkken yeniden değerlendirmede 4 profil uyarısı (3 kırmızı + 1 sarı süt izi) ve doğru gıda alternatifleri üretilmeli
+    const oreoWithAllergy = evaluateProduct({
+      rawText: oreo.rawText,
+      productType: oreo.productType,
+      allergenStatement: oreo.allergenStatement,
+      userProfiles: ['astim_alerji'],
+      lang
+    });
+    const alerts = oreoWithAllergy.cards.profileCard.alerts;
+    assert.equal(alerts.length, 4, `Dil=${lang} Oreo astim_alerji profilinde 4 uyarı (3 kırmızı + 1 sarı süt izi) üretmeli`);
+    assert.equal(alerts.filter((a) => a.level === 'kirmizi').length, 3);
+    assert.equal(alerts.filter((a) => a.level === 'sari').length, 1);
+    const oreoAllergySg = oreoWithAllergy.cards.swapGuideCard;
+    assert.ok(oreoAllergySg.items.some((x) => x.swapId === 'swap_allergen_dairy_milk'), `Dil=${lang} alerji profili açık Oreo süt alternatifi üretmeli`);
+    assert.ok(oreoAllergySg.items.some((x) => x.swapId === 'swap_allergen_soy_lecithin'), `Dil=${lang} alerji profili açık Oreo soya alternatifi üretmeli`);
+    assert.ok(oreoAllergySg.items.some((x) => x.swapId === 'swap_allergen_gluten_wheat'), `Dil=${lang} alerji profili açık Oreo gluten alternatifi üretmeli`);
+    assert.ok(!oreoAllergySg.items.some((x) => x.swapId === 'swap_uv_filters_silicones_nail'), `Dil=${lang} alerji profili açık Oreo'da kozmetik alternatifi çıkmamalı`);
+    assert.ok(!oreoAllergySg.items.some((x) => x.swapId === 'swap_allergen_nuts_other'), `Dil=${lang} süt izi uyarısı kuruyemiş/susam alternatifine düşmemeli`);
+
+    // 4) Tamamen temiz/uyumlu ürün (Aqua, Panthenol, Niacinamide) -> 0 swap ve allCleanMessage
     const clean = evaluateProduct({
       rawText: 'Aqua, Panthenol, Niacinamide, Sodium Hyaluronate',
       productType: 'cosmetic',

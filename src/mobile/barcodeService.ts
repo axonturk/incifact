@@ -21,6 +21,7 @@ export interface BarcodeLookupResult {
   productName?: string;
   productType?: 'cosmetic' | 'food';
   applicationType?: string | null;
+  allergenStatement?: string;
   rawText?: string;
   source?: string;
   updatedAt?: string;
@@ -35,6 +36,8 @@ interface CachedBarcodeEntry {
   barcode: string;
   productName: string;
   productType: 'cosmetic' | 'food';
+  applicationType?: string | null;
+  allergenStatement?: string;
   rawText: string;
   source: string;
   updatedAt: string;
@@ -118,6 +121,7 @@ export async function lookupBarcodeOnDevice(
             barcode: norm.code,
             productName: String(prodName).trim(),
             productType: ep.defaultType,
+            allergenStatement: String(p.allergens_from_ingredients || p.allergens || p.traces_from_ingredients || p.traces || '').trim(),
             rawText: String(ingText).trim(),
             source: ep.source,
             updatedAt: new Date().toISOString().slice(0, 10),
