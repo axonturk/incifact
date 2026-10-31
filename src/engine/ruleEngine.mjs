@@ -4989,7 +4989,7 @@ function buildRegulatoryReportCard({
       transitionCalendarItems.push({
         name: itemName,
         substance: itemName,
-        regulation: 'EU 2024/996 (Annex III/375 — Max 0.05% Body Lotion / 0.3% Face & Other)',
+        regulation: 'EU 2024/996 (Annex III/376 — Max 0.05% Body Lotion / 0.3% Face & Other)',
         placingOnMarketDate: '2025-11-01',
         makingAvailableDate: '2027-05-01',
         deadline: '2025-11-01 (Placing) / 2027-05-01 (Withdrawal)',
@@ -5003,7 +5003,7 @@ function buildRegulatoryReportCard({
       transitionCalendarItems.push({
         name: itemName,
         substance: itemName,
-        regulation: 'EU 2024/996 (Annex III/372 — Max 1.0% in Face & Hand Products)',
+        regulation: 'EU 2024/996 (Annex III/375 — Max 1.0% in Face & Hand Products)',
         placingOnMarketDate: '2025-02-01',
         makingAvailableDate: '2025-11-01',
         deadline: '2025-02-01 (Placing) / 2025-11-01 (Withdrawal)',
@@ -5016,7 +5016,7 @@ function buildRegulatoryReportCard({
       transitionCalendarItems.push({
         name: itemName,
         substance: itemName,
-        regulation: 'EU 2024/996 (Annex III/373 — Max 2.0% Face Cream / 0.5% Body Lotion)',
+        regulation: 'EU 2024/996 (Annex III/377 — Max 2.0% Face Cream / 0.5% Body Lotion)',
         placingOnMarketDate: '2025-02-01',
         makingAvailableDate: '2025-11-01',
         deadline: '2025-02-01 (Placing) / 2025-11-01 (Withdrawal)',
@@ -5029,7 +5029,7 @@ function buildRegulatoryReportCard({
       transitionCalendarItems.push({
         name: itemName,
         substance: itemName,
-        regulation: 'EU 2024/996 (Annex III/374 — Max 7.0% Face Cream)',
+        regulation: 'EU 2024/996 (Annex III/378 — Max 7.0% Face Cream)',
         placingOnMarketDate: '2025-02-01',
         makingAvailableDate: '2025-11-01',
         deadline: '2025-02-01 (Placing) / 2025-11-01 (Withdrawal)',

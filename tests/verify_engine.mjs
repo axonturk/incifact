@@ -1571,11 +1571,12 @@ runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 ka
           t.placingOnMarketDate === '2025-11-01' &&
           t.makingAvailableDate === '2027-05-01' &&
           /2027-05-01/.test(t.deadline) &&
+          /Annex III\/376/.test(t.regulation) &&
           /0\.05%/.test(t.regulation) &&
           /0\.3%/.test(t.regulation) &&
           /2024\/996/.test(t.regulation)
       ),
-      `Dil=${lang} Retinol için EU 2024/996 (0.05%/0.3%, 2025-11-01 / 2027-05-01) takvim maddesi bulunmalı`
+      `Dil=${lang} Retinol için EU 2024/996 (Annex III/376, 0.05%/0.3%, 2025-11-01 / 2027-05-01) takvim maddesi bulunmalı`
     );
     assert.ok(rr.detectedAllergens.length >= 2, `Dil=${lang} Linalool ve Limonene alerjen olarak listelenmeli`);
     assert.ok(rr.citedOfficialSources.length >= 3, `Dil=${lang} en az 3 resmi kaynak (checkedAt ve url ile) listelenmeli`);
@@ -1583,34 +1584,46 @@ runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 ka
       assert.ok(src.id && src.checkedAt && src.url, `Dil=${lang} resmi kaynakta id, checkedAt ve url bulunmalı`);
     }
 
-    // 2) Kojic Acid, Alpha-Arbutin ve Azelaic Acid ayrımı (EU 2024/996 madde bazlı doğru limit ve tarih)
+    // 2) Kojic Acid, Alpha-Arbutin, Arbutin ve Azelaic Acid ayrımı (EU 2024/996 madde bazlı doğru Ek III sıra no, limit ve tarih)
     const kojicEval = evaluateProduct({
-      rawText: 'Aqua, Kojic Acid, Alpha-Arbutin',
+      rawText: 'Aqua, Kojic Acid, Alpha-Arbutin, Arbutin',
       productType: 'cosmetic',
       lang
     });
     const kojicItems = kojicEval.cards.regulatoryReportCard.transitionCalendarItems;
-    assert.equal(kojicItems.length, 2, `Dil=${lang} Kojic Acid + Alpha-Arbutin 2 ayrı takvim maddesi üretmeli`);
+    assert.equal(kojicItems.length, 3, `Dil=${lang} Kojic Acid + Alpha-Arbutin + Arbutin 3 ayrı takvim maddesi üretmeli`);
     assert.ok(
       kojicItems.some(
         (t) =>
+          /Annex III\/375/.test(t.regulation) &&
           /1\.0%/.test(t.regulation) &&
           t.placingOnMarketDate === '2025-02-01' &&
           t.makingAvailableDate === '2025-11-01' &&
           !/0\.3%/.test(t.regulation) &&
           !/2027-05-01/.test(t.deadline)
       ),
-      `Dil=${lang} Kojic Acid için %1.0 yüz/el sınırı ve 2025-02-01 / 2025-11-01 tarihleri üretilmeli (Retinol bilgisi karışmamalı)`
+      `Dil=${lang} Kojic Acid için Annex III/375, %1.0 yüz/el sınırı ve 2025-02-01 / 2025-11-01 tarihleri üretilmeli (Retinol bilgisi karışmamalı)`
     );
     assert.ok(
       kojicItems.some(
         (t) =>
+          /Annex III\/377/.test(t.regulation) &&
           /2\.0%/.test(t.regulation) &&
           /0\.5%/.test(t.regulation) &&
           t.placingOnMarketDate === '2025-02-01' &&
           t.makingAvailableDate === '2025-11-01'
       ),
-      `Dil=${lang} Alpha-Arbutin için %2.0 yüz / %0.5 vücut sınırı ve 2025-02-01 / 2025-11-01 tarihleri üretilmeli`
+      `Dil=${lang} Alpha-Arbutin için Annex III/377, %2.0 yüz / %0.5 vücut sınırı ve 2025-02-01 / 2025-11-01 tarihleri üretilmeli`
+    );
+    assert.ok(
+      kojicItems.some(
+        (t) =>
+          /Annex III\/378/.test(t.regulation) &&
+          /7\.0%/.test(t.regulation) &&
+          t.placingOnMarketDate === '2025-02-01' &&
+          t.makingAvailableDate === '2025-11-01'
+      ),
+      `Dil=${lang} Arbutin için Annex III/378, %7.0 yüz sınırı ve 2025-02-01 / 2025-11-01 tarihleri üretilmeli`
     );
 
     const azelaicEval = evaluateProduct({
