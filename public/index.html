@@ -3729,6 +3729,7 @@
       const reg = state.evalData.cards.regulatoryCard;
       const prof = state.evalData.cards.profileCard;
       const halal = state.evalData.cards.halalCard;
+      const swapGuide = state.evalData.cards.swapGuideCard;
       const obs = state.evalData.observations || [];
       const unified = getUnifiedStatusPresentation(state.evalData, state.lang);
 
@@ -3970,6 +3971,47 @@
               : ''
           }
         </div>
+
+        <!-- ÖZELLİK 5: Marka Bağımsız "Bunun Yerine Rafta Ne Aramalıyım?" (Temiz & Helal Etiket Rehberi) -->
+        ${
+          swapGuide
+            ? `<div id="swapGuideCard" style="background:var(--surface); border:1.5px solid var(--accent); border-radius:18px; padding:13px 14px; display:flex; flex-direction:column; gap:9px;">
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <span style="font-size:13.5px; font-weight:800; color:var(--accent);">${escapeHtml(swapGuide.cardTitle)}</span>
+                    <span class="mono" style="font-size:11px; font-weight:800; padding:2px 8px; border-radius:10px; background:var(--soft); color:var(--accent); flex:none;">${formatDigits((swapGuide.items || []).length, state.lang)}</span>
+                  </div>
+                  <span style="font-size:11.5px; line-height:1.38; color:var(--muted);">${escapeHtml(swapGuide.cardSubtitle)}</span>
+                </div>
+                ${
+                  (swapGuide.items || []).length === 0
+                    ? `<div style="background:var(--ok-bg); color:var(--ok); border-radius:12px; padding:9px 11px; font-size:12px; font-weight:700;">✓ ${escapeHtml(swapGuide.allCleanMessage)}</div>`
+                    : `<div style="display:flex; flex-direction:column; gap:8px;">
+                        ${swapGuide.items
+                          .map((sw) => {
+                            const isRed = sw.severity === 'kirmizi';
+                            const toneCol = isRed ? 'var(--bad)' : 'var(--warn)';
+                            const toneBg = isRed ? 'var(--bad-bg)' : 'var(--warn-bg)';
+                            return `
+                              <div data-swap-id="${escapeHtml(sw.swapId)}" style="background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; flex-wrap:wrap;">
+                                  <span style="font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:8px; background:${toneBg}; color:${toneCol};">${escapeHtml(sw.categoryLabel)}</span>
+                                  <span style="font-size:11.5px; font-weight:800; color:${toneCol};">❌ ${escapeHtml(swapGuide.detectedLabel)}: ${escapeHtml(sw.detectedIngredient)}</span>
+                                </div>
+                                <div style="background:var(--ok-bg); border:1px solid var(--ok); border-radius:10px; padding:7px 10px; display:flex; flex-direction:column; gap:2px;">
+                                  <span style="font-size:10.5px; font-weight:800; color:var(--ok);">✅ ${escapeHtml(swapGuide.lookForLabel)}:</span>
+                                  <span style="font-size:12.5px; font-weight:800; line-height:1.38; color:var(--ink);">${escapeHtml(sw.lookForInstead)}</span>
+                                </div>
+                                <span style="font-size:11.5px; line-height:1.36; color:var(--muted);"><strong>${escapeHtml(swapGuide.whyLabel)}</strong> ${escapeHtml(sw.whySwap)}</span>
+                              </div>
+                            `;
+                          })
+                          .join('')}
+                      </div>`
+                }
+              </div>`
+            : ''
+        }
 
         <!-- Ingredients Filter Header -->
         <div style="display:flex; align-items:center; justify-content:space-between; margin-top:2px;">

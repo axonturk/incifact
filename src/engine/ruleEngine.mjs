@@ -2623,6 +2623,19 @@ export function evaluateProduct({
     sugarSource: sourcesData.sources.WHO_SUGAR_2015
   };
 
+  // ============================================================================
+  // CARD 5: BRAND-NEUTRAL CLEAN & HALAL INGREDIENT SWAP GUIDE (10 LANGUAGES)
+  // ============================================================================
+  const swapGuideCard = buildSwapGuideCard({
+    lang,
+    productType,
+    observations,
+    regulatoryCard,
+    profileCard,
+    halalCard,
+    veganSugarCard
+  });
+
   const langMeta = SUPPORTED_LANGUAGES.find((l) => l.code === lang) || SUPPORTED_LANGUAGES[0];
   const locale = getLocaleStrings(lang);
 
@@ -2646,9 +2659,1359 @@ export function evaluateProduct({
       regulatoryCard,
       profileCard,
       halalCard,
-      veganSugarCard
+      veganSugarCard,
+      swapGuideCard
     },
     appleGuideline141Disclaimer: et.appleDisclaimer
+  };
+}
+
+const SWAP_GUIDE_UI_I18N = {
+  tr: {
+    cardTitle: '💡 Bunun Yerine Rafta Ne Aramalıyım? (Temiz & Helal Etiket Rehberi)',
+    cardSubtitle: 'Marka bağımsız bilimsel rehber: Bu üründe tespit edilen sorunlu veya şüpheli bileşenler yerine, raftaki diğer ürünlerin etiketinde arayabileceğiniz temiz ve helal alternatif maddeler.',
+    detectedLabel: 'Bu Üründe Tespit Edilen',
+    lookForLabel: 'Etikette Bunun Yerine Arayın',
+    whyLabel: 'Neden?',
+    allCleanMessage: 'Bu üründe alternatif aramanızı gerektirecek sorunlu, kısıtlı veya şüpheli bir bileşen tespit edilmedi.',
+    categories: {
+      halal: 'Helal & Kaynak Alternatifi',
+      health_regulatory: 'Temiz İçerik & Mevzuat Alternatifi',
+      allergen_profile: 'Alerjen & Hassasiyet Alternatifi',
+      sugar_nutrition: 'Şeker & Beslenme Alternatifi'
+    }
+  },
+  en: {
+    cardTitle: '💡 What Should I Look For Instead? (Clean & Halal Label Guide)',
+    cardSubtitle: 'Brand-neutral scientific guide: Clean and Halal alternative ingredients to look for on other product labels instead of the flagged or doubtful substances detected here.',
+    detectedLabel: 'Detected in This Product',
+    lookForLabel: 'Look For This on the Label Instead',
+    whyLabel: 'Why?',
+    allCleanMessage: 'No problematic, restricted, or doubtful ingredients requiring a label swap were detected in this product.',
+    categories: {
+      halal: 'Halal & Origin Swap',
+      health_regulatory: 'Clean & Regulatory Swap',
+      allergen_profile: 'Allergen & Sensitivity Swap',
+      sugar_nutrition: 'Sugar & Nutrition Swap'
+    }
+  },
+  ar: {
+    cardTitle: '💡 ماذا أبحث عنه بدلاً من ذلك على الرف؟ (دليل البدائل النظيفة والحلال)',
+    cardSubtitle: 'دليل علمي محايد للعلامات التجارية: بدائل نظيفة وحلال يمكنك البحث عنها في قائمة مكونات المنتجات الأخرى بدلاً من المواد المشبوهة أو المرفوضة هنا.',
+    detectedLabel: 'المكتشف في هذا المنتج',
+    lookForLabel: 'ابحث عن هذا في الملصق بدلاً منه',
+    whyLabel: 'لماذا؟',
+    allCleanMessage: 'لم يتم رصد أي مكونات مشبوهة أو مقيدة تتطلب البحث عن بديل في هذا المنتج.',
+    categories: {
+      halal: 'بديل الحلال والمصدر',
+      health_regulatory: 'بديل المكونات النظيفة واللوائح',
+      allergen_profile: 'بديل الحساسية والملائمة',
+      sugar_nutrition: 'بديل السكر والتغذية'
+    }
+  },
+  de: {
+    cardTitle: '💡 Worauf sollte ich im Regal stattdessen achten? (Clean & Halal Etiketten-Guide)',
+    cardSubtitle: 'Markenunabhängiger Leitfaden: Saubere und Halal-konforme Alternativstoffe, nach denen Sie auf anderen Produktetiketten suchen können.',
+    detectedLabel: 'In diesem Produkt erkannt',
+    lookForLabel: 'Suchen Sie stattdessen auf dem Etikett nach',
+    whyLabel: 'Warum?',
+    allCleanMessage: 'In diesem Produkt wurden keine problematischen oder zweifelhaften Inhaltsstoffe erkannt, die einen Austausch erfordern.',
+    categories: {
+      halal: 'Halal- & Herkunftsalternative',
+      health_regulatory: 'Saubere & Regulatorische Alternative',
+      allergen_profile: 'Allergen- & Sensitivitätsalternative',
+      sugar_nutrition: 'Zucker- & Ernährungsalternative'
+    }
+  },
+  fr: {
+    cardTitle: '💡 Que chercher à la place en rayon ? (Guide d’étiquette Clean & Halal)',
+    cardSubtitle: 'Guide scientifique indépendant des marques : ingrédients alternatifs propres et Halal à privilégier sur les étiquettes d’autres produits.',
+    detectedLabel: 'Détecté dans ce produit',
+    lookForLabel: 'Cherchez plutôt sur l’étiquette',
+    whyLabel: 'Pourquoi ?',
+    allCleanMessage: 'Aucun ingrédient problématique, restreint ou douteux nécessitant une alternative n’a été détecté dans ce produit.',
+    categories: {
+      halal: 'Alternative Halal & Origine',
+      health_regulatory: 'Alternative Clean & Réglementaire',
+      allergen_profile: 'Alternative Allergènes & Sensibilité',
+      sugar_nutrition: 'Alternative Sucre & Nutrition'
+    }
+  },
+  id: {
+    cardTitle: '💡 Apa yang Harus Dicari di Rak Sebagai Gantinya? (Panduan Label Bersih & Halal)',
+    cardSubtitle: 'Panduan ilmiah netral-merek: Bahan alternatif bersih dan Halal yang dapat Anda cari pada daftar komposisi produk lain.',
+    detectedLabel: 'Terdeteksi pada Produk Ini',
+    lookForLabel: 'Cari Bahan Ini pada Label',
+    whyLabel: 'Mengapa?',
+    allCleanMessage: 'Tidak ditemukan bahan bermasalah, dibatasi, atau syubhat yang memerlukan penggantian pada produk ini.',
+    categories: {
+      halal: 'Alternatif Halal & Sumber',
+      health_regulatory: 'Alternatif Komposisi Bersih',
+      allergen_profile: 'Alternatif Alergen & Sensitivitas',
+      sugar_nutrition: 'Alternatif Gula & Nutrisi'
+    }
+  },
+  ms: {
+    cardTitle: '💡 Apa yang Perlu Dicari di Rak Sebagai Ganti? (Panduan Label Bersih & Halal)',
+    cardSubtitle: 'Panduan saintifik neutral-jenama: Ramuan alternatif bersih dan Halal untuk dicari pada label produk lain.',
+    detectedLabel: 'Dikesan dalam Produk Ini',
+    lookForLabel: 'Cari Bahan Ini pada Label',
+    whyLabel: 'Mengapa?',
+    allCleanMessage: 'Tiada ramuan bermasalah, terhad atau syubhah yang memerlukan alternatif dikesan dalam produk ini.',
+    categories: {
+      halal: 'Alternatif Halal & Sumber',
+      health_regulatory: 'Alternatif Ramuan Bersih',
+      allergen_profile: 'Alternatif Alergen & Sensitiviti',
+      sugar_nutrition: 'Alternatif Gula & Nutrisi'
+    }
+  },
+  es: {
+    cardTitle: '💡 ¿Qué buscar en su lugar en el estante? (Guía de Etiquetas Clean y Halal)',
+    cardSubtitle: 'Guía científica independiente de marcas: ingredientes alternativos limpios y Halal que puede buscar en las etiquetas de otros productos.',
+    detectedLabel: 'Detectado en este producto',
+    lookForLabel: 'Busque esto en la etiqueta',
+    whyLabel: '¿Por qué?',
+    allCleanMessage: 'No se detectaron ingredientes problemáticos, restringidos o dudosos que requieran buscar una alternativa.',
+    categories: {
+      halal: 'Alternativa Halal y Origen',
+      health_regulatory: 'Alternativa Limpia y Normativa',
+      allergen_profile: 'Alternativa sin Alérgenos',
+      sugar_nutrition: 'Alternativa de Azúcar y Nutrición'
+    }
+  },
+  ru: {
+    cardTitle: '💡 Что искать взамен на полке? (Гид по чистым и халяльным альтернативам)',
+    cardSubtitle: 'Независимый научный гид: чистые и халяльные альтернативные компоненты, которые стоит искать в составе других продуктов.',
+    detectedLabel: 'Обнаружено в продукте',
+    lookForLabel: 'Ищите на этикетке взамен',
+    whyLabel: 'Почему?',
+    allCleanMessage: 'В этом продукте не обнаружено проблемных или сомнительных компонентов, требующих замены.',
+    categories: {
+      halal: 'Халяль и источник',
+      health_regulatory: 'Чистый состав и нормы',
+      allergen_profile: 'Гипоаллергенная замена',
+      sugar_nutrition: 'Замена сахара и питание'
+    }
+  },
+  ur: {
+    cardTitle: '💡 اس کے بجائے شیلف پر کیا تلاش کریں؟ (صاف اور حلال لیبل گائیڈ)',
+    cardSubtitle: 'برانڈ سے آزاد سائنسی رہنمائی: اس پروڈکٹ میں پائے جانے والے مشکوک یا مضر اجزاء کے بجائے دیگر مصنوعات کے لیبل پر تلاش کیے جانے والے صاف اور حلال متبادل۔',
+    detectedLabel: 'اس پروڈکٹ میں پایا گیا',
+    lookForLabel: 'لیبل پر اس کے بجائے یہ تلاش کریں',
+    whyLabel: 'کیوں؟',
+    allCleanMessage: 'اس پروڈکٹ میں کوئی ایسا مشکوک یا مضر جزو نہیں ملا جس کے متبادل کی ضرورت ہو۔',
+    categories: {
+      halal: 'حلال اور ماخذ متبادل',
+      health_regulatory: 'صاف اجزاء اور ضوابط متبادل',
+      allergen_profile: 'الرجی اور حساسیت متبادل',
+      sugar_nutrition: 'شوگر اور غذائیت متبادل'
+    }
+  }
+};
+
+const SWAP_RULES_10LANG = {
+  swap_gelatin: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Bitkisel Pektin (E440), Agar-Agar (E406), Karagenan (E407) veya açıkça "Helal Sertifikalı Sığır/Balık Jelatini"',
+      why: 'Bitkisel jelleştiriciler (Pektin/Agar) domuz ve belirsiz kesim riskini %100 ortadan kaldırır; hem Helal hem Vegan uyumludur.'
+    },
+    en: {
+      lookFor: 'Plant Pectin (E440), Agar-Agar (E406), Carrageenan (E407), or explicitly "Halal-Certified Bovine/Fish Gelatin"',
+      why: 'Plant-based gelling agents (Pectin/Agar) completely eliminate porcine or unverified slaughter risks and are both Halal and Vegan.'
+    },
+    ar: {
+      lookFor: 'البكتين النباتي (E440)، أغار-أغار (E406)، الكاراجينان (E407) أو "جيلاتين بقري/سمكي بشهادة حلال صريحة"',
+      why: 'المكثفات النباتية (البكتين/الأغار) تقضي تماماً على مخاطر المصدر الخنزيري أو الذبح غير الموثق وتناسب الحلال والنباتي.'
+    },
+    de: {
+      lookFor: 'Pflanzliches Pektin (E440), Agar-Agar (E406), Carrageen (E407) oder explizit „Halal-zertifizierte Rinder-/Fischgelatine“',
+      why: 'Pflanzliche Geliermittel schließen Schweine- oder unklare Schlachtrisiken vollständig aus und sind Halal- sowie Vegan-konform.'
+    },
+    fr: {
+      lookFor: 'Pectine végétale (E440), Agar-Agar (E406), Carraghénane (E407) ou « Gélatine bovine/de poisson certifiée Halal »',
+      why: 'Les gélifiants végétaux éliminent tout risque d’origine porcine ou d’abattage non vérifié (100 % Halal et Vegan).'
+    },
+    id: {
+      lookFor: 'Pektin Nabati (E440), Agar-Agar (E406), Karagenan (E407), atau "Gelatin Sapi/Ikan Bersertifikat Halal"',
+      why: 'Pengental nabati (Pektin/Agar) menghilangkan risiko babi atau sembelihan tidak jelas serta 100% Halal dan Vegan.'
+    },
+    ms: {
+      lookFor: 'Pektin Tumbuhan (E440), Agar-Agar (E406), Karagenan (E407) atau "Gelatin Lembu/Ikan Bersijil Halal"',
+      why: 'Ejen pemekat tumbuhan menghapuskan risiko sumber khinzir atau sembelihan tidak sah serta mesra Halal dan Vegan.'
+    },
+    es: {
+      lookFor: 'Pectina vegetal (E440), Agar-Agar (E406), Carragenina (E407) o «Gelatina bovina/de pescado certificada Halal»',
+      why: 'Los gelificantes vegetales eliminan por completo el riesgo porcino o de sacrificio no verificado.'
+    },
+    ru: {
+      lookFor: 'Растительный пектин (E440), агар-агар (E406), каррагинан (E407) или «говяжий/рыбный желатин с сертификатом Халяль»',
+      why: 'Растительные желирующие агенты полностью исключают риск свиного происхождения и подходят для Халяль и Веган.'
+    },
+    ur: {
+      lookFor: 'نباتاتی پیکٹن (E440)، اگر-اگر (E406)، کیراجینن (E407) یا واضح طور پر "حلال سرٹیفائیڈ بیف/مچھلی جیلیٹن"',
+      why: 'نباتاتی جیلنگ اجزاء سور یا غیر مصدقہ ذبیحہ کے خطرے کو مکمل طور پر ختم کرتے ہیں اور حلال و ویگن دونوں کے لیے موزوں ہیں۔'
+    }
+  },
+  swap_animal_fat_meat: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Bitkisel Yağlar (Kakao Yağı, Shea, Zeytinyağı, Ayçiçek Yağı), Sabunlarda "Sodium Palmate / Sodium Cocoate" veya Açık Helal Kesim Sertifikası',
+      why: 'Hayvansal don yağı (Tallow/Lard) yerine bitkisel yağ bazlı formüller kaynak ve kesim şüphesini tamamen giderir.'
+    },
+    en: {
+      lookFor: 'Plant Oils (Cocoa Butter, Shea, Olive, Sunflower Oil), "Sodium Palmate / Sodium Cocoate" in soaps, or Halal-Slaughter Certification',
+      why: 'Plant-oil formulations replace animal tallow/lard and eliminate slaughter or porcine origin concerns.'
+    },
+    ar: {
+      lookFor: 'زيوت نباتية (زبدة الكاكاو، الشيا، زيت الزيتون)، أو "صوديوم بالمات / كوكوات" في الصابون، أو شهادة ذبح حلال معتمدة',
+      why: 'التركيبات القائمة على الزيوت النباتية تغني عن الشحوم الحيوانية وتزيل شبهة المصدر أو طريقة الذبح.'
+    },
+    de: {
+      lookFor: 'Pflanzenöle (Kakaobutter, Shea, Olivenöl), „Sodium Palmate / Sodium Cocoate“ in Seifen oder Halal-Schlachtzertifikat',
+      why: 'Pflanzliche Öle ersetzen tierischen Talg/Schmalz und beseitigen Herkunfts- sowie Schlachtungszweifel.'
+    },
+    fr: {
+      lookFor: 'Huiles végétales (Beurre de cacao, Karité, Olive), « Sodium Palmate / Sodium Cocoate » pour les savons ou certification Halal',
+      why: 'Les formules à base d’huiles végétales remplacent le suif/saindoux animal et lèvent tout doute d’abattage.'
+    },
+    id: {
+      lookFor: 'Minyak Nabati (Cocoa Butter, Shea, Zaitun), "Sodium Palmate / Sodium Cocoate" pada sabun, atau Sertifikat Sembelihan Halal',
+      why: 'Formula berbasis minyak nabati menggantikan lemak hewani (tallow/lard) sehingga bebas keraguan sumber.'
+    },
+    ms: {
+      lookFor: 'Minyak Tumbuhan (Mentega Koko, Shea, Zaitun), "Sodium Palmate / Sodium Cocoate" dalam sabun, atau Sijil Sembelihan Halal',
+      why: 'Formula berasaskan minyak tumbuhan menggantikan lemak haiwan (tallow/lard) dan menghapuskan keraguan sumber.'
+    },
+    es: {
+      lookFor: 'Aceites vegetales (Manteca de cacao, Karité, Oliva), «Sodium Palmate / Sodium Cocoate» en jabones o certificación Halal',
+      why: 'Las fórmulas con aceites vegetales sustituyen el sebo/manteca animal y eliminan dudas de origen.'
+    },
+    ru: {
+      lookFor: 'Растительные масла (какао, ши, оливковое), «Sodium Palmate / Sodium Cocoate» в мыле или сертификат убоя Халяль',
+      why: 'Растительные масла заменяют животный жир (таллоу/лярд) и снимают сомнения относительно убоя.'
+    },
+    ur: {
+      lookFor: 'نباتاتی تیل (کوکو بٹر، شیا، زیتون کا تیل)، صابن میں "Sodium Palmate / Sodium Cocoate" یا مصدقہ حلال ذبیحہ سرٹیفکیٹ',
+      why: 'حیوانی چربی کے بجائے نباتاتی تیل پر مبنی فارمولے ماخذ اور ذبیحہ کے شبہات کو مکمل طور پر ختم کر دیتے ہیں۔'
+    }
+  },
+  swap_carmine_e120: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Pancar Kökü Kırmızısı / Betanin (E162), Antosiyaninler (E163), Paprika Ekstresi (E160c) veya Likopen (E160d)',
+      why: 'Böcek kaynaklı Karmin (E120) yerine bitkisel kırmızı renklendiriciler tüm helal otoritelerinde (GİMDES, JAKIM, MUI, IFANCA) ve vegan standartlarında tartışmasız uygundur.'
+    },
+    en: {
+      lookFor: 'Beetroot Red / Betanin (E162), Anthocyanins (E163), Paprika Extract (E160c), or Lycopene (E160d)',
+      why: 'Plant-derived red colorants replace insect-derived Carmine (E120) and are universally accepted across all Halal authorities and Vegan standards.'
+    },
+    ar: {
+      lookFor: 'أحمر الشمندر / بيتانين (E162)، الأنثوسيانين (E163)، خلاصة البابريكا (E160c) أو الليكوبين (E160d)',
+      why: 'الملونات الحمراء النباتية تغني عن الكارمين الحشري (E120) وهي مقبولة بالإجماع لدى جميع هيئات الحلال والمعايير النباتية.'
+    },
+    de: {
+      lookFor: 'Betanin / Rote-Bete-Rot (E162), Anthocyane (E163), Paprikaextrakt (E160c) oder Lycopin (E160d)',
+      why: 'Pflanzliche rote Farbstoffe ersetzen insektenbasiertes Karmin (E120) und sind bei allen Halal-Zertifizierern sowie vegan uneingeschränkt zulässig.'
+    },
+    fr: {
+      lookFor: 'Rouge de betterave / Bétanine (E162), Anthocyanes (E163), Extrait de paprika (E160c) ou Lycopène (E160d)',
+      why: 'Les colorants rouges végétaux remplacent le Carmin d’origine animale/insecte (E120) et sont unanimement acceptés en Halal et Vegan.'
+    },
+    id: {
+      lookFor: 'Merah Bit / Betanin (E162), Antosianin (E163), Ekstrak Paprika (E160c), atau Likopen (E160d)',
+      why: 'Pewarna merah nabati menggantikan Karmin (E120) dari serangga dan diterima tanpa khilaf di seluruh lembaga Halal serta Vegan.'
+    },
+    ms: {
+      lookFor: 'Merah Ubi Bit / Betanin (E162), Antosianin (E163), Ekstrak Paprika (E160c) atau Likopena (E160d)',
+      why: 'Pewarna merah tumbuhan menggantikan Karmin (E120) berasaskan serangga dan diterima oleh semua badan Halal serta Vegan.'
+    },
+    es: {
+      lookFor: 'Rojo de remolacha / Betanina (E162), Antocianinas (E163), Extracto de pimentón (E160c) o Licopeno (E160d)',
+      why: 'Los colorantes rojos vegetales sustituyen al Carmín de insectos (E120) y son aceptados por todas las autoridades Halal y veganas.'
+    },
+    ru: {
+      lookFor: 'Свекольный красный / бетанин (E162), антоцианы (E163), экстракт паприки (E160c) или ликопин (E160d)',
+      why: 'Растительные красные красители заменяют кармин из насекомых (E120) и признаются всеми органами Халяль и Веган.'
+    },
+    ur: {
+      lookFor: 'چقندر کا سرخ رنگ / بیٹانین (E162)، اینتھوسائننز (E163)، پیپریکا ایکسٹریکٹ (E160c) یا لائیکوپین (E160d)',
+      why: 'کیڑے سے حاصل کردہ کارمین (E120) کے بجائے نباتاتی سرخ رنگ تمام حلال اتھارٹیز (GİMDES, JAKIM, MUI, IFANCA) اور ویگن معیارات میں متفقہ طور پر جائز ہیں۔'
+    }
+  },
+  swap_shellac_e904: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Karnauba Mumu (E903), Kandelilla Mumu (E902) veya Bitkisel Selüloz / Zein Kaplama',
+      why: 'Lak böceği salgısı (E904) yerine bitkisel mumlar tüm helal kurumlarında ve vegan profillerde tam uyumludur.'
+    },
+    en: {
+      lookFor: 'Carnauba Wax (E903), Candelilla Wax (E902), or Plant Cellulose / Zein Glazing',
+      why: 'Plant waxes replace lac-insect Shellac (E904) and are universally permissible across all Halal bodies and Vegan profiles.'
+    },
+    ar: {
+      lookFor: 'شمع الكارنوبا (E903)، شمع الكانديليلا (E902) أو التغليف بالسليلوز النباتي',
+      why: 'الشموع النباتية تحل محل الشيلاك الحشري (E904) وتعد مقبولة لدى جميع هيئات الحلال والنظام النباتي.'
+    },
+    de: {
+      lookFor: 'Carnaubawachs (E903), Candelillawachs (E902) oder pflanzliche Cellulose-Glasur',
+      why: 'Pflanzenwachse ersetzen Schellack (E904) und sind bei allen Halal-Stellen sowie für Veganer unbedenklich.'
+    },
+    fr: {
+      lookFor: 'Cire de carnauba (E903), Cire de candelilla (E902) ou enrobage végétal',
+      why: 'Les cires végétales remplacent le Shellac (E904) et sont conformes pour toutes les autorités Halal et Vegan.'
+    },
+    id: {
+      lookFor: 'Lilin Karnauba (E903), Lilin Kandelila (E902), atau Pelapis Selulosa Nabati',
+      why: 'Lilin nabati menggantikan Syelak (E904) dari kutu lak sehingga diterima semua lembaga Halal dan Vegan.'
+    },
+    ms: {
+      lookFor: 'Lilin Karnauba (E903), Lilin Kandelila (E902) atau Salutan Selulosa Tumbuhan',
+      why: 'Lilin tumbuhan menggantikan Syelak (E904) dan diterima sepenuhnya oleh semua badan Halal dan Vegan.'
+    },
+    es: {
+      lookFor: 'Cera de carnauba (E903), Cera de candelilla (E902) o recubrimiento vegetal',
+      why: 'Las ceras vegetales sustituyen a la goma laca (E904) y son aptas para todas las autoridades Halal y veganas.'
+    },
+    ru: {
+      lookFor: 'Карнаубский воск (E903), канделильский воск (E902) или растительная глазурь',
+      why: 'Растительные воски заменяют шеллак (E904) и подходят для всех стандартов Халяль и Веган.'
+    },
+    ur: {
+      lookFor: 'کارنوبا ویکس (E903)، کینڈیلیلا ویکس (E902) یا نباتاتی سیلولوز کوٹنگ',
+      why: 'لاکھ کیڑے کی رال (E904) کے بجائے نباتاتی موم تمام حلال اداروں اور ویگن معیارات میں مکمل طور پر موزوں ہیں۔'
+    }
+  },
+  swap_ethanol_alcohol: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Kozmetikte Gliserin, Pentylene Glycol, Propanediol veya "Alkolsüz / Alcohol-Free" Formül; Gıdada Alkolsüz Meyve/Sirke Özütü',
+      why: 'Etil alkol (Alcohol Denat. / Etanol) yerine bitkisel nemlendirici çözücüler hem cilt bariyerini kurutmaz hem de helal/alkol ihtilafını ortadan kaldırır.'
+    },
+    en: {
+      lookFor: 'In cosmetics: Glycerin, Pentylene Glycol, Propanediol, or "Alcohol-Free" formulas; in food: Non-Alcoholic Fruit/Vinegar Extracts',
+      why: 'Plant-derived humectant solvents replace volatile Ethyl Alcohol (Alcohol Denat.), preventing skin barrier dryness and resolving Halal ethanol disputes.'
+    },
+    ar: {
+      lookFor: 'في التجميل: الجلسرين النقي، بروبانديول، بنتيلين جلايكول أو تركيبة "خالية من الكحول"؛ وفي الغذاء: خلاصات الفواكه والخل غير الكحولية',
+      why: 'المذيبات المرطبة النباتية تغني عن الكحول الإيثيلي المتطاير، فلا تجفف البشرة وتنهي الخلاف الفقهي حول الإيثانول.'
+    },
+    de: {
+      lookFor: 'In Kosmetik: Glycerin, Pentylene Glycol, Propanediol oder „Alkoholfrei / Alcohol-Free“; in Lebensmitteln: alkoholfreie Fruchtextrakte',
+      why: 'Feuchtigkeitsspendende Lösungsmittel ersetzen flüchtiges Ethanol, schonen die Hautbarriere und vermeiden Halal-Konflikte.'
+    },
+    fr: {
+      lookFor: 'En cosmétique : Glycérine, Pentylene Glycol, Propanediol ou formule « Sans alcool / Alcohol-Free » ; en alimentation : extraits sans alcool',
+      why: 'Les solvants humectants remplacent l’alcool éthylique (Alcohol Denat.), préservent la barrière cutanée et évitent tout litige Halal.'
+    },
+    id: {
+      lookFor: 'Pada kosmetik: Gliserin, Pentylene Glycol, Propanediol, atau label "Alcohol-Free"; pada pangan: Ekstrak Buah/Cuka Non-Alkohol',
+      why: 'Pelarut pelembap nabati menggantikan etanol volatil sehingga tidak mengeringkan kulit dan bebas khilaf kehalalan.'
+    },
+    ms: {
+      lookFor: 'Dalam kosmetik: Gliserin, Pentylene Glycol, Propanediol atau "Tanpa Alkohol / Alcohol-Free"; dalam makanan: Ekstrak Tanpa Alkohol',
+      why: 'Pelarut pelembap tumbuhan menggantikan etanol meruap, melindungi penghalang kulit dan menyelesaikan isu Halal.'
+    },
+    es: {
+      lookFor: 'En cosmética: Glicerina, Pentylene Glycol, Propanediol o «Sin alcohol / Alcohol-Free»; en alimentos: extractos sin alcohol',
+      why: 'Los disolventes humectantes reemplazan al etanol volátil, cuidan la barrera cutánea y evitan conflictos Halal.'
+    },
+    ru: {
+      lookFor: 'В косметике: глицерин, пентиленгликоль, пропандиол или «Без спирта / Alcohol-Free»; в продуктах: безалкогольные экстракты',
+      why: 'Увлажняющие растворители заменяют этиловый спирт, не сушат кожу и снимают разногласия по стандартам Халяль.'
+    },
+    ur: {
+      lookFor: 'کاسمیٹکس میں: گلیسرین، Pentylene Glycol، Propanediol یا "Alcohol-Free" فارمولا؛ غذا میں: غیر الکحلی پھلوں کا عرق',
+      why: 'ایتھانول (Alcohol Denat.) کے بجائے نباتاتی موئسچرائزنگ محلول جلد کو خشک ہونے سے بچاتے ہیں اور حلال اتھارٹیز کے اختلاف کو ختم کرتے ہیں۔'
+    }
+  },
+  swap_emulsifier_e471: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Ayçiçek Lesitini (E322), Guar Gam (E412), Ksantan Gam (E415) veya açıkça "Bitkisel Kaynaklı (Vegetable) / Vegan / Helal Sertifikalı" İbareli Ürünler',
+      why: 'Kaynağı yazmayan E471, gliserin, stearat veya polisorbatlar hayvansal ya da bitkisel olabilir; Ayçiçek Lesitini veya "Bitkisel/Vegan" beyanı şüpheyi sıfırlar.'
+    },
+    en: {
+      lookFor: 'Sunflower Lecithin (E322), Guar Gum (E412), Xanthan Gum (E415), or products explicitly labeled "Vegetable-Origin / Vegan / Halal-Certified"',
+      why: 'Unspecified E471, glycerin, stearates, or polysorbates can be animal- or plant-derived; Sunflower Lecithin or explicit Vegan/Halal labeling removes ambiguity.'
+    },
+    ar: {
+      lookFor: 'ليسيثين دوار الشمس (E322)، صمغ الغوار (E412)، صمغ الزانثان (E415) أو المنتجات التي تحمل عبارة "من أصل نباتي / نباتي معتمد / حلال"',
+      why: 'المستحلبات (E471) أو الجلسرين أو الاستيارات غير محددة المصدر قد تكون حيوانية أو نباتية؛ ليسيثين دوار الشمس أو شهادة الحلال/النباتي تزيل الشبهة.'
+    },
+    de: {
+      lookFor: 'Sonnenblumenlecithin (E322), Guarkernmehl (E412), Xanthan (E415) oder explizit „Pflanzlich / Vegan / Halal-zertifiziert“',
+      why: 'Nicht näher bezeichnetes E471, Glycerin oder Stearate können tierischen oder pflanzlichen Ursprungs sein; Sonnenblumenlecithin oder Vegan/Halal-Siegel schaffen Klarheit.'
+    },
+    fr: {
+      lookFor: 'Lécithine de tournesol (E322), Gomme de guar (E412), Gomme xanthane (E415) ou mention explicite « Origine végétale / Vegan / Certifié Halal »',
+      why: 'Les E471, glycérine ou stéarates sans mention d’origine peuvent être animaux ou végétaux ; la lécithine de tournesol ou le label Vegan/Halal lève toute ambiguïté.'
+    },
+    id: {
+      lookFor: 'Lesitin Bunga Matahari (E322), Gom Guar (E412), Gomarab/Xanthan (E415), atau label eksplisit "Nabati (Vegetable) / Vegan / Bersertifikat Halal"',
+      why: 'E471, gliserin, stearat, atau polisorbat tanpa keterangan sumber bisa berasal dari lemak hewani maupun nabati; lesitin bunga matahari atau label Halal/Vegan menghilangkan syubhat.'
+    },
+    ms: {
+      lookFor: 'Lesitin Bunga Matahari (E322), Gam Guar (E412), Gam Xanthan (E415) atau label jelas "Sumber Tumbuhan / Vegan / Bersijil Halal"',
+      why: 'E471, gliserin atau stearat tanpa sumber jelas boleh berasal daripada haiwan atau tumbuhan; lesitin bunga matahari atau sijil Halal/Vegan menghapuskan syubhah.'
+    },
+    es: {
+      lookFor: 'Lecitina de girasol (E322), Goma guar (E412), Goma xantana (E415) o mención explícita «Origen vegetal / Vegano / Certificado Halal»',
+      why: 'Los E471, glicerina o estearatos sin origen declarado pueden ser animales o vegetales; la lecitina de girasol o el sello Vegano/Halal eliminan la duda.'
+    },
+    ru: {
+      lookFor: 'Подсолнечный лецитин (E322), гуаровая камедь (E412), ксантановая камедь (E415) или маркировка «Растительного происхождения / Веган / Халяль»',
+      why: 'E471, глицерин и стеараты без указания источника могут быть животными или растительными; подсолнечный лецитин или сертификат Халяль/Веган исключают сомнения.'
+    },
+    ur: {
+      lookFor: 'سورج مکھی کا لیسیتھین (E322)، گوار گم (E412)، زینتھن گم (E415) یا واضح طور پر "نباتاتی ماخذ (Vegetable) / ویگن / حلال سرٹیفائیڈ" مصنوعات',
+      why: 'غیر واضح E471، گلیسرین یا اسٹیریٹس حیوانی یا نباتاتی دونوں ہو سکتے ہیں؛ سورج مکھی کا لیسیتھین یا حلال/ویگن تصدیق اس شبہے کو ختم کرتی ہے۔'
+    }
+  },
+  swap_lcysteine_enzymes_whey: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Unlu Mamullerde Askorbik Asit (E300 / C Vitamini), Peynir Altı Suyunda "Mikrobiyal Maya (Microbial Rennet)", Çeşnide Maya Ekstresi (Yeast Extract) veya Helal Sertifikası',
+      why: 'Kıl/tüy kaynaklı L-Sistein (E920), hayvansal peynir mayası ve et özütlü E631 yerine bitkisel/mikrobiyal alternatifler kaynak belirsizliğini kapatır.'
+    },
+    en: {
+      lookFor: 'Ascorbic Acid (E300 / Vitamin C) in bakery, "Microbial Rennet" Whey, Yeast Extract for umami, or Halal Certification',
+      why: 'Replaces hair/feather L-Cysteine (E920), animal rennet whey, and meat-derived E631 nucleotides with clean microbial/plant alternatives.'
+    },
+    ar: {
+      lookFor: 'حمض الأسكوربيك (E300) في المخبوزات، "منفحة ميكروبية" لمصل اللبن، خلاصة الخميرة للنكهة، أو شهادة حلال معتمدة',
+      why: 'البدائل الميكروبية والنباتية تغني عن إل-سيستين (E920) والإنزيمات الحيوانية ومحسنات النكهة المشتقة من اللحوم (E631).'
+    },
+    de: {
+      lookFor: 'Ascorbinsäure (E300) in Backwaren, Molke mit „mikrobiellem Lab“, Hefeextrakt oder Halal-Zertifizierung',
+      why: 'Mikrobielle und pflanzliche Alternativen ersetzen L-Cystein (E920), tierisches Lab und fleischbasierte Ribonukleotide (E631).'
+    },
+    fr: {
+      lookFor: 'Acide ascorbique (E300) en boulangerie, lactosérum à « présure microbienne », extrait de levure ou certification Halal',
+      why: 'Les alternatives microbiennes et végétales remplacent la L-cystéine (E920), la présure animale et les ribonucléotides (E631).'
+    },
+    id: {
+      lookFor: 'Asam Askorbat (E300) pada roti, Whey dengan "Rennet Mikrobial", Ekstrak Ragi (Yeast Extract), atau Sertifikat Halal',
+      why: 'Alternatif mikrobial dan nabati menggantikan L-Sistein (E920), enzim hewani, serta penguat rasa E631 yang rawan syubhat.'
+    },
+    ms: {
+      lookFor: 'Asid Askorbik (E300) dalam roti, Whey "Rennet Mikrob", Ekstrak Yis atau Sijil Halal',
+      why: 'Alternatif mikrob dan tumbuhan menggantikan L-Sistein (E920), enzim haiwan serta penambah perisa E631.'
+    },
+    es: {
+      lookFor: 'Ácido ascórbico (E300) en panadería, suero con «cuajo microbiano», extracto de levadura o certificación Halal',
+      why: 'Las alternativas microbianas y vegetales sustituyen a la L-cisteína (E920), el cuajo animal y los nucleótidos E631.'
+    },
+    ru: {
+      lookFor: 'Аскорбиновая кислота (E300) в выпечке, сыворотка на «микробном ферменте», дрожжевой экстракт или сертификат Халяль',
+      why: 'Микробные и растительные аналоги заменяют L-цистеин (E920), животный сычуг и нуклеотиды E631.'
+    },
+    ur: {
+      lookFor: 'بیکری میں ایسکوربک ایسڈ (E300)، "مائیکروبیل رینٹ" والا وے (Whey)، ییسٹ ایکسٹریکٹ یا حلال سرٹیفکیٹ',
+      why: 'L-Cysteine (E920)، حیوانی انزائمز اور E631 کے بجائے مائیکروبیل اور نباتاتی متبادل ماخذ کے شبہے کو دور کرتے ہیں۔'
+    }
+  },
+  swap_collagen_snail_squalene: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Zeytin Kaynaklı Skualan ("Squalane" - "a" harfiyle), Bitkisel Fitoseramidler (Ceramide NP/AP), Bitkisel Peptitler veya Hyaluronik Asit',
+      why: 'Hayvansal kolajen, kolesterol, salyangoz salgısı veya köpekbalığı skualeni ("Squalene") yerine bitkisel Squalane ve fitoseramidler aynı bariyer/onarım etkisini helal ve vegan olarak sunar.'
+    },
+    en: {
+      lookFor: 'Olive-Derived "Squalane" (with an "a"), Plant Phytoceramides (Ceramide NP/AP), Plant Peptides, or Hyaluronic Acid',
+      why: 'Plant Squalane and phytoceramides provide the same barrier repair as animal collagen, cholesterol, snail mucin, or shark squalene, while remaining 100% Halal and Vegan.'
+    },
+    ar: {
+      lookFor: 'السكوالان النباتي المشتق من الزيتون (Squalane)، السيراميدات النباتية (Ceramide NP/AP)، الببتيدات النباتية أو حمض الهيالورونيك',
+      why: 'السكوالان والسيراميد النباتي يوفران نفس ترميم البشرة بدلاً من الكولاجين الحيواني أو الكوليسترول أو خلاصة الحلزون مع توافق تام مع الحلال والنباتي.'
+    },
+    de: {
+      lookFor: 'Pflanzliches „Squalane“ (aus Oliven, mit „a“), Phytoceramide (Ceramide NP/AP), pflanzliche Peptide oder Hyaluronsäure',
+      why: 'Pflanzliches Squalan und Phytoceramide bieten dieselbe Barrierereparatur wie tierisches Kollagen, Cholesterin oder Schneckenschleim – komplett Halal und Vegan.'
+    },
+    fr: {
+      lookFor: '« Squalane » végétal issu de l’olive (avec un « a »), Phytocéramides (Ceramide NP/AP), Peptides végétaux ou Acide hyaluronique',
+      why: 'Le squalane végétal et les phytocéramides offrent la même réparation cutanée que le collagène animal, le cholestérol ou la mucine d’escargot, en étant 100 % Halal et Vegan.'
+    },
+    id: {
+      lookFor: 'Squalane Nabati dari Zaitun (dengan huruf "a"), Fitoseramida (Ceramide NP/AP), Peptida Nabati, atau Asam Hialuronat',
+      why: 'Squalane nabati dan fitoseramida memberikan perbaikan skin barrier yang setara dengan kolagen hewani, kolesterol, atau lendir siput secara Halal dan Vegan.'
+    },
+    ms: {
+      lookFor: 'Squalane Tumbuhan daripada Zaitun (ejaan "a"), Fitoseramida (Ceramide NP/AP), Peptida Tumbuhan atau Asid Hialuronik',
+      why: 'Squalane tumbuhan dan fitoseramida memberi pemulihan kulit setara kolagen haiwan, kolesterol atau lendir siput secara 100% Halal dan Vegan.'
+    },
+    es: {
+      lookFor: '«Squalane» vegetal de oliva (con «a»), Fitoceramidas (Ceramide NP/AP), Péptidos vegetales o Ácido hialurónico',
+      why: 'El escualano vegetal y las fitoceramidas reparan la barrera cutánea igual que el colágeno animal, colesterol o baba de caracol, siendo 100% Halal y veganos.'
+    },
+    ru: {
+      lookFor: 'Растительный сквалан из оливы («Squalane» через «a»), фитоцерамиды (Ceramide NP/AP), растительные пептиды или гиалуроновая кислота',
+      why: 'Растительный сквалан и фитоцерамиды восстанавливают кожный барьер так же эффективно, как животный коллаген, холестерин или муцин улитки, оставаясь Халяль и Веган.'
+    },
+    ur: {
+      lookFor: 'زیتون سے حاصل کردہ نباتاتی اسکوئلین ("Squalane" — "a" کے ساتھ)، نباتاتی سیرامائیڈز (Ceramide NP/AP)، پیپٹائڈز یا ہائیلورونک ایسڈ',
+      why: 'حیوانی کولاجن، کولیسٹرول یا گھونگھے کے لعاب کے بجائے نباتاتی Squalane اور سیرامائیڈز جلد کی بہترین مرمت حلال اور ویگن طریقے سے کرتے ہیں۔'
+    }
+  },
+  swap_aroma_vanilla_carrier: {
+    category: 'halal',
+    tr: {
+      lookFor: 'Doğal Vanilya Çubuğu Tozu, Alkolsüz Vanilin veya "Helal Sertifikalı / Bitkisel Yağ Taşıyıcılı" Aroma',
+      why: 'Sıvı aromalarda ve vanilya ekstraktında etil alkol çözücü riskini dışlamak için toz vanilya, vanilin veya helal sertifikalı aroma tercih edilmelidir.'
+    },
+    en: {
+      lookFor: 'Natural Vanilla Bean Powder, Alcohol-Free Vanillin, or "Halal-Certified / Plant-Oil Carrier" Flavorings',
+      why: 'Vanilla bean powder, vanillin, or Halal-certified oil-based flavorings avoid the ethyl alcohol extraction/carrier solvent risk.'
+    },
+    ar: {
+      lookFor: 'مسحوق الفانيليا الطبيعية، الفانيلين الخالي من الكحول، أو المنكهات ذات "شهادة الحلال / المذيب الزيتي النباتي"',
+      why: 'لتجنب احتمال استخدام الكحول الإيثيلي كمذيب في خلاصة الفانيليا السائلة والمنكهات، يُفضل مسحوق الفانيليا أو الفانيلين أو المنتج الموثق بشهادة حلال.'
+    },
+    de: {
+      lookFor: 'Gemahlene Vanilleschote, alkoholfreies Vanillin oder „Halal-zertifizierte Aromen auf Pflanzenölbasis“',
+      why: 'Vanillepulver, Vanillin oder Halal-zertifizierte Aromen schließen das Risiko von Ethanol als Extraktions- oder Trägerlösungsmittel aus.'
+    },
+    fr: {
+      lookFor: 'Poudre de gousse de vanille, Vanilline sans alcool ou arômes « Certifiés Halal / sur support huile végétale »',
+      why: 'La poudre de vanille, la vanilline ou les arômes certifiés Halal évitent le risque de solvant éthylique dans les extraits liquides.'
+    },
+    id: {
+      lookFor: 'Bubuk Vanili Alami, Vanilin Bebas Alkohol, atau Perisa "Bersertifikat Halal / Pelarut Minyak Nabati"',
+      why: 'Bubuk vanili, vanilin, atau perisa bersertifikat Halal menghindari risiko pelarut etanol pada ekstrak vanila cair.'
+    },
+    ms: {
+      lookFor: 'Serbuk Vanila Asli, Vanilin Tanpa Alkohol atau Perisa "Bersijil Halal / Pembawa Minyak Tumbuhan"',
+      why: 'Serbuk vanila, vanilin atau perisa bersijil Halal mengelakkan risiko pelarut etanol dalam ekstrak vanila cecair.'
+    },
+    es: {
+      lookFor: 'Polvo de vaina de vainilla, Vainillina sin alcohol o aromas «Certificados Halal / en base de aceite vegetal»',
+      why: 'El polvo de vainilla, la vainillina o los aromas certificados Halal evitan el uso de etanol como disolvente portador.'
+    },
+    ru: {
+      lookFor: 'Молотая натуральная ваниль, безалкогольный ванилин или ароматизаторы с сертификатом «Халяль»',
+      why: 'Ванильный порошок, ванилин или сертифицированные Халяль ароматизаторы исключают риск спиртового растворителя.'
+    },
+    ur: {
+      lookFor: 'قدرتی ونیلا پاؤڈر، الکحل سے پاک ونیلن (Vanillin) یا "حلال سرٹیفائیڈ / نباتاتی تیل والا فلیور"',
+      why: 'مائع ونیلا ایکسٹریکٹ اور فلیورز میں ایتھانول محلول کے خطرے سے بچنے کے لیے ونیلا پاؤڈر، ونیلن یا حلال سرٹیفائیڈ فلیور بہترین انتخاب ہے۔'
+    }
+  },
+  swap_preservatives_mi_parabens: {
+    category: 'health_regulatory',
+    tr: {
+      lookFor: 'Sodium Benzoate, Potassium Sorbate, Pentylene Glycol + Ethylhexylglycerin veya "Paraben & MI/MCI İçermez" Formüller',
+      why: 'Yüksek kontakt alerji potansiyelli MI/MCI, formaldehit salıcılar veya uzun zincirli parabenler yerine gıda sınıfı organik asit tuzları ve biyomimetik glikoller cilt için çok daha güvenlidir.'
+    },
+    en: {
+      lookFor: 'Sodium Benzoate, Potassium Sorbate, Pentylene Glycol + Ethylhexylglycerin, or "Paraben & MI/MCI-Free" formulas',
+      why: 'Organic acid salts and biomimetic glycols provide safe preservation without the contact allergy or endocrine concerns of MI/MCI, formaldehyde releasers, or long-chain parabens.'
+    },
+    ar: {
+      lookFor: 'بنزوات الصوديوم (Sodium Benzoate)، سوربات البوتاسيوم (Potassium Sorbate)، أو بنتيلين جلايكول مع إيثيل هكسيل جلسرين',
+      why: 'بدائل الحفظ اللطيفة تحمي المنتج دون مخاطر التحسس الجلدي الشديد المرتبطة بمواد MI/MCI أو مطلقات الفورمالديهايد أو البارابين المحظور.'
+    },
+    de: {
+      lookFor: 'Sodium Benzoate, Potassium Sorbate, Pentylene Glycol + Ethylhexylglycerin oder „Paraben- & MI/MCI-frei“',
+      why: 'Milde Konservierungssysteme vermeiden das hohe Kontaktallergie- und Reizpotenzial von MI/MCI, Formaldehydabspaltern und bedenklichen Parabenen.'
+    },
+    fr: {
+      lookFor: 'Sodium Benzoate, Potassium Sorbate, Pentylene Glycol + Ethylhexylglycerin ou formules « Sans parabènes ni MI/MCI »',
+      why: 'Ces conservateurs doux évitent le fort potentiel allergène des isothiazolinones (MI/MCI), des libérateurs de formaldéhyde et des parabènes à chaîne longue.'
+    },
+    id: {
+      lookFor: 'Sodium Benzoate, Potassium Sorbate, Pentylene Glycol + Ethylhexylglycerin, atau formula "Bebas Paraben & MI/MCI"',
+      why: 'Pengawet lembut ini mencegah risiko alergi kontak tinggi dari MI/MCI, pelepas formaldehida, maupun paraben rantai panjang.'
+    },
+    ms: {
+      lookFor: 'Sodium Benzoate, Potassium Sorbate, Pentylene Glycol + Ethylhexylglycerin atau formula "Bebas Paraben & MI/MCI"',
+      why: 'Pengawet lembut ini mengelakkan risiko alahan sentuhan tinggi daripada MI/MCI, pelepas formaldehid dan paraben terlarang.'
+    },
+    es: {
+      lookFor: 'Sodium Benzoate, Potassium Sorbate, Pentylene Glycol + Ethylhexylglycerin o fórmulas «Sin parabenos ni MI/MCI»',
+      why: 'Estos conservantes suaves evitan la dermatitis de contacto asociada a MI/MCI, liberadores de formaldehído y parabenos restringidos.'
+    },
+    ru: {
+      lookFor: 'Sodium Benzoate, Potassium Sorbate, Pentylene Glycol + Ethylhexylglycerin или формулы «Без парабенов и MI/MCI»',
+      why: 'Мягкие консерванты защищают формулу без высокого риска контактного дерматита от MI/MCI, доноров формальдегида и парабенов.'
+    },
+    ur: {
+      lookFor: 'Sodium Benzoate، Potassium Sorbate، Pentylene Glycol + Ethylhexylglycerin یا "پیرابین اور MI/MCI سے پاک" فارمولے',
+      why: 'MI/MCI، فارملڈیہائیڈ خارج کرنے والے اجزاء اور پیرابینز کے مقابلے میں یہ متبادل حساس جلد کو الرجی اور جلن سے محفوظ رکھتے ہیں۔'
+    }
+  },
+  swap_harsh_sulfates: {
+    category: 'health_regulatory',
+    tr: {
+      lookFor: 'Coco-Glucoside, Decyl Glucoside, Lauryl Glucoside, Sodium Cocoyl Isethionate veya Cocamidopropyl Betaine ("Sülfatsız / Sulfate-Free")',
+      why: 'Sert sülfatlar (SLS/SLES) yerine şeker ve hindistancevizi bazlı glukozit/izetiyonat yüzey aktifler cilt ve saç derisi bariyerini kurutmadan temizler.'
+    },
+    en: {
+      lookFor: 'Coco-Glucoside, Decyl Glucoside, Lauryl Glucoside, Sodium Cocoyl Isethionate, or Cocamidopropyl Betaine ("Sulfate-Free")',
+      why: 'Sugar- and coconut-derived glucoside/isethionate surfactants cleanse gently without stripping the skin or scalp barrier like harsh SLS/SLES.'
+    },
+    ar: {
+      lookFor: 'كوكو جلوكوسيد (Coco-Glucoside)، ديسيل جلوكوسيد (Decyl Glucoside)، أو إيزيثيونات الصوديوم ("خالٍ من السلفات / Sulfate-Free")',
+      why: 'المنظفات المشتقة من السكر وجوز الهند تنظف بلطف دون إضعاف حاجز البشرة أو فروة الرأس كما تفعل السلفات القوية (SLS/SLES).'
+    },
+    de: {
+      lookFor: 'Coco-Glucoside, Decyl Glucoside, Lauryl Glucoside, Sodium Cocoyl Isethionate („Sulfatfrei / Sulfate-Free“)',
+      why: 'Zucker- und kokosbasierte Tenside reinigen sanft, ohne die Hautbarriere wie aggressive Sulfate (SLS/SLES) auszutrocknen.'
+    },
+    fr: {
+      lookFor: 'Coco-Glucoside, Decyl Glucoside, Lauryl Glucoside, Sodium Cocoyl Isethionate (« Sans sulfates / Sulfate-Free »)',
+      why: 'Les tensioactifs doux issus du sucre et de la noix de coco nettoient sans agresser la barrière cutanée contrairement aux SLS/SLES.'
+    },
+    id: {
+      lookFor: 'Coco-Glucoside, Decyl Glucoside, Lauryl Glucoside, atau Sodium Cocoyl Isethionate ("Bebas Sulfat / Sulfate-Free")',
+      why: 'Surfaktan berbasis gula dan kelapa membersihkan dengan lembut tanpa mengikis pelindung kulit seperti SLS/SLES.'
+    },
+    ms: {
+      lookFor: 'Coco-Glucoside, Decyl Glucoside, Lauryl Glucoside atau Sodium Cocoyl Isethionate ("Bebas Sulfat / Sulfate-Free")',
+      why: 'Surfaktan berasaskan gula dan kelapa membersihkan secara lembut tanpa merengsakan kulit seperti SLS/SLES.'
+    },
+    es: {
+      lookFor: 'Coco-Glucoside, Decyl Glucoside, Lauryl Glucoside o Sodium Cocoyl Isethionate («Sin sulfatos / Sulfate-Free»)',
+      why: 'Los tensioactivos derivados del azúcar y el coco limpian suavemente sin resecar la barrera cutánea como el SLS/SLES.'
+    },
+    ru: {
+      lookFor: 'Coco-Glucoside, Decyl Glucoside, Lauryl Glucoside или Sodium Cocoyl Isethionate («Без сульфатов / Sulfate-Free»)',
+      why: 'Мягкие ПАВ из кокоса и сахаров бережно очищают кожу и волосы, не разрушая липидный барьер, в отличие от SLS/SLES.'
+    },
+    ur: {
+      lookFor: 'Coco-Glucoside، Decyl Glucoside، Lauryl Glucoside یا Sodium Cocoyl Isethionate ("سلفیٹ فری / Sulfate-Free")',
+      why: 'تیز سلفیٹس (SLS/SLES) کے بجائے ناریل اور شوگر سے بنے نرم کلینزنگ اجزاء جلد اور بالوں کی قدرتی نمی کو نقصان پہنچائے بغیر صفائی کرتے ہیں۔'
+    }
+  },
+  swap_fragrance_sensitizers: {
+    category: 'health_regulatory',
+    tr: {
+      lookFor: '"Parfümsüz / Fragrance-Free" İbareli, Panthenol (B5), Allantoin, Bisabolol veya Yulaf Özlü (Avena Sativa) Formüller',
+      why: 'Yasaklı/alerjen koku bileşenleri (Lilial, Lyral, Linalool, Limonene, Parfum) kontakt dermatitin 1 numaralı tetikleyicisidir; parfümsüz yatıştırıcı formüller bu riski kapatır.'
+    },
+    en: {
+      lookFor: '"Fragrance-Free / Unscented" formulas enriched with Panthenol (B5), Allantoin, Bisabolol, or Colloidal Oatmeal (Avena Sativa)',
+      why: 'Banned or sensitizing fragrance allergens (Lilial, Lyral, Linalool, Limonene, Parfum) are leading triggers of contact dermatitis; fragrance-free soothing formulas eliminate this risk.'
+    },
+    ar: {
+      lookFor: 'تركيبات تحمل عبارة "خالٍ من العطور / Fragrance-Free" مع البانثينول (B5)، الألانتوين، البيسابولول أو خلاصة الشوفان',
+      why: 'مسببات حساسية العطور (مثل Lilial وLinalool وParfum) هي المحفز الأول لالتهاب الجلد التماسي؛ المنتجات الخالية من العطور تمنع هذا التهيج.'
+    },
+    de: {
+      lookFor: '„Parfümfrei / Fragrance-Free“-Formeln mit Panthenol (B5), Allantoin, Bisabolol oder Haferextrakt (Avena Sativa)',
+      why: 'Duftstoffallergene (Lilial, Linalool, Limonene, Parfum) sind Hauptauslöser für Kontaktallergien; parfümfreie Pflege schützt empfindliche Haut.'
+    },
+    fr: {
+      lookFor: 'Formules « Sans parfum / Fragrance-Free » avec Panthénol (B5), Allantoïne, Bisabolol ou Avoine colloïdale (Avena Sativa)',
+      why: 'Les allergènes de parfum (Lilial, Linalool, Limonene, Parfum) sont la première cause d’eczéma de contact ; les soins sans parfum éliminent ce risque.'
+    },
+    id: {
+      lookFor: 'Formula "Fragrance-Free / Tanpa Parfum" dengan Panthenol (B5), Allantoin, Bisabolol, atau Oat (Avena Sativa)',
+      why: 'Alergen pewangi (Lilial, Linalool, Limonene, Parfum) adalah pemicu utama dermatitis kontak; formula bebas parfum menjaga kulit sensitif tetap aman.'
+    },
+    ms: {
+      lookFor: 'Formula "Tanpa Pewangi / Fragrance-Free" dengan Panthenol (B5), Allantoin, Bisabolol atau Ekstrak Oat (Avena Sativa)',
+      why: 'Alergen pewangi (Lilial, Linalool, Limonene, Parfum) ialah pencetus utama ekzema sentuhan; formula bebas pewangi menghapuskan risiko ini.'
+    },
+    es: {
+      lookFor: 'Fórmulas «Sin perfume / Fragrance-Free» con Pantenol (B5), Alantoína, Bisabolol o Avena coloidal (Avena Sativa)',
+      why: 'Los alérgenos de fragancia (Lilial, Linalool, Limonene, Parfum) son la principal causa de dermatitis de contacto; las fórmulas sin perfume previenen la irritación.'
+    },
+    ru: {
+      lookFor: 'Формулы «Без отдушек / Fragrance-Free» с пантенолом (B5), аллантоином, бисабололом или экстрактом овса (Avena Sativa)',
+      why: 'Парфюмерные аллергены (Lilial, Linalool, Limonene, Parfum) — главная причина контактного дерматита; средства без отдушек безопасны для чувствительной кожи.'
+    },
+    ur: {
+      lookFor: '"خوشبو سے پاک / Fragrance-Free" فارمولے جن میں Panthenol (B5)، Allantoin، Bisabolol یا جئی کا عرق (Avena Sativa) شامل ہو',
+      why: 'خوشبو کے الرجنز (جیسے Lilial، Linalool، Parfum) جلد کی الرجی اور خارش کی سب سے بڑی وجہ ہیں؛ خوشبو سے پاک فارمولے اس خطرے کو ختم کرتے ہیں۔'
+    }
+  },
+  swap_retinoids_acids_actives: {
+    category: 'health_regulatory',
+    tr: {
+      lookFor: 'Bakuchiol (Bitkisel Retinol Alternatifi), Niacinamide (B3), Azelaic Acid, Tranexamic Acid veya PHA (Gluconolactone)',
+      why: 'Gebelikte veya hassas ciltte kısıtlı/tahriş edici retinoid, hidrokinon ve sert soyucu asitler yerine Bakuchiol, Azelaik Asit ve Niacinamide güvenli leke ve yenileme desteği sağlar.'
+    },
+    en: {
+      lookFor: 'Bakuchiol (Plant Retinol Alternative), Niacinamide (Vitamin B3), Azelaic Acid, Tranexamic Acid, or PHA (Gluconolactone)',
+      why: 'Bakuchiol, Azelaic Acid, and Niacinamide deliver gentle brightening and renewal without the pregnancy or irritation risks of retinoids, hydroquinone, or strong acids.'
+    },
+    ar: {
+      lookFor: 'باكوتشيول (Bakuchiol - البديل النباتي للريتينول)، نياسيناميد (B3)، حمض الأزيليك (Azelaic Acid) أو أحماض PHA اللطيفة',
+      why: 'الباكوتشيول وحمض الأزيليك والنياسيناميد توفر تجديداً وتفتيحاً آمناً للبشرة دون مخاطر الريتينويدات أو الهيدروكينون أثناء الحمل أو للبشرة الحساسة.'
+    },
+    de: {
+      lookFor: 'Bakuchiol (pflanzliche Retinol-Alternative), Niacinamid (B3), Azelainsäure (Azelaic Acid) oder milde PHA (Gluconolacton)',
+      why: 'Bakuchiol, Azelainsäure und Niacinamid bieten sanfte Hauterneuerung ohne die Schwangerschafts- und Reizrisiken von Retinoiden oder Hydrochinon.'
+    },
+    fr: {
+      lookFor: 'Bakuchiol (alternative végétale au rétinol), Niacinamide (B3), Acide azélaïque ou PHA doux (Gluconolactone)',
+      why: 'Le Bakuchiol, l’acide azélaïque et la niacinamide offrent un soin anti-taches et régénérant sûr, sans les risques liés aux rétinoïdes ou à l’hydroquinone.'
+    },
+    id: {
+      lookFor: 'Bakuchiol (Alternatif Retinol Nabati), Niacinamide (B3), Azelaic Acid, Tranexamic Acid, atau PHA (Gluconolactone)',
+      why: 'Bakuchiol, Azelaic Acid, dan Niacinamide memberikan pencerahan serta regenerasi kulit yang aman bagi ibu hamil dan kulit sensitif.'
+    },
+    ms: {
+      lookFor: 'Bakuchiol (Alternatif Retinol Tumbuhan), Niacinamide (B3), Azelaic Acid, Tranexamic Acid atau PHA (Gluconolactone)',
+      why: 'Bakuchiol, Azelaic Acid dan Niacinamide mencerahkan serta memperbaharui kulit dengan selamat tanpa risiko retinoid atau hidrokuinon.'
+    },
+    es: {
+      lookFor: 'Bakuchiol (alternativa vegetal al retinol), Niacinamida (B3), Ácido azelaico o PHA suaves (Gluconolactona)',
+      why: 'El Bakuchiol, el ácido azelaico y la niacinamida renuevan e iluminan la piel sin los riesgos de los retinoides o la hidroquinona.'
+    },
+    ru: {
+      lookFor: 'Бакучиол (Bakuchiol — растительная альтернатива ретинолу), ниацинамид (B3), азелаиновая кислота или мягкие PHA-кислоты',
+      why: 'Бакучиол, азелаиновая кислота и ниацинамид безопасно обновляют и осветляют кожу без рисков ретиноидов и гидрохинона.'
+    },
+    ur: {
+      lookFor: 'باکوچیول (Bakuchiol — ریٹینول کا نباتاتی متبادل)، نیاسینامائڈ (B3)، ایزیلک ایسڈ (Azelaic Acid) یا نرم PHA (Gluconolactone)',
+      why: 'حمل یا حساس جلد میں ریٹینول، ہائیڈروکوئنون اور تیز تیزاب کے بجائے باکوچیول، ایزیلک ایسڈ اور نیاسینامائڈ محفوظ متبادل ہیں۔'
+    }
+  },
+  swap_uv_filters_silicones_nail: {
+    category: 'health_regulatory',
+    tr: {
+      lookFor: 'Güneşte Mineral Filtre (Zinc Oxide) veya Yeni Nesil Tinosorb S / Uvinul A Plus; Tırnakta "HEMA-Free & TPO-Free"; Bakımda Skualan / Piroctone Olamine',
+      why: 'Endokrin/alerji şüphesi taşıyan eski nesil UV filtreleri, siklosiloksanlar (D4/D5), Zinc Pyrithione ve TPO/HEMA yerine yeni nesil güvenli aktifler tercih edilmelidir.'
+    },
+    en: {
+      lookFor: 'Mineral UV Filters (Zinc Oxide) or Modern Filters (Tinosorb S / Uvinul A Plus); "HEMA-Free & TPO-Free" nail gels; Squalane / Piroctone Olamine in care',
+      why: 'Replaces legacy UV filters, cyclosiloxanes (D4/D5), banned Zinc Pyrithione, and sensitizing nail monomers (TPO/HEMA) with compliant modern actives.'
+    },
+    ar: {
+      lookFor: 'فلاتر شمسية معدنية (Zinc Oxide) أو حديثة (Tinosorb S)؛ طلاء أظافر "خالٍ من TPO وHEMA"؛ وسكوالان / بيروكتون أولامين في العناية',
+      why: 'استبدال فلاتر الأشعة القديمة والسيكلوسيلوكسانات ومواد الأظافر المحظورة (TPO/HEMA) ببدائل حديثة آمنة ومعتمدة.'
+    },
+    de: {
+      lookFor: 'Mineralische UV-Filter (Zinc Oxide) oder Tinosorb S; „HEMA-Free & TPO-Free“ bei Nagellack; Squalan / Pirocton Olamin in der Pflege',
+      why: 'Ersetzt bedenkliche Alt-UV-Filter, Cyclosiloxane (D4/D5), Zinkpyrithion und TPO/HEMA durch moderne, EU-konforme Wirkstoffe.'
+    },
+    fr: {
+      lookFor: 'Filtres UV minéraux (Zinc Oxide) ou Tinosorb S ; vernis « Sans HEMA ni TPO » ; Squalane / Piroctone Olamine en soin',
+      why: 'Remplace les anciens filtres UV, cyclosiloxanes (D4/D5), pyrithione de zinc et monomères TPO/HEMA par des actifs modernes sûrs.'
+    },
+    id: {
+      lookFor: 'Filter UV Mineral (Zinc Oxide) atau Tinosorb S; Kuteks Gel "HEMA-Free & TPO-Free"; Squalane / Piroctone Olamine pada perawatan',
+      why: 'Menggantikan filter UV lama, siklosiloksan (D4/D5), Zinc Pyrithione, dan monomer kuku TPO/HEMA dengan bahan aktif modern yang aman.'
+    },
+    ms: {
+      lookFor: 'Penapis UV Mineral (Zinc Oxide) atau Tinosorb S; Gel Kuku "HEMA-Free & TPO-Free"; Squalane / Piroctone Olamine dalam penjagaan',
+      why: 'Menggantikan penapis UV lama, siklosiloksana (D4/D5), Zinc Pyrithione dan monomer TPO/HEMA dengan bahan aktif moden yang selamat.'
+    },
+    es: {
+      lookFor: 'Filtros UV minerales (Zinc Oxide) o Tinosorb S; esmaltes «Sin HEMA ni TPO»; Escualano / Piroctona Olamina en cuidado',
+      why: 'Sustituye filtros UV antiguos, ciclosiloxanos (D4/D5), piritionato de zinc y TPO/HEMA por activos modernos seguros.'
+    },
+    ru: {
+      lookFor: 'Минеральные UV-фильтры (Zinc Oxide) или Tinosorb S; гель-лаки «HEMA-Free & TPO-Free»; сквалан / пироктон оламин в уходе',
+      why: 'Заменяет устаревшие UV-фильтры, циклосилоксаны (D4/D5), пиритион цинка и мономеры TPO/HEMA современными безопасными компонентами.'
+    },
+    ur: {
+      lookFor: 'منرل یو وی فلٹرز (Zinc Oxide) یا جدید Tinosorb S؛ نیل جیل میں "HEMA-Free & TPO-Free"؛ اور دیکھ بھال میں Squalane / Piroctone Olamine',
+      why: 'پرانے یو وی فلٹرز، سائیکلوسلوکسین (D4/D5)، ممنوعہ زنک پائریتھیون اور TPO/HEMA کے بجائے جدید اور محفوظ اجزاء کا انتخاب کریں۔'
+    }
+  },
+  swap_comedogenic_acne: {
+    category: 'health_regulatory',
+    tr: {
+      lookFor: '"Non-Comedogenic (Gözenek Tıkamaz)" İbareli Skualan (Squalane), Jojoba Yağı, Caprylic/Capric Triglyceride veya Niacinamide',
+      why: 'Komedojenik ester ve ağır yağlar (Isopropyl Myristate, Hindistancevizi/Kakao yağı) akneye eğilimli ciltte gözenek tıkar; hafif kuru yağlar ve skualan gözenek dostudur.'
+    },
+    en: {
+      lookFor: '"Non-Comedogenic" Squalane, Jojoba Oil, Caprylic/Capric Triglyceride, or Niacinamide',
+      why: 'Heavy comedogenic esters and butters (Isopropyl Myristate, Coconut/Cocoa Butter) clog acne-prone pores; Squalane and lightweight triglycerides keep pores clear.'
+    },
+    ar: {
+      lookFor: 'السكوالان (Squalane)، زيت الجوجوبا، Caprylic/Capric Triglyceride أو النياسيناميد بعلامة "لا يسد المسام / Non-Comedogenic"',
+      why: 'الإسترات والزيوت الثقيلة (مثل Isopropyl Myristate وزيت جوز الهند) تسد المسام للبشرة المعرضة لحب الشباب، بينما السكوالان خفيف وآمن للمسام.'
+    },
+    de: {
+      lookFor: '„Nicht komedogenes (Non-Comedogenic)“ Squalan, Jojobaöl, Caprylic/Capric Triglyceride oder Niacinamid',
+      why: 'Schwere komedogene Ester und Fette verstopfen zu Akne neigende Poren; leichtes Squalan pflegt ohne Porenblockade.'
+    },
+    fr: {
+      lookFor: 'Squalane « Non comédogène », Huile de jojoba, Caprylic/Capric Triglyceride ou Niacinamide',
+      why: 'Les esters et beurres comédogènes obstruent les pores des peaux acnéiques ; le squalane hydrate sans boucher les pores.'
+    },
+    id: {
+      lookFor: 'Squalane "Non-Comedogenic", Minyak Jojoba, Caprylic/Capric Triglyceride, atau Niacinamide',
+      why: 'Ester dan minyak berat (Isopropyl Myristate, minyak kelapa) menyumbat pori kulit berjerawat; Squalane melembapkan tanpa memicu komedo.'
+    },
+    ms: {
+      lookFor: 'Squalane "Non-Comedogenic", Minyak Jojoba, Caprylic/Capric Triglyceride atau Niacinamide',
+      why: 'Ester dan minyak berat menyumbat liang pori kulit berjerawat; Squalane melembapkan tanpa menyumbat pori.'
+    },
+    es: {
+      lookFor: 'Escualano «No comedogénico», Aceite de jojoba, Caprylic/Capric Triglyceride o Niacinamida',
+      why: 'Los ésteres y mantecas comedogénicas obstruyen los poros con tendencia acneica; el escualano hidrata sin obstruir.'
+    },
+    ru: {
+      lookFor: 'Некомедогенный сквалан (Squalane), масло жожоба, Caprylic/Capric Triglyceride или ниацинамид',
+      why: 'Комедогенные эфиры и плотные масла забивают поры проблемной кожи; легкий сквалан увлажняет без риска комедонов.'
+    },
+    ur: {
+      lookFor: '"نان کومیڈوجینک (Non-Comedogenic)" اسکوئلین (Squalane)، جوجوبا آئل، Caprylic/Capric Triglyceride یا نیاسینامائڈ',
+      why: 'بھاری تیل اور ایسٹرز (جیسے Isopropyl Myristate) مسام بند کر کے ایکنی بڑھاتے ہیں؛ اسکوئلین مسام بند کیے بغیر جلد کو نرم رکھتا ہے۔'
+    }
+  },
+  swap_food_dyes_additives: {
+    category: 'health_regulatory',
+    tr: {
+      lookFor: 'Doğal Bitkisel Boyalar (Zerdeçal E100, Beta-Karoten E160a, Pancar E162), Biberiye Ekstresi (E392), C/E Vitamini (E300/E306) ve "Koruyucusuz / Renklendiricisiz" Etiket',
+      why: 'Sentetik azo boyalar, Titanyum Dioksit (E171), nitritler (E250) ve BHA/BHT yerine bitkisel özler ve doğal antioksidanlar çocuk gelişimi ve metabolik sağlık için güvenli alternatiftir.'
+    },
+    en: {
+      lookFor: 'Natural Plant Colorants (Turmeric/Curcumin E100, Beta-Carotene E160a, Beetroot E162), Rosemary Extract (E392), Vitamins C/E (E300/E306), and "No Artificial Colors/Preservatives"',
+      why: 'Replaces synthetic azo dyes, Titanium Dioxide (E171), nitrites (E250), and BHA/BHT with natural plant pigments and antioxidants.'
+    },
+    ar: {
+      lookFor: 'ملونات نباتية طبيعية (الكركم E100، بيتا كاروتين E160a، الشمندر E162)، خلاصة إكليل الجبل (E392)، وفيتامين C/E (E300/E306)',
+      why: 'استبدال أصباغ الآزو الصناعية وثاني أكسيد التيتانيوم (E171) والنتريت (E250) ومضادات الأكسدة الصناعية بمستخلصات نباتية طبيعية آمنة.'
+    },
+    de: {
+      lookFor: 'Natürliche Pflanzenfarbstoffe (Kurkuma E100, Beta-Carotin E160a, Rote Bete E162), Rosmarinextrakt (E392) sowie Vitamin C/E (E300/E306)',
+      why: 'Pflanzliche Farbstoffe und natürliche Antioxidantien ersetzen synthetische Azofarbstoffe, Titandioxid (E171), Nitrite (E250) und BHA/BHT.'
+    },
+    fr: {
+      lookFor: 'Colorants végétaux naturels (Curcuma E100, Bêta-carotène E160a, Betterave E162), Extrait de romarin (E392) et Vitamines C/E (E300/E306)',
+      why: 'Remplace les colorants azoïques synthétiques, le dioxyde de titane (E171), les nitrites (E250) et les BHA/BHT par des extraits végétaux naturels.'
+    },
+    id: {
+      lookFor: 'Pewarna Nabati Alami (Kunyit/Kurkumin E100, Beta-Karoten E160a, Bit E162), Ekstrak Rosemary (E392), dan Vitamin C/E (E300/E306)',
+      why: 'Menggantikan pewarna sintetis azo, Titanium Dioksida (E171), nitrit (E250), dan BHA/BHT dengan pigmen serta antioksidan alami.'
+    },
+    ms: {
+      lookFor: 'Pewarna Tumbuhan Asli (Kunyit E100, Beta-Karotena E160a, Ubi Bit E162), Ekstrak Rosemary (E392) dan Vitamin C/E (E300/E306)',
+      why: 'Menggantikan pewarna sintetik azo, Titanium Dioksida (E171), nitrit (E250) dan BHA/BHT dengan ekstrak tumbuhan semula jadi.'
+    },
+    es: {
+      lookFor: 'Colorantes vegetales naturales (Cúrcuma E100, Betacaroteno E160a, Remolacha E162), Extracto de romero (E392) y Vitaminas C/E (E300/E306)',
+      why: 'Sustituye colorantes azoicos sintéticos, dióxido de titanio (E171), nitritos (E250) y BHA/BHT por pigmentos y antioxidantes naturales.'
+    },
+    ru: {
+      lookFor: 'Натуральные растительные красители (куркумин E100, бета-каротин E160a, свекла E162), экстракт розмарина (E392) и витамины C/E (E300/E306)',
+      why: 'Заменяет синтетические азокрасители, диоксид титана (E171), нитриты (E250) и BHA/BHT безопасными природными антиоксидантами.'
+    },
+    ur: {
+      lookFor: 'قدرتی نباتاتی رنگ (ہلدی E100، بیٹا کیروٹین E160a، چقندر E162)، روزمیری ایکسٹریکٹ (E392) اور وٹامن C/E (E300/E306)',
+      why: 'مصنوعی رنگوں، ٹائٹینیم ڈائی آکسائیڈ (E171)، نائٹرائٹس (E250) اور BHA/BHT کے بجائے قدرتی نباتاتی اجزاء صحت کے لیے محفوظ متبادل ہیں۔'
+    }
+  },
+  swap_allergen_soy_lecithin: {
+    category: 'allergen_profile',
+    tr: {
+      lookFor: 'Ayçiçek Lesitini (Sunflower Lecithin) ve "Soya İçermez / Soy-Free" İbareli Ürünler',
+      why: 'Soya alerjisi veya hassasiyeti olanlar için Ayçiçek Lesitini (Sunflower Lecithin) aynı emülgatör görevini soya proteini riski olmadan yerine getirir.'
+    },
+    en: {
+      lookFor: 'Sunflower Lecithin and products labeled "Soy-Free"',
+      why: 'Sunflower Lecithin performs the exact same emulsifying function without soy allergen risks.'
+    },
+    ar: {
+      lookFor: 'ليسيثين دوار الشمس (Sunflower Lecithin) والمنتجات التي تحمل عبارة "خالٍ من الصويا / Soy-Free"',
+      why: 'يقوم ليسيثين دوار الشمس بنفس وظيفة الاستحلاب تماماً دون مخاطر حساسية الصويا.'
+    },
+    de: {
+      lookFor: 'Sonnenblumenlecithin (Sunflower Lecithin) und Produkte mit dem Hinweis „Sojafrei / Soy-Free“',
+      why: 'Sonnenblumenlecithin erfüllt dieselbe Emulgatorfunktion ohne das Allergierisiko von Soja.'
+    },
+    fr: {
+      lookFor: 'Lécithine de tournesol (Sunflower Lecithin) et produits mentionnant « Sans soja / Soy-Free »',
+      why: 'La lécithine de tournesol assure la même fonction émulsifiante sans risque d’allergie au soja.'
+    },
+    id: {
+      lookFor: 'Lesitin Bunga Matahari (Sunflower Lecithin) dan produk berlabel "Bebas Kedelai / Soy-Free"',
+      why: 'Lesitin bunga matahari memberikan fungsi pengemulsi yang sama tanpa risiko alergen kedelai.'
+    },
+    ms: {
+      lookFor: 'Lesitin Bunga Matahari (Sunflower Lecithin) dan produk berlabel "Bebas Soya / Soy-Free"',
+      why: 'Lesitin bunga matahari berfungsi sebagai pengemulsi yang sama tanpa risiko alahan soya.'
+    },
+    es: {
+      lookFor: 'Lecitina de girasol (Sunflower Lecithin) y productos etiquetados «Sin soja / Soy-Free»',
+      why: 'La lecitina de girasol cumple la misma función emulsionante sin el riesgo alergénico de la soja.'
+    },
+    ru: {
+      lookFor: 'Подсолнечный лецитин (Sunflower Lecithin) и продукты с маркировкой «Без сои / Soy-Free»',
+      why: 'Подсолнечный лецитин выполняет ту же роль эмульгатора без риска аллергии на сою.'
+    },
+    ur: {
+      lookFor: 'سورج مکھی کا لیسیتھین (Sunflower Lecithin) اور "سویا سے پاک / Soy-Free" لیبل والی مصنوعات',
+      why: 'سویا الرجی سے بچاؤ کے لیے سورج مکھی کا لیسیتھین بغیر کسی الرجن خطرے کے بالکل وہی ایملسیفائر کا کام کرتا ہے۔'
+    }
+  },
+  swap_allergen_dairy_milk: {
+    category: 'allergen_profile',
+    tr: {
+      lookFor: 'Yulaf, Badem veya Hindistancevizi Sütü/Kreması Bazlı ve "Süt Ürünü İçermez / Dairy-Free / Vegan" Etiketli Ürünler',
+      why: 'Süt proteini (kazein/peynir altı suyu), laktoz veya "eser miktarda süt" çapraz bulaşma riskine karşı bitkisel bazlı ve ayrı hatta üretilmiş ("Dairy-Free") ürünler güvenlidir.'
+    },
+    en: {
+      lookFor: 'Oat, Almond, or Coconut Milk/Cream alternatives labeled "Dairy-Free / Certified Vegan"',
+      why: 'Dedicated "Dairy-Free" plant-based products prevent both direct milk/lactose exposure and cross-contact trace milk risks.'
+    },
+    ar: {
+      lookFor: 'بدائل حليب الشوفان أو اللوز أو جوز الهند مع ملصق "خالٍ من الألبان / Dairy-Free / نباتي معتمد"',
+      why: 'المنتجات النباتية المصنعة في خطوط خالية من الألبان تحمي من بروتين الحليب واللاكتوز وآثار التلوث الخلطي.'
+    },
+    de: {
+      lookFor: 'Hafer-, Mandel- oder Kokosmilch-Alternativen mit „Milchfrei / Dairy-Free / Vegan“-Kennzeichnung',
+      why: 'Zertifiziert milchfreie Produkte schützen sowohl vor direktem Milcheiweiß/Laktose als auch vor Kreuzkontamination („Spuren von Milch“).'
+    },
+    fr: {
+      lookFor: 'Alternatives à base d’avoine, d’amande ou de coco portant la mention « Sans produits laitiers / Dairy-Free / Vegan »',
+      why: 'Les produits certifiés sans lait évitent l’exposition directe au lactose/caséine ainsi que les traces de contamination croisée.'
+    },
+    id: {
+      lookFor: 'Alternatif Susu Oat, Almond, atau Kelapa dengan label "Bebas Susu / Dairy-Free / Vegan"',
+      why: 'Produk nabati berlabel "Dairy-Free" mencegah paparan protein susu, laktosa, maupun kontaminasi silang.'
+    },
+    ms: {
+      lookFor: 'Alternatif Susu Oat, Badam atau Kelapa berlabel "Bebas Tenusu / Dairy-Free / Vegan"',
+      why: 'Produk berasaskan tumbuhan berlabel "Dairy-Free" mengelakkan pendedahan protein susu, laktosa dan jejak pencemaran silang.'
+    },
+    es: {
+      lookFor: 'Alternativas de avena, almendra o coco con etiqueta «Sin lácteos / Dairy-Free / Vegano»',
+      why: 'Los productos certificados sin lácteos evitan tanto la proteína de leche/lactosa como las trazas por contaminación cruzada.'
+    },
+    ru: {
+      lookFor: 'Продукты на основе овсяного, миндального или кокосового молока с маркировкой «Без молока / Dairy-Free / Веган»',
+      why: 'Сертифицированные безмолочные продукты защищают от молочного белка, лактозы и следов перекрестного загрязнения.'
+    },
+    ur: {
+      lookFor: 'جئی (Oat)، بادام یا ناریل کے دودھ پر مبنی اور "ڈیری فری / Dairy-Free / ویگن" لیبل والی مصنوعات',
+      why: 'دودھ کی الرجی، لیکٹوز یا "معمولی ذرات (May contain milk)" کے خطرے سے بچنے کے لیے ڈیری فری لائن پر تیار کردہ نباتاتی مصنوعات محفوظ ہیں۔'
+    }
+  },
+  swap_allergen_gluten_wheat: {
+    category: 'allergen_profile',
+    tr: {
+      lookFor: '"Glutensiz (Gluten-Free)" Sertifikalı Pirinç Unu, Karabuğday (Greçka), Mısır, Kinoa veya Glutensiz Yulaf Unu',
+      why: 'Çölyak ve gluten hassasiyetinde buğday/arpa/çavdar unu yerine sertifikalı glutensiz tahıl ve tohum unları tercih edilmelidir.'
+    },
+    en: {
+      lookFor: '"Certified Gluten-Free" Rice Flour, Buckwheat, Corn, Quinoa, or Gluten-Free Oat Flour',
+      why: 'Certified gluten-free grain and seed flours safely replace wheat, barley, and rye for celiac or gluten-sensitive individuals.'
+    },
+    ar: {
+      lookFor: 'دقيق الأرز، الحنطة السوداء، الذرة، الكينوا أو الشوفان المعتمد بشهادة "خالٍ من الغلوتين / Gluten-Free"',
+      why: 'للمصابين بالسيلياك أو حساسية الغلوتين، يُستبدل دقيق القمح والشعير ببدائل الحبوب المعتمدة الخالية من الغلوتين.'
+    },
+    de: {
+      lookFor: 'Zertifiziert „Glutenfreies (Gluten-Free)“ Reismehl, Buchweizen, Mais, Quinoa oder glutenfreies Hafermehl',
+      why: 'Bei Zöliakie und Glutensensitivität ersetzen zertifiziert glutenfreie Mehle Weizen, Gerste und Roggen sicher.'
+    },
+    fr: {
+      lookFor: 'Farine de riz, sarrasin, maïs, quinoa ou avoine certifiée « Sans gluten / Gluten-Free »',
+      why: 'Les farines certifiées sans gluten remplacent le blé, l’orge et le seigle en toute sécurité.'
+    },
+    id: {
+      lookFor: 'Tepung Beras, Buckwheat, Jagung, Quinoa, atau Oat Bersertifikat "Bebas Gluten / Gluten-Free"',
+      why: 'Tepung bebas gluten bersertifikat menggantikan gandum dan jelai dengan aman bagi penderita celiac atau sensitivitas gluten.'
+    },
+    ms: {
+      lookFor: 'Tepung Beras, Buckwheat, Jagung, Quinoa atau Oat Bersijil "Bebas Gluten / Gluten-Free"',
+      why: 'Tepung bebas gluten bersijil menggantikan gandum dan barli dengan selamat bagi individu sensitif gluten.'
+    },
+    es: {
+      lookFor: 'Harina de arroz, trigo sarraceno, maíz, quinoa o avena certificada «Sin gluten / Gluten-Free»',
+      why: 'Las harinas certificadas sin gluten sustituyen de forma segura al trigo, la cebada y el centeno.'
+    },
+    ru: {
+      lookFor: 'Рисовая, гречневая, кукурузная, киноа или овсяная мука с сертификатом «Без глютена / Gluten-Free»',
+      why: 'При целиакии и чувствительности к глютену пшеничную и ячменную муку заменяют сертифицированными безглютеновыми аналогами.'
+    },
+    ur: {
+      lookFor: '"گلوٹین فری (Gluten-Free)" سرٹیفائیڈ چاول کا آٹا، بک وہیٹ (Buckwheat)، مکئی، کوئنوا یا گلوٹین فری جئی کا آٹا',
+      why: 'سیلیک یا گلوٹین کی حساسیت میں گندم اور جو کے بجائے مصدقہ گلوٹین فری آٹا محفوظ متبادل ہے۔'
+    }
+  },
+  swap_allergen_nuts_other: {
+    category: 'allergen_profile',
+    tr: {
+      lookFor: 'Ayçiçeği/Kabak Çekirdeği Ezmesi, Nohut/Tahin Bazlı Ezme, Keten/Chia Jeli, "Kükürtsüz (Unsulphured)" Kuru Meyve ve "Alerjensiz Hat (Nut/Allergen-Free)" Etiketi',
+      why: 'Fındık/fıstık, yumurta, susam, sülfit veya çapraz bulaşma uyarısı taşıyan ürünler yerine ayrı üretim hattında üretilmiş sertifikalı alternatifler seçilmelidir.'
+    },
+    en: {
+      lookFor: 'Sunflower/Pumpkin Seed Butter, Chickpea/Tahini spreads, Flax/Chia gel, "Unsulphured" dried fruit, and "Nut-Free / Allergen-Free Facility" labels',
+      why: 'Seed-based spreads and dedicated allergen-free production lines avoid tree nut, peanut, egg, sulfite, and cross-contact trace risks.'
+    },
+    ar: {
+      lookFor: 'زبدة بذور دوار الشمس أو اليقطين، بدائل الحمص، الفواكه المجففة "غير المكبرتة (Unsulphured)" وملصق "مصنع خالٍ من المكسرات/مسببات الحساسية"',
+      why: 'بدائل البذور وخطوط الإنتاج المعزولة تحمي من حساسية المكسرات والفول السوداني والبيض والكبريتيت والتلوث الخلطي.'
+    },
+    de: {
+      lookFor: 'Sonnenblumenkern-/Kürbiskernmus, Leinsamen-/Chia-Gel, „ungeschwefelte“ Trockenfrüchte und „Nussfrei / Allergen-Free“-Kennzeichnung',
+      why: 'Saatenmuse und getrennte Produktionslinien vermeiden Risiken durch Schalenfrüchte, Erdnüsse, Ei, Sulfite und Kreuzkontamination.'
+    },
+    fr: {
+      lookFor: 'Purée de graines de tournesol/courge, gel de lin/chia, fruits secs « sans sulfites » et mention « Garanti sans fruits à coque / allergènes »',
+      why: 'Les purées de graines et lignes dédiées éliminent les risques liés aux fruits à coque, arachides, œufs, sulfites et traces croisées.'
+    },
+    id: {
+      lookFor: 'Selai Biji Bunga Matahari/Labu, Gel Chia/Flax, Buah Kering "Tanpa Sulfit", dan label "Bebas Kacang / Allergen-Free Facility"',
+      why: 'Alternatif biji-bijian dan fasilitas produksi bebas alergen mencegah risiko alergi kacang, telur, sulfit, serta kontaminasi silang.'
+    },
+    ms: {
+      lookFor: 'Mentega Biji Bunga Matahari/Labu, Gel Chia/Flax, Buah Kering "Tanpa Sulfit" dan label "Fasiliti Bebas Kacang / Alergen"',
+      why: 'Alternatif berasaskan biji dan barisan pengeluaran khusus mengelakkan risiko kacang, telur, sulfit serta pencemaran silang.'
+    },
+    es: {
+      lookFor: 'Crema de semillas de girasol/calabaza, gel de lino/chía, fruta seca «sin sulfitos» y sello «Sin frutos secos / Libre de alérgenos»',
+      why: 'Las cremas de semillas y líneas libres de alérgenos evitan riesgos de frutos secos, cacahuetes, huevo, sulfitos y trazas.'
+    },
+    ru: {
+      lookFor: 'Паста из семян подсолнечника/тыквы, гель чиа/льна, сухофрукты «без диоксида серы» и маркировка «Без орехов / аллергенов»',
+      why: 'Семенные пасты и отдельные производственные линии исключают риск аллергии на орехи, арахис, яйца, сульфиты и следы.'
+    },
+    ur: {
+      lookFor: 'سورج مکھی یا کدو کے بیجوں کا مکھن، السی/چیا جیل، "سلفائٹ سے پاک" خشک میوہ جات اور "نٹ فری / الرجن فری" لیبل والی مصنوعات',
+      why: 'گری دار میوے، مونگ پھلی، انڈے یا کراس کنٹیکٹ الرجی سے بچاؤ کے لیے بیجوں پر مبنی اور الگ لائن پر تیار کردہ مصنوعات محفوظ ہیں۔'
+    }
+  },
+  swap_added_sugar_syrup: {
+    category: 'sugar_nutrition',
+    tr: {
+      lookFor: '%100 Hurma Özü / Meyve Püresi, Stevia (E960), Eritritol (E968), Ksilitol (E967) veya "İlave Şekersiz / Glukoz-Fruktoz Şurupsuz" Etiketli Ürünler',
+      why: 'Rafine şeker, glukoz-fruktoz şurubu ve maltodekstrin ani kan şekeri dalgalanması yaratır; lifli meyve özleri veya doğal stevia/poliol alternatifleri glisemik yükü düşürür.'
+    },
+    en: {
+      lookFor: '100% Date/Fruit Puree, Stevia (E960), Erythritol (E968), Xylitol (E967), or products labeled "No Added Sugar / Glucose-Fructose Syrup-Free"',
+      why: 'Refined sucrose, glucose-fructose syrup, and maltodextrin spike blood glucose rapidly; whole-fruit purees or stevia/polyols lower glycemic load.'
+    },
+    ar: {
+      lookFor: 'خلاصة التمر أو الفاكهة الطبيعية 100%، ستيفيا (E960)، إريثريتول (E968)، أو المنتجات التي تحمل عبارة "بدون سكر مضاف / خالٍ من شراب الجلوكوز والفركتوز"',
+      why: 'السكر المكرر وشراب الجلوكوز والفركتوز والمالتوديكسترين ترفع سكر الدم بسرعة؛ بدائل الفاكهة الكاملة أو الستيفيا تخفض المؤشر الجلايسيمي.'
+    },
+    de: {
+      lookFor: '100 % Dattel-/Fruchtmark, Stevia (E960), Erythrit (E968), Xylit (E967) oder Produkte mit „Ohne Zuckerzusatz / Ohne Glukose-Fruktose-Sirup“',
+      why: 'Raffinierter Zucker, Glukose-Fruktose-Sirup und Maltodextrin lassen den Blutzucker stark ansteigen; Fruchtmark oder Stevia/Erythrit senken die glykämische Last.'
+    },
+    fr: {
+      lookFor: 'Purée de dattes/fruits 100 %, Stévia (E960), Érythritol (E968) ou mention « Sans sucres ajoutés / Sans sirop de glucose-fructose »',
+      why: 'Le sucre raffiné, le sirop de glucose-fructose et la maltodextrine provoquent des pics glycémiques ; les purées de fruits ou la stévia réduisent la charge glycémique.'
+    },
+    id: {
+      lookFor: 'Sari Kurma / Puree Buah 100%, Stevia (E960), Eritritol (E968), atau produk berlabel "Tanpa Gula Tambahan / Bebas Sirup Glukosa-Fruktosa"',
+      why: 'Gula rafinasi, sirup glukosa-fruktosa, dan maltodekstrin memicu lonjakan gula darah; sari buah utuh atau stevia memiliki beban glikemik lebih rendah.'
+    },
+    ms: {
+      lookFor: 'Puri Kurma / Buah 100%, Stevia (E960), Eritritol (E968) atau produk berlabel "Tanpa Gula Tambahan / Bebas Sirap Glukosa-Fruktosa"',
+      why: 'Gula bertapis, sirap glukosa-fruktosa dan maltodekstrin meningkatkan gula darah secara mendadak; puri buah atau stevia merendahkan beban glisemik.'
+    },
+    es: {
+      lookFor: 'Puré de dátiles/fruta 100 %, Estevia (E960), Eritritol (E968) o productos «Sin azúcares añadidos / Sin jarabe de glucosa-fructosa»',
+      why: 'El azúcar refinado, el jarabe de glucosa-fructosa y la maltodextrina elevan rápido la glucosa; la fruta entera o la estevia reducen la carga glucémica.'
+    },
+    ru: {
+      lookFor: '100% финиковая/фруктовая паста, стевия (E960), эритрит (E968) или маркировка «Без добавленного сахара и глюкозно-фруктозного сиропа»',
+      why: 'Рафинированный сахар, глюкозно-фруктозный сироп и мальтодекстрин вызывают скачки глюкозы; фруктовое пюре и стевия снижают гликемическую нагрузку.'
+    },
+    ur: {
+      lookFor: '100% کھجور یا پھلوں کا گودا، اسٹیویا (E960)، ایرتھریٹول (E968) یا "بغیر اضافی چینی / گلوکوز فرکٹوز سیرپ سے پاک" مصنوعات',
+      why: 'ریفائنڈ چینی، گلوکوز فرکٹوز سیرپ اور مالٹوڈیکسٹرین خون میں شوگر کو تیزی سے بڑھاتے ہیں؛ کھجور/پھلوں کا عرق یا اسٹیویا گلائسیمک بوجھ کم کرتے ہیں۔'
+    }
+  },
+  swap_custom_watchlist: {
+    category: 'allergen_profile',
+    tr: {
+      lookFor: 'Kişisel kara listenizdeki maddeyi içermeyen ("Free-From") kısa ve şeffaf içerikli alternatif formüller',
+      why: 'Kişisel kara listenizde işaretlediğiniz bileşenden kaçınmak için etiketinde bu maddenin ve türevlerinin yer almadığı sade formülleri tercih edin.'
+    },
+    en: {
+      lookFor: 'Minimalist "Free-From" formulas that exclude your personal watchlist ingredient and its derivatives',
+      why: 'Choose transparent, short-ingredient-list products that omit the specific substance flagged in your personal watchlist.'
+    },
+    ar: {
+      lookFor: 'تركيبات مبسطة وشفافة تخلو تماماً من المكون المدرج في قائمتك السوداء الشخصية ومشتقاته',
+      why: 'لتجنب المادة التي حددتها في قائمتك السوداء الشخصية، اختر منتجات ذات قائمة مكونات قصيرة وواضحة.'
+    },
+    de: {
+      lookFor: 'Minimalistische „Free-From“-Formulierungen ohne den auf Ihrer persönlichen Sperrliste markierten Inhaltsstoff',
+      why: 'Wählen Sie Produkte mit kurzer, transparenter INCI-Liste, die Ihren gesperrten Stoff vollständig ausschließen.'
+    },
+    fr: {
+      lookFor: 'Formules minimalistes « Sans / Free-From » excluant l’ingrédient inscrit sur votre liste noire personnelle',
+      why: 'Privilégiez des produits à liste courte qui ne contiennent pas la substance que vous avez personnellement exclue.'
+    },
+    id: {
+      lookFor: 'Formula minimalis yang bebas dari bahan dalam daftar hitam pribadi Anda',
+      why: 'Pilih produk dengan daftar komposisi singkat dan transparan yang tidak mengandung bahan yang Anda tandai.'
+    },
+    ms: {
+      lookFor: 'Formula ringkas yang bebas daripada bahan dalam senarai hitam peribadi anda',
+      why: 'Pilih produk dengan senarai ramuan pendek dan telus yang tidak mengandungi bahan yang anda sekat.'
+    },
+    es: {
+      lookFor: 'Fórmulas minimalistas libres del ingrediente incluido en su lista negra personal',
+      why: 'Elija productos con listas de ingredientes cortas y transparentes que excluyan la sustancia bloqueada en su perfil.'
+    },
+    ru: {
+      lookFor: 'Минималистичные формулы без компонента, внесенного в ваш личный черный список',
+      why: 'Выбирайте продукты с коротким и прозрачным составом, не содержащие отмеченное вами вещество.'
+    },
+    ur: {
+      lookFor: 'مختصر اور شفاف اجزاء والے فارمولے جو آپ کی ذاتی بلیک لسٹ میں شامل جزو سے پاک ہوں',
+      why: 'اپنی ذاتی بلیک لسٹ میں نشان زد کردہ مادے سے بچنے کے لیے سادہ اور واضح لیبل والی مصنوعات منتخب کریں۔'
+    }
+  }
+};
+
+function resolveHalalRuleSwapKey(ruleId) {
+  switch (ruleId) {
+    case 'pork_gelatin':
+    case 'gelatin_unspecified':
+      return 'swap_gelatin';
+    case 'lard':
+    case 'pork_generic':
+    case 'pork_bacon_ham_lardate':
+    case 'meat_poultry_tallow_slaughter_check':
+      return 'swap_animal_fat_meat';
+    case 'carmine_e120':
+      return 'swap_carmine_e120';
+    case 'shellac_e904':
+      return 'swap_shellac_e904';
+    case 'ethanol_cosmetic_or_food':
+    case 'wine_beer_liquor':
+      return 'swap_ethanol_alcohol';
+    case 'e471':
+    case 'e472_477':
+    case 'e432_e436_polysorbates':
+    case 'e481_e482_stearoyl_lactylates':
+    case 'stearic_acid_mg_stearate':
+    case 'glycerin':
+      return 'swap_emulsifier_e471';
+    case 'l_cysteine':
+    case 'whey_rennet':
+    case 'animal_enzymes_pepsin_lipase':
+    case 'e631_e635_nucleotides':
+    case 'edible_bone_phosphate_e542':
+      return 'swap_lcysteine_enzymes_whey';
+    case 'collagen_keratin':
+    case 'snail_mucin_halal':
+    case 'cholesterol_lipid':
+    case 'squalene':
+      return 'swap_collagen_snail_squalene';
+    case 'flavourings_aroma_solvent_check':
+    case 'vanilla_extract_carrier':
+      return 'swap_aroma_vanilla_carrier';
+    default:
+      return 'swap_emulsifier_e471';
+  }
+}
+
+function resolveSubstanceSwapKey(substanceId) {
+  switch (substanceId) {
+    case 'mi_mci':
+    case 'formaldehyde_releasers':
+    case 'formaldehyde_direct_banned':
+    case 'quaternium_15_chloroacetamide_banned':
+    case 'banned_parabens':
+    case 'propylparaben':
+    case 'butylparaben':
+    case 'methylparaben':
+    case 'ethylparaben':
+    case 'phenoxyethanol':
+    case 'benzyl_alcohol':
+    case 'chlorphenesin_ipbc_chlorhexidine':
+      return 'swap_preservatives_mi_parabens';
+    case 'sls':
+    case 'sles':
+    case 'stronger_anionic_surfactants':
+    case 'cocamide_dea_mea':
+      return 'swap_harsh_sulfates';
+    case 'lilial':
+    case 'lyral_hicc_banned':
+    case 'fragrance_allergens':
+    case 'parfum':
+    case 'essential_oils_potent':
+      return 'swap_fragrance_sensitizers';
+    case 'retinol':
+    case 'tretinoin':
+    case 'salicylic_acid':
+    case 'benzoyl_peroxide':
+    case 'hydroquinone_banned':
+    case 'kojic_acid':
+    case 'aha_glycolic_lactic_mandelic':
+    case 'boric_acid_borates_restricted':
+    case 'mercury_compounds_banned':
+      return 'swap_retinoids_acids_actives';
+    case 'comedogenic_esters_oils':
+      return 'swap_comedogenic_acne';
+    case 'titanium_dioxide_e171_ci77891':
+    case 'southampton_dyes':
+    case 'other_synthetic_food_colors_e123_e155':
+    case 'ammonia_sulfite_caramel_e150c_d':
+    case 'nitrites_e249_e250':
+    case 'nitrates_e251_e252':
+    case 'bht':
+    case 'bha_antioxidant':
+    case 'tbhq_propyl_gallate_e310_e319':
+    case 'carrageenan_e407':
+    case 'msg_e621':
+    case 'phosphates_e338_e452':
+    case 'artificial_sweeteners_aspartame_acesulfame_sucralose':
+      return 'swap_food_dyes_additives';
+    case 'alcohol_denat':
+    case 'isopropyl_alcohol':
+      return 'swap_ethanol_alcohol';
+    case 'allergen_soy':
+      return 'swap_allergen_soy_lecithin';
+    case 'allergen_milk_dairy':
+      return 'swap_allergen_dairy_milk';
+    case 'allergen_gluten_wheat':
+      return 'swap_allergen_gluten_wheat';
+    case 'allergen_peanuts':
+    case 'allergen_tree_nuts':
+    case 'allergen_egg':
+    case 'allergen_sesame':
+    case 'allergen_mustard':
+    case 'allergen_celery':
+    case 'allergen_lupin':
+    case 'allergen_fish':
+    case 'allergen_crustaceans':
+    case 'allergen_molluscs':
+    case 'sulfites_e220_e228':
+    case 'lysozyme_e1105_egg':
+    case 'cross_contact_trace_allergen':
+      return 'swap_allergen_nuts_other';
+    default:
+      return 'swap_uv_filters_silicones_nail';
+  }
+}
+
+function buildSwapGuideCard({ lang, productType, observations, regulatoryCard, profileCard, halalCard, veganSugarCard }) {
+  const ui = SWAP_GUIDE_UI_I18N[lang] || SWAP_GUIDE_UI_I18N.en;
+  const grouped = new Map();
+
+  function addSwapTrigger(swapKey, detectedName, severity) {
+    const ruleDef = SWAP_RULES_10LANG[swapKey];
+    if (!ruleDef) return;
+    const locRule = ruleDef[lang] || ruleDef.en;
+    const cleanName = String(detectedName || '').trim();
+    if (!cleanName) return;
+
+    if (!grouped.has(swapKey)) {
+      grouped.set(swapKey, {
+        swapId: swapKey,
+        category: ruleDef.category,
+        categoryLabel: ui.categories[ruleDef.category] || ui.categories.health_regulatory,
+        severity: severity === 'kirmizi' ? 'kirmizi' : 'sari',
+        detectedIngredients: [cleanName],
+        lookForInstead: locRule.lookFor,
+        whySwap: locRule.why
+      });
+    } else {
+      const entry = grouped.get(swapKey);
+      if (!entry.detectedIngredients.includes(cleanName)) {
+        entry.detectedIngredients.push(cleanName);
+      }
+      if (severity === 'kirmizi') {
+        entry.severity = 'kirmizi';
+      }
+    }
+  }
+
+  // 1. Halal & Origin findings (Red, Conflict, or Yellow/Musbooh)
+  for (const f of halalCard.findings || []) {
+    if (f.status === 'kirmizi' || f.status === 'conflict' || f.status === 'sari' || f.status === 'sari_yesil') {
+      const key = resolveHalalRuleSwapKey(f.ruleId);
+      const sev = f.status === 'kirmizi' || f.status === 'conflict' ? 'kirmizi' : 'sari';
+      addSwapTrigger(key, f.localizedName || f.canonical || f.rawToken, sev);
+    }
+  }
+
+  // 2. Regulatory & Safety findings (Banned, Restricted, Warning)
+  for (const f of regulatoryCard.findings || []) {
+    if (f.euStatus !== 'izinli' && f.euStatus !== 'serbest' && f.severity !== 'bilgi') {
+      const key = resolveSubstanceSwapKey(f.substanceId);
+      const sev = f.euStatus === 'yasak' || f.severity === 'yuksek' ? 'kirmizi' : 'sari';
+      addSwapTrigger(key, f.localizedName || f.name || f.rawToken, sev);
+    }
+  }
+
+  // 3. Active Profile & Custom Watchlist Alerts
+  for (const a of profileCard.alerts || []) {
+    if (a.profile === 'ozel_kara_liste') {
+      addSwapTrigger('swap_custom_watchlist', a.localizedName || a.watchTerm || a.rawToken, 'kirmizi');
+    } else {
+      const obs = (observations || []).find((o) => o.position === a.position);
+      const subId = obs && obs.substance ? obs.substance.id : '';
+      const key = subId ? resolveSubstanceSwapKey(subId) : 'swap_allergen_nuts_other';
+      addSwapTrigger(key, a.localizedName || a.substanceName || a.rawToken, a.level === 'kirmizi' ? 'kirmizi' : 'sari');
+    }
+  }
+
+  // 4. Major Food Allergens & Cross-Contact Trace Allergens present in observations (even when no profile is toggled)
+  if (productType === 'food') {
+    for (const obs of observations || []) {
+      const rawStr = String(obs.raw || '');
+      const isCrossContactToken = /(?:may\s+contain|traces?\s+of|eser\s+miktarda|kann\s+spuren|peut\s+contenir|puede\s+contener|قد\s+يحتوي|может\s+содержать|میں\s+شامل)/iu.test(rawStr);
+      if (isCrossContactToken) {
+        const isMilkTrace = /\b(milk|süt|sut|dairy|lactose|laktoz|milch|lait|leche|susu)\b|حليب|لبن|دودھ|молоко/iu.test(rawStr);
+        const isSoyTrace = /\b(soy|soya|soja|kedelai)\b|صويا|سویا|соя/iu.test(rawStr);
+        const isGlutenTrace = /\b(wheat|gluten|buğday|bugday|weizen|blé|trigo|gandum)\b|قمح|غلوتين|گندم|пшениц/iu.test(rawStr);
+        const key = isMilkTrace
+          ? 'swap_allergen_dairy_milk'
+          : isSoyTrace
+          ? 'swap_allergen_soy_lecithin'
+          : isGlutenTrace
+          ? 'swap_allergen_gluten_wheat'
+          : 'swap_allergen_nuts_other';
+        addSwapTrigger(key, obs.localizedName || obs.raw, 'sari');
+        continue;
+      }
+
+      const scanText = rawStr
+        .replace(/[\p{L}]+[\s\-]*(?:free|frei)(?=[^\p{L}]|$)/giu, ' ')
+        .replace(/(?:free\s+(?:of|from)|without|ohne|sans|sin|senza|tanpa|bebas)\s+[\p{L}]+/giu, ' ')
+        .replace(/[\p{L}]+(?:siz|sız|suz|süz)(?=[^\p{L}]|$)/giu, ' ')
+        .replace(/[\p{L}]+\s+(?:içermez|icermez|yoktur|bulunmaz)(?=[^\p{L}]|$)/giu, ' ');
+
+      if (/(?:^|[^\p{L}\p{N}])(soy|soya|soja|kedelai|соя|соев[а-я]*|صويا|سویا|sojalecithin|soybean[s]?)(?=[^\p{L}\p{N}]|$)/iu.test(scanText)) {
+        addSwapTrigger('swap_allergen_soy_lecithin', obs.localizedName || obs.raw, 'sari');
+      }
+      if (/(?:^|[^\p{L}\p{N}])(milk|süt|sut|lait|leche|milch|latte|susu|молок[а-я]*|حليب|دودھ|whey|casein|lactose|laktoz|kazein|peynir\s*altı\s*suyu)(?=[^\p{L}\p{N}]|$)/iu.test(scanText)) {
+        addSwapTrigger('swap_allergen_dairy_milk', obs.localizedName || obs.raw, 'sari');
+      }
+      const isGlutenNegated = /gluten[\s\-]*(?:free|frei|siz|sız)|(?:free\s+(?:of|from)|without|ohne|sans|sin)\s+gluten/iu.test(rawStr);
+      const hasGlutenCereal = isGlutenNegated
+        ? /(?:^|[^\p{L}\p{N}])(wheat|buğday|bugday|weizen|blé|ble|trigo|пшениц[а-я]*|قمح|barley|arpa|rye|çavdar|cavdar|spelt|kamut|oats|yulaf)(?=[^\p{L}\p{N}]|$)/iu.test(scanText)
+        : /(?:^|[^\p{L}\p{N}])(wheat|buğday|bugday|gluten|flour|un|weizen|farine|trigo|gandum|пшениц[а-я]*|دقيق|قمح|گندم|arpa|barley|çavdar|rye|oats|yulaf|spelt|kamut)(?=[^\p{L}\p{N}]|$)/iu.test(scanText);
+      if (hasGlutenCereal) {
+        addSwapTrigger('swap_allergen_gluten_wheat', obs.localizedName || obs.raw, 'sari');
+      }
+      if (/(?:^|[^\p{L}\p{N}])(hazelnut[s]?|haseln[üu]ss[e]?|fındık|findik|noisette[s]?|avellana[s]?|фундук|بندق|ہیزل|almond[s]?|badem|mandel[n]?|amande[s]?|almendra[s]?|миндаль|لوز|بادام|walnut[s]?|ceviz|walnuss|noix|nuez|nueces|cashew[s]?|kaju|pistachio[s]?|fıstık|fistik|peanut[s]?|arachide[s]?|erdnuss|erdnüsse|cacahuete[s]?|арахис|مونگ\s*پھلی|egg[s]?|yumurta|oeuf[s]?|huevo[s]?|яйц[а-я]*|بيض|انڈہ|sesame|susam|tahin|tahini|кунжут|سمسم|تل|sulphite[s]?|sulfite[s]?|sülfit|sulfit|e220|e221|e222|e223|e224)(?=[^\p{L}\p{N}]|$)/iu.test(scanText)) {
+        addSwapTrigger('swap_allergen_nuts_other', obs.localizedName || obs.raw, 'sari');
+      }
+    }
+  }
+
+  // 5. Added Free Sugars & Rapid Carbs
+  for (const s of veganSugarCard.detectedFreeSugars || []) {
+    addSwapTrigger('swap_added_sugar_syrup', s.localizedName || s.canonical || s.rawToken, 'sari');
+  }
+  for (const rc of veganSugarCard.detectedRapidCarbs || []) {
+    addSwapTrigger('swap_added_sugar_syrup', rc.localizedName || rc.canonical || rc.rawToken, 'sari');
+  }
+
+  const items = Array.from(grouped.values())
+    .map((entry) => ({
+      ...entry,
+      detectedIngredient: entry.detectedIngredients.join(' · ')
+    }))
+    .sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'kirmizi' ? -1 : 1));
+
+  return {
+    cardTitle: ui.cardTitle,
+    cardSubtitle: ui.cardSubtitle,
+    detectedLabel: ui.detectedLabel,
+    lookForLabel: ui.lookForLabel,
+    whyLabel: ui.whyLabel,
+    allCleanMessage: ui.allCleanMessage,
+    totalSwaps: items.length,
+    items
   };
 }
 

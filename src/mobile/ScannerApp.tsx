@@ -967,6 +967,56 @@ export default function InciFactMobileApp() {
                 <Text style={{ color: theme.text, fontWeight: '800', fontSize: 12 }}>🅱️ B</Text>
               </TouchableOpacity>
             </View>
+
+            {/* Brand-Neutral Clean & Halal Ingredient Swap Guide */}
+            {evalMain.cards.swapGuideCard && (
+              <View
+                style={{
+                  marginTop: 14,
+                  padding: 12,
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: theme.accent,
+                  backgroundColor: theme.subtle
+                }}
+              >
+                <Text style={{ color: theme.accent, fontWeight: '800', fontSize: 13, marginBottom: 4, textAlign: isRtl ? 'right' : 'left' }}>
+                  {evalMain.cards.swapGuideCard.cardTitle}
+                </Text>
+                <Text style={{ color: theme.muted, fontSize: 11, lineHeight: 16, marginBottom: 8, textAlign: isRtl ? 'right' : 'left' }}>
+                  {evalMain.cards.swapGuideCard.cardSubtitle}
+                </Text>
+                {(evalMain.cards.swapGuideCard.items || []).length === 0 ? (
+                  <Text style={{ color: theme.accent, fontSize: 12, fontWeight: '700', textAlign: isRtl ? 'right' : 'left' }}>
+                    ✓ {evalMain.cards.swapGuideCard.allCleanMessage}
+                  </Text>
+                ) : (
+                  (evalMain.cards.swapGuideCard.items || []).map((sw: any, idx: number) => (
+                    <View
+                      key={sw.swapId || idx}
+                      style={{
+                        marginTop: idx === 0 ? 0 : 8,
+                        padding: 10,
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: theme.border,
+                        backgroundColor: theme.card
+                      }}
+                    >
+                      <Text style={{ color: sw.severity === 'kirmizi' ? '#DC2626' : '#D97706', fontWeight: '800', fontSize: 11.5, textAlign: isRtl ? 'right' : 'left' }}>
+                        ❌ {evalMain.cards.swapGuideCard.detectedLabel}: {sw.detectedIngredient}
+                      </Text>
+                      <Text style={{ color: theme.text, fontWeight: '700', fontSize: 12, marginTop: 4, textAlign: isRtl ? 'right' : 'left' }}>
+                        ✅ {evalMain.cards.swapGuideCard.lookForLabel}: {sw.lookForInstead}
+                      </Text>
+                      <Text style={{ color: theme.muted, fontSize: 11, marginTop: 3, textAlign: isRtl ? 'right' : 'left' }}>
+                        {evalMain.cards.swapGuideCard.whyLabel} {sw.whySwap}
+                      </Text>
+                    </View>
+                  ))
+                )}
+              </View>
+            )}
           </View>
         )}
 

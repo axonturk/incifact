@@ -1305,5 +1305,49 @@ runTest('54. Hibrit Barkod Okuyucu: EAN-13 (Arapça/Urduca rakamlar dahil), 10 d
   assert.equal(missing.requiresOcrFallback, true);
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/54 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// ============================================================================
+// TEST 55: Marka Bağımsız "Bunun Yerine Rafta Ne Aramalıyım?" (Temiz & Helal Etiket Rehberi - 10 Dil)
+// ============================================================================
+runTest('55. Marka bağımsız Temiz & Helal Etiket Rehberi (swapGuideCard) 10 dilde deterministik alternatif üretmeli', () => {
+  const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  for (const lang of langs) {
+    // 1) Helal + Katkı + Şeker içeren ürün (Carmine E120 + Gelatin + E471 + Glucose-Fructose Syrup)
+    const gummy = evaluateProduct({
+      rawText: 'Glucose-Fructose Syrup, Sugar, Gelatin, Mono- and Diglycerides of Fatty Acids (E471), Carmine (E120), Citric Acid',
+      productType: 'food',
+      halalAuthority: 'GIMDES',
+      lang
+    });
+    const sg = gummy.cards.swapGuideCard;
+    assert.ok(sg && Array.isArray(sg.items), `Dil=${lang} swapGuideCard mevcut olmalı`);
+    assert.ok(sg.items.some((x) => x.swapId === 'swap_carmine_e120' && x.severity === 'kirmizi'), `Dil=${lang} E120 alternatifi (E162/E163) üretilmeli`);
+    assert.ok(sg.items.some((x) => x.swapId === 'swap_gelatin'), `Dil=${lang} Jelatin alternatifi (Pektin E440 / Agar E406) üretilmeli`);
+    assert.ok(sg.items.some((x) => x.swapId === 'swap_emulsifier_e471'), `Dil=${lang} E471 alternatifi (E322 / Bitkisel) üretilmeli`);
+    assert.ok(sg.items.some((x) => x.swapId === 'swap_added_sugar_syrup'), `Dil=${lang} Şeker/Şurup alternatifi üretilmeli`);
+    for (const item of sg.items) {
+      assert.ok(item.lookForInstead && item.lookForInstead.length > 10, `Dil=${lang} lookForInstead boş olmamalı`);
+      assert.ok(item.whySwap && item.whySwap.length > 10, `Dil=${lang} whySwap boş olmamalı`);
+      assert.ok(item.detectedIngredient && item.detectedIngredient.length > 1, `Dil=${lang} detectedIngredient boş olmamalı`);
+    }
+
+    // 2) Barkod (Nutella 3017620422003) -> Soya Lesitini için Ayçiçek Lesitini (Sunflower Lecithin) önermeli
+    const nutella = lookupBarcodeProduct({ barcode: '3017620422003', lang });
+    const nutSg = nutella.evaluation.cards.swapGuideCard;
+    assert.ok(nutSg.items.some((x) => x.swapId === 'swap_allergen_soy_lecithin'), `Dil=${lang} Nutella soya lesitini için ayçiçek lesitini önermeli`);
+    assert.ok(nutSg.items.some((x) => x.swapId === 'swap_added_sugar_syrup'), `Dil=${lang} Nutella ilave şeker alternatifi önermeli`);
+
+    // 3) Tamamen temiz/uyumlu ürün (Aqua, Panthenol, Niacinamide) -> 0 swap ve allCleanMessage
+    const clean = evaluateProduct({
+      rawText: 'Aqua, Panthenol, Niacinamide, Sodium Hyaluronate',
+      productType: 'cosmetic',
+      lang
+    });
+    assert.equal(clean.cards.swapGuideCard.totalSwaps, 0, `Dil=${lang} temiz üründe 0 alternatif olmalı`);
+    assert.equal(clean.cards.swapGuideCard.items.length, 0);
+    assert.ok(clean.cards.swapGuideCard.allCleanMessage.length > 15);
+  }
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/55 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+
 
