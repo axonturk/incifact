@@ -1,5 +1,5 @@
-// Live API vs disk engine parity for the audit-3 vectors & 30 barcode vectors (timestamp excluded).
-import { evaluateProduct, lookupBarcodeProduct } from '../src/engine/ruleEngine.mjs';
+// Live API vs disk engine parity for the audit-3 vectors & full barcode catalog (timestamp excluded).
+import { evaluateProduct, lookupBarcodeProduct, VERIFIED_BARCODE_CATALOG } from '../src/engine/ruleEngine.mjs';
 const cases = [
   { rawText: 'Aqua, Methoxypropylamino Cyclohexenylidene Ethoxyethylcyanoacetate ٤٪', applicationType: 'lotion' },
   { rawText: 'Aqua, Methylisothiazolinone ٠٫٠٠١٦٪', applicationType: 'rinse_off' },
@@ -31,7 +31,7 @@ for (const c of cases) {
   console.log(res.status, same ? 'EQUAL' : 'DIFF ', expectOk ? 'OK ' : 'BAD', 'score=' + r.score, 'cap=' + r.capApplied, al.length ? 'allergens=' + al.join('|') : '', '<-', input.rawText.slice(0, 70));
 }
 
-const barcodeCodes = ['3017620422003', '3337875597388', '7622210449283', '0000000000017'];
+const barcodeCodes = Object.keys(VERIFIED_BARCODE_CATALOG);
 const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
 const totalBarcodeChecks = barcodeCodes.length * langs.length;
 let barcodeOk = 0;

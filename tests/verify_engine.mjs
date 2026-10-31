@@ -4,11 +4,13 @@ import {
   compareProducts,
   parseIngredientList,
   normalizeBarcodeInput,
-  lookupBarcodeProduct
+  lookupBarcodeProduct,
+  createCustomBarcodeEntry,
+  VERIFIED_BARCODE_CATALOG
 } from '../src/engine/ruleEngine.mjs';
 
 console.log('======================================================================');
-console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (54 KABUL KRİTERİ)');
+console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (58 KABUL KRİTERİ)');
 console.log('======================================================================\n');
 
 let passed = 0;
@@ -1380,6 +1382,191 @@ runTest('55. Marka bağımsız Temiz & Helal Etiket Rehberi (swapGuideCard) 10 d
   }
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/55 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// ============================================================================
+// TEST 56: Kozmetik "Birlikte Kullanım / Cilt Rutini Çakışma Uyarısı" (routineConflictCard & compareProducts.routineLayeringCard - 10 Dil)
+// ============================================================================
+runTest('56. Kozmetik Cilt Rutini Çakışma Uyarısı (routineConflictCard ve compareProducts.routineLayeringCard) 10 dilde aktif çakışmaları ve SPF uyarısını tespit etmeli', () => {
+  const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  for (const lang of langs) {
+    // 1) Tek formülde Retinol + Glycolic Acid + Alcohol Denat. (Top-5) -> conflict_retinoid_aha_bha (kirmizi) + conflict_multi_acids_or_alcohol (sari) + needsSpfReminder=true
+    const retAcid = evaluateProduct({
+      rawText: 'Aqua, Alcohol Denat., Glycolic Acid, Glycerin, Retinol, Panthenol',
+      productType: 'cosmetic',
+      lang
+    });
+    const rc = retAcid.cards.routineConflictCard;
+    assert.ok(rc && rc.applicable === true, `Dil=${lang} kozmetik üründe routineConflictCard applicable=true olmalı`);
+    assert.equal(rc.needsSpfReminder, true, `Dil=${lang} Retinol + AHA/BHA içeren üründe needsSpfReminder=true olmalı`);
+    assert.ok(rc.spfReminderText && rc.spfReminderText.length > 15);
+    assert.ok(
+      rc.conflicts.some((c) => c.conflictId === 'conflict_retinoid_aha_bha' && c.severity === 'kirmizi'),
+      `Dil=${lang} Retinol + Glycolic Acid çakışması (conflict_retinoid_aha_bha) tespit edilmeli`
+    );
+    assert.ok(
+      rc.conflicts.some((c) => c.conflictId === 'conflict_multi_acids_or_alcohol' && c.severity === 'sari'),
+      `Dil=${lang} Top-5 Alcohol Denat. + Aktif çakışması (conflict_multi_acids_or_alcohol) tespit edilmeli`
+    );
+
+    // 2) Retinol + Benzoyl Peroxide -> conflict_retinoid_benzoyl_peroxide (kirmizi)
+    const retBpo = evaluateProduct({
+      rawText: 'Aqua, Glycerin, Benzoyl Peroxide, Retinol, Panthenol',
+      productType: 'cosmetic',
+      lang
+    });
+    assert.ok(
+      retBpo.cards.routineConflictCard.conflicts.some(
+        (c) => c.conflictId === 'conflict_retinoid_benzoyl_peroxide' && c.severity === 'kirmizi'
+      ),
+      `Dil=${lang} Retinol + Benzoyl Peroxide çakışması tespit edilmeli`
+    );
+
+    // 3) Copper Tripeptide-1 + Ascorbic Acid -> conflict_copper_peptide_acids_vitc (sari)
+    const copperVitC = evaluateProduct({
+      rawText: 'Aqua, Glycerin, Copper Tripeptide-1, Ascorbic Acid, Panthenol',
+      productType: 'cosmetic',
+      lang
+    });
+    assert.ok(
+      copperVitC.cards.routineConflictCard.conflicts.some(
+        (c) => c.conflictId === 'conflict_copper_peptide_acids_vitc' && c.severity === 'sari'
+      ),
+      `Dil=${lang} Bakır Peptit + Saf C Vitamini çakışması tespit edilmeli`
+    );
+
+    // 4) İki ayrı kozmetik ürün karşılaştırıldığında (Ürün A: The Ordinary Glycolic Acid 7% vs Ürün B: La Roche-Posay Retinol B3) -> routineLayeringCard
+    const compLayer = compareProducts(
+      {
+        name: 'The Ordinary Glycolic Acid 7%',
+        rawText: 'Aqua, Glycolic Acid, Salicylic Acid, Glycerin, Panthenol',
+        productType: 'cosmetic'
+      },
+      {
+        name: 'La Roche-Posay Retinol B3 Serum',
+        rawText: 'Aqua, Glycerin, Niacinamide, Retinol, Retinyl Palmitate, Tocopherol',
+        productType: 'cosmetic'
+      },
+      { lang }
+    );
+    assert.ok(compLayer.routineLayeringCard && compLayer.routineLayeringCard.applicable === true);
+    assert.ok(
+      compLayer.routineLayeringCard.conflicts.some((c) => c.conflictId === 'conflict_retinoid_aha_bha'),
+      `Dil=${lang} A ve B ürünleri arasında Retinoid + AHA/BHA katmanlama çakışması tespit edilmeli`
+    );
+    assert.equal(compLayer.routineLayeringCard.needsSpfReminder, true);
+
+    // 5) Gıda ürününde routineConflictCard applicable=false olmalı
+    const foodEval = evaluateProduct({
+      rawText: 'Sugar, Cocoa Butter, Skimmed Milk Powder',
+      productType: 'food',
+      lang
+    });
+    assert.equal(foodEval.cards.routineConflictCard.applicable, false);
+  }
+});
+
+// ============================================================================
+// TEST 57: Genişletilmiş Barkod Kataloğu (22 Ürün · 10 Dil) ve Cihaza Özel Barkod Kaydı (createCustomBarcodeEntry & customCatalog)
+// ============================================================================
+runTest('57. Genişletilmiş Barkod Kataloğu (21 tam kapsamlı ürün + 1 <%80 test kaydı = 22 barkod) 10 dilde çalışmalı ve özel barkod kaydı doğrulanmalı', () => {
+  const allCodes = Object.keys(VERIFIED_BARCODE_CATALOG);
+  assert.ok(allCodes.length >= 22, `Katalogda en az 22 doğrulanmış barkod olmalı (bulunan: ${allCodes.length})`);
+
+  const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  for (const code of allCodes) {
+    for (const lang of langs) {
+      const res = lookupBarcodeProduct({ barcode: code, lang });
+      assert.equal(res.valid, true, `Barkod=${code} Dil=${lang} valid=true olmalı`);
+      assert.equal(res.found, true, `Barkod=${code} Dil=${lang} found=true olmalı`);
+      assert.ok(res.productName && res.productName.length > 2, `Barkod=${code} Dil=${lang} yerelleştirilmiş ad dönmeli`);
+      if (code === '0000000000017') {
+        assert.ok(res.coveragePercent < 80);
+        assert.equal(res.requiresOcrFallback, true);
+      } else {
+        assert.equal(res.coveragePercent, 100, `Barkod=${code} Dil=${lang} %100 tanınma kapsamına sahip olmalı (bulunan: ${res.coveragePercent})`);
+        assert.equal(res.requiresOcrFallback, false, `Barkod=${code} Dil=${lang} requiresOcrFallback=false olmalı`);
+      }
+    }
+  }
+
+  // Özel Barkod Kaydı (createCustomBarcodeEntry + lookupBarcodeProduct customCatalog)
+  const customCode = '8699999888877';
+  const builtOk = createCustomBarcodeEntry({
+    barcode: customCode,
+    productName: 'Özel Bebek Şampuanı',
+    productType: 'cosmetic',
+    applicationType: 'rinse_off',
+    rawText: 'Aqua, Glycerin, Panthenol, Coco-Glucoside, Citric Acid',
+    lang: 'tr'
+  });
+  assert.equal(builtOk.ok, true);
+  assert.equal(builtOk.coveragePercent, 100);
+  const customCatalog = { [customCode]: builtOk.entry };
+  const customLookup = lookupBarcodeProduct({ barcode: customCode, lang: 'tr', customCatalog });
+  assert.equal(customLookup.found, true);
+  assert.equal(customLookup.productName, 'Özel Bebek Şampuanı');
+  assert.equal(customLookup.coveragePercent, 100);
+  assert.equal(customLookup.requiresOcrFallback, false);
+
+  // <%80 kapsamlı etiketle özel barkod kaydı reddedilmeli
+  const builtLow = createCustomBarcodeEntry({
+    barcode: '8699999888866',
+    productName: 'Bilinmeyen Karışım',
+    productType: 'cosmetic',
+    rawText: 'Aqua, Mystery Substance X1, Mystery Substance X2, Mystery Substance X3',
+    lang: 'tr'
+  });
+  assert.equal(builtLow.ok, false);
+  assert.equal(builtLow.reason, 'insufficient_coverage_under_80_percent');
+});
+
+// ============================================================================
+// TEST 58: Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard & 4 Katmanlı Güncellik Mimarisi - 10 Dil)
+// ============================================================================
+runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 katmanlı güncellik mührü, Omnibus geçiş takvimi, alerjen listesi ve resmi URL kaynaklarını üretmeli', () => {
+  const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  for (const lang of langs) {
+    // 1) Kozmetik (TPO + TPHP + Retinol + Linalool + Limonene) -> Omnibus takvimi + koku alerjenleri + resmi kaynaklar
+    const cosEval = evaluateProduct({
+      rawText: 'Aqua, Glycerin, Trimethylbenzoyl Diphenylphosphine Oxide, Triphenyl Phosphate, Retinol, Linalool, Limonene',
+      productType: 'cosmetic',
+      jurisdiction: 'EU',
+      halalAuthority: 'GIMDES',
+      lang
+    });
+    const rr = cosEval.cards.regulatoryReportCard;
+    assert.ok(rr, `Dil=${lang} regulatoryReportCard mevcut olmalı`);
+    assert.equal(rr.datasetManifest.datasetVersion, '2026.10-omnibus');
+    assert.equal(rr.datasetManifest.cosingDictionaryCount, 30609);
+    assert.equal(rr.datasetManifest.activeJurisdiction, 'EU');
+    assert.equal(rr.datasetManifest.selectedHalalAuthority, 'GIMDES');
+    assert.equal(rr.freshnessPillars.length, 4, `Dil=${lang} 4 katmanlı güncellik mimarisi bulunmalı`);
+    assert.ok(
+      rr.transitionCalendarItems.some((t) => /2025-09-01/.test(t.deadline) && /2025\/877/.test(t.regulation)),
+      `Dil=${lang} TPO için EU 2025/877 (2025-09-01) takvim maddesi bulunmalı`
+    );
+    assert.ok(
+      rr.transitionCalendarItems.some((t) => /2027-11-01/.test(t.deadline) && /2026\/909/.test(t.regulation)),
+      `Dil=${lang} TPHP için EU 2026/909 (2027-11-01) takvim maddesi bulunmalı`
+    );
+    assert.ok(
+      rr.transitionCalendarItems.some((t) => /2027-05-01/.test(t.deadline) && /2024\/996/.test(t.regulation)),
+      `Dil=${lang} Retinol için EU 2024/996 (2027-05-01) takvim maddesi bulunmalı`
+    );
+    assert.ok(rr.detectedAllergens.length >= 2, `Dil=${lang} Linalool ve Limonene alerjen olarak listelenmeli`);
+    assert.ok(rr.citedOfficialSources.length >= 3, `Dil=${lang} en az 3 resmi kaynak (checkedAt ve url ile) listelenmeli`);
+    for (const src of rr.citedOfficialSources) {
+      assert.ok(src.id && src.checkedAt && src.url, `Dil=${lang} resmi kaynakta id, checkedAt ve url bulunmalı`);
+    }
+
+    // 2) Gıda (Nutella barkodu) -> Fındık, Süt, Soya alerjenleri EU_1169_2011 altında raporlanmalı
+    const nutella = lookupBarcodeProduct({ barcode: '3017620422003', lang });
+    const nutRr = nutella.evaluation.cards.regulatoryReportCard;
+    assert.ok(nutRr.detectedAllergens.length >= 3, `Dil=${lang} Nutella'da en az 3 gıda alerjeni (fındık, süt, soya) raporlanmalı`);
+    assert.ok(nutRr.citedOfficialSources.some((s) => s.id === 'EU_1169_2011'));
+  }
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/58 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+
 
 

@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   normalizeBarcodeInput,
   lookupBarcodeProduct,
+  createCustomBarcodeEntry,
   VERIFIED_BARCODE_CATALOG
 } from '../engine/ruleEngine.mjs';
 
@@ -154,3 +155,52 @@ export async function lookupBarcodeOnDevice(
 
   return lookupBarcodeProduct({ barcode: norm.code, lang, evaluationOptions });
 }
+
+export async function saveCustomBarcodeOnDevice(params: {
+  barcode: string;
+  productName?: string;
+  productType: 'cosmetic' | 'food';
+  applicationType?: string | null;
+  allergenStatement?: string;
+  rawText: string;
+  lang?: string;
+}): Promise<{ ok: boolean; barcode: string; coveragePercent?: number; reason?: string }> {
+  const built = createCustomBarcodeEntry(params);
+  if (!built || !built.ok || !built.entry) {
+    return {
+      ok: false,
+      barcode: built ? built.barcode : String(params.barcode || ''),
+      coveragePercent: built ? built.coveragePercent : undefined,
+      reason: built ? built.reason : 'unknown_error'
+    };
+  }
+  const entry = built.entry;
+  const cachedRecord: CachedBarcodeEntry = {
+    barcode: entry.code,
+    productName: entry.productName,
+    productType: entry.productType,
+    applicationType: entry.applicationType,
+    allergenStatement: entry.allergenStatement,
+    rawText: entry.rawText,
+    source: entry.source,
+    updatedAt: entry.updatedAt,
+    cachedAt: Date.now()
+  };
+  try {
+    const existingRaw = await AsyncStorage.getItem(BARCODE_CACHE_KEY);
+    const existing: CachedBarcodeEntry[] = existingRaw ? JSON.parse(existingRaw) : [];
+    const now = Date.now();
+    const filtered = Array.isArray(existing)
+      ? existing.filter((c) => c && c.barcode !== entry.code && now - (c.cachedAt || 0) < CACHE_TTL_MS)
+      : [];
+    await AsyncStorage.setItem(BARCODE_CACHE_KEY, JSON.stringify([cachedRecord, ...filtered].slice(0, 50)));
+  } catch {
+    // Ignore storage write errors
+  }
+  return {
+    ok: true,
+    barcode: entry.code,
+    coveragePercent: built.coveragePercent
+  };
+}
+

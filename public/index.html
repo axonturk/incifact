@@ -1759,64 +1759,94 @@
 
     const BARCODE_UI_I18N = {
       tr: {
-        title: '📦 Hibrit Barkod Okuyucu (EAN / Open Food & Beauty Facts)',
+        title: '📦 Hibrit Barkod Okuyucu (22+ Doğrulanmış Katalog + Cihaz Kaydı)',
         placeholder: '8–14 haneli barkod (Örn: 3017620422003)',
         btn: 'Barkod Sorgula',
-        quickLbl: 'Hazır Barkodlar:'
+        quickLbl: 'Hazır Barkodlar:',
+        saveCustomBtn: (code) => `💾 Barkodu (${code}) Mevcut Etiketle Cihazıma Kaydet`,
+        savedCustomOk: (code, name) => `Barkod (${code}) "${name}" etiketiyle cihazınıza kaydedildi (%80+ kapsam doğrulandı).`,
+        savedCustomLowCov: 'Barkodu kaydetmek için ekrandaki içindekiler etiketinin en az %80 tanınmış olması gerekir.'
       },
       en: {
-        title: '📦 Hybrid Barcode Lookup (EAN / Open Food & Beauty Facts)',
+        title: '📦 Hybrid Barcode Lookup (22+ Verified Catalog + Device Save)',
         placeholder: '8–14 digit barcode (e.g. 3017620422003)',
         btn: 'Lookup Barcode',
-        quickLbl: 'Quick Barcodes:'
+        quickLbl: 'Quick Barcodes:',
+        saveCustomBtn: (code) => `💾 Save Barcode (${code}) with Current Label to Device`,
+        savedCustomOk: (code, name) => `Barcode (${code}) saved to your device with "${name}" label (80%+ coverage verified).`,
+        savedCustomLowCov: 'At least 80% ingredient recognition coverage is required to save a custom barcode.'
       },
       ar: {
-        title: '📦 قارئ الباركود الهجين (EAN / Open Food & Beauty Facts)',
+        title: '📦 قارئ الباركود الهجين (كتالوج موثق + حفظ على الجهاز)',
         placeholder: 'باركود من 8 إلى 14 رقماً (مثال: 3017620422003)',
         btn: 'فحص الباركود',
-        quickLbl: 'باركودات جاهزة:'
+        quickLbl: 'باركودات جاهزة:',
+        saveCustomBtn: (code) => `💾 حفظ الباركود (${code}) مع الملصق الحالي على جهازي`,
+        savedCustomOk: (code, name) => `تم حفظ الباركود (${code}) باسم "${name}" على جهازك (تغطية +80% موثقة).`,
+        savedCustomLowCov: 'يتطلب حفظ الباركود تغطية تعرف على المكونات بنسبة 80% على الأقل.'
       },
       de: {
-        title: '📦 Hybrider Barcode-Scanner (EAN / Open Food & Beauty Facts)',
+        title: '📦 Hybrider Barcode-Scanner (22+ Katalog + Gerätespeicher)',
         placeholder: '8–14-stelliger Barcode (z. B. 3017620422003)',
         btn: 'Barcode prüfen',
-        quickLbl: 'Schnellwahl:'
+        quickLbl: 'Schnellwahl:',
+        saveCustomBtn: (code) => `💾 Barcode (${code}) mit aktuellem Etikett speichern`,
+        savedCustomOk: (code, name) => `Barcode (${code}) als „${name}“ lokal gespeichert (≥80 % Abdeckung bestätigt).`,
+        savedCustomLowCov: 'Zum Speichern eines Barcodes sind mindestens 80 % erkannte Inhaltsstoffe erforderlich.'
       },
       fr: {
-        title: '📦 Lecteur Code-Barres Hybride (EAN / Open Food & Beauty Facts)',
+        title: '📦 Lecteur Code-Barres Hybride (Catalogue 22+ & Sauvegarde)',
         placeholder: 'Code-barres 8–14 chiffres (ex. 3017620422003)',
         btn: 'Vérifier Code',
-        quickLbl: 'Codes rapides :'
+        quickLbl: 'Codes rapides :',
+        saveCustomBtn: (code) => `💾 Enregistrer le code (${code}) avec l'étiquette actuelle`,
+        savedCustomOk: (code, name) => `Code-barres (${code}) enregistré sous « ${name} » (couverture ≥80 % vérifiée).`,
+        savedCustomLowCov: 'Une couverture d\'au moins 80 % est requise pour enregistrer un code-barres.'
       },
       id: {
-        title: '📦 Pemindai Barcode Hibrida (EAN / Open Food & Beauty Facts)',
+        title: '📦 Pemindai Barcode Hibrida (Katalog 22+ & Simpan ke Perangkat)',
         placeholder: '8–14 digit barcode (Mis: 3017620422003)',
         btn: 'Cari Barcode',
-        quickLbl: 'Barcode Cepat:'
+        quickLbl: 'Barcode Cepat:',
+        saveCustomBtn: (code) => `💾 Simpan Barcode (${code}) dengan Label Saat Ini`,
+        savedCustomOk: (code, name) => `Barcode (${code}) disimpan sebagai "${name}" (cakupan ≥80% terverifikasi).`,
+        savedCustomLowCov: 'Minimal 80% cakupan komposisi diperlukan untuk menyimpan barcode.'
       },
       ms: {
-        title: '📦 Pengimbas Kod Bar Hibrid (EAN / Open Food & Beauty Facts)',
+        title: '📦 Pengimbas Kod Bar Hibrid (Katalog 22+ & Simpan Peranti)',
         placeholder: '8–14 digit kod bar (Cth: 3017620422003)',
         btn: 'Semak Kod Bar',
-        quickLbl: 'Kod Bar Pantas:'
+        quickLbl: 'Kod Bar Pantas:',
+        saveCustomBtn: (code) => `💾 Simpan Kod Bar (${code}) dengan Label Semasa`,
+        savedCustomOk: (code, name) => `Kod bar (${code}) disimpan sebagai "${name}" (liputan ≥80% disahkan).`,
+        savedCustomLowCov: 'Sekurang-kurangnya 80% liputan ramuan diperlukan untuk menyimpan kod bar.'
       },
       es: {
-        title: '📦 Lector Híbrido de Código de Barras (Open Food & Beauty Facts)',
+        title: '📦 Lector Híbrido de Código de Barras (Catálogo 22+ y Guardado)',
         placeholder: 'Código de 8–14 dígitos (Ej. 3017620422003)',
         btn: 'Buscar Código',
-        quickLbl: 'Códigos rápidos:'
+        quickLbl: 'Códigos rápidos:',
+        saveCustomBtn: (code) => `💾 Guardar código (${code}) con la etiqueta actual`,
+        savedCustomOk: (code, name) => `Código (${code}) guardado como "${name}" en el dispositivo (cobertura ≥80%).`,
+        savedCustomLowCov: 'Se requiere al menos un 80% de cobertura para guardar un código personalizado.'
       },
       ru: {
-        title: '📦 Гибридный поиск по штрихкоду (EAN / Open Food & Beauty Facts)',
+        title: '📦 Гибридный поиск по штрихкоду (Каталог 22+ и сохранение)',
         placeholder: '8–14 цифр штрихкода (напр. 3017620422003)',
         btn: 'Найти штрихкод',
-        quickLbl: 'Быстрые коды:'
+        quickLbl: 'Быстрые коды:',
+        saveCustomBtn: (code) => `💾 Сохранить штрихкод (${code}) с текущим составом`,
+        savedCustomOk: (code, name) => `Штрихкод (${code}) сохранен как «${name}» (покрытие ≥80% подтверждено).`,
+        savedCustomLowCov: 'Для сохранения штрихкода требуется распознавание не менее 80% состава.'
       },
       ur: {
-        title: '📦 ہائبرڈ بارکوڈ اسکینر (EAN / Open Food & Beauty Facts)',
+        title: '📦 ہائبرڈ بارکوڈ اسکینر (22+ تصدیق شدہ کیٹلاگ اور ڈیوائس سیو)',
         placeholder: '8 تا 14 ہندسوں کا بارکوڈ (مثلاً: 3017620422003)',
         btn: 'بارکوڈ چیک کریں',
-        quickLbl: 'فوری بارکوڈز:'
+        quickLbl: 'فوری بارکوڈز:',
+        saveCustomBtn: (code) => `💾 بارکوڈ (${code}) کو موجودہ لیبل کے ساتھ محفوظ کریں`,
+        savedCustomOk: (code, name) => `بارکوڈ (${code}) "${name}" کے طور پر محفوظ ہو گیا (80%+ کوریج تصدیق شدہ)۔`,
+        savedCustomLowCov: 'بارکوڈ محفوظ کرنے کے لیے کم از کم 80% اجزاء کی شناخت ضروری ہے۔'
       }
     };
 
@@ -1825,6 +1855,12 @@
       { code: '3337875597388', label: 'CeraVe' },
       { code: '8809598450653', label: 'COSRX Snail' },
       { code: '7622210449283', label: 'Oreo' },
+      { code: '3337872411991', label: 'LRP Cicaplast' },
+      { code: '0769915190977', label: 'TO Glycolic 7%' },
+      { code: '3337875696586', label: 'LRP Retinol B3' },
+      { code: '3600542154727', label: 'Garnier Vit C' },
+      { code: '9002490100070', label: 'Red Bull' },
+      { code: '8000500037560', label: 'Kinder Bueno' },
       { code: '5900000202501', label: 'TPO Gel' },
       { code: '0000000000017', label: '<80% OCR' }
     ];
@@ -1835,13 +1871,16 @@
       state.barcodeInputVal = rawCode;
       if (inp) inp.value = rawCode;
 
+      const customCatalog = loadSavedJson('incifact_custom_barcodes_v1', {});
+
       try {
         const res = await fetch('/api/barcode', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             barcode: rawCode,
-            lang: state.lang
+            lang: state.lang,
+            customCatalog: customCatalog && typeof customCatalog === 'object' ? customCatalog : {}
           })
         });
         const data = await res.json();
@@ -1849,6 +1888,7 @@
           state.barcodeStatusBanner = {
             tone: 'warn',
             barcode: (data && data.barcode) || rawCode,
+            canSaveCustom: Boolean(data && data.valid && data.reason === 'barcode_not_found'),
             message: (data && data.message) || 'Barcode not found.'
           };
           renderScreen();
@@ -1894,6 +1934,7 @@
         state.barcodeStatusBanner = {
           tone: data.requiresOcrFallback ? 'warn' : 'ok',
           barcode: data.barcode,
+          canSaveCustom: false,
           message: data.message
         };
         state.productTitle = data.productName;
@@ -1913,11 +1954,49 @@
         state.barcodeStatusBanner = {
           tone: 'warn',
           barcode: rawCode,
+          canSaveCustom: false,
           message: String(err && err.message ? err.message : err)
         };
         renderScreen();
         return null;
       }
+    }
+
+    async function saveCustomBarcodeToDevice(barcodeToSave) {
+      const bUi = BARCODE_UI_I18N[state.lang] || BARCODE_UI_I18N.en;
+      const code = String(barcodeToSave || state.barcodeInputVal || '').trim();
+      const reg = state.evalData && state.evalData.cards && state.evalData.cards.regulatoryCard;
+      if (!reg || reg.coveragePercent < 80) {
+        state.barcodeStatusBanner = {
+          tone: 'warn',
+          barcode: code,
+          canSaveCustom: false,
+          message: bUi.savedCustomLowCov
+        };
+        renderScreen();
+        return null;
+      }
+      const rawText = document.getElementById('liveInput').value.trim();
+      const productType = document.getElementById('prodType').value || 'cosmetic';
+      const resolvedTitle = state.productTitle || deriveCustomProductTitle(rawText, state.lang) || `EAN ${code}`;
+      const customCatalog = loadSavedJson('incifact_custom_barcodes_v1', {});
+      const nextCatalog = customCatalog && typeof customCatalog === 'object' ? { ...customCatalog } : {};
+      nextCatalog[code] = {
+        code,
+        productName: resolvedTitle,
+        names: {
+          tr: resolvedTitle, en: resolvedTitle, ar: resolvedTitle, de: resolvedTitle, fr: resolvedTitle,
+          id: resolvedTitle, ms: resolvedTitle, es: resolvedTitle, ru: resolvedTitle, ur: resolvedTitle
+        },
+        productType,
+        applicationType: productType === 'food' ? 'oral' : 'leave_on',
+        allergenStatement: (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '',
+        rawText,
+        source: 'User Verified Label (Local Device Cache)',
+        updatedAt: '2026-10-31'
+      };
+      saveJson('incifact_custom_barcodes_v1', nextCatalog);
+      return lookupBarcodeFromUi(code);
     }
 
     function getUnifiedStatusPresentation() {
@@ -3658,8 +3737,13 @@
             </div>
             ${
               state.barcodeStatusBanner
-                ? `<div id="barcodeStatusMsg" style="padding:7px 10px; border-radius:9px; background:${state.barcodeStatusBanner.tone === 'ok' ? 'rgba(16,185,129,0.22)' : 'rgba(245,158,11,0.24)'}; border:1px solid ${state.barcodeStatusBanner.tone === 'ok' ? '#34D399' : '#FBBF24'}; color:#FFFFFF; font-size:11.5px; font-weight:700; line-height:1.35;">
-                     ${state.barcodeStatusBanner.tone === 'ok' ? '🟢 ' : '⚠️ '}${escapeHtml(state.barcodeStatusBanner.message)}
+                ? `<div id="barcodeStatusMsg" style="padding:7px 10px; border-radius:9px; background:${state.barcodeStatusBanner.tone === 'ok' ? 'rgba(16,185,129,0.22)' : 'rgba(245,158,11,0.24)'}; border:1px solid ${state.barcodeStatusBanner.tone === 'ok' ? '#34D399' : '#FBBF24'}; color:#FFFFFF; font-size:11.5px; font-weight:700; line-height:1.35; display:flex; flex-direction:column; gap:6px;">
+                     <span>${state.barcodeStatusBanner.tone === 'ok' ? '🟢 ' : '⚠️ '}${escapeHtml(state.barcodeStatusBanner.message)}</span>
+                     ${
+                       state.barcodeStatusBanner.canSaveCustom
+                         ? `<button id="saveCustomBarcodeBtn" type="button" onclick="saveCustomBarcodeToDevice('${escapeHtml(state.barcodeStatusBanner.barcode)}')" style="min-height:34px; padding:4px 10px; border-radius:8px; border:1px solid #34D399; background:rgba(16,185,129,0.28); color:#ECFDF5; font-size:11px; font-weight:800; cursor:pointer; text-align:center;">${escapeHtml(bUi.saveCustomBtn(state.barcodeStatusBanner.barcode))}</button>`
+                         : ''
+                     }
                    </div>`
                 : ''
             }
@@ -3736,6 +3820,8 @@
       const prof = state.evalData.cards.profileCard;
       const halal = state.evalData.cards.halalCard;
       const swapGuide = state.evalData.cards.swapGuideCard;
+      const routineConflict = state.evalData.cards.routineConflictCard;
+      const regReport = state.evalData.cards.regulatoryReportCard;
       const obs = state.evalData.observations || [];
       const unified = getUnifiedStatusPresentation(state.evalData, state.lang);
 
@@ -4022,6 +4108,52 @@
           }
         </div>
 
+        <!-- ÖZELLİK 6: Kozmetik "Birlikte Kullanım / Cilt Rutini Çakışma Uyarısı" (Retinol + AHA/BHA, Saf C Vit + Asit, Bakır Peptit, Alkol Denat) -->
+        ${
+          routineConflict && routineConflict.applicable && ((routineConflict.conflicts && routineConflict.conflicts.length > 0) || routineConflict.needsSpfReminder)
+            ? `<div id="routineConflictCard" style="background:var(--surface); border:1.5px solid ${(routineConflict.conflicts || []).some((c) => c.severity === 'kirmizi') ? 'var(--bad)' : 'var(--warn)'}; border-radius:18px; padding:13px 14px; display:flex; flex-direction:column; gap:9px;">
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <span style="font-size:13.5px; font-weight:800; color:${(routineConflict.conflicts || []).some((c) => c.severity === 'kirmizi') ? 'var(--bad)' : 'var(--warn)'};">${escapeHtml(routineConflict.cardTitle)}</span>
+                    <span class="mono" style="font-size:11px; font-weight:800; padding:2px 8px; border-radius:10px; background:var(--warn-bg); color:var(--warn); flex:none;">${formatDigits((routineConflict.conflicts || []).length, state.lang)}</span>
+                  </div>
+                  <span style="font-size:11.5px; line-height:1.38; color:var(--muted);">${escapeHtml(routineConflict.cardSubtitle)}</span>
+                </div>
+                ${
+                  (routineConflict.conflicts || []).length > 0
+                    ? `<div style="display:flex; flex-direction:column; gap:8px;">
+                        ${routineConflict.conflicts
+                          .map((rc) => {
+                            const isRed = rc.severity === 'kirmizi';
+                            const toneCol = isRed ? 'var(--bad)' : 'var(--warn)';
+                            const toneBg = isRed ? 'var(--bad-bg)' : 'var(--warn-bg)';
+                            return `
+                              <div data-conflict-id="${escapeHtml(rc.conflictId)}" style="background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; flex-wrap:wrap;">
+                                  <span style="font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:8px; background:${toneBg}; color:${toneCol};">${escapeHtml(rc.severityLabel)} · ${escapeHtml(rc.title)}</span>
+                                  <span style="font-size:11.5px; font-weight:800; color:${toneCol};">⚡ ${escapeHtml(routineConflict.pairLabel)}: ${escapeHtml(rc.detectedPair)}</span>
+                                </div>
+                                <span style="font-size:11.5px; line-height:1.36; color:var(--muted);"><strong>${escapeHtml(routineConflict.whyLabel)}</strong> ${escapeHtml(rc.whyConflict)}</span>
+                                <div style="background:var(--ok-bg); border:1px solid var(--ok); border-radius:10px; padding:7px 10px; display:flex; flex-direction:column; gap:2px;">
+                                  <span style="font-size:10.5px; font-weight:800; color:var(--ok);">🛡️ ${escapeHtml(routineConflict.routineTipLabel)}:</span>
+                                  <span style="font-size:12px; font-weight:700; line-height:1.38; color:var(--ink);">${escapeHtml(rc.howToLayer)}</span>
+                                </div>
+                              </div>
+                            `;
+                          })
+                          .join('')}
+                      </div>`
+                    : ''
+                }
+                ${
+                  routineConflict.needsSpfReminder
+                    ? `<div style="background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn); border-radius:11px; padding:8px 10px; font-size:11.5px; font-weight:700; line-height:1.35;">☀️ ${escapeHtml(routineConflict.spfReminderText)}</div>`
+                    : ''
+                }
+              </div>`
+            : ''
+        }
+
         <!-- ÖZELLİK 5: Marka Bağımsız "Bunun Yerine Rafta Ne Aramalıyım?" (Temiz & Helal Etiket Rehberi) -->
         ${
           swapGuide
@@ -4059,6 +4191,35 @@
                           .join('')}
                       </div>`
                 }
+              </div>`
+            : ''
+        }
+
+        <!-- ÖZELLİK 7: Resmi Mevzuat & Alerjen Raporu (4 Katmanlı Güncellik Mimarisi + A4 Yazdır / Kopyala) -->
+        ${
+          regReport
+            ? `<div id="regulatoryReportCard" style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:13px 14px; display:flex; flex-direction:column; gap:9px;">
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${escapeHtml(regReport.cardTitle)}</span>
+                    <span class="mono" style="font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px; background:var(--soft); color:var(--accent); flex:none;" dir="ltr">v${escapeHtml(regReport.datasetManifest.datasetVersion)}</span>
+                  </div>
+                  <span style="font-size:11.5px; line-height:1.38; color:var(--muted);">${escapeHtml(regReport.cardSubtitle)}</span>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                  <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:8px; background:var(--bg); border:1px solid var(--line); color:var(--ink);">🏛️ ${escapeHtml(regReport.datasetManifest.activeJurisdiction)} · ${escapeHtml(regReport.datasetManifest.selectedHalalAuthority)}</span>
+                  <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:8px; background:var(--bg); border:1px solid var(--line); color:var(--ink);">📚 ${formatDigits((regReport.citedOfficialSources || []).length, state.lang)} Resmi Kaynak</span>
+                  <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:8px; background:${(regReport.detectedAllergens || []).length > 0 ? 'var(--warn-bg)' : 'var(--ok-bg)'}; color:${(regReport.detectedAllergens || []).length > 0 ? 'var(--warn)' : 'var(--ok)'};">⚠️ ${formatDigits((regReport.detectedAllergens || []).length, state.lang)} Alerjen</span>
+                  ${
+                    (regReport.transitionCalendarItems || []).length > 0
+                      ? `<span style="font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:8px; background:var(--bad-bg); color:var(--bad);">⏳ ${formatDigits(regReport.transitionCalendarItems.length, state.lang)} Omnibus Takvim</span>`
+                      : ''
+                  }
+                </div>
+                <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:8px;">
+                  <button id="openRegReportModalBtn" type="button" onclick="openRegulatoryReportModal(this)" style="height:38px; border-radius:12px; border:1.5px solid var(--accent); background:var(--soft); color:var(--accent); font-size:11.5px; font-weight:800; cursor:pointer;">${escapeHtml(regReport.openModalBtn)}</button>
+                  <button id="copyRegReportBtn" type="button" onclick="copyRegulatoryReportText()" style="height:38px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font-size:11.5px; font-weight:700; cursor:pointer;">📋 ${escapeHtml(regReport.copyReportBtn)}</button>
+                </div>
               </div>`
             : ''
         }
@@ -4464,6 +4625,32 @@
             </div>`
               : ''
           }
+          ${
+            comp.routineLayeringCard && comp.routineLayeringCard.applicable && (comp.routineLayeringCard.conflicts || []).length > 0
+              ? `
+            <div id="routineLayeringCard" style="border-radius:14px; background:var(--surface2); border:1.5px solid ${(comp.routineLayeringCard.conflicts || []).some((c) => c.severity === 'kirmizi') ? 'var(--bad)' : 'var(--warn)'}; padding:12px; display:flex; flex-direction:column; gap:7px;">
+              <span style="font-size:13px; font-weight:800; color:${(comp.routineLayeringCard.conflicts || []).some((c) => c.severity === 'kirmizi') ? 'var(--bad)' : 'var(--warn)'};">${escapeHtml(comp.routineLayeringCard.compareLayerTitle)}</span>
+              <span style="font-size:11.5px; color:var(--muted);">${escapeHtml(comp.routineLayeringCard.compareLayerSubtitle)}</span>
+              ${comp.routineLayeringCard.conflicts
+                .map((rc) => {
+                  const isRed = rc.severity === 'kirmizi';
+                  const toneCol = isRed ? 'var(--bad)' : 'var(--warn)';
+                  return `
+                  <div data-layer-conflict-id="${escapeHtml(rc.conflictId)}" style="background:var(--surface); border:1px solid var(--line); border-radius:11px; padding:9px 10px; display:flex; flex-direction:column; gap:4px;">
+                    <span style="font-size:11.5px; font-weight:800; color:${toneCol};">${escapeHtml(rc.severityLabel)} · ${escapeHtml(rc.detectedPair)}</span>
+                    <span style="font-size:11.5px; line-height:1.35; color:var(--muted);">${escapeHtml(rc.whyConflict)}</span>
+                    <span style="font-size:11.5px; line-height:1.35; font-weight:700; color:var(--ok);">🛡️ ${escapeHtml(rc.howToLayer)}</span>
+                  </div>`;
+                })
+                .join('')}
+              ${
+                comp.routineLayeringCard.needsSpfReminder
+                  ? `<div style="font-size:11px; font-weight:700; color:var(--warn);">☀️ ${escapeHtml(comp.routineLayeringCard.spfReminderText)}</div>`
+                  : ''
+              }
+            </div>`
+              : ''
+          }
         </div>
 
         <!-- ÖZELLİK 4: Son Tarananlar Geçmişi & Tek Tıkla Karşılaştırmaya (A / B) Aktarma -->
@@ -4567,18 +4754,190 @@
       }
     }
 
+    let lastRegReportTriggerEl = null;
+
+    function generateRegulatoryReportPlainText() {
+      if (!state.evalData || !state.evalData.cards || !state.evalData.cards.regulatoryReportCard) return '';
+      const rr = state.evalData.cards.regulatoryReportCard;
+      const lines = [
+        `📄 INCIFACT — ${rr.cardTitle}`,
+        `${state.productTitle || 'Product'} (${rr.datasetManifest.activeJurisdiction} · ${rr.datasetManifest.selectedHalalAuthority})`,
+        `Dataset: v${rr.datasetManifest.datasetVersion} · Engine: ${rr.datasetManifest.ruleEngineVersion} · CosIng: ${rr.datasetManifest.cosingDictionaryCount}`,
+        '',
+        `=== ${rr.freshnessTitle} ===`,
+        ...(rr.freshnessPillars || []).map((p, i) => `${i + 1}. ${p.title}: ${p.detail}`),
+        '',
+        `=== ${rr.transitionCalendarTitle} ===`,
+        ...(rr.transitionCalendarItems && rr.transitionCalendarItems.length > 0
+          ? rr.transitionCalendarItems.map((t) => `• ${t.name}: ${t.regulation} (Deadline: ${t.deadline}) — ${t.status}`)
+          : [rr.noTransitionItems]),
+        '',
+        `=== ${rr.allergenSectionTitle} ===`,
+        ...(rr.detectedAllergens && rr.detectedAllergens.length > 0
+          ? rr.detectedAllergens.map((a) => `• ${a.name} (${a.category} · ${a.regulation})`)
+          : [rr.noAllergensFound]),
+        '',
+        `=== ${rr.officialSourcesTitle} ===`,
+        ...(rr.citedOfficialSources || []).map((s) => `• [${s.id}] ${s.title} (${s.jurisdiction}) — ${rr.checkedAtLabel}: ${s.checkedAt} — ${s.url}`)
+      ];
+      return lines.join('\n');
+    }
+
+    function copyRegulatoryReportText() {
+      const txt = generateRegulatoryReportPlainText();
+      if (!txt) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).catch(() => fallbackCopy(txt, 'copyRegReportBtn'));
+      } else {
+        fallbackCopy(txt, 'copyRegReportBtn');
+      }
+      state.shareToast = true;
+      renderScreen();
+      if (window._shareToastTimer) clearTimeout(window._shareToastTimer);
+      window._shareToastTimer = setTimeout(() => {
+        state.shareToast = false;
+        renderScreen();
+      }, 3000);
+    }
+
+    function openRegulatoryReportModal(triggerEl) {
+      lastRegReportTriggerEl = triggerEl || document.activeElement;
+      const modal = document.getElementById('regReportModal');
+      if (!modal || !state.evalData || !state.evalData.cards || !state.evalData.cards.regulatoryReportCard) return;
+      const rr = state.evalData.cards.regulatoryReportCard;
+      const u = getUiText(state.lang);
+      const dir = (state.evalData && state.evalData.dir) || (state.lang === 'ar' || state.lang === 'ur' ? 'rtl' : 'ltr');
+      modal.setAttribute('dir', dir);
+      const titleEl = document.getElementById('regReportModalTitle');
+      const xBtn = document.getElementById('regReportModalCloseBtn');
+      const printBtn = document.getElementById('regReportPrintBtn');
+      const copyBtn = document.getElementById('regReportCopyModalBtn');
+      const bodyEl = document.getElementById('regReportModalBody');
+      if (titleEl) titleEl.textContent = rr.cardTitle;
+      if (xBtn) xBtn.setAttribute('aria-label', u.methodologyClose || 'Close');
+      if (printBtn) printBtn.textContent = '🖨️ ' + rr.printReportBtn;
+      if (copyBtn) copyBtn.textContent = '📋 ' + rr.copyReportBtn;
+      if (bodyEl) {
+        bodyEl.innerHTML = `
+          <div style="background:var(--soft); border:1px solid var(--accent); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:12.5px; font-weight:800; color:var(--accent);">🛡️ ${escapeHtml(rr.freshnessTitle)}</div>
+            <div class="mono" dir="ltr" style="font-size:10.5px; color:var(--ink); font-weight:700;">
+              Dataset v${escapeHtml(rr.datasetManifest.datasetVersion)} · Engine ${escapeHtml(rr.datasetManifest.ruleEngineVersion)} · CosIng ${formatDigits(rr.datasetManifest.cosingDictionaryCount, state.lang)} · ${escapeHtml(rr.datasetManifest.activeJurisdiction)} · ${escapeHtml(rr.datasetManifest.selectedHalalAuthority)}
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px; margin-top:2px;">
+              ${(rr.freshnessPillars || [])
+                .map(
+                  (p, idx) => `
+                <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:7px 9px; font-size:11.5px; line-height:1.38;">
+                  <strong style="color:var(--ink);">${idx + 1}. ${escapeHtml(p.title)}:</strong>
+                  <span style="color:var(--muted);"> ${escapeHtml(p.detail)}</span>
+                </div>`
+                )
+                .join('')}
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <strong style="font-size:12.5px; color:var(--ink);">⏳ ${escapeHtml(rr.transitionCalendarTitle)}</strong>
+            ${
+              (rr.transitionCalendarItems || []).length === 0
+                ? `<div style="background:var(--ok-bg); color:var(--ok); border-radius:10px; padding:8px 10px; font-size:11.5px; font-weight:700;">✓ ${escapeHtml(rr.noTransitionItems)}</div>`
+                : rr.transitionCalendarItems
+                    .map(
+                      (t) => `
+                  <div style="background:var(--bad-bg); border:1px solid var(--bad); border-radius:10px; padding:8px 10px; display:flex; flex-direction:column; gap:3px;">
+                    <div style="display:flex; justify-content:space-between; gap:6px; font-size:11.5px; font-weight:800; color:var(--bad);">
+                      <span>${escapeHtml(t.name)}</span>
+                      <span class="mono" dir="ltr">${escapeHtml(t.regulation)} · ${escapeHtml(t.deadline)}</span>
+                    </div>
+                    <span style="font-size:11px; color:var(--ink);">${escapeHtml(t.status)}</span>
+                  </div>`
+                    )
+                    .join('')
+            }
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <strong style="font-size:12.5px; color:var(--ink);">⚠️ ${escapeHtml(rr.allergenSectionTitle)} (${formatDigits((rr.detectedAllergens || []).length, state.lang)})</strong>
+            ${
+              (rr.detectedAllergens || []).length === 0
+                ? `<div style="background:var(--ok-bg); color:var(--ok); border-radius:10px; padding:8px 10px; font-size:11.5px; font-weight:700;">✓ ${escapeHtml(rr.noAllergensFound)}</div>`
+                : `<div style="display:flex; flex-wrap:wrap; gap:6px;">
+                    ${rr.detectedAllergens
+                      .map(
+                        (a) => `
+                      <span style="background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn); border-radius:9px; padding:4px 9px; font-size:11px; font-weight:800;">
+                        ${escapeHtml(a.name)} · <span class="mono" dir="ltr">${escapeHtml(a.regulation)}</span>
+                      </span>`
+                      )
+                      .join('')}
+                  </div>`
+            }
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <strong style="font-size:12.5px; color:var(--ink);">🏛️ ${escapeHtml(rr.officialSourcesTitle)} (${formatDigits((rr.citedOfficialSources || []).length, state.lang)})</strong>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              ${(rr.citedOfficialSources || [])
+                .map(
+                  (s) => `
+                <div style="background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:8px 10px; display:flex; flex-direction:column; gap:3px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; flex-wrap:wrap;">
+                    <span class="mono" dir="ltr" style="font-size:11px; font-weight:800; color:var(--accent);">${escapeHtml(s.id)} (${escapeHtml(s.jurisdiction)})</span>
+                    <span class="mono" dir="ltr" style="font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:6px; background:var(--ok-bg); color:var(--ok);">✓ ${escapeHtml(rr.checkedAtLabel)}: ${escapeHtml(s.checkedAt)}</span>
+                  </div>
+                  <span style="font-size:11.5px; font-weight:700; color:var(--ink);">${escapeHtml(s.title)}</span>
+                  ${
+                    s.url
+                      ? `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" dir="ltr" style="font-size:10.5px; color:var(--accent); text-decoration:underline; word-break:break-all;">${escapeHtml(s.url)} ↗</a>`
+                      : ''
+                  }
+                </div>`
+                )
+                .join('')}
+            </div>
+          </div>
+        `;
+      }
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      if (xBtn) {
+        xBtn.focus();
+        requestAnimationFrame(() => setTimeout(() => xBtn.focus(), 0));
+      }
+    }
+
+    function closeRegulatoryReportModal() {
+      const modal = document.getElementById('regReportModal');
+      if (modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      }
+      const target =
+        lastRegReportTriggerEl && document.body.contains(lastRegReportTriggerEl)
+          ? lastRegReportTriggerEl
+          : document.getElementById('openRegReportModalBtn');
+      if (target && typeof target.focus === 'function') {
+        target.focus();
+      }
+    }
+
     document.addEventListener('keydown', (e) => {
       const shareModal = document.getElementById('shareCardModal');
       const methModal = document.getElementById('methodologyModal');
+      const regModal = document.getElementById('regReportModal');
       const activeModal =
         shareModal && shareModal.style.display === 'flex'
           ? shareModal
           : methModal && methModal.style.display === 'flex'
           ? methModal
+          : regModal && regModal.style.display === 'flex'
+          ? regModal
           : null;
       if (e.key === 'Escape' && activeModal) {
         if (activeModal === shareModal) closeShareCardModal();
         if (activeModal === methModal) closeMethodologyModal();
+        if (activeModal === regModal) closeRegulatoryReportModal();
         return;
       }
       if (e.key === 'Tab' && activeModal) {
@@ -4655,6 +5014,21 @@
       </div>
       <div style="padding:12px 18px; border-top:1px solid var(--line); display:flex; justify-content:flex-end;">
         <button id="methodologyModalOkBtn" type="button" onclick="closeMethodologyModal()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; min-height:44px; min-width:88px; padding:10px 22px; font-weight:700; font-size:13px; cursor:pointer;">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÖZELLİK 7: Resmi Mevzuat & Alerjen Raporu Modalı (4 Katmanlı Güncellik Mimarisi + A4 Yazdır / PDF) -->
+  <div id="regReportModal" role="dialog" aria-modal="true" aria-labelledby="regReportModalTitle" onclick="if(event.target===this)closeRegulatoryReportModal();" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.68); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--surface); border:1.5px solid var(--accent); border-radius:24px; max-width:460px; width:100%; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 48px rgba(0,0,0,0.45);">
+      <div style="padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
+        <span id="regReportModalTitle" style="font-weight:800; font-size:14.5px; color:var(--ink);">📄 Resmi Mevzuat & Alerjen Raporu</span>
+        <button id="regReportModalCloseBtn" type="button" aria-label="Close" onclick="closeRegulatoryReportModal()" style="border:none; background:var(--surface2); width:36px; height:36px; border-radius:18px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+      </div>
+      <div id="regReportModalBody" style="padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; font-size:12px; line-height:1.45; color:var(--ink);"></div>
+      <div style="padding:12px 18px; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <button id="regReportPrintBtn" type="button" onclick="window.print()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; min-height:42px; font-weight:800; font-size:12.5px; cursor:pointer;">🖨️ Yazdır / PDF</button>
+        <button id="regReportCopyModalBtn" type="button" onclick="copyRegulatoryReportText(); closeRegulatoryReportModal();" style="background:var(--surface2); color:var(--ink); border:1px solid var(--line); border-radius:12px; min-height:42px; font-weight:700; font-size:12px; cursor:pointer;">📋 Raporu Kopyala</button>
       </div>
     </div>
   </div>

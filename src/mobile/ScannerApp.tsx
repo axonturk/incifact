@@ -984,6 +984,57 @@ export default function InciFactMobileApp() {
               </TouchableOpacity>
             </View>
 
+            {/* Cosmetic Routine & Layering Conflict Alert */}
+            {evalMain.cards.routineConflictCard?.applicable &&
+              ((evalMain.cards.routineConflictCard.conflicts || []).length > 0 ||
+                evalMain.cards.routineConflictCard.needsSpfReminder) && (
+                <View
+                  style={{
+                    marginTop: 14,
+                    padding: 12,
+                    borderRadius: 14,
+                    borderWidth: 1,
+                    borderColor: '#D97706',
+                    backgroundColor: theme.subtle
+                  }}
+                >
+                  <Text style={{ color: '#D97706', fontWeight: '800', fontSize: 13, marginBottom: 4, textAlign: isRtl ? 'right' : 'left' }}>
+                    {evalMain.cards.routineConflictCard.cardTitle}
+                  </Text>
+                  <Text style={{ color: theme.muted, fontSize: 11, lineHeight: 16, marginBottom: 8, textAlign: isRtl ? 'right' : 'left' }}>
+                    {evalMain.cards.routineConflictCard.cardSubtitle}
+                  </Text>
+                  {(evalMain.cards.routineConflictCard.conflicts || []).map((rc: any, idx: number) => (
+                    <View
+                      key={rc.conflictId || idx}
+                      style={{
+                        marginTop: idx === 0 ? 0 : 8,
+                        padding: 10,
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: theme.border,
+                        backgroundColor: theme.card
+                      }}
+                    >
+                      <Text style={{ color: rc.severity === 'kirmizi' ? '#DC2626' : '#D97706', fontWeight: '800', fontSize: 11.5, textAlign: isRtl ? 'right' : 'left' }}>
+                        ⚡ {rc.severityLabel} · {rc.detectedPair}
+                      </Text>
+                      <Text style={{ color: theme.muted, fontSize: 11, marginTop: 3, textAlign: isRtl ? 'right' : 'left' }}>
+                        {evalMain.cards.routineConflictCard.whyLabel} {rc.whyConflict}
+                      </Text>
+                      <Text style={{ color: theme.accent, fontWeight: '700', fontSize: 11.5, marginTop: 4, textAlign: isRtl ? 'right' : 'left' }}>
+                        🛡️ {evalMain.cards.routineConflictCard.routineTipLabel}: {rc.howToLayer}
+                      </Text>
+                    </View>
+                  ))}
+                  {evalMain.cards.routineConflictCard.needsSpfReminder && (
+                    <Text style={{ color: '#D97706', fontSize: 11, fontWeight: '700', marginTop: 8, textAlign: isRtl ? 'right' : 'left' }}>
+                      ☀️ {evalMain.cards.routineConflictCard.spfReminderText}
+                    </Text>
+                  )}
+                </View>
+              )}
+
             {/* Brand-Neutral Clean & Halal Ingredient Swap Guide */}
             {evalMain.cards.swapGuideCard && (
               <View
@@ -1031,6 +1082,27 @@ export default function InciFactMobileApp() {
                     </View>
                   ))
                 )}
+              </View>
+            )}
+
+            {/* Official Regulatory & Allergen Report Summary */}
+            {evalMain.cards.regulatoryReportCard && (
+              <View
+                style={{
+                  marginTop: 14,
+                  padding: 12,
+                  borderRadius: 14,
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                  backgroundColor: theme.subtle
+                }}
+              >
+                <Text style={{ color: theme.text, fontWeight: '800', fontSize: 13, marginBottom: 4, textAlign: isRtl ? 'right' : 'left' }}>
+                  {evalMain.cards.regulatoryReportCard.cardTitle} (v{evalMain.cards.regulatoryReportCard.datasetManifest.datasetVersion})
+                </Text>
+                <Text style={{ color: theme.muted, fontSize: 11, lineHeight: 16, textAlign: isRtl ? 'right' : 'left' }}>
+                  {evalMain.cards.regulatoryReportCard.cardSubtitle}
+                </Text>
               </View>
             )}
           </View>
@@ -1201,6 +1273,24 @@ export default function InciFactMobileApp() {
                 <Text style={{ fontSize: 12, color: '#8A3B08', lineHeight: 18 }}>
                   {comparison.decidingDifference.explanation}
                 </Text>
+              </View>
+            )}
+
+            {comparison.routineLayeringCard?.applicable && (comparison.routineLayeringCard.conflicts || []).length > 0 && (
+              <View style={[styles.diffBox, { marginTop: 10 }]}>
+                <Text style={{ fontWeight: '800', color: '#8A3B08', marginBottom: 4 }}>
+                  {comparison.routineLayeringCard.compareLayerTitle}
+                </Text>
+                {(comparison.routineLayeringCard.conflicts || []).map((rc: any, idx: number) => (
+                  <View key={rc.conflictId || idx} style={{ marginTop: 6 }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', color: '#991B1B' }}>
+                      {rc.severityLabel} · {rc.detectedPair}
+                    </Text>
+                    <Text style={{ fontSize: 11.5, color: '#8A3B08', marginTop: 2 }}>
+                      {rc.howToLayer}
+                    </Text>
+                  </View>
+                ))}
               </View>
             )}
 
