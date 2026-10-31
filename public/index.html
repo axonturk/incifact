@@ -3764,18 +3764,29 @@
           levelText = (loc.badges && loc.badges.unrecognized) || 'Unrecognized';
           whyText = ft.unrecognizedWhy || u.stdIngredientDesc;
         } else if (regFind && (regFind.severity === 'yuksek' || regFind.severity === 'orta' || regFind.severity === 'dusuk')) {
-          kind = 'warn';
+          kind = regFind.euStatus === 'yasak' ? 'bad' : 'warn';
           levelText = regFind.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted;
           whyText = regFind.legalText || localizeItemExplanation('warn', regFind.euStatus, '', state.lang);
         } else if (profAlert) {
-          kind = profAlert.profile === 'ozel_kara_liste' ? 'warn' : 'info';
+          kind =
+            profAlert.profile === 'ozel_kara_liste' || profAlert.level === 'kirmizi'
+              ? 'bad'
+              : profAlert.level === 'sari'
+              ? 'warn'
+              : 'info';
           const profName =
             profAlert.profile === 'ozel_kara_liste'
               ? ft.watchlistBadge
               : loc.profileScreen.profiles[profAlert.profile]
               ? loc.profileScreen.profiles[profAlert.profile].name
               : profAlert.profile;
-          levelText = profAlert.profile === 'ozel_kara_liste' ? profName : `${u.infoBadge} · ${profName}`;
+          const levelPrefix =
+            kind === 'bad'
+              ? loc.badges.avoid
+              : kind === 'warn'
+              ? u.attentionTab
+              : u.infoBadge;
+          levelText = profAlert.profile === 'ozel_kara_liste' ? profName : `${levelPrefix} · ${profName}`;
           whyText = profAlert.explanation;
         } else if (shield) {
           kind = 'ok';
@@ -3787,6 +3798,7 @@
           pos: o.position,
           name: o.localizedName || (o.substance ? o.substance.name : o.raw),
           kind,
+          alertLevel: profAlert ? profAlert.level : kind === 'bad' ? 'kirmizi' : kind === 'warn' ? 'sari' : 'ok',
           levelText,
           whyText,
           sources
@@ -3795,17 +3807,30 @@
 
       for (const extraAlert of prof.alerts || []) {
         if (!obs.some((o) => o.position === extraAlert.position)) {
+          const extraKind =
+            extraAlert.profile === 'ozel_kara_liste' || extraAlert.level === 'kirmizi'
+              ? 'bad'
+              : extraAlert.level === 'sari'
+              ? 'warn'
+              : 'info';
           const profName =
             extraAlert.profile === 'ozel_kara_liste'
               ? ft.watchlistBadge
               : loc.profileScreen.profiles[extraAlert.profile]
               ? loc.profileScreen.profiles[extraAlert.profile].name
               : extraAlert.profile;
+          const levelPrefix =
+            extraKind === 'bad'
+              ? loc.badges.avoid
+              : extraKind === 'warn'
+              ? u.attentionTab
+              : u.infoBadge;
           allRows.push({
             pos: extraAlert.position,
             name: extraAlert.localizedName || extraAlert.substanceName || extraAlert.rawToken,
-            kind: extraAlert.profile === 'ozel_kara_liste' || extraAlert.level === 'kirmizi' ? 'warn' : 'info',
-            levelText: extraAlert.profile === 'ozel_kara_liste' ? profName : `${u.infoBadge} · ${profName}`,
+            kind: extraKind,
+            alertLevel: extraAlert.level || (extraKind === 'bad' ? 'kirmizi' : extraKind === 'warn' ? 'sari' : 'veri_yok'),
+            levelText: extraAlert.profile === 'ozel_kara_liste' ? profName : `${levelPrefix} · ${profName}`,
             whyText: extraAlert.explanation,
             sources: extraAlert.sources || []
           });
@@ -4058,12 +4083,30 @@
               ? `<div style="background:var(--ok-bg); color:var(--ok); border-radius:16px; padding:12px 14px; font-size:12.5px; font-weight:700;">✓ ${escapeHtml(u.noRestrictedFound)}</div>`
               : visibleRows
                   .map((it) => {
-                    const badgeBg = it.kind === 'warn' ? 'var(--warn-bg)' : it.kind === 'info' ? 'var(--info-bg)' : it.kind === 'unknown' ? 'var(--surface2)' : 'var(--ok-bg)';
-                    const fg = it.kind === 'warn' ? 'var(--warn)' : it.kind === 'info' ? 'var(--info)' : it.kind === 'unknown' ? 'var(--muted)' : 'var(--ok)';
+                    const badgeBg =
+                      it.kind === 'bad'
+                        ? 'var(--bad-bg)'
+                        : it.kind === 'warn'
+                        ? 'var(--warn-bg)'
+                        : it.kind === 'info'
+                        ? 'var(--info-bg)'
+                        : it.kind === 'unknown'
+                        ? 'var(--surface2)'
+                        : 'var(--ok-bg)';
+                    const fg =
+                      it.kind === 'bad'
+                        ? 'var(--bad)'
+                        : it.kind === 'warn'
+                        ? 'var(--warn)'
+                        : it.kind === 'info'
+                        ? 'var(--info)'
+                        : it.kind === 'unknown'
+                        ? 'var(--muted)'
+                        : 'var(--ok)';
                     return `
-              <div style="background:var(--surface); border-radius:18px; padding:12px 14px; display:flex; gap:10px;">
+              <div data-row-kind="${escapeHtml(it.kind)}" data-alert-level="${escapeHtml(it.alertLevel || '')}" style="background:var(--surface); border-radius:18px; padding:12px 14px; display:flex; gap:10px;">
                 <span style="width:26px; height:26px; border-radius:13px; background:${badgeBg}; color:${fg}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex:none;">
-                  ${it.kind === 'warn' ? '!' : it.kind === 'info' ? 'i' : it.kind === 'unknown' ? '?' : '✓'}
+                  ${it.kind === 'bad' || it.kind === 'warn' ? '!' : it.kind === 'info' ? 'i' : it.kind === 'unknown' ? '?' : '✓'}
                 </span>
                 <div style="display:flex; flex-direction:column; gap:4px; min-width:0; flex:1;">
                   <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px; flex-wrap:wrap;">
