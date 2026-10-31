@@ -922,6 +922,233 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
     return titleCaseWords(rawToken);
   }
 
+  // 3.6. Disambiguate Brightening Actives (Alpha-Arbutin, Arbutin, Tranexamic Acid, Azelaic Acid) & Kojic Acid & Omnibus substances
+  const withRawSuffix = (localLabel) => {
+    if (!localLabel) return rawToken;
+    if (localLabel.toLowerCase() === rawToken.toLowerCase()) return localLabel;
+    if ((lang === 'ar' || lang === 'ur') && /[\u0600-\u06FF]/.test(rawToken)) return rawToken;
+    if (lang === 'ru' && /[\u0400-\u04FF]/.test(rawToken)) return rawToken;
+    return `${localLabel} (${rawToken})`;
+  };
+
+  if (entity.id === 'tranexamic_azelaic_arbutin') {
+    if (/(?:^|[^\p{L}\p{N}])(alpha[\s\-]*arbutin|alfa[\s\-]*arbutin|ألفا[\s\-]*أربوتين|альфа[\s\-]*арбутин|الفا[\s\-]*اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
+      const map = {
+        tr: 'Alfa-Arbutin',
+        en: 'Alpha-Arbutin',
+        ar: 'ألفا أربوتين',
+        de: 'Alpha-Arbutin',
+        fr: 'Alpha-Arbutine',
+        id: 'Alfa-Arbutin',
+        ms: 'Alfa-Arbutin',
+        es: 'Alfa-Arbutina',
+        ru: 'Альфа-арбутин',
+        ur: 'الفا اربوٹین'
+      };
+      return withRawSuffix(map[lang] || 'Alpha-Arbutin');
+    }
+    if (/(?:^|[^\p{L}\p{N}])(arbutin|beta[\s\-]*arbutin|أربوتين|арбутин|اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
+      const map = {
+        tr: 'Arbutin',
+        en: 'Arbutin',
+        ar: 'أربوتين',
+        de: 'Arbutin',
+        fr: 'Arbutine',
+        id: 'Arbutin',
+        ms: 'Arbutin',
+        es: 'Arbutina',
+        ru: 'Арбутин',
+        ur: 'اربوٹین'
+      };
+      return withRawSuffix(map[lang] || 'Arbutin');
+    }
+    if (/(?:^|[^\p{L}\p{N}])(tranexamic\s+acid|traneksamik\s+asit|tranexamsäure|acide\s+tranexamique|ácido\s+tranexámico|транексамовая\s+кислота|حمض\s+الترانيكساميك|ترانيكساميك|ٹرانیکسامک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
+      const map = {
+        tr: 'Traneksamik Asit',
+        en: 'Tranexamic Acid',
+        ar: 'حمض الترانيكساميك',
+        de: 'Tranexamsäure',
+        fr: 'Acide tranexamique',
+        id: 'Asam Traneksamat',
+        ms: 'Asid Traneksamik',
+        es: 'Ácido tranexámico',
+        ru: 'Транексамовая кислота',
+        ur: 'ٹرانیکسامک ایسڈ'
+      };
+      return withRawSuffix(map[lang] || 'Tranexamic Acid');
+    }
+    if (/(?:^|[^\p{L}\p{N}])(azelaic\s+acid|azelaik\s+asit|azelainsäure|acide\s+azélaïque|ácido\s+azelaico|азелаиновая\s+кислота|حمض\s+الأزيليك|ازیلائک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
+      const map = {
+        tr: 'Azelaik Asit',
+        en: 'Azelaic Acid',
+        ar: 'حمض الأزيليك',
+        de: 'Azelainsäure',
+        fr: 'Acide azélaïque',
+        id: 'Asam Azelaic',
+        ms: 'Asid Azelaik',
+        es: 'Ácido azelaico',
+        ru: 'Азелаиновая кислота',
+        ur: 'ازیلائک ایسڈ'
+      };
+      return withRawSuffix(map[lang] || 'Azelaic Acid');
+    }
+    return rawToken;
+  }
+
+  if (entity.id === 'kojic_acid') {
+    const map = {
+      tr: 'Kojik Asit',
+      en: 'Kojic Acid',
+      ar: 'حمض الكوجيك',
+      de: 'Kojisäure',
+      fr: 'Acide kojique',
+      id: 'Asam Kojat',
+      ms: 'Asid Kojik',
+      es: 'Ácido kójico',
+      ru: 'Койевая кислота',
+      ur: 'کوجک ایسڈ'
+    };
+    return withRawSuffix(map[lang] || 'Kojic Acid');
+  }
+
+  if (entity.id === 'retinol') {
+    if (/retinyl\s+palmitate/i.test(lowerRaw)) {
+      const map = {
+        tr: 'Retinil Palmitat',
+        en: 'Retinyl Palmitate',
+        ar: 'بالميتات الريتينيل',
+        de: 'Retinylpalmitat',
+        fr: 'Palmitate de rétinyle',
+        id: 'Retinil Palmitat',
+        ms: 'Retinil Palmitat',
+        es: 'Palmitato de retinilo',
+        ru: 'Ретинилпальмитат',
+        ur: 'ریٹینائل پامٹیٹ'
+      };
+      return withRawSuffix(map[lang] || 'Retinyl Palmitate');
+    }
+    if (/retinyl\s+acetate/i.test(lowerRaw)) {
+      const map = {
+        tr: 'Retinil Asetat',
+        en: 'Retinyl Acetate',
+        ar: 'أسيتات الريتينيل',
+        de: 'Retinylacetat',
+        fr: 'Acétate de rétinyle',
+        id: 'Retinil Asetat',
+        ms: 'Retinil Asetat',
+        es: 'Acetato de retinilo',
+        ru: 'Ретинилацетат',
+        ur: 'ریٹینائل ایسیٹیٹ'
+      };
+      return withRawSuffix(map[lang] || 'Retinyl Acetate');
+    }
+    const map = {
+      tr: 'Retinol',
+      en: 'Retinol',
+      ar: 'ريتينول',
+      de: 'Retinol',
+      fr: 'Rétinol',
+      id: 'Retinol',
+      ms: 'Retinol',
+      es: 'Retinol',
+      ru: 'Ретинол',
+      ur: 'ریٹینول'
+    };
+    return withRawSuffix(map[lang] || 'Retinol');
+  }
+
+  if (entity.id === 'tphp_triphenyl_phosphate_banned') {
+    const map = {
+      tr: 'Trifenil Fosfat',
+      en: 'Triphenyl Phosphate',
+      ar: 'فوسفات ثلاثي الفينيل',
+      de: 'Triphenylphosphat',
+      fr: 'Phosphate de triphényle',
+      id: 'Trifenil Fosfat',
+      ms: 'Trifenil Fosfat',
+      es: 'Fosfato de trifenilo',
+      ru: 'Трифенилфосфат',
+      ur: 'ٹرائی فینائل فاسفیٹ'
+    };
+    return withRawSuffix(map[lang] || 'Triphenyl Phosphate');
+  }
+
+  if (entity.id === 'tpo_nail_banned_2025') {
+    const map = {
+      tr: 'Trimetilbenzoil Difenilfosfin Oksit',
+      en: 'Trimethylbenzoyl Diphenylphosphine Oxide',
+      ar: 'أكسيد ثلاثي ميثيل بنزويل ثنائي فينيل فوسفين',
+      de: 'Trimethylbenzoyldiphenylphosphinoxid',
+      fr: 'Oxyde de triméthylbenzoyl diphénylphosphine',
+      id: 'Trimetilbenzoil Difenilfosfin Oksida',
+      ms: 'Trimetilbenzoil Difenilfosfin Oksida',
+      es: 'Óxido de trimetilbenzoil difenilfosfina',
+      ru: 'Оксид триметилбензоил дифенилфосфина',
+      ur: 'ٹرائی میتھائل بینزوئل ڈائی فینائل فاسفین آکسائیڈ'
+    };
+    return withRawSuffix(map[lang] || rawToken);
+  }
+
+  if (entity.id === 'fragrance_allergens') {
+    if (/\blinalool\b/i.test(lowerRaw)) {
+      const map = { tr: 'Linalol', en: 'Linalool', ar: 'لينالول', de: 'Linalool', fr: 'Linalol', id: 'Linalool', ms: 'Linalool', es: 'Linalol', ru: 'Линалоол', ur: 'لینالول' };
+      return withRawSuffix(map[lang] || 'Linalool');
+    }
+    if (/\blimonene\b/i.test(lowerRaw)) {
+      const map = { tr: 'Limonen', en: 'Limonene', ar: 'ليمونين', de: 'Limonen', fr: 'Limonène', id: 'Limonena', ms: 'Limonena', es: 'Limoneno', ru: 'Лимонен', ur: 'لیمونین' };
+      return withRawSuffix(map[lang] || 'Limonene');
+    }
+    if (/\bgeraniol\b/i.test(lowerRaw)) {
+      const map = { tr: 'Geraniol', en: 'Geraniol', ar: 'جيرانيول', de: 'Geraniol', fr: 'Géraniol', id: 'Geraniol', ms: 'Geraniol', es: 'Geraniol', ru: 'Гераниол', ur: 'جیرانیول' };
+      return withRawSuffix(map[lang] || 'Geraniol');
+    }
+    if (/\bcitronellol\b/i.test(lowerRaw)) {
+      const map = { tr: 'Sitronellol', en: 'Citronellol', ar: 'سيترونيلول', de: 'Citronellol', fr: 'Citronellol', id: 'Sitronelol', ms: 'Sitronelol', es: 'Citronelol', ru: 'Цитронеллол', ur: 'سٹرونیلول' };
+      return withRawSuffix(map[lang] || 'Citronellol');
+    }
+    if (/\bbenzyl\s+benzoate\b/i.test(lowerRaw)) {
+      const map = { tr: 'Benzil Benzoat', en: 'Benzyl Benzoate', ar: 'بنزوات البنزيل', de: 'Benzylbenzoat', fr: 'Benzoate de benzyle', id: 'Benzil Benzoat', ms: 'Benzil Benzoat', es: 'Benzoato de bencilo', ru: 'Бензилбензоат', ur: 'بینزائل بینزویٹ' };
+      return withRawSuffix(map[lang] || 'Benzyl Benzoate');
+    }
+    if (/\bcinnamyl\s+alcohol\b/i.test(lowerRaw)) {
+      const map = { tr: 'Sinnamil Alkol', en: 'Cinnamyl Alcohol', ar: 'كحول سيناميل', de: 'Zimtalkohol', fr: 'Alcool cinnamique', id: 'Sinamil Alkohol', ms: 'Sinamil Alkohol', es: 'Alcohol cinamílico', ru: 'Коричный спирт', ur: 'سینامائل الکوحل' };
+      return withRawSuffix(map[lang] || 'Cinnamyl Alcohol');
+    }
+    return rawToken;
+  }
+
+  if (entity.id === 'comedogenic_esters_oils') {
+    if (/cocoa\s+butter|kakao\s+yağı|kakaobutter|beurre\s+de\s+cacao|manteca\s+de\s+cacao|масло\s+какао|زبدة\s+الكاكاو/i.test(lowerRaw)) {
+      const map = { tr: 'Kakao Yağı', en: 'Cocoa Butter', ar: 'زبدة الكاكاو', de: 'Kakaobutter', fr: 'Beurre de cacao', id: 'Lemak Kakao', ms: 'Mentega Koko', es: 'Manteca de cacao', ru: 'Масло какао', ur: 'کوکو بٹر' };
+      return withRawSuffix(map[lang] || 'Cocoa Butter');
+    }
+    if (/coconut|cocos\s+nucifera|hindistan\s+cevizi/i.test(lowerRaw)) {
+      const map = { tr: 'Hindistan Cevizi Yağı', en: 'Coconut Oil', ar: 'زيت جوز الهند', de: 'Kokosöl', fr: 'Huile de coco', id: 'Minyak Kelapa', ms: 'Minyak Kelapa', es: 'Aceite de coco', ru: 'Кокосовое масло', ur: 'ناریل کا تیل' };
+      return withRawSuffix(map[lang] || 'Coconut Oil');
+    }
+    return rawToken;
+  }
+
+  // Guard against multi-chemical umbrella groups falling through to generic first-alias lookup
+  const SINGLE_CHEMICAL_IDS_WITH_SLASH = new Set([
+    'aqua',
+    'parfum',
+    'alcohol_denat',
+    'tocopherol',
+    'sodium_hyaluronate',
+    'urea_carbamide',
+    'msg_e621',
+    'titanium_dioxide_e171_ci77891',
+    'carmine_e120',
+    'lecithin_e322',
+    'e471_mono_and_diglycerides',
+    'citric_acid_e330',
+    'propylene_glycol_e1520'
+  ]);
+  if ((/[\/&]/.test(canon) || entity.id === 'mineral_oil_petrolatum') && !SINGLE_CHEMICAL_IDS_WITH_SLASH.has(entity.id)) {
+    return rawToken;
+  }
+
   // 4. Fragrance allergen: Vanillin
   if (/vanillin|vanilin|فانيلين|ванилин|ونیلن|vanilline|vainillina/.test(lowerRaw)) {
     const map = { tr: 'Vanilin', en: 'Vanillin', ar: 'فانيلين', de: 'Vanillin', fr: 'Vanilline', es: 'Vainillina', ru: 'Ванилин', id: 'Vanilin', ms: 'Vanilin', ur: 'ونیلن' };

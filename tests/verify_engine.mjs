@@ -1584,7 +1584,7 @@ runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 ka
       assert.ok(src.id && src.checkedAt && src.url, `Dil=${lang} resmi kaynakta id, checkedAt ve url bulunmalı`);
     }
 
-    // 2) Kojic Acid, Alpha-Arbutin, Arbutin ve Azelaic Acid ayrımı (EU 2024/996 madde bazlı doğru Ek III sıra no, limit ve tarih)
+    // 2) Kojic Acid, Alpha-Arbutin, Arbutin ve Azelaic Acid ayrımı (EU 2024/996 madde bazlı doğru Ek III sıra no, limit, tarih ve görünen ad)
     const kojicEval = evaluateProduct({
       rawText: 'Aqua, Kojic Acid, Alpha-Arbutin, Arbutin',
       productType: 'cosmetic',
@@ -1592,6 +1592,23 @@ runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 ka
     });
     const kojicItems = kojicEval.cards.regulatoryReportCard.transitionCalendarItems;
     assert.equal(kojicItems.length, 3, `Dil=${lang} Kojic Acid + Alpha-Arbutin + Arbutin 3 ayrı takvim maddesi üretmeli`);
+    const alphaItem = kojicItems.find((t) => /Annex III\/377/.test(t.regulation));
+    const arbutinItem = kojicItems.find((t) => /Annex III\/378/.test(t.regulation));
+    const kojicItem = kojicItems.find((t) => /Annex III\/375/.test(t.regulation));
+    assert.ok(alphaItem && arbutinItem && kojicItem, `Dil=${lang} Ek III/375, 377 ve 378 maddeleri eksiksiz olmalı`);
+    assert.notEqual(
+      alphaItem.name,
+      arbutinItem.name,
+      `Dil=${lang} Alpha-Arbutin (${alphaItem.name}) ile Arbutin (${arbutinItem.name}) görünen adları birbirinden farklı olmalı`
+    );
+    assert.ok(
+      !/azelai|tranex|ترانيكساميك|أزيليك|азелаин|транексам|ازیلائک|ٹرانیکسامک/iu.test(alphaItem.name),
+      `Dil=${lang} Alpha-Arbutin görünen adı Azelaic/Tranexamic Acid ile karışmamalı: ${alphaItem.name}`
+    );
+    assert.ok(
+      !/azelai|tranex|ترانيكساميك|أزيليك|азелаин|транексам|ازیلائک|ٹرانیکسامک/iu.test(arbutinItem.name),
+      `Dil=${lang} Arbutin görünen adı Azelaic/Tranexamic Acid ile karışmamalı: ${arbutinItem.name}`
+    );
     assert.ok(
       kojicItems.some(
         (t) =>
