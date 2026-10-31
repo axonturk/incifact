@@ -55,6 +55,27 @@ function readJsonBody(req, res, callback) {
 const server = http.createServer((req, res) => {
   const pathname = (req.url || '/').split('?')[0];
 
+  if (req.method === 'GET' && pathname === '/api/health') {
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'X-Content-Type-Options': 'nosniff'
+    });
+    res.end(
+      JSON.stringify(
+        {
+          status: 'ok',
+          version: '1.0.0',
+          datasetVersion: '2026.10-omnibus',
+          ruleEngineVersion: '3.2.0',
+          engineMode: 'node-http'
+        },
+        null,
+        2
+      )
+    );
+    return;
+  }
+
   if (req.method === 'GET' && pathname === '/api/locales') {
     res.writeHead(200, {
       'Content-Type': 'application/json; charset=utf-8',
@@ -180,6 +201,64 @@ const server = http.createServer((req, res) => {
     } else {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'X-Content-Type-Options': 'nosniff' });
       res.end('Asset not found');
+      return;
+    }
+  }
+
+  // Static ES Modules handler (/src/*) for Dual-Mode Browser & Offline PWA Engine Fallback
+  if ((req.method === 'GET' || req.method === 'HEAD') && pathname.startsWith('/src/')) {
+    const safeSubPath = path.normalize(pathname.replace(/^\/src\//, '')).replace(/^(\.\.[\/\\])+/, '');
+    const filePath = path.join(__dirname, 'src', safeSubPath);
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const ext = path.extname(filePath).toLowerCase();
+      const mimeTypes = {
+        '.mjs': 'application/javascript; charset=utf-8',
+        '.js': 'application/javascript; charset=utf-8',
+        '.json': 'application/json; charset=utf-8'
+      };
+      const contentType = mimeTypes[ext];
+      if (contentType) {
+        res.writeHead(200, {
+          'Content-Type': contentType,
+          'X-Content-Type-Options': 'nosniff',
+          'Cache-Control': 'public, max-age=3600'
+        });
+        if (req.method === 'HEAD') {
+          res.end();
+          return;
+        }
+        fs.createReadStream(filePath).pipe(res);
+        return;
+      }
+    }
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'X-Content-Type-Options': 'nosniff' });
+    res.end('Module not found');
+    return;
+  }
+
+  // Root PWA & Legal static files (/manifest.webmanifest, /sw.js, /privacy.html)
+  if (
+    (req.method === 'GET' || req.method === 'HEAD') &&
+    (pathname === '/manifest.webmanifest' || pathname === '/sw.js' || pathname === '/privacy.html')
+  ) {
+    const filePath = path.join(__dirname, 'public', pathname.slice(1));
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const contentType =
+        pathname === '/manifest.webmanifest'
+          ? 'application/manifest+json; charset=utf-8'
+          : pathname === '/sw.js'
+          ? 'application/javascript; charset=utf-8'
+          : 'text/html; charset=utf-8';
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'X-Content-Type-Options': 'nosniff',
+        'Cache-Control': 'no-cache'
+      });
+      if (req.method === 'HEAD') {
+        res.end();
+        return;
+      }
+      fs.createReadStream(filePath).pipe(res);
       return;
     }
   }

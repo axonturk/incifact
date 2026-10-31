@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node server.mjs",
     "build:data": "node scripts/build_data_modules.mjs",
+    "build:pages": "node scripts/build_static_site.mjs",
     "test": "node tests/data_modules_sync.mjs && node tests/html_script_syntax.mjs && node tests/verify_engine.mjs && node tests/audit3_regressions.mjs && node tests/localized_samples_coverage.mjs && node scripts/audit_collisions.mjs",
     "expand-db": "node scripts/expand_database.mjs",
     "expo:start": "npx expo start",

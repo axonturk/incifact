@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0F291E" />
   <title>InciFact — Göz Yormayan 5 Ekranlı Mobil Deneyim & Karşılaştırma Motoru</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./assets/incifact-app-icon.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" />
   <style>
@@ -1867,6 +1870,57 @@
       { code: '0000000000017', label: '<80% OCR' }
     ];
 
+    let _browserRuleEnginePromise = null;
+    let _preferClientEngine = false;
+
+    async function getBrowserRuleEngine() {
+      if (!_browserRuleEnginePromise) {
+        _browserRuleEnginePromise = import('./src/engine/ruleEngine.mjs').catch(() =>
+          import('../src/engine/ruleEngine.mjs')
+        );
+      }
+      return _browserRuleEnginePromise;
+    }
+
+    async function callInciFactApi(endpoint, payload) {
+      const isStaticHost =
+        typeof location !== 'undefined' &&
+        (location.hostname.endsWith('.github.io') ||
+          location.hostname.endsWith('.pages.dev') ||
+          location.protocol === 'file:');
+
+      if (!_preferClientEngine && !isStaticHost) {
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            return await res.json();
+          }
+          if (res.status === 404 || res.status === 405) {
+            _preferClientEngine = true;
+          }
+        } catch (_err) {
+          _preferClientEngine = true;
+        }
+      }
+
+      const engine = await getBrowserRuleEngine();
+      if (endpoint === '/api/evaluate') {
+        return engine.evaluateProduct(payload || {});
+      }
+      if (endpoint === '/api/compare') {
+        const body = payload || {};
+        return engine.compareProducts(body.productA || {}, body.productB || {}, body.sharedOptions || {});
+      }
+      if (endpoint === '/api/barcode') {
+        return engine.lookupBarcodeProduct(payload || {});
+      }
+      throw new Error('Unknown endpoint: ' + endpoint);
+    }
+
     async function lookupBarcodeFromUi(codeOverride) {
       const inp = document.getElementById('barcodeInput');
       const rawCode = codeOverride !== undefined ? String(codeOverride) : (inp ? inp.value : state.barcodeInputVal);
@@ -1876,16 +1930,11 @@
       const customCatalog = loadSavedJson('incifact_custom_barcodes_v1', {});
 
       try {
-        const res = await fetch('/api/barcode', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            barcode: rawCode,
-            lang: state.lang,
-            customCatalog: customCatalog && typeof customCatalog === 'object' ? customCatalog : {}
-          })
+        const data = await callInciFactApi('/api/barcode', {
+          barcode: rawCode,
+          lang: state.lang,
+          customCatalog: customCatalog && typeof customCatalog === 'object' ? customCatalog : {}
         });
-        const data = await res.json();
         if (!data || !data.found) {
           state.barcodeStatusBanner = {
             tone: 'warn',
@@ -2551,24 +2600,19 @@
         state.productTitle = deriveCustomProductTitle(rawText, state.lang);
       }
 
-      const evalRes = await fetch('/api/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rawText,
-          allergenStatement: (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '',
-          applicationType: (state.activeBarcodeMeta && state.activeBarcodeMeta.applicationType) || undefined,
-          productType,
-          jurisdiction: state.jurisdiction || 'EU',
-          userProfiles: activeProfiles,
-          customWatchlist: state.customWatchlist || [],
-          halalAuthority,
-          claims: state.claims,
-          userConfirmations: state.userConfirmations,
-          lang: state.lang
-        })
+      const nextEvalData = await callInciFactApi('/api/evaluate', {
+        rawText,
+        allergenStatement: (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '',
+        applicationType: (state.activeBarcodeMeta && state.activeBarcodeMeta.applicationType) || undefined,
+        productType,
+        jurisdiction: state.jurisdiction || 'EU',
+        userProfiles: activeProfiles,
+        customWatchlist: state.customWatchlist || [],
+        halalAuthority,
+        claims: state.claims,
+        userConfirmations: state.userConfirmations,
+        lang: state.lang
       });
-      const nextEvalData = await evalRes.json();
       if (myReqToken !== refreshReqToken) return;
       state.evalData = nextEvalData;
       recordCurrentScanToHistory(state.evalData, rawText, productType);
@@ -2576,22 +2620,17 @@
       const cNames = COMPARE_NAMES[state.lang] || COMPARE_NAMES.en;
       const prodA = state.customCompareA || { ...COMPARE_PAIR.productA, name: cNames[0] };
       const prodB = state.customCompareB || { ...COMPARE_PAIR.productB, name: cNames[1] };
-      const compRes = await fetch('/api/compare', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productA: prodA,
-          productB: prodB,
-          sharedOptions: {
-            jurisdiction: state.jurisdiction || 'EU',
-            userProfiles: activeProfiles,
-            customWatchlist: state.customWatchlist || [],
-            halalAuthority,
-            lang: state.lang
-          }
-        })
+      const nextCompareData = await callInciFactApi('/api/compare', {
+        productA: prodA,
+        productB: prodB,
+        sharedOptions: {
+          jurisdiction: state.jurisdiction || 'EU',
+          userProfiles: activeProfiles,
+          customWatchlist: state.customWatchlist || [],
+          halalAuthority,
+          lang: state.lang
+        }
       });
-      const nextCompareData = await compRes.json();
       if (myReqToken !== refreshReqToken) return;
       state.compareData = nextCompareData;
       syncShareModalI18n();
@@ -4976,6 +5015,12 @@
       initLive.value = getSampleText(state.activeSampleIdx, state.lang);
     }
     refreshAll();
+
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && typeof location !== 'undefined' && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
   </script>
 
   <!-- ÖZELLİK 1: WhatsApp / Instagram Sonuç Özeti Kartı Paylaşım Modalı (A11y Dialog + 10-Language Localized) -->

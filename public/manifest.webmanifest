@@ -1,0 +1,27 @@
+{
+  "name": "InciFact — Clean, Allergen & Halal Scanner",
+  "short_name": "InciFact",
+  "description": "Zero-Hallucination Cosmetic, Food, Allergen & 4-Authority Halal Ingredient Scanner across 10 languages.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F7F4EF",
+  "theme_color": "#0F291E",
+  "lang": "tr",
+  "categories": ["health", "medical", "lifestyle", "shopping"],
+  "icons": [
+    {
+      "src": "./assets/incifact-app-icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/incifact-corporate-seal.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
