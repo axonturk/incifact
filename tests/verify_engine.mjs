@@ -9,13 +9,17 @@ import {
   VERIFIED_BARCODE_CATALOG
 } from '../src/engine/ruleEngine.mjs';
 
+import cosingIngredients from '../src/data/generated/cosing_ingredients.mjs';
+
 console.log('======================================================================');
-console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (58 KABUL KRİTERİ)');
+console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (60 KABUL KRİTERİ)');
 console.log('======================================================================\n');
 
 let passed = 0;
+let total = 0;
 
 function runTest(name, fn) {
+  total++;
   try {
     fn();
     passed++;
@@ -635,8 +639,8 @@ runTest('30. TPHP (AB 2026/909) geçiş dönemi ve 2027 yürürlük takvimi; Bor
   assert.equal(borFinding.euStatus, 'yasak');
 });
 
-// 31. CosIng 30.609 Bileşen Temel Sözlüğü & Ek II/III Güvenlik Ağı Entegrasyonu
-runTest('31. 30.609 AB CosIng bileşeni temel sözlük olarak tanınmalı ve Ek II yasaklıları yakalanmalı', () => {
+// 31. CosIng 30.594 Bileşen Temel Sözlüğü & Ek II/III Güvenlik Ağı Entegrasyonu
+runTest('31. 30.594 AB CosIng bileşeni temel sözlük olarak tanınmalı ve Ek II yasaklıları yakalanmalı', () => {
   // Test A: Nadir botanik CosIng bileşenleri tanınmalı ve kapsamı %100 yapmalı
   const resCosSafe = evaluateProduct({
     rawText: 'Ingredients: Aqua, Euphrasia Officinalis Powder, Sambucus Nigra Flower Powder, Cryptocarya Massoy Bark Extract',
@@ -1536,7 +1540,7 @@ runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 ka
     const rr = cosEval.cards.regulatoryReportCard;
     assert.ok(rr, `Dil=${lang} regulatoryReportCard mevcut olmalı`);
     assert.equal(rr.datasetManifest.datasetVersion, '2026.10-omnibus');
-    assert.equal(rr.datasetManifest.cosingDictionaryCount, 30609);
+    assert.equal(rr.datasetManifest.cosingDictionaryCount, 30594);
     assert.equal(rr.datasetManifest.activeJurisdiction, 'EU');
     assert.equal(rr.datasetManifest.selectedHalalAuthority, 'GIMDES');
     assert.equal(rr.freshnessPillars.length, 4, `Dil=${lang} 4 katmanlı güncellik mimarisi bulunmalı`);
@@ -1662,7 +1666,100 @@ runTest('58. Resmi Mevzuat & Alerjen Raporu (regulatoryReportCard) 10 dilde 4 ka
   }
 });
 
-console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/58 KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
+// ============================================================================
+// TEST 59 (P0-1): Alpha-Arbutin, Arbutin & Azelaic/Tranexamic Ayrışması ve AB 2024/996 Konsantrasyon/Ürün Tipi Limitleri
+// ============================================================================
+runTest('59. [P0-1] Alpha-Arbutin (Ek III/377), Arbutin (Ek III/378) ve Azelaic/Tranexamic (İzinli) ayrık kimlik & konsantrasyon limitleri', () => {
+  const alphaOk = evaluateProduct({ rawText: 'Aqua, Alpha-Arbutin 2%', productType: 'cosmetic' });
+  assert.equal(alphaOk.observations.find((o) => /alpha/i.test(o.raw)).substance.id, 'alpha_arbutin');
+  assert.ok(alphaOk.cards.regulatoryCard.score < 100, 'Alpha-Arbutin 2% kısıtlı olduğu için skor < 100 olmalı');
+
+  const alphaOver = evaluateProduct({ rawText: 'Aqua, Alpha-Arbutin 5%', productType: 'cosmetic' });
+  assert.equal(alphaOver.cards.regulatoryCard.score, 10);
+  assert.equal(alphaOver.cards.regulatoryCard.capApplied, 10);
+
+  const alphaBodyOk = evaluateProduct({ rawText: 'Aqua, Alpha-Arbutin 0.5%', productType: 'cosmetic', applicationType: 'body_lotion' });
+  assert.ok(alphaBodyOk.cards.regulatoryCard.score < 100 && alphaBodyOk.cards.regulatoryCard.score > 10);
+
+  const alphaBodyOver = evaluateProduct({ rawText: 'Aqua, Alpha-Arbutin 1.0%', productType: 'cosmetic', applicationType: 'body_lotion' });
+  assert.equal(alphaBodyOver.cards.regulatoryCard.score, 10);
+
+  const arbutinOk = evaluateProduct({ rawText: 'Aqua, Arbutin 7%', productType: 'cosmetic' });
+  assert.equal(arbutinOk.observations.find((o) => /arbutin/i.test(o.raw)).substance.id, 'arbutin');
+  assert.ok(arbutinOk.cards.regulatoryCard.score < 100);
+
+  const arbutinOver = evaluateProduct({ rawText: 'Aqua, Arbutin 10%', productType: 'cosmetic' });
+  assert.equal(arbutinOver.cards.regulatoryCard.score, 10);
+
+  const arbutinBodyBanned = evaluateProduct({ rawText: 'Aqua, Arbutin 2%', productType: 'cosmetic', applicationType: 'body_lotion' });
+  assert.equal(arbutinBodyBanned.cards.regulatoryCard.score, 10);
+
+  const azelaic = evaluateProduct({ rawText: 'Aqua, Azelaic Acid 10%', productType: 'cosmetic' });
+  assert.equal(azelaic.observations.find((o) => /azelaic/i.test(o.raw)).substance.id, 'tranexamic_azelaic_arbutin');
+  assert.equal(azelaic.cards.regulatoryCard.score, 100);
+
+  const tranexamic = evaluateProduct({ rawText: 'Aqua, Tranexamic Acid 5%', productType: 'cosmetic' });
+  assert.equal(tranexamic.observations.find((o) => /tranexamic/i.test(o.raw)).substance.id, 'tranexamic_azelaic_arbutin');
+  assert.equal(tranexamic.cards.regulatoryCard.score, 100);
+});
+
+// ============================================================================
+// TEST 60 (P0-2): Triclosan, Triclocarban, Genistein, Daidzein (AB 2024/996) & CosIng s===0&&a Kapanışı
+// ============================================================================
+runTest('60. [P0-2] Triclosan, Triclocarban, Genistein, Daidzein limit/takvim kuralları ve CosIng s===0&&a=0 ile dinamik Ek/şiddet', () => {
+  // 1) Triclosan (Annex V/25: max 0.3%, mouthwash / spray / <3 toothpaste banned)
+  const triOk = evaluateProduct({ rawText: 'Aqua, Triclosan 0.3%', productType: 'cosmetic' });
+  assert.equal(triOk.observations.find((o) => /triclosan/i.test(o.raw)).substance.id, 'triclosan');
+  assert.ok(triOk.cards.regulatoryCard.score < 100 && triOk.cards.regulatoryCard.score > 10);
+  const triOver = evaluateProduct({ rawText: 'Aqua, Triclosan 0.5%', productType: 'cosmetic' });
+  assert.equal(triOver.cards.regulatoryCard.score, 10);
+  const triMouthwash = evaluateProduct({ rawText: 'Mouthwash: Aqua, Triclosan 0.1%', productType: 'cosmetic' });
+  assert.equal(triMouthwash.cards.regulatoryCard.score, 10);
+  const triSpray = evaluateProduct({ rawText: 'Aqua, Triclosan 0.1%', productType: 'cosmetic', applicationType: 'spray' });
+  assert.equal(triSpray.cards.regulatoryCard.score, 10);
+  const triCalendar = triOk.cards.regulatoryReportCard.transitionCalendarItems;
+  assert.ok(triCalendar.some((t) => /Annex V\/25/.test(t.regulation) && !/Retinol|III\/376/i.test(t.regulation)));
+
+  // 2) Triclocarban (Annex V/23 0.2% preservative / Annex III 1.5% rinse-off non-preservative, mouthwash banned)
+  const tccOk = evaluateProduct({ rawText: 'Aqua, Triclocarban 0.2%', productType: 'cosmetic' });
+  assert.ok(tccOk.cards.regulatoryCard.score < 100 && tccOk.cards.regulatoryCard.score > 10);
+  const tccLeaveOnOver = evaluateProduct({ rawText: 'Aqua, Triclocarban 0.5%', productType: 'cosmetic' });
+  assert.equal(tccLeaveOnOver.cards.regulatoryCard.score, 10);
+  const tccRinseSoapOk = evaluateProduct({ rawText: 'Rinse-off soap: Aqua, Triclocarban 1.0%', productType: 'cosmetic', applicationType: 'rinse_off' });
+  assert.ok(tccRinseSoapOk.cards.regulatoryCard.score < 100 && tccRinseSoapOk.cards.regulatoryCard.score > 10);
+  const tccRinseSoapOver = evaluateProduct({ rawText: 'Rinse-off soap: Aqua, Triclocarban 2.0%', productType: 'cosmetic', applicationType: 'rinse_off' });
+  assert.equal(tccRinseSoapOver.cards.regulatoryCard.score, 10);
+  const tccMouthwash = evaluateProduct({ rawText: 'Mouthwash: Aqua, Triclocarban 0.1%', productType: 'cosmetic' });
+  assert.equal(tccMouthwash.cards.regulatoryCard.score, 10);
+  assert.ok(tccOk.cards.regulatoryReportCard.transitionCalendarItems.some((t) => /Annex V\/23/.test(t.regulation)));
+
+  // 3) Genistein (Annex III/373: max 0.007%) & Daidzein (Annex III/374: max 0.02%)
+  const genOk = evaluateProduct({ rawText: 'Aqua, Genistein 0.005%', productType: 'cosmetic' });
+  assert.ok(genOk.cards.regulatoryCard.score < 100 && genOk.cards.regulatoryCard.score > 10);
+  const genOver = evaluateProduct({ rawText: 'Aqua, Genistein 0.01%', productType: 'cosmetic' });
+  assert.equal(genOver.cards.regulatoryCard.score, 10);
+  assert.ok(genOk.cards.regulatoryReportCard.transitionCalendarItems.some((t) => /Annex III\/373/.test(t.regulation) && t.placingOnMarketDate === '2025-02-01' && t.makingAvailableDate === '2025-11-01'));
+
+  const daidOk = evaluateProduct({ rawText: 'Aqua, Daidzein 0.02%', productType: 'cosmetic' });
+  assert.ok(daidOk.cards.regulatoryCard.score < 100 && daidOk.cards.regulatoryCard.score > 10);
+  const daidOver = evaluateProduct({ rawText: 'Aqua, Daidzein 0.05%', productType: 'cosmetic' });
+  assert.equal(daidOver.cards.regulatoryCard.score, 10);
+  assert.ok(daidOk.cards.regulatoryReportCard.transitionCalendarItems.some((t) => /Annex III\/374/.test(t.regulation) && t.placingOnMarketDate === '2025-02-01' && t.makingAvailableDate === '2025-11-01'));
+
+  // 4) CosIng s===0 && a === 0 ve makeCosingSubstance dinamik Ek/şiddet
+  const zeroS0WithAnnex = Object.values(cosingIngredients).filter((e) => e.s === 0 && e.a).length;
+  assert.equal(zeroS0WithAnnex, 0, `cosing_ingredients içinde s===0 && a sayısı 0 olmalı (bulunan: ${zeroS0WithAnnex})`);
+
+  const annex4 = evaluateProduct({ rawText: 'Aqua, Acid Blue 74', productType: 'cosmetic', lang: 'tr' });
+  const f4 = annex4.cards.regulatoryCard.findings.find((f) => f.substanceId === 'cosing_31612');
+  assert.ok(f4 && f4.euStatus === 'kisitli' && f4.severity === 'dusuk' && /Ek IV/.test(f4.legalText));
+
+  const annex3 = evaluateProduct({ rawText: 'Aqua, Almondamide DEA', productType: 'cosmetic', lang: 'tr' });
+  const f3 = annex3.cards.regulatoryCard.findings.find((f) => f.substanceId === 'cosing_31426');
+  assert.ok(f3 && f3.euStatus === 'kisitli' && f3.severity === 'orta' && /Ek III/.test(f3.legalText));
+});
+
+console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/${total} KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);
 
 
 

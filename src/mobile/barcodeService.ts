@@ -47,6 +47,14 @@ interface CachedBarcodeEntry {
 
 const BARCODE_CACHE_KEY = 'incifact_barcode_cache_v1';
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const MAX_BARCODE_RESPONSE_BYTES = 512 * 1024; // 512 KB
+
+function getUtf8ByteLength(text: string): number {
+  if (typeof TextEncoder !== 'undefined') {
+    return new TextEncoder().encode(text).byteLength;
+  }
+  return text.length * 2;
+}
 
 export async function lookupBarcodeOnDevice(
   rawBarcode: string,
@@ -92,9 +100,9 @@ export async function lookupBarcodeOnDevice(
   ];
 
   for (const ep of endpoints) {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), 4000) : null;
     try {
-      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timer = controller ? setTimeout(() => controller.abort(), 4000) : null;
       const resp = await fetch(ep.url, {
         method: 'GET',
         headers: {
@@ -102,9 +110,21 @@ export async function lookupBarcodeOnDevice(
         },
         signal: controller ? controller.signal : undefined
       });
-      if (timer) clearTimeout(timer);
-      if (!resp.ok) continue;
-      const json: any = await resp.json();
+      if (!resp || !resp.ok) continue;
+
+      const contentLengthRaw =
+        resp.headers && typeof resp.headers.get === 'function' ? resp.headers.get('content-length') : null;
+      if (contentLengthRaw && Number(contentLengthRaw) > MAX_BARCODE_RESPONSE_BYTES) {
+        continue;
+      }
+
+      const rawBody = await resp.text();
+      if (typeof rawBody !== 'string' || rawBody.length === 0) continue;
+      if (getUtf8ByteLength(rawBody) > MAX_BARCODE_RESPONSE_BYTES) {
+        continue;
+      }
+
+      const json: any = JSON.parse(rawBody);
       if (json && json.status === 1 && json.product) {
         const p = json.product;
         const ingText =
@@ -128,28 +148,38 @@ export async function lookupBarcodeOnDevice(
             updatedAt: new Date().toISOString().slice(0, 10),
             cachedAt: Date.now()
           };
-          // Persist in 7-day LRU cache (max 50 entries)
-          try {
-            const existingRaw = await AsyncStorage.getItem(BARCODE_CACHE_KEY);
-            const existing: CachedBarcodeEntry[] = existingRaw ? JSON.parse(existingRaw) : [];
-            const now = Date.now();
-            const filtered = Array.isArray(existing)
-              ? existing.filter((c) => c && c.barcode !== norm.code && now - (c.cachedAt || 0) < CACHE_TTL_MS)
-              : [];
-            await AsyncStorage.setItem(BARCODE_CACHE_KEY, JSON.stringify([externalProduct, ...filtered].slice(0, 50)));
-          } catch {
-            // Ignore cache write errors
-          }
-          return lookupBarcodeProduct({
+          const evaluated: BarcodeLookupResult = lookupBarcodeProduct({
             barcode: norm.code,
             lang,
             evaluationOptions,
             externalProduct
           });
+          // Never cache incomplete (<80% coverage / pending OCR) OFF/OBF entries
+          if (
+            !evaluated.requiresOcrFallback &&
+            typeof evaluated.coveragePercent === 'number' &&
+            evaluated.coveragePercent >= 80
+          ) {
+            // Persist in 7-day LRU cache (max 50 entries)
+            try {
+              const existingRaw = await AsyncStorage.getItem(BARCODE_CACHE_KEY);
+              const existing: CachedBarcodeEntry[] = existingRaw ? JSON.parse(existingRaw) : [];
+              const now = Date.now();
+              const filtered = Array.isArray(existing)
+                ? existing.filter((c) => c && c.barcode !== norm.code && now - (c.cachedAt || 0) < CACHE_TTL_MS)
+                : [];
+              await AsyncStorage.setItem(BARCODE_CACHE_KEY, JSON.stringify([externalProduct, ...filtered].slice(0, 50)));
+            } catch {
+              // Ignore cache write errors
+            }
+          }
+          return evaluated;
         }
       }
     } catch {
-      // Offline or timed out; continue to fallback
+      // Offline, timed out, aborted, oversized, or invalid JSON; continue to fallback
+    } finally {
+      if (timer) clearTimeout(timer);
     }
   }
 

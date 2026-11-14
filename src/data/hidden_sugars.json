@@ -366,7 +366,19 @@
         "مالتوديكسترين",
         "مالٹوڈیکسٹرین"
       ],
-      "explanation": "Kimyasal olarak şeker sınıfında değildir ancak yüksek glisemik indeksli, hızlı sindirilen bir polisakkarittir. İnsülin direnci / metabolik sağlık profilinde bilgi olarak gösterilir."
+      "explanation": "Kimyasal olarak şeker sınıfında değildir ancak yüksek glisemik indeksli, hızlı sindirilen bir polisakkarittir. İnsülin direnci / metabolik sağlık profilinde bilgi olarak gösterilir.",
+      "explanations": {
+        "tr": "Kimyasal olarak şeker sınıfında değildir ancak yüksek glisemik indeksli, hızlı sindirilen bir polisakkarittir. İnsülin direnci / metabolik sağlık profilinde bilgi olarak gösterilir.",
+        "en": "Chemically not classified as a sugar, but a rapidly digested high-glycemic polysaccharide. Shown as informational in the insulin resistance / metabolic health profile.",
+        "ar": "لا يُصنَّف كيميائياً كسكر، لكنه عديد سكاريد سريع الهضم وذو مؤشر جلايسيمي مرتفع. يُعرض للمعلومية في ملف مقاومة الإنسولين / الصحة الأيضية.",
+        "de": "Chemisch kein Zucker, sondern ein schnell verdauliches Polysaccharid mit hohem glykämischem Index. Wird im Profil für Insulinresistenz / Stoffwechsel als Hinweis angezeigt.",
+        "fr": "Chimiquement non classé comme sucre, mais polysaccharide rapidement digéré à indice glycémique élevé. Affiché à titre informatif pour la résistance à l'insuline / santé métabolique.",
+        "id": "Secara kimia bukan tergolong gula, melainkan polisakarida berindeks glikemik tinggi yang cepat dicerna. Ditampilkan sebagai informasi pada profil resistensi insulin / metabolik.",
+        "ms": "Dari segi kimia bukan tergolong sebagai gula, tetapi polisakarida berindeks glisemik tinggi yang cepat dihadam. Dipaparkan sebagai maklumat dalam profil rintangan insulin / metabolik.",
+        "es": "Químicamente no es un azúcar, sino un polisacárido de rápida digestión y alto índice glucémico. Se muestra como información en el perfil de resistencia a la insulina / salud metabólica.",
+        "ru": "Химически не относится к сахарам, но является быстро усваиваемым полисахаридом с высоким гликемическим индексом. Показывается справочно в профиле метаболического здоровья.",
+        "ur": "کیمیائی طور پر شکر کے زمرے میں نہیں آتا، لیکن یہ تیزی سے ہضم ہونے والا اور زیادہ گلائسیمک انڈیکس والا پولی سیکرائڈ ہے۔ انسولین مزاحمت / میٹابولک پروفائل میں معلومات کے طور پر دکھایا جاتا ہے۔"
+      }
     }
   ]
 }

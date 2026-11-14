@@ -10,8 +10,32 @@
       --surface: #FFFFFF;
       --ink: #0F291E;
       --muted: #4A5568;
-      --line: #DCD7CD;
+      --line: #6E7670;
       --accent: #0F291E;
+      --code-bg: #EFECE6;
+      --shadow: 0 12px 32px rgba(15, 41, 30, 0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0B1612;
+        --surface: #11211B;
+        --ink: #ECFDF5;
+        --muted: #B8CEC5;
+        --line: #5E8C76;
+        --accent: #5EEAD4;
+        --code-bg: #183028;
+        --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      }
+    }
+    body.dark {
+      --bg: #0B1612;
+      --surface: #11211B;
+      --ink: #ECFDF5;
+      --muted: #B8CEC5;
+      --line: #5E8C76;
+      --accent: #5EEAD4;
+      --code-bg: #183028;
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
     }
     body {
       margin: 0;
@@ -28,19 +52,32 @@
       border: 1px solid var(--line);
       border-radius: 20px;
       padding: 28px 24px;
-      box-shadow: 0 12px 32px rgba(15, 41, 30, 0.08);
+      box-shadow: var(--shadow);
     }
     h1 { font-size: 22px; margin-top: 0; }
     h2 { font-size: 16px; margin-top: 22px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
     p, li { font-size: 14px; color: var(--muted); }
     strong { color: var(--ink); }
+    code {
+      background: var(--code-bg);
+      color: var(--ink);
+      padding: 1px 5px;
+      border-radius: 5px;
+      font-size: 12.5px;
+    }
     .back-link {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
       margin-bottom: 16px;
       color: var(--accent);
       font-weight: 700;
       text-decoration: none;
       font-size: 14px;
+    }
+    .back-link:hover,
+    .back-link:focus-visible {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -50,10 +87,12 @@
     <h1>🛡️ InciFact — Gizlilik Politikası &amp; Hukuki Sorumluluk Beyanı (Privacy Policy &amp; Legal Disclaimer)</h1>
     <p><strong>Yürürlük Tarihi / Effective Date:</strong> 2026-10-31 · <strong>Veri Seti Sürümü / Dataset:</strong> v2026.10-omnibus</p>
 
-    <h2>1. Sıfır Sunucu Takibi ve Yerel Veri İşleme (Zero-Server-Tracking &amp; On-Device Privacy)</h2>
+    <h2>1. Sıfır Sunucu Takibi, Yerel İşleme ve İsteğe Bağlı Barkod Sorgusu (On-Device Privacy &amp; Optional Barcode Lookup)</h2>
     <ul>
-      <li><strong>TR:</strong> InciFact deterministik kural motoru ile çalışır. Kamera görüntüleriniz, barkod sorgularınız, sağlık/alerji profilleriniz (hamilelik, akne, egzama, çölyak vb.) ve özel kara listeniz yalnızca kendi cihazınızda (<code>localStorage</code> / <code>AsyncStorage</code>) saklanır; hiçbir üçüncü taraf reklam ağına veya uzak sunucuya satılmaz ya da aktarılmaz.</li>
-      <li><strong>EN:</strong> InciFact operates with a deterministic rule engine. Your camera frames, barcode queries, health/allergy profiles (pregnancy, acne, eczema, celiac, etc.), and custom watchlists are stored strictly on your own device (<code>localStorage</code> / <code>AsyncStorage</code>) and are never sold or transmitted to third-party ad networks.</li>
+      <li><strong>TR:</strong> InciFact deterministik kural motoru ile çalışır. Kamera görüntüleriniz, sağlık/alerji profilleriniz (hamilelik, akne, egzama, çölyak vb.), tarama geçmişiniz ve özel kara listeniz yalnızca kendi cihazınızda (<code>localStorage</code> / <code>AsyncStorage</code>) saklanır; hiçbir üçüncü taraf reklam ağına veya reklam izleyicisine (ad tracker) satılmaz ya da aktarılmaz.</li>
+      <li><strong>TR (İsteğe Bağlı Canlı Barkod Sorgusu):</strong> Mobil uygulamada taranan barkod cihazdaki yerel katalogda veya 7 günlük yerel önbellekte bulunamazsa, isteğe bağlı olarak doğrudan cihazdan <strong>Open Food Facts</strong> (<code>world.openfoodfacts.org</code>) ve <strong>Open Beauty Facts</strong> (<code>world.openbeautyfacts.org</code>) açık veri uçlarına salt-okunur HTTPS sorgusu yapılır. Bu sorguda <strong>yalnızca barkod numarası</strong> (ve genel uygulama <code>User-Agent</code> başlığı) gönderilir; kişisel veri (KVK/PII), konum, kamera görüntüsü veya sağlık/alerji profili kesinlikle iletilmez ve reklam/analitik izleyici kullanılmaz.</li>
+      <li><strong>EN:</strong> InciFact operates with a deterministic on-device rule engine. Your camera frames, health/allergy profiles (pregnancy, acne, eczema, celiac, etc.), scan history, and custom watchlists are stored strictly on your own device (<code>localStorage</code> / <code>AsyncStorage</code>) and are never sold or transmitted to third-party ad networks or ad trackers.</li>
+      <li><strong>EN (Optional Live Barcode Lookup):</strong> In the mobile app, if a scanned barcode is not found in the built-in offline catalog or the 7-day on-device cache, an optional direct HTTPS lookup is sent from your device to <strong>Open Food Facts</strong> (<code>world.openfoodfacts.org</code>) and <strong>Open Beauty Facts</strong> (<code>world.openbeautyfacts.org</code>). <strong>Only the barcode number</strong> (and a generic app <code>User-Agent</code> header) is transmitted; no personal data (PII), device location, camera images, or health/allergy profiles are ever sent, and no ad trackers are present.</li>
     </ul>
 
     <h2>2. Tıbbi ve Dermatolojik Sorumluluk Reddi (Medical &amp; Dermatological Disclaimer)</h2>

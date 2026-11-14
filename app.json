@@ -22,6 +22,7 @@
     },
     "android": {
       "package": "com.incifact.app",
+      "usesCleartextTraffic": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0B132B"
@@ -31,12 +32,6 @@
       ]
     },
     "plugins": [
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow InciFact to scan ingredient labels on cosmetic and food packages."
-        }
-      ],
       [
         "expo-image-picker",
         {

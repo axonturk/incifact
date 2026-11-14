@@ -51,10 +51,12 @@
     },
     "EU_2021_1902": {
       "id": "EU_2021_1902",
+      "institution": "European Commission",
       "title": "Commission Regulation (EU) 2021/1902 (Omnibus IV - Zinc Pyrithione & Lilial Ban)",
       "jurisdiction": "EU",
       "type": "regulation",
-      "url": "https://eur-lex.europa.eu/eli/reg/2021/1902/oj"
+      "url": "https://eur-lex.europa.eu/eli/reg/2021/1902/oj",
+      "checked_at": "2026-10-13"
     },
     "EU_358_2014": {
       "id": "EU_358_2014",
@@ -82,10 +84,12 @@
     },
     "EU_2023_1545": {
       "id": "EU_2023_1545",
+      "institution": "European Commission",
       "title": "Commission Regulation (EU) 2023/1545 (Extended Fragrance Allergens Labeling in Cosmetics)",
       "jurisdiction": "EU",
       "type": "regulation",
-      "url": "https://eur-lex.europa.eu/eli/reg/2023/1545/oj"
+      "url": "https://eur-lex.europa.eu/eli/reg/2023/1545/oj",
+      "checked_at": "2026-10-13"
     },
     "EC_ED_PRIORITY": {
       "id": "EC_ED_PRIORITY",
@@ -233,10 +237,12 @@
     },
     "EU_2024_1328": {
       "id": "EU_2024_1328",
+      "institution": "European Commission / REACH",
       "title": "Commission Regulation (EU) 2024/1328 (REACH Restriction on D4, D5, D6 Cyclosiloxanes)",
       "jurisdiction": "EU",
       "type": "regulation",
-      "url": "https://eur-lex.europa.eu/eli/reg/2024/1328/oj"
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1328/oj",
+      "checked_at": "2026-10-13"
     },
     "BPJPH_MUI_ID": {
       "id": "BPJPH_MUI_ID",
@@ -244,21 +250,26 @@
       "title": "MUI Fatwa No. 24 Tahun 2012 (Penggunaan Binatang untuk Bahan Kosmetika dan Obat-obatan — Non-Food External Cosmetic vs Oral Distinction) & Mufti Wilayah Irsyad Al-Fatwa Series 188",
       "jurisdiction": "ID",
       "type": "halal_standard",
-      "url": "https://halalmui.org/mengenal-bahan-kosmetika-dan-obat-obatan/"
+      "url": "https://halalmui.org/mengenal-bahan-kosmetika-dan-obat-obatan/",
+      "checked_at": "2026-10-13"
     },
     "EU_2024_197": {
       "id": "EU_2024_197",
+      "institution": "European Commission",
       "title": "Commission Delegated Regulation (EU) 2024/197 & Omnibus VII (TPO Ban in Cosmetics from Sept 2025)",
       "jurisdiction": "EU",
       "type": "regulation",
-      "url": "https://eur-lex.europa.eu/eli/reg_del/2024/197/oj"
+      "url": "https://eur-lex.europa.eu/eli/reg_del/2024/197/oj",
+      "checked_at": "2026-10-13"
     },
     "EU_2023_2055": {
       "id": "EU_2023_2055",
+      "institution": "European Commission / REACH",
       "title": "Commission Regulation (EU) 2023/2055 (REACH Restriction on Synthetic Polymer Microparticles / Microplastics)",
       "jurisdiction": "EU",
       "type": "regulation",
-      "url": "https://eur-lex.europa.eu/eli/reg/2023/2055/oj"
+      "url": "https://eur-lex.europa.eu/eli/reg/2023/2055/oj",
+      "checked_at": "2026-10-13"
     },
     "EU_2025_877": {
       "id": "EU_2025_877",

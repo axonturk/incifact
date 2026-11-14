@@ -16,13 +16,15 @@
       --surface2: #EFECE6;
       --ink: #0F291E;
       --muted: #4A5568;
-      --line: #DCD7CD;
+      --line: #6E7670;
+      --divider: #DCD7CD;
       --accent: #0F291E;
       --accent-gold: #C5A059;
       --gold-ink: #6E5015;
       --on-accent: #FFFFFF;
       --soft: #E9EFEA;
       --ok: #145A32;
+      --on-ok: #FFFFFF;
       --ok-bg: #E6F4EA;
       --warn: #8A3B08;
       --warn-bg: #FEF3C7;
@@ -37,13 +39,15 @@
       --surface2: #163829;
       --ink: #F7F4EF;
       --muted: #A3B8B0;
-      --line: #234B39;
+      --line: #5E8C76;
+      --divider: #234B39;
       --accent: #C5A059;
       --accent-gold: #E6C98A;
       --gold-ink: #E6C98A;
       --on-accent: #07120E;
       --soft: #183A2C;
       --ok: #34D399;
+      --on-ok: #07120E;
       --ok-bg: #064E3B;
       --warn: #FBBF24;
       --warn-bg: #451A03;
@@ -130,12 +134,16 @@
     }
     .screen-pills { display: flex; gap: 6px; flex-wrap: wrap; }
     .screen-pill {
-      height: 36px; padding: 0 14px; border-radius: 18px;
+      min-height: 44px; min-width: 44px; padding: 8px 14px; border-radius: 22px;
       border: 1px solid var(--line); background: transparent;
       color: var(--muted); font-size: 13.5px; font-weight: 700;
     }
     .screen-pill.active {
       background: var(--accent); color: var(--on-accent); border-color: var(--accent);
+    }
+    [dir="rtl"] .rtl-flip-arrow {
+      display: inline-block;
+      transform: scaleX(-1);
     }
     .workspace {
       display: flex;
@@ -179,8 +187,8 @@
       padding-top: 8px;
     }
     .nav-btn {
-      width: 68px; border: none; background: transparent;
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      min-width: 44px; min-height: 44px; width: 68px; border: none; background: transparent;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
       font-size: 11.5px; font-weight: 600; color: var(--muted);
     }
     .nav-btn.active { color: var(--accent); font-weight: 800; }
@@ -204,10 +212,11 @@
     }
     .mono { font-family: 'IBM Plex Mono', monospace; }
     .preset-chip {
-      text-align: left; padding: 10px 12px; border-radius: 14px;
+      min-height: 44px;
+      text-align: start; padding: 10px 12px; border-radius: 14px;
       border: 1px solid var(--line); background: var(--bg);
       color: var(--ink); font-size: 13px; font-weight: 600;
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
     .preset-chip:hover { border-color: var(--accent); }
     textarea.ocr-box {
@@ -223,26 +232,109 @@
         border-radius: 0;
         margin-bottom: 0;
         border-inline: none;
+        min-width: 0;
+        width: 100%;
       }
       .workspace {
         order: 1;
         gap: 12px;
         max-width: 100%;
+        min-width: 0;
       }
       .phone-frame {
         width: 100%;
-        max-width: 100vw;
-        height: 844px;
+        max-width: 100%;
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
         border-radius: 0;
         box-shadow: none;
+        display: flex;
+        flex-direction: column;
       }
       .phone-scroll {
+        position: static;
+        overflow-y: visible;
+        flex: 1;
         padding: 14px 14px 20px;
         gap: 9px;
       }
+      .phone-nav {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+      }
       .side-inspector {
+        min-width: 0;
+        width: 100%;
         border-radius: 0;
         border-inline: none;
+      }
+    }
+    @media print {
+      @page {
+        size: A4;
+        margin: 12mm;
+      }
+      body {
+        background: #FFFFFF !important;
+        color: #0F291E !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      .studio-bar,
+      .side-inspector,
+      .phone-nav,
+      #bottomNav,
+      #shareCardModal,
+      #methodologyModal,
+      #regReportModalCloseBtn,
+      #regReportPrintBtn,
+      #regReportCopyModalBtn,
+      .reg-report-modal-actions {
+        display: none !important;
+      }
+      .workspace {
+        display: block !important;
+        max-width: 100% !important;
+      }
+      .phone-frame {
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+      .phone-scroll {
+        position: static !important;
+        overflow: visible !important;
+        padding: 0 !important;
+      }
+      body:has(#regReportModal[aria-hidden="false"]) .workspace {
+        display: none !important;
+      }
+      #regReportModal {
+        position: static !important;
+        inset: auto !important;
+        padding: 0 !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        max-height: none !important;
+        overflow: visible !important;
+        width: 100% !important;
+      }
+      #regReportModal > div {
+        max-width: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+      #regReportModalBody {
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 8px 0 !important;
       }
     }
   </style>
@@ -256,7 +348,7 @@
       <div>
         <div style="font-weight: 800; font-size: 17px; letter-spacing: -0.01em; display:flex; align-items:center; gap:8px;">
           <span>InciFact</span>
-          <span style="font-size:10px; font-weight:800; color:var(--gold-ink); background:rgba(197,160,89,0.16); border:1px solid rgba(197,160,89,0.45); border-radius:6px; padding:1px 6px; letter-spacing:0.02em;">30,609 COSING</span>
+          <span style="font-size:10px; font-weight:800; color:var(--gold-ink); background:rgba(197,160,89,0.16); border:1px solid rgba(197,160,89,0.45); border-radius:6px; padding:1px 6px; letter-spacing:0.02em;">30,594 COSING</span>
         </div>
         <div id="brandTagline" style="font-size: 12px; color: var(--muted);">Kozmetik, Gıda & Helal İçerik Analizi · 10 Dil & Yan Yana Karşılaştırma</div>
       </div>
@@ -307,7 +399,7 @@
         <div style="display:flex; flex-direction:column; gap:3px;">
           <div id="sideTitle" style="font-size: 15.5px; font-weight: 800;">Canlı Kural Motoru & 10 Dil Test Paneli</div>
           <div id="sideDesc" style="font-size: 12.5px; color: var(--muted); line-height: 1.38;">
-            Sol taraftaki <b>InciFact</b> telefon ekranı <b>30.609 AB CosIng resmi bileşen sözlüğüne</b> ve deterministik kural motoruna (<span class="mono">ruleEngine.mjs</span>) bağlıdır.
+            Sol taraftaki <b>InciFact</b> telefon ekranı <b>30.594 AB CosIng resmi bileşen sözlüğüne</b> ve deterministik kural motoruna (<span class="mono">ruleEngine.mjs</span>) bağlıdır.
           </div>
         </div>
       </div>
@@ -348,26 +440,30 @@
         </button>
       </div>
 
-      <div id="liveEditHeader" style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase;">Etiket İçeriğini Canlı Düzenle (10 Dil Destekli)</div>
+      <label for="liveInput" id="liveEditHeader" style="display:block; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase;">Etiket İçeriğini Canlı Düzenle (10 Dil Destekli)</label>
       <textarea class="ocr-box" id="liveInput" oninput="onInputChanged()">Ingredients: Aqua, Glycerin, Cetearyl Alcohol, Cetyl Alcohol, Niacinamide, Panthenol, Ceramide NP, Tocopherol, Citric Acid</textarea>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
         <div>
-          <div id="prodTypeLbl" style="font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">ÜRÜN TÜRÜ</div>
-          <select id="prodType" onchange="refreshAll()" style="width:100%; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
+          <label for="prodType" id="prodTypeLbl" style="display:block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">ÜRÜN TÜRÜ</label>
+          <select id="prodType" onchange="refreshAll()" style="width:100%; min-height:44px; border-radius:10px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
             <option value="cosmetic" id="optCosmetic">Kozmetik (INCI)</option>
             <option value="food" id="optFood">Gıda (E-Kodu)</option>
           </select>
         </div>
         <div>
-          <div id="halalAuthLbl" style="font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">HELAL KURUMU</div>
-          <select id="halalAuth" onchange="refreshAll()" style="width:100%; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
+          <label for="halalAuth" id="halalAuthLbl" style="display:block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">HELAL KURUMU</label>
+          <select id="halalAuth" onchange="refreshAll()" style="width:100%; min-height:44px; border-radius:10px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
             <option value="GIMDES" id="optAuth-GIMDES">GİMDES (Türkiye)</option>
             <option value="MUI" id="optAuth-MUI">MUI (Indonesia)</option>
             <option value="JAKIM" id="optAuth-JAKIM">JAKIM (Malaysia)</option>
             <option value="IFANCA" id="optAuth-IFANCA">IFANCA (Global)</option>
           </select>
         </div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding-top:8px; border-top:1px solid var(--divider); font-size:12px;">
+        <span style="color:var(--muted); font-weight:600;">EU 2023/1545 (80+ Alerjen) · 30.594 CosIng</span>
+        <a id="sidePrivacyLink" href="./privacy.html" target="_blank" rel="noopener noreferrer" style="min-height:44px; min-width:44px; display:inline-flex; align-items:center; gap:5px; padding:4px 8px; color:var(--accent); font-weight:700; text-decoration:underline;">🔒 Gizlilik Politikası</a>
       </div>
     </div>
   </div>
@@ -617,12 +713,127 @@
     const initialDeviceLang = detectDeviceLang();
     const initialStruct = MARKET_STRUCTURES[initialDeviceLang] || MARKET_STRUCTURES.tr;
 
+    function isPlainObject(val) {
+      return Boolean(val) && typeof val === 'object' && !Array.isArray(val);
+    }
+
+    function getJsonDepth(val, depth = 0) {
+      if (depth > 12) return depth;
+      if (Array.isArray(val)) {
+        let maxD = depth;
+        for (const item of val) {
+          const d = getJsonDepth(item, depth + 1);
+          if (d > 12) return d;
+          if (d > maxD) maxD = d;
+        }
+        return maxD;
+      }
+      if (isPlainObject(val)) {
+        let maxD = depth;
+        for (const k of Object.keys(val)) {
+          const d = getJsonDepth(val[k], depth + 1);
+          if (d > 12) return d;
+          if (d > maxD) maxD = d;
+        }
+        return maxD;
+      }
+      return depth;
+    }
+
+    function sanitizeWatchlistSchema(arr) {
+      if (!Array.isArray(arr)) return [];
+      const seen = new Set();
+      const out = [];
+      for (const item of arr) {
+        if (typeof item !== 'string') continue;
+        const clean = item.trim().slice(0, 80);
+        if (clean.length < 2) continue;
+        const lower = clean.toLowerCase();
+        if (seen.has(lower)) continue;
+        seen.add(lower);
+        out.push(clean);
+        if (out.length >= 50) break;
+      }
+      return out;
+    }
+
+    function sanitizeScanHistorySchema(arr) {
+      if (!Array.isArray(arr)) return [];
+      const out = [];
+      for (const h of arr) {
+        if (!isPlainObject(h)) continue;
+        if (typeof h.rawText !== 'string' || !h.rawText.trim()) continue;
+        const cleanScore = typeof h.score === 'number' && Number.isFinite(h.score) ? h.score : null;
+        out.push({
+          id: typeof h.id === 'string' ? h.id.slice(0, 240) : '',
+          title: typeof h.title === 'string' ? h.title.slice(0, 140) : '',
+          sampleIdx: typeof h.sampleIdx === 'number' && Number.isInteger(h.sampleIdx) && h.sampleIdx >= 0 ? h.sampleIdx : null,
+          rawText: h.rawText,
+          productType: h.productType === 'food' ? 'food' : 'cosmetic',
+          jurisdiction: typeof h.jurisdiction === 'string' ? h.jurisdiction : 'EU',
+          claims: isPlainObject(h.claims)
+            ? {
+                halalCertified: Boolean(h.claims.halalCertified),
+                veganStatus: typeof h.claims.veganStatus === 'string' ? h.claims.veganStatus : 'none',
+                vegetarianStatus: typeof h.claims.vegetarianStatus === 'string' ? h.claims.vegetarianStatus : 'none'
+              }
+            : { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'none' },
+          userConfirmations: isPlainObject(h.userConfirmations)
+            ? Object.fromEntries(
+                Object.entries(h.userConfirmations).filter(
+                  ([k, v]) => typeof k === 'string' && typeof v === 'string' && k !== '__proto__' && k !== 'constructor' && k !== 'prototype'
+                )
+              )
+            : {},
+          score: cleanScore,
+          canShowScore: Boolean(h.canShowScore),
+          halalStatus: typeof h.halalStatus === 'string' ? h.halalStatus : 'unknown',
+          halalAuthority: typeof h.halalAuthority === 'string' ? h.halalAuthority : 'GIMDES',
+          ts: typeof h.ts === 'number' && Number.isFinite(h.ts) ? h.ts : 0
+        });
+        if (out.length >= 10) break;
+      }
+      return out;
+    }
+
+    function sanitizeBarcodeCacheSchema(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr
+        .filter((c) => isPlainObject(c) && typeof c.barcode === 'string' && typeof c.rawText === 'string' && c.barcode.trim())
+        .slice(0, 50);
+    }
+
+    function sanitizeCustomBarcodeCatalogSchema(obj) {
+      if (!isPlainObject(obj)) return {};
+      const out = {};
+      for (const [k, v] of Object.entries(obj)) {
+        if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+        if (!/^\d{8,14}$/.test(k) || !isPlainObject(v) || typeof v.rawText !== 'string' || !v.rawText.trim()) continue;
+        out[k] = v;
+      }
+      return out;
+    }
+
     function loadSavedJson(key, fallback) {
       try {
         const raw = localStorage.getItem(key);
         if (!raw) return fallback;
         const parsed = JSON.parse(raw);
-        return parsed !== null && parsed !== undefined ? parsed : fallback;
+        if (parsed === null || parsed === undefined) return fallback;
+        if (getJsonDepth(parsed) > 12) return fallback;
+        if (Array.isArray(fallback)) {
+          if (!Array.isArray(parsed)) return fallback;
+          if (key === 'incifact_custom_watchlist_v1') return sanitizeWatchlistSchema(parsed);
+          if (key === 'incifact_scan_history_v1') return sanitizeScanHistorySchema(parsed);
+          if (key === 'incifact_barcode_cache_v1') return sanitizeBarcodeCacheSchema(parsed);
+          return parsed.filter((item) => item !== null && item !== undefined);
+        }
+        if (isPlainObject(fallback)) {
+          if (!isPlainObject(parsed)) return fallback;
+          if (key === 'incifact_custom_barcodes_v1') return sanitizeCustomBarcodeCatalogSchema(parsed);
+          return parsed;
+        }
+        return typeof parsed === typeof fallback ? parsed : fallback;
       } catch (_) {
         return fallback;
       }
@@ -667,7 +878,8 @@
       lastCopiedMsg: null,
       activeBarcodeMeta: null,
       barcodeInputVal: '',
-      barcodeStatusBanner: null
+      barcodeStatusBanner: null,
+      apiError: null
     };
 
     function getSampleTitle(idx, lang) {
@@ -688,7 +900,39 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+        .replace(/'/g, '&#39;')
+        .replace(/`/g, '&#96;');
+    }
+
+    function decodeBasicHtmlEntities(str) {
+      return String(str)
+        .replace(/&#x([0-9a-f]+);?/gi, (_, hex) => {
+          const cp = parseInt(hex, 16);
+          return Number.isFinite(cp) && cp >= 0 && cp <= 0x10ffff ? String.fromCodePoint(cp) : '';
+        })
+        .replace(/&#(\d+);?/g, (_, dec) => {
+          const cp = parseInt(dec, 10);
+          return Number.isFinite(cp) && cp >= 0 && cp <= 0x10ffff ? String.fromCodePoint(cp) : '';
+        })
+        .replace(/&colon;/gi, ':')
+        .replace(/&amp;/gi, '&')
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;|&apos;/gi, "'");
+    }
+
+    function sanitizeHttpUrl(u) {
+      if (typeof u !== 'string') return '';
+      const cleaned = decodeBasicHtmlEntities(u).replace(/[\u0000-\u001F\u007F]+/g, '').trim();
+      if (!/^https?:\/\//i.test(cleaned)) return '';
+      try {
+        const parsed = new URL(cleaned);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+        return parsed.href;
+      } catch (_) {
+        return '';
+      }
     }
 
     window.handleResolveClick = function(btn) {
@@ -1022,12 +1266,12 @@
         liveInput.value = getSampleText(state.activeSampleIdx, state.lang);
       }
       if (state.activeBarcodeMeta && state.activeBarcodeMeta.barcode) {
-        fetch('/api/barcode', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ barcode: state.activeBarcodeMeta.barcode, lang: state.lang })
+        const customCatalog = loadSavedJson('incifact_custom_barcodes_v1', {});
+        callInciFactApi('/api/barcode', {
+          barcode: state.activeBarcodeMeta.barcode,
+          lang: state.lang,
+          customCatalog
         })
-          .then((r) => r.json())
           .then((bData) => {
             if (bData && bData.found && state.activeBarcodeMeta && state.activeBarcodeMeta.barcode === bData.barcode) {
               state.activeBarcodeMeta.productName = bData.productName;
@@ -1059,9 +1303,43 @@
       refreshAll();
     }
 
+    const PRIVACY_LINK_I18N = {
+      tr: 'Gizlilik Politikası',
+      en: 'Privacy Policy',
+      ar: 'سياسة الخصوصية',
+      de: 'Datenschutz',
+      fr: 'Politique de confidentialité',
+      id: 'Kebijakan Privasi',
+      ms: 'Dasar Privasi',
+      es: 'Política de privacidad',
+      ru: 'Политика конфиденциальности',
+      ur: 'رازداری کی پالیسی'
+    };
+
+    const SHARE_CARD_FOOTER_I18N = {
+      tr: 'incifact.app · Deterministik 30.594 CosIng & Helal Doğrulama Motoru',
+      en: 'incifact.app · Deterministic 30,594 CosIng & Halal Verification Engine',
+      ar: 'incifact.app · محرك التحقق الحتمي (٣٠٬٥٩٤ CosIng) ومعايير الحلال',
+      de: 'incifact.app · Deterministische 30.594 CosIng & Halal-Prüf-Engine',
+      fr: 'incifact.app · Moteur déterministe 30 594 CosIng & Vérification Halal',
+      id: 'incifact.app · Mesin Verifikasi Deterministik 30.594 CosIng & Halal',
+      ms: 'incifact.app · Enjin Pengesahan Deterministik 30,594 CosIng & Halal',
+      es: 'incifact.app · Motor determinista 30.594 CosIng y Verificación Halal',
+      ru: 'incifact.app · Детерминированный движок 30 594 CosIng и Халяль',
+      ur: 'incifact.app · ۳۰,۵۹۴ CosIng اور حلال تصدیقی انجن'
+    };
+
+    function syncThemeColorMeta() {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) {
+        meta.setAttribute('content', state.dark ? '#07120E' : '#0F291E');
+      }
+    }
+
     function toggleDark() {
       state.dark = !state.dark;
       document.body.classList.toggle('dark', state.dark);
+      syncThemeColorMeta();
       const u = getUiText(state.lang);
       document.getElementById('darkBtn').textContent = state.dark ? u.lightThemeBtn : u.darkThemeBtn;
       renderScreen();
@@ -1871,13 +2149,27 @@
     ];
 
     let _browserRuleEnginePromise = null;
-    let _preferClientEngine = false;
+    let _clientEngineCooldownUntil = 0;
+    const CLIENT_ENGINE_COOLDOWN_MS = 30000;
+    const API_TIMEOUT_MS = 8000;
+    let _savingCustomBarcode = false;
 
     async function getBrowserRuleEngine() {
       if (!_browserRuleEnginePromise) {
-        _browserRuleEnginePromise = import('./src/engine/ruleEngine.mjs').catch(() =>
-          import('../src/engine/ruleEngine.mjs')
-        );
+        _browserRuleEnginePromise = import('./src/engine/ruleEngine.mjs')
+          .catch(() => import('../src/engine/ruleEngine.mjs'))
+          .catch((err) => {
+            _browserRuleEnginePromise = null;
+            if (typeof location !== 'undefined' && location.protocol === 'file:') {
+              const corsErr = new Error(
+                'Yerel dosya protokolünde (file://) tarayıcı CORS politikası modül yüklemesini engelliyor. Lütfen proje klasöründe "node server.mjs" çalıştırıp http://localhost:3456 adresini açın.'
+              );
+              corsErr.isFileCors = true;
+              corsErr.cause = err;
+              throw corsErr;
+            }
+            throw err;
+          });
       }
       return _browserRuleEnginePromise;
     }
@@ -1889,21 +2181,40 @@
           location.hostname.endsWith('.pages.dev') ||
           location.protocol === 'file:');
 
-      if (!_preferClientEngine && !isStaticHost) {
+      if (!isStaticHost && Date.now() >= _clientEngineCooldownUntil) {
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), API_TIMEOUT_MS) : null;
         try {
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: controller ? controller.signal : undefined
           });
           if (res.ok) {
+            _clientEngineCooldownUntil = 0;
             return await res.json();
           }
-          if (res.status === 404 || res.status === 405) {
-            _preferClientEngine = true;
+          if (res.status === 400 || res.status === 413) {
+            let errMsg = `HTTP ${res.status}`;
+            try {
+              const errJson = await res.json();
+              if (errJson && errJson.error) errMsg = errJson.error;
+            } catch (_) {}
+            const apiErr = new Error(errMsg);
+            apiErr.status = res.status;
+            apiErr.isClientRequestError = true;
+            throw apiErr;
           }
-        } catch (_err) {
-          _preferClientEngine = true;
+          // Transient 5xx or static 404/405 -> 30000ms cooldown before retrying server
+          _clientEngineCooldownUntil = Date.now() + CLIENT_ENGINE_COOLDOWN_MS;
+        } catch (err) {
+          if (err && err.isClientRequestError) {
+            throw err;
+          }
+          _clientEngineCooldownUntil = Date.now() + CLIENT_ENGINE_COOLDOWN_MS;
+        } finally {
+          if (timeoutId !== null) clearTimeout(timeoutId);
         }
       }
 
@@ -1921,6 +2232,15 @@
       throw new Error('Unknown endpoint: ' + endpoint);
     }
 
+    function normalizeBarcodeLocal(raw) {
+      if (raw === null || raw === undefined) return '';
+      return String(raw)
+        .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+        .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+        .replace(/[\s\-_]+/g, '')
+        .trim();
+    }
+
     async function lookupBarcodeFromUi(codeOverride) {
       const inp = document.getElementById('barcodeInput');
       const rawCode = codeOverride !== undefined ? String(codeOverride) : (inp ? inp.value : state.barcodeInputVal);
@@ -1928,13 +2248,58 @@
       if (inp) inp.value = rawCode;
 
       const customCatalog = loadSavedJson('incifact_custom_barcodes_v1', {});
+      const normCode = normalizeBarcodeLocal(rawCode);
+      const hasCustomOverride =
+        Boolean(normCode) && isPlainObject(customCatalog) && Object.hasOwn(customCatalog, normCode);
 
       try {
-        const data = await callInciFactApi('/api/barcode', {
-          barcode: rawCode,
-          lang: state.lang,
-          customCatalog: customCatalog && typeof customCatalog === 'object' ? customCatalog : {}
-        });
+        let data = null;
+        if (normCode && /^\d{8,14}$/.test(normCode) && !hasCustomOverride) {
+          const cacheList = loadSavedJson('incifact_barcode_cache_v1', []);
+          const nowMs = Date.now();
+          const ttlMs = 7 * 24 * 60 * 60 * 1000;
+          const hit = Array.isArray(cacheList)
+            ? cacheList.find(
+                (c) =>
+                  c &&
+                  c.barcode === normCode &&
+                  c.lang === state.lang &&
+                  typeof c.cachedAt === 'number' &&
+                  nowMs - c.cachedAt <= ttlMs &&
+                  typeof c.rawText === 'string' &&
+                  c.rawText.trim() &&
+                  !c.requiresOcrFallback &&
+                  (typeof c.coveragePercent !== 'number' || c.coveragePercent >= 80)
+              )
+            : null;
+          if (hit) {
+            data = {
+              found: true,
+              valid: true,
+              barcode: hit.barcode,
+              productName: hit.productName,
+              productType: hit.productType || 'cosmetic',
+              applicationType: hit.applicationType || null,
+              rawText: hit.rawText,
+              allergenStatement: hit.allergenStatement || '',
+              source: hit.source || 'Local Barcode Cache',
+              updatedAt: hit.updatedAt || '',
+              coveragePercent: hit.coveragePercent,
+              requiresOcrFallback: false,
+              message: hit.message || `${hit.productName} (Cache)`,
+              fromCache: true
+            };
+          }
+        }
+
+        if (!data) {
+          data = await callInciFactApi('/api/barcode', {
+            barcode: rawCode,
+            lang: state.lang,
+            customCatalog: isPlainObject(customCatalog) ? customCatalog : {}
+          });
+        }
+
         if (!data || !data.found) {
           state.barcodeStatusBanner = {
             tone: 'warn',
@@ -1946,29 +2311,36 @@
           return data;
         }
 
-        // Save to 7-day local barcode cache (LRU max 50) ONLY if >=80% coverage (no OCR fallback required)
-        try {
-          const cacheList = loadSavedJson('incifact_barcode_cache_v1', []);
-          const nowMs = Date.now();
-          const ttlMs = 7 * 24 * 60 * 60 * 1000;
-          const validCache = Array.isArray(cacheList)
-            ? cacheList.filter((c) => c && c.barcode !== data.barcode && nowMs - (c.cachedAt || 0) < ttlMs)
-            : [];
-          if (!data.requiresOcrFallback && (typeof data.coveragePercent !== 'number' || data.coveragePercent >= 80)) {
-            validCache.unshift({
-              barcode: data.barcode,
-              productName: data.productName,
-              productType: data.productType,
-              applicationType: data.applicationType || null,
-              rawText: data.rawText,
-              allergenStatement: data.allergenStatement || '',
-              source: data.source,
-              updatedAt: data.updatedAt,
-              cachedAt: nowMs
-            });
-          }
-          saveJson('incifact_barcode_cache_v1', validCache.slice(0, 50));
-        } catch (_) {}
+        // Save to 7-day local barcode cache (LRU max 50) ONLY if >=80% coverage (no OCR fallback required) and not from cache
+        if (!data.fromCache) {
+          try {
+            const cacheList = loadSavedJson('incifact_barcode_cache_v1', []);
+            const nowMs = Date.now();
+            const ttlMs = 7 * 24 * 60 * 60 * 1000;
+            const validCache = Array.isArray(cacheList)
+              ? cacheList.filter(
+                  (c) => c && !(c.barcode === data.barcode && c.lang === state.lang) && nowMs - (c.cachedAt || 0) < ttlMs
+                )
+              : [];
+            if (!data.requiresOcrFallback && (typeof data.coveragePercent !== 'number' || data.coveragePercent >= 80)) {
+              validCache.unshift({
+                barcode: data.barcode,
+                lang: state.lang,
+                productName: data.productName,
+                productType: data.productType,
+                applicationType: data.applicationType || null,
+                rawText: data.rawText,
+                allergenStatement: data.allergenStatement || '',
+                source: data.source,
+                updatedAt: data.updatedAt,
+                coveragePercent: data.coveragePercent,
+                message: data.message,
+                cachedAt: nowMs
+              });
+            }
+            saveJson('incifact_barcode_cache_v1', validCache.slice(0, 50));
+          } catch (_) {}
+        }
 
         state.activeSampleIdx = null;
         state.userConfirmations = {};
@@ -2016,49 +2388,84 @@
     }
 
     async function saveCustomBarcodeToDevice(barcodeToSave) {
+      if (_savingCustomBarcode) return null;
+      _savingCustomBarcode = true;
       const bUi = BARCODE_UI_I18N[state.lang] || BARCODE_UI_I18N.en;
-      const code = String(barcodeToSave || state.barcodeInputVal || '').trim();
-      if (window._liveInputDebounce) {
-        clearTimeout(window._liveInputDebounce);
-        window._liveInputDebounce = null;
-      }
-      await refreshAll();
-      const rawText = document.getElementById('liveInput').value.trim();
-      const reg = state.evalData && state.evalData.cards && state.evalData.cards.regulatoryCard;
-      const hasPendingOcr =
-        state.evalData &&
-        Array.isArray(state.evalData.unresolvedConfirmations) &&
-        state.evalData.unresolvedConfirmations.length > 0;
-      if (!rawText || !reg || reg.coveragePercent < 80 || hasPendingOcr) {
+      const rawCode = String(barcodeToSave || state.barcodeInputVal || '').trim();
+      try {
+        if (window._liveInputDebounce) {
+          clearTimeout(window._liveInputDebounce);
+          window._liveInputDebounce = null;
+        }
+        await refreshAll();
+        const engine = await getBrowserRuleEngine();
+        const norm = engine.normalizeBarcodeInput(rawCode);
+        if (!norm || !norm.valid) {
+          state.barcodeStatusBanner = {
+            tone: 'warn',
+            barcode: rawCode,
+            canSaveCustom: false,
+            message: bUi.savedCustomLowCov
+          };
+          renderScreen();
+          return null;
+        }
+        const liveEl = document.getElementById('liveInput');
+        const rawText = liveEl ? liveEl.value.trim() : '';
+        const reg = state.evalData && state.evalData.cards && state.evalData.cards.regulatoryCard;
+        const hasPendingOcr =
+          state.evalData &&
+          Array.isArray(state.evalData.unresolvedConfirmations) &&
+          state.evalData.unresolvedConfirmations.length > 0;
+        if (!rawText || !reg || reg.coveragePercent < 80 || hasPendingOcr) {
+          state.barcodeStatusBanner = {
+            tone: 'warn',
+            barcode: norm.code,
+            canSaveCustom: false,
+            message: bUi.savedCustomLowCov
+          };
+          renderScreen();
+          return null;
+        }
+        const prodEl = document.getElementById('prodType');
+        const productType = (prodEl && prodEl.value) || 'cosmetic';
+        const resolvedTitle = state.productTitle || deriveCustomProductTitle(rawText, state.lang) || `EAN ${norm.code}`;
+        const created = engine.createCustomBarcodeEntry({
+          barcode: norm.code,
+          productName: resolvedTitle,
+          productType,
+          applicationType: productType === 'food' ? 'oral' : 'leave_on',
+          allergenStatement: (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '',
+          rawText,
+          lang: state.lang
+        });
+        if (!created || !created.ok || !created.entry) {
+          state.barcodeStatusBanner = {
+            tone: 'warn',
+            barcode: norm.code,
+            canSaveCustom: false,
+            message: bUi.savedCustomLowCov
+          };
+          renderScreen();
+          return null;
+        }
+        const customCatalog = loadSavedJson('incifact_custom_barcodes_v1', {});
+        const nextCatalog = isPlainObject(customCatalog) ? { ...customCatalog } : {};
+        nextCatalog[created.barcode] = created.entry;
+        saveJson('incifact_custom_barcodes_v1', nextCatalog);
+        return await lookupBarcodeFromUi(created.barcode);
+      } catch (err) {
         state.barcodeStatusBanner = {
           tone: 'warn',
-          barcode: code,
+          barcode: rawCode,
           canSaveCustom: false,
-          message: bUi.savedCustomLowCov
+          message: String(err && err.message ? err.message : err)
         };
         renderScreen();
         return null;
+      } finally {
+        _savingCustomBarcode = false;
       }
-      const productType = document.getElementById('prodType').value || 'cosmetic';
-      const resolvedTitle = state.productTitle || deriveCustomProductTitle(rawText, state.lang) || `EAN ${code}`;
-      const customCatalog = loadSavedJson('incifact_custom_barcodes_v1', {});
-      const nextCatalog = customCatalog && typeof customCatalog === 'object' ? { ...customCatalog } : {};
-      nextCatalog[code] = {
-        code,
-        productName: resolvedTitle,
-        names: {
-          tr: resolvedTitle, en: resolvedTitle, ar: resolvedTitle, de: resolvedTitle, fr: resolvedTitle,
-          id: resolvedTitle, ms: resolvedTitle, es: resolvedTitle, ru: resolvedTitle, ur: resolvedTitle
-        },
-        productType,
-        applicationType: productType === 'food' ? 'oral' : 'leave_on',
-        allergenStatement: (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '',
-        rawText,
-        source: 'User Verified Label (Local Device Cache)',
-        updatedAt: '2026-10-31'
-      };
-      saveJson('incifact_custom_barcodes_v1', nextCatalog);
-      return lookupBarcodeFromUi(code);
     }
 
     function getUnifiedStatusPresentation() {
@@ -2535,7 +2942,8 @@
       });
       ctx.fillStyle = '#E6C98A';
       ctx.font = '700 20px system-ui, -apple-system, sans-serif';
-      ctx.fillText('incifact.app · Deterministic 30,609 CosIng & Halal Verification Engine', W / 2, H - 56);
+      const footerLine = SHARE_CARD_FOOTER_I18N[state.lang] || SHARE_CARD_FOOTER_I18N.en;
+      ctx.fillText(fitCanvasText(ctx, footerLine, W - 120), W / 2, H - 56);
     }
 
     function downloadShareCardPng() {
@@ -2600,38 +3008,55 @@
         state.productTitle = deriveCustomProductTitle(rawText, state.lang);
       }
 
-      const nextEvalData = await callInciFactApi('/api/evaluate', {
-        rawText,
-        allergenStatement: (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '',
-        applicationType: (state.activeBarcodeMeta && state.activeBarcodeMeta.applicationType) || undefined,
-        productType,
-        jurisdiction: state.jurisdiction || 'EU',
-        userProfiles: activeProfiles,
-        customWatchlist: state.customWatchlist || [],
-        halalAuthority,
-        claims: state.claims,
-        userConfirmations: state.userConfirmations,
-        lang: state.lang
-      });
-      if (myReqToken !== refreshReqToken) return;
-      state.evalData = nextEvalData;
-      recordCurrentScanToHistory(state.evalData, rawText, productType);
-
-      const cNames = COMPARE_NAMES[state.lang] || COMPARE_NAMES.en;
-      const prodA = state.customCompareA || { ...COMPARE_PAIR.productA, name: cNames[0] };
-      const prodB = state.customCompareB || { ...COMPARE_PAIR.productB, name: cNames[1] };
-      const nextCompareData = await callInciFactApi('/api/compare', {
-        productA: prodA,
-        productB: prodB,
-        sharedOptions: {
+      let nextEvalData;
+      let nextCompareData;
+      try {
+        nextEvalData = await callInciFactApi('/api/evaluate', {
+          rawText,
+          allergenStatement: (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '',
+          applicationType: (state.activeBarcodeMeta && state.activeBarcodeMeta.applicationType) || undefined,
+          productType,
           jurisdiction: state.jurisdiction || 'EU',
           userProfiles: activeProfiles,
           customWatchlist: state.customWatchlist || [],
           halalAuthority,
+          claims: state.claims,
+          userConfirmations: state.userConfirmations,
           lang: state.lang
-        }
-      });
-      if (myReqToken !== refreshReqToken) return;
+        });
+        if (myReqToken !== refreshReqToken) return;
+
+        const cNames = COMPARE_NAMES[state.lang] || COMPARE_NAMES.en;
+        const prodA = state.customCompareA || { ...COMPARE_PAIR.productA, name: cNames[0] };
+        const prodB = state.customCompareB || { ...COMPARE_PAIR.productB, name: cNames[1] };
+        nextCompareData = await callInciFactApi('/api/compare', {
+          productA: prodA,
+          productB: prodB,
+          sharedOptions: {
+            jurisdiction: state.jurisdiction || 'EU',
+            userProfiles: activeProfiles,
+            customWatchlist: state.customWatchlist || [],
+            halalAuthority,
+            lang: state.lang
+          }
+        });
+        if (myReqToken !== refreshReqToken) return;
+      } catch (err) {
+        if (myReqToken !== refreshReqToken) return;
+        const isFileCors =
+          Boolean(err && err.isFileCors) ||
+          (typeof location !== 'undefined' && location.protocol === 'file:');
+        state.apiError = {
+          type: isFileCors ? 'file_cors' : 'api_error',
+          status: (err && err.status) || null,
+          message: String((err && err.message) || err || 'Request failed')
+        };
+        renderScreen();
+        return;
+      }
+      state.apiError = null;
+      state.evalData = nextEvalData;
+      recordCurrentScanToHistory(state.evalData, rawText, productType);
       state.compareData = nextCompareData;
       syncShareModalI18n();
 
@@ -2696,6 +3121,8 @@
         if (aM) aM.textContent = authOpts.MUI;
         if (aJ) aJ.textContent = authOpts.JAKIM;
         if (aI) aI.textContent = authOpts.IFANCA;
+        const privLink = document.getElementById('sidePrivacyLink');
+        if (privLink) privLink.textContent = '🔒 ' + (PRIVACY_LINK_I18N[state.lang] || PRIVACY_LINK_I18N.en);
       }
 
       renderScreen();
@@ -3545,32 +3972,75 @@
       return u.stdIngredientDesc;
     }
 
+    function renderApiErrorBanner() {
+      if (!state.apiError) return '';
+      if (state.apiError.type === 'file_cors') {
+        return `
+          <div id="fileCorsInfoCard" role="alert" style="background:var(--warn-bg); color:var(--ink); border:1.5px solid var(--warn); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:13.5px; font-weight:800; color:var(--warn);">⚠️ Yerel Dosya (file://) CORS Kısıtlaması</div>
+            <div style="font-size:12px; line-height:1.45;">
+              Tarayıcı güvenlik politikası <code>file://</code> üzerinden ES modülü ve API çağrısını engeller. Uygulamayı çalıştırmak için proje dizininde yerel sunucuyu başlatın:
+            </div>
+            <div class="mono" dir="ltr" style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:11.5px; overflow-wrap:anywhere;">
+              node server.mjs<br/>
+              http://localhost:3456
+            </div>
+          </div>`;
+      }
+      const statusTxt = state.apiError.status ? `HTTP ${escapeHtml(state.apiError.status)} · ` : '';
+      return `
+        <div id="apiErrorBanner" role="alert" style="background:var(--bad-bg); color:var(--bad); border:1.5px solid var(--bad); border-radius:14px; padding:10px 12px; font-size:12px; font-weight:700; line-height:1.4; overflow-wrap:anywhere;">
+          ⚠️ ${statusTxt}${escapeHtml(state.apiError.message)}
+        </div>`;
+    }
+
     function renderScreen() {
       const el = document.getElementById('screenContent');
-      if (!state.evalData) return;
+      if (!el) return;
+      if (!el._delegatedListenersAttached) {
+        el._delegatedListenersAttached = true;
+        el.addEventListener('click', (e) => {
+          const saveBtn = e.target && e.target.closest ? e.target.closest('[data-save-barcode]') : null;
+          if (saveBtn) {
+            const code = saveBtn.getAttribute('data-save-barcode') || '';
+            saveCustomBarcodeToDevice(code);
+          }
+        });
+      }
+      const errBannerHtml = renderApiErrorBanner();
+      if (!state.evalData) {
+        if (errBannerHtml) {
+          el.innerHTML = errBannerHtml;
+        }
+        return;
+      }
       const prevFocusedId =
         document.activeElement && el.contains(document.activeElement) && document.activeElement.id
           ? document.activeElement.id
           : null;
 
+      let screenHtml = '';
       if (state.screen === 'main') {
-        el.innerHTML = renderMainScreen();
+        screenHtml = renderMainScreen();
       } else if (state.screen === 'scan') {
-        el.innerHTML = renderScanScreen();
+        screenHtml = renderScanScreen();
       } else if (state.screen === 'result') {
-        el.innerHTML = renderResultScreen();
+        screenHtml = renderResultScreen();
       } else if (state.screen === 'halal') {
-        el.innerHTML = renderHalalScreen();
+        screenHtml = renderHalalScreen();
       } else if (state.screen === 'compare') {
-        el.innerHTML = renderCompareScreen();
+        screenHtml = renderCompareScreen();
       }
+      el.innerHTML = errBannerHtml + screenHtml;
 
       if (prevFocusedId) {
         const shareModal = document.getElementById('shareCardModal');
         const methModal = document.getElementById('methodologyModal');
+        const regModal = document.getElementById('regReportModal');
         const modalOpen =
           (shareModal && shareModal.style.display === 'flex') ||
-          (methModal && methModal.style.display === 'flex');
+          (methModal && methModal.style.display === 'flex') ||
+          (regModal && regModal.style.display === 'flex');
         if (!modalOpen) {
           const nextFocusEl = document.getElementById(prevFocusedId);
           if (nextFocusEl && typeof nextFocusEl.focus === 'function') {
@@ -3646,13 +4116,13 @@
         <!-- ÖZELLİK 3: Kişisel Özel Hassasiyet / Kara Liste Ekleme ("Benim Yasaklılarım") -->
         <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:9px;">
           <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
-            <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${getFeatText(state.lang).watchlistTitle}</span>
+            <label for="customWatchInput" style="font-size:13.5px; font-weight:800; color:var(--ink);">${getFeatText(state.lang).watchlistTitle}</label>
             <span class="mono" style="font-size:11px; font-weight:800; color:${(state.customWatchlist || []).length >= 50 ? 'var(--bad)' : 'var(--muted)'};">${formatDigits((state.customWatchlist || []).length, state.lang)}/50</span>
           </div>
           <span style="font-size:11.5px; line-height:1.38; color:var(--muted); margin-top:-4px;">${getFeatText(state.lang).watchlistSub}</span>
-          <div style="display:flex; gap:6px;">
-            <input id="customWatchInput" type="text" maxlength="80" placeholder="${escapeHtml(getFeatText(state.lang).watchlistPlaceholder)}" onkeydown="if(event.key==='Enter'){event.preventDefault();addWatchlistItem();}" style="flex:1; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12px;" />
-            <button type="button" onclick="addWatchlistItem()" style="height:38px; padding:0 14px; border-radius:10px; border:none; background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; flex:none;">${getFeatText(state.lang).watchlistAddBtn}</button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <input id="customWatchInput" type="text" maxlength="80" aria-label="${escapeHtml(getFeatText(state.lang).watchlistTitle)}" placeholder="${escapeHtml(getFeatText(state.lang).watchlistPlaceholder)}" onkeydown="if(event.key==='Enter'){event.preventDefault();addWatchlistItem();}" style="flex:1; min-width:140px; min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12px;" />
+            <button type="button" onclick="addWatchlistItem()" style="min-height:44px; padding:0 14px; border-radius:10px; border:none; background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; flex:none;">${getFeatText(state.lang).watchlistAddBtn}</button>
           </div>
           ${
             state.watchlistLimitWarning || (state.evalData && state.evalData.cards && state.evalData.cards.profileCard && state.evalData.cards.profileCard.watchlistLimitExceeded)
@@ -3664,7 +4134,7 @@
             ${['Niacinamide', 'Parfum', 'Phenoxyethanol', 'Salicylic Acid', 'Alcohol Denat.']
               .map(
                 (q) =>
-                  `<button type="button" onclick="addWatchlistItem('${q}')" style="border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:10px; padding:3px 9px; font-size:11px; font-weight:700;">+ ${q}</button>`
+                  `<button type="button" onclick="addWatchlistItem('${q}')" style="min-height:44px; min-width:44px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:12px; padding:8px 12px; font-size:11.5px; font-weight:700;">+ ${q}</button>`
               )
               .join('')}
           </div>
@@ -3687,20 +4157,20 @@
 
         <!-- AYARLAR: Bölge, Dil ve Ülke Yapısı Seçimi (Varsayılan: İndirilen Ülke / Cihaz Dili) -->
         <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:10px;">
-          <div onclick="state.settingsExpanded = !state.settingsExpanded; renderScreen();" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <div style="display:flex; flex-direction:column; gap:2px;">
+          <button type="button" aria-expanded="${state.settingsExpanded ? 'true' : 'false'}" onclick="state.settingsExpanded = !state.settingsExpanded; renderScreen();" style="width:100%; min-height:44px; border:none; background:transparent; padding:4px 0; text-align:start; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <span style="display:flex; flex-direction:column; gap:2px; min-width:0;">
               <span style="font-size:13.5px; font-weight:800;">${st.settingsTitle}</span>
               <span style="font-size:11.5px; color:var(--muted);">${struct.flag} ${struct.name} · ${currentAuth}</span>
-            </div>
+            </span>
             <span style="font-size:11px; font-weight:700; padding:4px 8px; border-radius:10px; background:var(--soft); color:var(--accent); flex:none;">
               ${state.autoDetected ? st.autoBadge : st.manualBadge} ${state.settingsExpanded ? '▴' : '▾'}
             </span>
-          </div>
+          </button>
 
           <div style="display:flex; flex-direction:column; gap:8px; padding-top:8px; border-top:1px solid var(--line);">
             <div>
-              <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.countryStructureLbl}</label>
-              <select onchange="switchLang(this.value)" style="width:100%; height:38px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12.5px; font-weight:700;">
+              <label for="countryStructureSelect" style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.countryStructureLbl}</label>
+              <select id="countryStructureSelect" onchange="switchLang(this.value)" style="width:100%; min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12.5px; font-weight:700;">
                 <option value="auto" ${state.autoDetected ? 'selected' : ''}>${st.autoOptionLbl} (${MARKET_STRUCTURES[detectDeviceLang()].flag} ${MARKET_STRUCTURES[detectDeviceLang()].name})</option>
                 ${Object.entries(MARKET_STRUCTURES)
                   .map(
@@ -3711,10 +4181,10 @@
               </select>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px;">
               <div>
-                <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.halalAuthSettingLbl}</label>
-                <select onchange="changeAuthorityFromSettings(this.value)" style="width:100%; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
+                <label for="halalAuthSettingsSelect" style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.halalAuthSettingLbl}</label>
+                <select id="halalAuthSettingsSelect" onchange="changeAuthorityFromSettings(this.value)" style="width:100%; min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
                   <option value="GIMDES" ${currentAuth === 'GIMDES' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).GIMDES}</option>
                   <option value="MUI" ${currentAuth === 'MUI' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).MUI}</option>
                   <option value="JAKIM" ${currentAuth === 'JAKIM' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).JAKIM}</option>
@@ -3722,8 +4192,8 @@
                 </select>
               </div>
               <div>
-                <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.regStructureLbl}</label>
-                <select onchange="changeJurisdictionFromSettings(this.value)" style="width:100%; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
+                <label for="regStructureSettingsSelect" style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.regStructureLbl}</label>
+                <select id="regStructureSettingsSelect" onchange="changeJurisdictionFromSettings(this.value)" style="width:100%; min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
                   <option value="TR" ${state.jurisdiction === 'TR' ? 'selected' : ''}>TR (TİTCK/TGK + AB)</option>
                   <option value="EU" ${state.jurisdiction === 'EU' ? 'selected' : ''}>EU (EC 1223/2009)</option>
                   <option value="US" ${state.jurisdiction === 'US' ? 'selected' : ''}>US (FDA 21 CFR)</option>
@@ -3765,7 +4235,7 @@
       const recCount = obs.filter((o) => o.status === 'recognized').length;
 
       return `
-        <div style="background:#111613; color:#F3F5F2; margin:-48px -18px -24px; min-height:760px; padding:48px 18px 24px; display:flex; flex-direction:column; justify-content:space-between; position:relative;">
+        <div style="background:#111613; color:#F3F5F2; margin:0; border-radius:22px; min-height:100%; width:100%; max-width:100%; box-sizing:border-box; min-width:0; padding:18px 14px 20px; display:flex; flex-direction:column; justify-content:space-between; position:relative;">
           <div style="display:flex; align-items:center; justify-content:space-between;">
             <span style="font-weight:800; font-size:16px;">${u.cameraTitle}</span>
             <span style="font-size:12px; padding:6px 12px; border-radius:16px; background:rgba(255,255,255,0.14); font-weight:700;">
@@ -3784,7 +4254,7 @@
               <span style="font-size:10.5px; color:#CBD5E1; font-weight:700;">${escapeHtml(bUi.quickLbl)}</span>
               ${QUICK_BARCODES.map(
                 (q) =>
-                  `<button type="button" onclick="lookupBarcodeFromUi('${q.code}')" style="min-height:28px; padding:2px 8px; border-radius:8px; border:1px solid rgba(230,201,138,0.45); background:rgba(255,255,255,0.08); color:#F3F5F2; font-size:10.5px; font-weight:700; cursor:pointer;">${escapeHtml(q.label)} · ${q.code.slice(-4)}</button>`
+                  `<button type="button" onclick="lookupBarcodeFromUi('${q.code}')" style="min-height:44px; min-width:44px; padding:8px 12px; border-radius:10px; border:1px solid rgba(230,201,138,0.45); background:rgba(255,255,255,0.08); color:#F3F5F2; font-size:11px; font-weight:700; cursor:pointer;">${escapeHtml(q.label)} · ${q.code.slice(-4)}</button>`
               ).join('')}
             </div>
             ${
@@ -3793,7 +4263,7 @@
                      <span>${state.barcodeStatusBanner.tone === 'ok' ? '🟢 ' : '⚠️ '}${escapeHtml(state.barcodeStatusBanner.message)}</span>
                      ${
                        state.barcodeStatusBanner.canSaveCustom
-                         ? `<button id="saveCustomBarcodeBtn" type="button" onclick="saveCustomBarcodeToDevice('${escapeHtml(state.barcodeStatusBanner.barcode)}')" style="min-height:34px; padding:4px 10px; border-radius:8px; border:1px solid #34D399; background:rgba(16,185,129,0.28); color:#ECFDF5; font-size:11px; font-weight:800; cursor:pointer; text-align:center;">${escapeHtml(bUi.saveCustomBtn(state.barcodeStatusBanner.barcode))}</button>`
+                         ? `<button id="saveCustomBarcodeBtn" type="button" data-save-barcode="${escapeHtml(state.barcodeStatusBanner.barcode)}" style="min-height:44px; padding:6px 10px; border-radius:8px; border:1px solid #34D399; background:rgba(16,185,129,0.28); color:#ECFDF5; font-size:11px; font-weight:800; cursor:pointer; text-align:center;">${escapeHtml(bUi.saveCustomBtn(state.barcodeStatusBanner.barcode))}</button>`
                          : ''
                      }
                    </div>`
@@ -3836,13 +4306,13 @@
                         ? c.options
                             .map(
                               (opt) => `
-                          <button type="button" data-token="${escapeHtml(c.token)}" data-opt="${escapeHtml(opt.id)}" onclick="handleResolveClick(this)" style="height:48px; border-radius:14px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; font-weight:700;">
+                          <button type="button" data-token="${escapeHtml(c.token)}" data-opt="${escapeHtml(opt.id)}" onclick="handleResolveClick(this)" style="min-height:48px; border-radius:14px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); display:flex; align-items:center; justify-content:space-between; padding:8px 14px; font-size:14px; font-weight:700;">
                             <span>${escapeHtml(opt.label)}</span>
                             <span class="mono" style="font-size:12px; color:var(--muted);">${escapeHtml(opt.code || '')}</span>
                           </button>`
                             )
                             .join('')
-                        : `<button type="button" data-token="${escapeHtml(c.token)}" data-opt="${escapeHtml(c.candidateCode)}" onclick="handleResolveClick(this)" style="height:48px; border-radius:14px; border:1.5px solid var(--accent); background:var(--soft); color:var(--ink); font-weight:700;">${escapeHtml(u.confirmCodeBtn(c.candidateCode))}</button>`
+                        : `<button type="button" data-token="${escapeHtml(c.token)}" data-opt="${escapeHtml(c.candidateCode)}" onclick="handleResolveClick(this)" style="min-height:48px; border-radius:14px; border:1.5px solid var(--accent); background:var(--soft); color:var(--ink); font-weight:700; padding:8px 14px;">${escapeHtml(u.confirmCodeBtn(c.candidateCode))}</button>`
                     }
                   </div>
                 `
@@ -3854,7 +4324,7 @@
                       <div style="font-size:16px; font-weight:800;">${u.allClearTitle}</div>
                       <div style="font-size:12.5px; color:var(--muted);">${u.allClearSub}</div>
                     </div>
-                    <button type="button" onclick="switchScreen('result')" style="height:42px; padding:0 16px; border-radius:21px; border:none; background:var(--accent); color:var(--on-accent); font-weight:700; flex:none;">${u.goResultBtn}</button>
+                    <button type="button" onclick="switchScreen('result')" style="min-height:44px; min-width:44px; padding:8px 16px; border-radius:22px; border:none; background:var(--accent); color:var(--on-accent); font-weight:700; flex:none;">${u.goResultBtn}</button>
                   </div>
                 `
             }
@@ -4022,9 +4492,9 @@
             <img src="./assets/incifact-app-icon.png" width="28" height="28" style="border-radius:7px; display:block; flex:none; box-shadow: 0 1px 4px rgba(11, 19, 43, 0.2);" alt="InciFact Logo" />
             <span style="font-weight:800; font-size:16px;">InciFact</span>
           </div>
-          <div style="display:flex; gap:6px;">
-            <button type="button" onclick="switchScreen('compare')" style="height:34px; padding:0 12px; border-radius:17px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.compareBtnTop}</button>
-            <button type="button" onclick="switchScreen('main')" style="height:34px; padding:0 12px; border-radius:17px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.myPrefsBtnTop}</button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" onclick="switchScreen('compare')" style="min-height:44px; min-width:44px; padding:8px 14px; border-radius:22px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.compareBtnTop}</button>
+            <button type="button" onclick="switchScreen('main')" style="min-height:44px; min-width:44px; padding:8px 14px; border-radius:22px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700;">${u.myPrefsBtnTop}</button>
           </div>
         </div>
 
@@ -4048,21 +4518,21 @@
         </div>
 
         <!-- Aktif Ülke / Mevzuat / Helal Kriteri Bilgilendirme Çubuğu -->
-        <div onclick="state.regionNoticeHighlight = !state.regionNoticeHighlight; renderScreen();" style="cursor:pointer; background:${state.regionNoticeHighlight ? 'var(--soft)' : 'var(--surface)'}; border:1px solid ${state.regionNoticeHighlight ? 'var(--accent)' : 'var(--line)'}; border-radius:12px; padding:7px 11px; display:flex; flex-direction:column; gap:5px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+        <button type="button" aria-expanded="${state.regionNoticeHighlight ? 'true' : 'false'}" onclick="state.regionNoticeHighlight = !state.regionNoticeHighlight; renderScreen();" style="width:100%; min-height:44px; text-align:start; color:var(--ink); cursor:pointer; background:${state.regionNoticeHighlight ? 'var(--soft)' : 'var(--surface)'}; border:1px solid ${state.regionNoticeHighlight ? 'var(--accent)' : 'var(--line)'}; border-radius:12px; padding:7px 11px; display:flex; flex-direction:column; justify-content:center; gap:5px;">
+          <span style="display:flex; align-items:center; justify-content:space-between; gap:6px; width:100%;">
             <span style="font-size:11.5px; font-weight:700; color:var(--ink);">
               ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).activeBar((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).flag, (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).name.split('·')[0].trim(), halal.selectedAuthority, state.jurisdiction === 'US' ? 'US FDA' : state.jurisdiction)}
             </span>
             <span style="font-size:11px; font-weight:800; color:var(--accent); flex:none;">ⓘ</span>
-          </div>
+          </span>
           ${
             state.regionNoticeHighlight
-              ? `<span style="font-size:11px; line-height:1.4; color:var(--ink); border-top:1px solid var(--line); padding-top:5px;">
+              ? `<span style="font-size:11px; line-height:1.4; color:var(--ink); border-top:1px solid var(--line); padding-top:5px; width:100%;">
                    ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyBody((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).flag, (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).name, halal.selectedAuthority, state.jurisdiction === 'US' ? 'US FDA 21 CFR' : (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).regLabel)}
                  </span>`
               : ''
           }
-        </div>
+        </button>
 
         <!-- Score Ring & Penalty Breakdown Card -->
         <div style="background:var(--surface); border-radius:22px; padding:16px; display:flex; gap:16px; align-items:center;">
@@ -4107,19 +4577,19 @@
 
         <!-- 2x1 Personal & Halal Summary Tiles (Unified 6-State Model) -->
         <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px;">
-          <div onclick="switchScreen('${unified.hasPendingOcr ? 'scan' : 'main'}')" style="cursor:pointer; background:${unified.profileBg}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px;">
+          <button type="button" onclick="switchScreen('${unified.hasPendingOcr ? 'scan' : 'main'}')" style="border:none; text-align:start; cursor:pointer; background:${unified.profileBg}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px; min-width:0;">
             <span style="font-size:11.5px; font-weight:800; color:${unified.profileFg};">${u.forYouCaps}</span>
             <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${escapeHtml(unified.profileTitle)}</span>
-            <span style="font-size:12px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            <span style="font-size:12px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;">
               ${escapeHtml(unified.profileSub)}
             </span>
-          </div>
+          </button>
 
-          <div onclick="switchScreen('${unified.hasPendingOcr ? 'scan' : 'halal'}')" style="cursor:pointer; background:${unified.halalBg}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px;">
-            <span style="font-size:11.5px; font-weight:800; color:${unified.halalFg};">${u.halalCaps} · ${halal.selectedAuthority}</span>
+          <button type="button" onclick="switchScreen('${unified.hasPendingOcr ? 'scan' : 'halal'}')" style="border:none; text-align:start; cursor:pointer; background:${unified.halalBg}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px; min-width:0;">
+            <span style="font-size:11.5px; font-weight:800; color:${unified.halalFg};">${u.halalCaps} · ${escapeHtml(halal.selectedAuthority)}</span>
             <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${escapeHtml(unified.halalTitle)}</span>
             <span style="font-size:12px; color:var(--ink);">${u.tapForDetail}</span>
-          </div>
+          </button>
         </div>
 
         <!-- LabelSafa-style Calm Ethanol & False-Positive Shield Row -->
@@ -4132,19 +4602,19 @@
 
         <!-- ÖZELLİK 1 & 4: Tek Tıkla Sonuç Kartı Paylaşımı (WhatsApp / Instagram PNG) & Karşılaştırma A/B Seçimi -->
         <div style="display:flex; flex-direction:column; gap:6px;">
-          <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:8px;">
-            <button id="openShareCardBtn" type="button" onclick="openShareCardModal(this)" style="height:40px; border-radius:14px; border:1.5px solid var(--accent); background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <button id="openShareCardBtn" type="button" onclick="openShareCardModal(this)" style="flex:1.25 1 140px; min-height:44px; padding:8px 12px; border-radius:14px; border:1.5px solid var(--accent); background:var(--accent); color:var(--on-accent); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px;">
               <span>${ft.shareCardBtn}</span>
             </button>
-            <button id="copyShareSummaryBtn" type="button" onclick="copyShareSummaryText()" style="height:40px; border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <button id="copyShareSummaryBtn" type="button" onclick="copyShareSummaryText()" style="flex:1 1 120px; min-height:44px; padding:8px 12px; border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;">
               <span>${ft.shareTextBtn}</span>
             </button>
           </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <button type="button" onclick="setCompareSlot('A')" style="height:36px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <button type="button" onclick="setCompareSlot('A')" style="flex:1 1 120px; min-height:44px; padding:8px 10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
               ${ft.setSlotABtn}
             </button>
-            <button type="button" onclick="setCompareSlot('B')" style="height:36px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
+            <button type="button" onclick="setCompareSlot('B')" style="flex:1 1 120px; min-height:44px; padding:8px 10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11.5px; font-weight:700;">
               ${ft.setSlotBBtn}
             </button>
           </div>
@@ -4268,22 +4738,22 @@
                       : ''
                   }
                 </div>
-                <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:8px;">
-                  <button id="openRegReportModalBtn" type="button" onclick="openRegulatoryReportModal(this)" style="height:38px; border-radius:12px; border:1.5px solid var(--accent); background:var(--soft); color:var(--accent); font-size:11.5px; font-weight:800; cursor:pointer;">${escapeHtml(regReport.openModalBtn)}</button>
-                  <button id="copyRegReportBtn" type="button" onclick="copyRegulatoryReportText()" style="height:38px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font-size:11.5px; font-weight:700; cursor:pointer;">📋 ${escapeHtml(regReport.copyReportBtn)}</button>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                  <button id="openRegReportModalBtn" type="button" onclick="openRegulatoryReportModal(this)" style="flex:1.25 1 140px; min-height:44px; padding:8px 12px; border-radius:12px; border:1.5px solid var(--accent); background:var(--soft); color:var(--accent); font-size:11.5px; font-weight:800; cursor:pointer;">${escapeHtml(regReport.openModalBtn)}</button>
+                  <button id="copyRegReportBtn" type="button" onclick="copyRegulatoryReportText()" style="flex:1 1 120px; min-height:44px; padding:8px 12px; border-radius:12px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font-size:11.5px; font-weight:700; cursor:pointer;">📋 ${escapeHtml(regReport.copyReportBtn)}</button>
                 </div>
               </div>`
             : ''
         }
 
         <!-- Ingredients Filter Header -->
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:2px;">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-top:2px;">
           <h2 style="margin:0; font-size:16px; font-weight:800;">${u.ingredientsHeader}</h2>
-          <div style="display:flex; padding:3px; border-radius:16px; background:var(--surface2);">
-            <button type="button" onclick="state.showAllIngredients=false; renderScreen();" style="height:30px; padding:0 12px; border-radius:13px; border:none; background:${!state.showAllIngredients ? 'var(--surface)' : 'transparent'}; color:${!state.showAllIngredients ? 'var(--ink)' : 'var(--muted)'}; font-size:12px; font-weight:700;">
+          <div style="display:flex; flex-wrap:wrap; gap:4px; padding:3px; border-radius:16px; background:var(--surface2);">
+            <button type="button" onclick="state.showAllIngredients=false; renderScreen();" style="min-height:44px; padding:6px 12px; border-radius:13px; border:none; background:${!state.showAllIngredients ? 'var(--surface)' : 'transparent'}; color:${!state.showAllIngredients ? 'var(--ink)' : 'var(--muted)'}; font-size:12px; font-weight:700;">
               ${u.attentionTab} · ${formatDigits(flaggedRows.length, state.lang)}
             </button>
-            <button type="button" onclick="state.showAllIngredients=true; renderScreen();" style="height:30px; padding:0 12px; border-radius:13px; border:none; background:${state.showAllIngredients ? 'var(--surface)' : 'transparent'}; color:${state.showAllIngredients ? 'var(--ink)' : 'var(--muted)'}; font-size:12px; font-weight:700;">
+            <button type="button" onclick="state.showAllIngredients=true; renderScreen();" style="min-height:44px; padding:6px 12px; border-radius:13px; border:none; background:${state.showAllIngredients ? 'var(--surface)' : 'transparent'}; color:${state.showAllIngredients ? 'var(--ink)' : 'var(--muted)'}; font-size:12px; font-weight:700;">
               ${u.allTab} · ${formatDigits(allRows.length, state.lang)}
             </button>
           </div>
@@ -4359,35 +4829,36 @@
       const u = getUiText(state.lang);
       const ft = getFeatText(state.lang);
       const halal = state.evalData.cards.halalCard;
-      const isOk = halal.overallStatus === 'uygun_gorunuyor';
       const isBad = halal.overallStatus === 'uygunsuz_bulgu' || halal.overallStatus === 'conflict';
-      const isLowCov = halal.overallStatus === 'kapsam_yetersiz';
-      const isPendingOcr = halal.overallStatus === 'unknown' || (state.evalData.unresolvedConfirmations || []).length > 0;
-      const statusLabel = isPendingOcr
+      const isPendingOcr = !isBad && (halal.overallStatus === 'unknown' || (state.evalData.unresolvedConfirmations || []).length > 0);
+      const isLowCov = !isBad && !isPendingOcr && halal.overallStatus === 'kapsam_yetersiz';
+      const isOk = !isBad && !isPendingOcr && !isLowCov && halal.overallStatus === 'uygun_gorunuyor';
+      const statusLabel = isBad
+        ? loc.badges.halalRed
+        : isPendingOcr
         ? ft.statusPendingOcr
         : isLowCov
-        ? ft.statusLowCoverage
+        ? (loc.badges.lowCoverage || ft.statusLowCoverage)
         : isOk
         ? loc.badges.halalOk
-        : isBad
-        ? loc.badges.halalRed
         : loc.badges.musbooh;
-      const subLabel = isPendingOcr
-        ? ft.statusPendingOcrSub
+      const subLabel = isBad
+        ? u.halalSubBad
+        : isPendingOcr
+        ? ft.pendingOcrTileSub
         : isLowCov
-        ? ft.statusLowCoverageSub
+        ? ft.lowCovTileSub
         : isOk
         ? u.halalSubOk
-        : isBad
-        ? u.halalSubBad
         : u.halalSubWarn;
+      const backAriaLabel = (u.goResultBtn || u.navResult || 'Back').replace(/[→←]/g, '').trim() || 'Back';
 
       return `
         <div style="display:flex; align-items:center; gap:10px;">
-          <button type="button" onclick="switchScreen('result')" style="width:40px; height:40px; border-radius:20px; border:none; background:var(--surface); color:var(--ink); font-weight:800;">←</button>
-          <div>
+          <button type="button" onclick="switchScreen('result')" aria-label="${escapeHtml(backAriaLabel)}" style="min-width:44px; min-height:44px; border-radius:22px; border:none; background:var(--surface); color:var(--ink); font-weight:800; flex:none;"><span class="rtl-flip-arrow" aria-hidden="true">←</span></button>
+          <div style="min-width:0;">
             <div style="font-size:17px; font-weight:800;">${u.halalEvalTitle}</div>
-            <div style="font-size:12.5px; color:var(--muted);">${escapeHtml(state.productTitle)} · ${u.authorityWord}: ${halal.selectedAuthority}</div>
+            <div style="font-size:12.5px; color:var(--muted);">${escapeHtml(state.productTitle)} · ${u.authorityWord}: ${escapeHtml(halal.selectedAuthority)}</div>
           </div>
         </div>
 
@@ -4420,8 +4891,8 @@
             <span style="font-size:13px; line-height:1.2;">⚖️</span>
             <span style="font-size:11.5px; line-height:1.45; color:var(--muted);">${u.legalDisclaimerMicro}</span>
           </div>
-          <button id="openMethodBtn" type="button" onclick="openMethodologyModal(this)" style="align-self:flex-end; border:none; background:transparent; color:var(--accent); font-size:11.5px; font-weight:700; cursor:pointer; padding:2px 4px; text-decoration:underline;">
-            ${u.methodologyLink} →
+          <button id="openMethodBtn" type="button" onclick="openMethodologyModal(this)" style="align-self:flex-end; min-height:44px; min-width:44px; border:none; background:transparent; color:var(--accent); font-size:12px; font-weight:700; cursor:pointer; padding:10px 8px; text-decoration:underline;">
+            ${u.methodologyLink} <span class="rtl-flip-arrow" aria-hidden="true">→</span>
           </button>
         </div>
 
@@ -4505,23 +4976,23 @@
         <h2 style="margin:4px 0 0; font-size:15.5px; font-weight:800;">${u.howToClarify}</h2>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <!-- 1. Paketteki Helal Logosunu Doğrula (Simülasyon Toggle) -->
-          <button type="button" onclick="toggleHalalCertified()" style="min-height:50px; border-radius:16px; border:${state.claims.halalCertified ? 'none' : '1.5px solid var(--accent)'}; background:${state.claims.halalCertified ? 'var(--ok)' : 'var(--surface)'}; color:${state.claims.halalCertified ? '#FFFFFF' : 'var(--ink)'}; padding:0 16px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:all 0.2s; box-shadow:${state.claims.halalCertified ? '0 4px 14px rgba(20,90,50,0.25)' : 'none'};">
+          <button type="button" onclick="toggleHalalCertified()" style="min-height:50px; border-radius:16px; border:${state.claims.halalCertified ? 'none' : '1.5px solid var(--accent)'}; background:${state.claims.halalCertified ? 'var(--ok)' : 'var(--surface)'}; color:${state.claims.halalCertified ? 'var(--on-ok)' : 'var(--ink)'}; padding:8px 16px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:all 0.2s; box-shadow:${state.claims.halalCertified ? '0 4px 14px rgba(20,90,50,0.25)' : 'none'};">
             <span style="display:flex; align-items:center; gap:8px;">
               <span>${state.claims.halalCertified ? '✓' : '🏷️'}</span>
               <span>${u.verifyHalalLogoBtn}</span>
             </span>
-            <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:10px; background:${state.claims.halalCertified ? 'rgba(255,255,255,0.22)' : 'var(--soft)'}; color:${state.claims.halalCertified ? '#FFFFFF' : 'var(--accent)'}; white-space:nowrap; flex:none;">
+            <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:10px; background:${state.claims.halalCertified ? 'rgba(255,255,255,0.22)' : 'var(--soft)'}; color:${state.claims.halalCertified ? 'var(--on-ok)' : 'var(--accent)'}; white-space:nowrap; flex:none;">
               ${state.claims.halalCertified ? u.activeWord : u.simulateWord + ' ⚡'}
             </span>
           </button>
 
           <!-- 2. Üreticiye Sormak İçin Hazır Mesajı Kopyala (Gerçek Pano Kopyalama) -->
-          <button type="button" onclick="copyManufacturerMessage()" style="min-height:50px; border-radius:16px; border:1.5px solid ${state.copiedToast ? 'var(--ok)' : 'var(--line)'}; background:${state.copiedToast ? 'var(--ok-bg)' : 'var(--surface)'}; color:${state.copiedToast ? 'var(--ok)' : 'var(--ink)'}; padding:0 16px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:all 0.2s;">
+          <button type="button" onclick="copyManufacturerMessage()" style="min-height:50px; border-radius:16px; border:1.5px solid ${state.copiedToast ? 'var(--ok)' : 'var(--line)'}; background:${state.copiedToast ? 'var(--ok-bg)' : 'var(--surface)'}; color:${state.copiedToast ? 'var(--ok)' : 'var(--ink)'}; padding:8px 16px; font-size:13.5px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; transition:all 0.2s;">
             <span style="display:flex; align-items:center; gap:8px;">
               <span>💬</span>
               <span>${u.copyAskManufacturer}</span>
             </span>
-            <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:10px; background:${state.copiedToast ? 'var(--ok)' : 'var(--surface2)'}; color:${state.copiedToast ? '#FFFFFF' : 'var(--ink)'}; white-space:nowrap; flex:none;">
+            <span style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:10px; background:${state.copiedToast ? 'var(--ok)' : 'var(--surface2)'}; color:${state.copiedToast ? 'var(--on-ok)' : 'var(--ink)'}; white-space:nowrap; flex:none;">
               ${state.copiedToast ? u.copiedWord : '📋'}
             </span>
           </button>
@@ -4619,44 +5090,44 @@
           <h1 style="margin:0; font-size:22px; font-weight:800; letter-spacing:-0.02em;">${loc.compareScreen.title}</h1>
           ${
             state.customCompareA || state.customCompareB
-              ? `<button type="button" onclick="resetCustomCompare()" style="height:32px; padding:0 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--accent); font-size:11.5px; font-weight:800;">↺ ${ft.resetCompareBtn}</button>`
+              ? `<button type="button" onclick="resetCustomCompare()" style="min-height:44px; min-width:44px; padding:8px 14px; border-radius:14px; border:1px solid var(--line); background:var(--surface); color:var(--accent); font-size:12px; font-weight:800;">↺ ${ft.resetCompareBtn}</button>`
               : ''
           }
         </div>
 
         <!-- Gerçek A vs B Karşılaştırma Kartı İlk Ekranda (Above the fold) -->
         <div style="background:var(--surface); border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:10px; border:1px solid var(--line);">
-          <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
-            <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${aBg}; border:1.5px solid ${aBetter ? 'var(--ok)' : a.hasBanned ? 'var(--bad)' : 'transparent'};">
-              <span style="font-size:30px; font-weight:800; line-height:1; color:${aColor};">${a.score !== null ? formatDigits(a.score, state.lang) : '—'}</span>
-              <span style="font-size:13px; font-weight:700; text-align:center;">${escapeHtml(a.name)}</span>
+          <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px;">
+            <div style="min-width:0; display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${aBg}; border:1.5px solid ${aBetter ? 'var(--ok)' : a.hasBanned ? 'var(--bad)' : 'transparent'};">
+              <span style="font-size:30px; font-weight:800; line-height:1; color:${aColor};">${a.score !== null ? escapeHtml(formatDigits(a.score, state.lang)) : '—'}</span>
+              <span style="font-size:13px; font-weight:700; text-align:center; overflow-wrap:anywhere;">${escapeHtml(a.name)}</span>
             </div>
-            <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${bBg}; border:1.5px solid ${bBetter ? 'var(--ok)' : b.hasBanned ? 'var(--bad)' : 'transparent'};">
-              <span style="font-size:30px; font-weight:800; line-height:1; color:${bColor};">${b.score !== null ? formatDigits(b.score, state.lang) : '—'}</span>
-              <span style="font-size:13px; font-weight:700; text-align:center;">${escapeHtml(b.name)}</span>
+            <div style="min-width:0; display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${bBg}; border:1.5px solid ${bBetter ? 'var(--ok)' : b.hasBanned ? 'var(--bad)' : 'transparent'};">
+              <span style="font-size:30px; font-weight:800; line-height:1; color:${bColor};">${b.score !== null ? escapeHtml(formatDigits(b.score, state.lang)) : '—'}</span>
+              <span style="font-size:13px; font-weight:700; text-align:center; overflow-wrap:anywhere;">${escapeHtml(b.name)}</span>
             </div>
           </div>
 
-          <div style="display:flex; flex-direction:column;">
-            <div style="display:grid; grid-template-columns:1fr 90px 90px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
-              <span style="color:var(--muted);">${loc.compareScreen.euBanRow}</span>
-              <span style="text-align:center; font-weight:700; color:${aBannedColor};">${a.hasBanned ? loc.badges.present : loc.badges.none}</span>
-              <span style="text-align:center; font-weight:700; color:${bBannedColor};">${b.hasBanned ? loc.badges.present : loc.badges.none}</span>
+          <div style="display:flex; flex-direction:column; min-width:0;">
+            <div style="display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(68px, 0.9fr) minmax(68px, 0.9fr); gap:6px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px; min-width:0;">
+              <span style="color:var(--muted); min-width:0; overflow-wrap:anywhere;">${loc.compareScreen.euBanRow}</span>
+              <span style="text-align:center; font-weight:700; color:${aBannedColor}; min-width:0; overflow-wrap:anywhere;">${a.hasBanned ? loc.badges.present : loc.badges.none}</span>
+              <span style="text-align:center; font-weight:700; color:${bBannedColor}; min-width:0; overflow-wrap:anywhere;">${b.hasBanned ? loc.badges.present : loc.badges.none}</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 90px 90px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px;">
-              <span style="color:var(--muted);">${loc.compareScreen.attentionRow}</span>
-              <span style="text-align:center; font-weight:700; color:${aAttnColor};">${formatDigits(a.attentionCount, state.lang)}</span>
-              <span style="text-align:center; font-weight:700; color:${bAttnColor};">${formatDigits(b.attentionCount, state.lang)}</span>
+            <div style="display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(68px, 0.9fr) minmax(68px, 0.9fr); gap:6px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13px; min-width:0;">
+              <span style="color:var(--muted); min-width:0; overflow-wrap:anywhere;">${loc.compareScreen.attentionRow}</span>
+              <span style="text-align:center; font-weight:700; color:${aAttnColor}; min-width:0; overflow-wrap:anywhere;">${escapeHtml(formatDigits(a.attentionCount, state.lang))}</span>
+              <span style="text-align:center; font-weight:700; color:${bAttnColor}; min-width:0; overflow-wrap:anywhere;">${escapeHtml(formatDigits(b.attentionCount, state.lang))}</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 90px 90px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:12.5px;">
-              <span style="color:var(--muted);">${loc.compareScreen.profileRow}</span>
-              <span style="text-align:center; font-weight:700; color:${aProfileColor};">${escapeHtml(mapProfileLabel(a))}</span>
-              <span style="text-align:center; font-weight:700; color:${bProfileColor};">${escapeHtml(mapProfileLabel(b))}</span>
+            <div style="display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(68px, 0.9fr) minmax(68px, 0.9fr); gap:6px; align-items:center; padding:8px 2px; border-bottom:1px solid var(--line); font-size:12.5px; min-width:0;">
+              <span style="color:var(--muted); min-width:0; overflow-wrap:anywhere;">${loc.compareScreen.profileRow}</span>
+              <span style="text-align:center; font-weight:700; color:${aProfileColor}; min-width:0; overflow-wrap:anywhere;">${escapeHtml(mapProfileLabel(a))}</span>
+              <span style="text-align:center; font-weight:700; color:${bProfileColor}; min-width:0; overflow-wrap:anywhere;">${escapeHtml(mapProfileLabel(b))}</span>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 90px 90px; align-items:center; padding:8px 2px; font-size:12.5px;">
-              <span style="color:var(--muted);">${loc.compareScreen.halalRow}</span>
-              <span style="text-align:center; font-weight:700; color:${aHalalColor};">${escapeHtml(mapHalalLabel(a))}</span>
-              <span style="text-align:center; font-weight:700; color:${bHalalColor};">${escapeHtml(mapHalalLabel(b))}</span>
+            <div style="display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(68px, 0.9fr) minmax(68px, 0.9fr); gap:6px; align-items:center; padding:8px 2px; font-size:12.5px; min-width:0;">
+              <span style="color:var(--muted); min-width:0; overflow-wrap:anywhere;">${loc.compareScreen.halalRow}</span>
+              <span style="text-align:center; font-weight:700; color:${aHalalColor}; min-width:0; overflow-wrap:anywhere;">${escapeHtml(mapHalalLabel(a))}</span>
+              <span style="text-align:center; font-weight:700; color:${bHalalColor}; min-width:0; overflow-wrap:anywhere;">${escapeHtml(mapHalalLabel(b))}</span>
             </div>
           </div>
 
@@ -4710,7 +5181,7 @@
           <h2 style="margin:0; font-size:16px; font-weight:800;">🕘 ${u.recentScans}</h2>
           ${
             state.scanHistory && state.scanHistory.length > 0
-              ? `<button type="button" onclick="state.scanHistory=[]; saveJson('incifact_scan_history_v1', []); refreshAll();" style="border:none; background:transparent; color:var(--muted); font-size:11.5px; font-weight:700;">${ft.clearHistoryBtn}</button>`
+              ? `<button type="button" onclick="state.scanHistory=[]; saveJson('incifact_scan_history_v1', []); refreshAll();" style="min-height:44px; min-width:44px; padding:8px 10px; border:none; background:transparent; color:var(--muted); font-size:12px; font-weight:700;">${ft.clearHistoryBtn}</button>`
               : ''
           }
         </div>
@@ -4722,25 +5193,27 @@
         <div style="background:var(--surface); border-radius:20px; display:flex; flex-direction:column;">
           ${histList
             .map((h, i) => {
-              const sc = h.score;
+              if (!h || typeof h !== 'object') return '';
+              const sc = typeof h.score === 'number' && Number.isFinite(h.score) ? h.score : null;
               const isGood = sc !== null && sc >= 75;
               const isBadSc = sc !== null && sc <= 25;
               const badgeBg = sc === null ? 'var(--warn-bg)' : isGood ? 'var(--ok-bg)' : isBadSc ? 'var(--bad-bg)' : 'var(--warn-bg)';
               const badgeCol = sc === null ? 'var(--warn)' : isGood ? 'var(--ok)' : isBadSc ? 'var(--bad)' : 'var(--warn)';
+              const typeLabel = h.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort;
               return `
-              <div style="display:flex; align-items:center; gap:10px; padding:11px 12px; border-bottom:${i < histList.length - 1 ? '1px solid var(--line)' : 'none'}; color:var(--ink);">
-                <button type="button" onclick="loadHistoryItem(${i})" style="border:none; background:transparent; text-align:start; display:flex; align-items:center; gap:10px; flex:1; padding:0; color:var(--ink);">
+              <div style="display:flex; align-items:center; gap:10px; padding:11px 12px; border-bottom:${i < histList.length - 1 ? '1px solid var(--line)' : 'none'}; color:var(--ink); min-width:0;">
+                <button type="button" onclick="loadHistoryItem(${i})" style="min-height:44px; border:none; background:transparent; text-align:start; display:flex; align-items:center; gap:10px; flex:1; min-width:0; padding:6px 0; color:var(--ink);">
                   <span style="width:38px; height:38px; border-radius:12px; background:${badgeBg}; color:${badgeCol}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13.5px; flex:none;">
-                    ${sc !== null && sc !== undefined ? formatDigits(sc, state.lang) : '?'}
+                    ${sc !== null ? escapeHtml(formatDigits(sc, state.lang)) : '?'}
                   </span>
                   <div style="flex:1; min-width:0;">
                     <div style="font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(h.title)}</div>
-                    <div style="font-size:11.5px; color:var(--muted);">${h.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${u.tapToInspect}</div>
+                    <div style="font-size:11.5px; color:var(--muted);">${escapeHtml(typeLabel)} · ${escapeHtml(u.tapToInspect)}</div>
                   </div>
                 </button>
                 <div style="display:flex; gap:6px; flex:none;">
-                  <button type="button" onclick="setCompareSlot('A', ${i})" title="Product A" style="min-width:34px; height:34px; padding:0 10px; border-radius:10px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:800;">A</button>
-                  <button type="button" onclick="setCompareSlot('B', ${i})" title="Product B" style="min-width:34px; height:34px; padding:0 10px; border-radius:10px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:800;">B</button>
+                  <button type="button" onclick="setCompareSlot('A', ${i})" title="Product A" style="min-width:44px; min-height:44px; padding:0 10px; border-radius:10px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:800;">A</button>
+                  <button type="button" onclick="setCompareSlot('B', ${i})" title="Product B" style="min-width:44px; min-height:44px; padding:0 10px; border-radius:10px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:800;">B</button>
                 </div>
               </div>`;
             })
@@ -4766,6 +5239,7 @@
         if (closeBtn) closeBtn.textContent = u.methodologyClose;
         if (xBtn) xBtn.setAttribute('aria-label', u.methodologyClose);
         if (bodyEl && Array.isArray(u.methodologyItems)) {
+          const privLabel = PRIVACY_LINK_I18N[state.lang] || PRIVACY_LINK_I18N.en;
           bodyEl.innerHTML = `
             <div style="display:flex; align-items:center; gap:12px; background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
               <img src="./assets/incifact-corporate-seal.jpg" alt="InciFact Corporate Seal" width="54" height="54" style="border-radius:10px; flex:none; border:1px solid rgba(197,160,89,0.4);" />
@@ -4780,7 +5254,15 @@
               </div>`
               )
               .join('')}
+            <div style="padding-top:6px; border-top:1px solid var(--divider); display:flex; align-items:center;">
+              <a href="./privacy.html" target="_blank" rel="noopener noreferrer" style="min-height:44px; display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:12.5px; font-weight:700; text-decoration:underline;">🔒 ${escapeHtml(privLabel)}</a>
+            </div>
           `;
+        }
+        const privFooterLink = document.getElementById('methodologyPrivacyLink');
+        if (privFooterLink) {
+          const privLabel = PRIVACY_LINK_I18N[state.lang] || PRIVACY_LINK_I18N.en;
+          privFooterLink.textContent = `🔒 ${privLabel}`;
         }
         modal.style.display = 'flex';
         modal.setAttribute('aria-hidden', 'false');
@@ -4939,11 +5421,12 @@
                     <span class="mono" dir="ltr" style="font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:6px; background:var(--ok-bg); color:var(--ok);">✓ ${escapeHtml(rr.checkedAtLabel)}: ${escapeHtml(s.checkedAt)}</span>
                   </div>
                   <span style="font-size:11.5px; font-weight:700; color:var(--ink);">${escapeHtml(s.title)}</span>
-                  ${
-                    s.url
-                      ? `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" dir="ltr" style="font-size:10.5px; color:var(--accent); text-decoration:underline; word-break:break-all;">${escapeHtml(s.url)} ↗</a>`
-                      : ''
-                  }
+                  ${(() => {
+                    const safeUrl = sanitizeHttpUrl(s.url);
+                    return safeUrl
+                      ? `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" dir="ltr" style="min-height:44px; display:inline-flex; align-items:center; font-size:10.5px; color:var(--accent); text-decoration:underline; word-break:break-all;">${escapeHtml(safeUrl)} ↗</a>`
+                      : '';
+                  })()}
                 </div>`
                 )
                 .join('')}
@@ -5014,6 +5497,7 @@
     if (initLive) {
       initLive.value = getSampleText(state.activeSampleIdx, state.lang);
     }
+    syncThemeColorMeta();
     refreshAll();
 
     if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && typeof location !== 'undefined' && location.protocol.startsWith('http')) {
@@ -5024,29 +5508,29 @@
   </script>
 
   <!-- ÖZELLİK 1: WhatsApp / Instagram Sonuç Özeti Kartı Paylaşım Modalı (A11y Dialog + 10-Language Localized) -->
-  <div id="shareCardModal" role="dialog" aria-modal="true" aria-labelledby="shareCardModalTitle" onclick="if(event.target===this)closeShareCardModal();" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.72); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
+  <div id="shareCardModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="shareCardModalTitle" onclick="if(event.target===this)closeShareCardModal();" style="display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,0.72); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:16px;">
     <div style="background:var(--surface); border:1.5px solid var(--accent); border-radius:24px; max-width:430px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 48px rgba(0,0,0,0.5);">
       <div style="padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
         <span id="shareCardModalTitle" style="font-weight:800; font-size:14.5px; color:var(--ink);">📸 InciFact · WhatsApp / Instagram Kartı</span>
-        <button id="shareModalCloseBtn" type="button" aria-label="Close" onclick="closeShareCardModal()" style="border:none; background:var(--surface2); width:36px; height:36px; border-radius:18px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+        <button id="shareModalCloseBtn" type="button" aria-label="Close" onclick="closeShareCardModal()" style="border:none; background:var(--surface2); min-width:44px; min-height:44px; width:44px; height:44px; border-radius:22px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
       </div>
       <div style="padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; gap:12px;">
         <canvas id="shareCardCanvas" width="1080" height="1350" style="width:100%; max-width:320px; height:auto; border-radius:16px; box-shadow:0 12px 28px rgba(11,19,43,0.45); border:1px solid rgba(197,160,89,0.45);"></canvas>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%;">
-          <button id="shareModalDownloadBtn" type="button" onclick="downloadShareCardPng()" style="height:44px; border-radius:12px; border:none; background:var(--accent); color:var(--on-accent); font-size:12.5px; font-weight:800; cursor:pointer;">📥 PNG İndir</button>
-          <button id="shareModalWaBtn" type="button" onclick="shareViaWhatsApp()" style="height:44px; border-radius:12px; border:none; background:#145A32; color:#FFFFFF; font-size:12.5px; font-weight:800; cursor:pointer;">📲 WhatsApp</button>
+          <button id="shareModalDownloadBtn" type="button" onclick="downloadShareCardPng()" style="min-height:44px; border-radius:12px; border:none; background:var(--accent); color:var(--on-accent); font-size:12.5px; font-weight:800; cursor:pointer;">📥 PNG İndir</button>
+          <button id="shareModalWaBtn" type="button" onclick="shareViaWhatsApp()" style="min-height:44px; border-radius:12px; border:none; background:#145A32; color:#FFFFFF; font-size:12.5px; font-weight:800; cursor:pointer;">📲 WhatsApp</button>
         </div>
-        <button id="shareModalCopyBtn" type="button" onclick="copyShareSummaryText(); closeShareCardModal();" style="height:40px; width:100%; border-radius:12px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:700; cursor:pointer;">📋 Özet Metni Panoya Kopyala</button>
+        <button id="shareModalCopyBtn" type="button" onclick="copyShareSummaryText(); closeShareCardModal();" style="min-height:44px; width:100%; border-radius:12px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:700; cursor:pointer;">📋 Özet Metni Panoya Kopyala</button>
       </div>
     </div>
   </div>
 
   <!-- Hukuki Metodoloji & Kaynak Beyanı Modalı (P0 Legal + A11y Dialog) -->
-  <div id="methodologyModal" role="dialog" aria-modal="true" aria-labelledby="methodologyModalTitle" onclick="if(event.target===this)closeMethodologyModal();" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+  <div id="methodologyModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="methodologyModalTitle" onclick="if(event.target===this)closeMethodologyModal();" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
     <div style="background:var(--surface); border:1px solid var(--line); border-radius:24px; max-width:440px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.4);">
       <div style="padding:16px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
         <span id="methodologyModalTitle" style="font-weight:800; font-size:15px; color:var(--ink);">⚖️ Fıkhi Metodoloji & Kaynak Beyanı</span>
-        <button id="methodologyModalCloseBtn" type="button" aria-label="Close" onclick="closeMethodologyModal()" style="border:none; background:var(--surface2); width:36px; height:36px; border-radius:18px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+        <button id="methodologyModalCloseBtn" type="button" aria-label="Close" onclick="closeMethodologyModal()" style="border:none; background:var(--surface2); min-width:44px; min-height:44px; width:44px; height:44px; border-radius:22px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
       </div>
       <div id="methodologyModalBody" style="padding:16px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; font-size:12.5px; line-height:1.5; color:var(--ink);">
         <div style="display:flex; align-items:center; gap:12px; background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
@@ -5070,23 +5554,24 @@
           <span style="color:var(--muted);">Doğrulanmış sentetik veya mikrobiyal kaynaklı E471 gibi çift kaynaklı bileşenleri izinli sayar; açık domuz ve şarap türevlerini haram kabul eder.</span>
         </div>
       </div>
-      <div style="padding:12px 18px; border-top:1px solid var(--line); display:flex; justify-content:flex-end;">
+      <div style="padding:12px 18px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+        <a id="methodologyPrivacyLink" href="./privacy.html" target="_blank" rel="noopener noreferrer" style="min-height:44px; display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:12px; font-weight:700; text-decoration:underline;">🔒 Gizlilik Politikası</a>
         <button id="methodologyModalOkBtn" type="button" onclick="closeMethodologyModal()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; min-height:44px; min-width:88px; padding:10px 22px; font-weight:700; font-size:13px; cursor:pointer;">Kapat</button>
       </div>
     </div>
   </div>
 
   <!-- ÖZELLİK 7: Resmi Mevzuat & Alerjen Raporu Modalı (4 Katmanlı Güncellik Mimarisi + A4 Yazdır / PDF) -->
-  <div id="regReportModal" role="dialog" aria-modal="true" aria-labelledby="regReportModalTitle" onclick="if(event.target===this)closeRegulatoryReportModal();" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.68); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+  <div id="regReportModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="regReportModalTitle" onclick="if(event.target===this)closeRegulatoryReportModal();" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.68); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
     <div style="background:var(--surface); border:1.5px solid var(--accent); border-radius:24px; max-width:460px; width:100%; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 48px rgba(0,0,0,0.45);">
       <div style="padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
         <span id="regReportModalTitle" style="font-weight:800; font-size:14.5px; color:var(--ink);">📄 Resmi Mevzuat & Alerjen Raporu</span>
-        <button id="regReportModalCloseBtn" type="button" aria-label="Close" onclick="closeRegulatoryReportModal()" style="border:none; background:var(--surface2); width:36px; height:36px; border-radius:18px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+        <button id="regReportModalCloseBtn" type="button" aria-label="Close" onclick="closeRegulatoryReportModal()" style="border:none; background:var(--surface2); min-width:44px; min-height:44px; width:44px; height:44px; border-radius:22px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
       </div>
       <div id="regReportModalBody" style="padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; font-size:12px; line-height:1.45; color:var(--ink);"></div>
-      <div style="padding:12px 18px; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-        <button id="regReportPrintBtn" type="button" onclick="window.print()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; min-height:42px; font-weight:800; font-size:12.5px; cursor:pointer;">🖨️ Yazdır / PDF</button>
-        <button id="regReportCopyModalBtn" type="button" onclick="copyRegulatoryReportText(); closeRegulatoryReportModal();" style="background:var(--surface2); color:var(--ink); border:1px solid var(--line); border-radius:12px; min-height:42px; font-weight:700; font-size:12px; cursor:pointer;">📋 Raporu Kopyala</button>
+      <div class="reg-report-modal-actions" style="padding:12px 18px; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <button id="regReportPrintBtn" type="button" onclick="window.print()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; min-height:44px; font-weight:800; font-size:12.5px; cursor:pointer;">🖨️ Yazdır / PDF</button>
+        <button id="regReportCopyModalBtn" type="button" onclick="copyRegulatoryReportText(); closeRegulatoryReportModal();" style="background:var(--surface2); color:var(--ink); border:1px solid var(--line); border-radius:12px; min-height:44px; font-weight:700; font-size:12px; cursor:pointer;">📋 Raporu Kopyala</button>
       </div>
     </div>
   </div>

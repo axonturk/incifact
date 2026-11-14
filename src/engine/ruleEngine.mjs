@@ -13,7 +13,11 @@ function makeCosingSubstance(cosingEntry) {
   const isBanned = cosingEntry.s === 2;
   const isRestricted = cosingEntry.s === 1;
   const euStatus = isBanned ? 'yasak' : isRestricted ? 'kisitli' : 'izinli';
-  const severity = isBanned ? 'yuksek' : isRestricted ? 'orta' : 'bilgi';
+  const severity = isBanned
+    ? 'yuksek'
+    : isRestricted
+    ? (/^(?:II\/|III)/.test(cosingEntry.a || '') ? 'orta' : 'dusuk')
+    : 'bilgi';
   const annexInfo = cosingEntry.a ? ` (${cosingEntry.a})` : '';
 
   return {
@@ -28,7 +32,7 @@ function makeCosingSubstance(cosingEntry) {
     eu_detail: isBanned
       ? `AB Kozmetik Yönetmeliği Ek II kapsamında doğrudan yasaklı bileşen${annexInfo}.`
       : isRestricted
-      ? `AB Kozmetik Yönetmeliği Ek III kapsamında kısıtlamaya tabi bileşen${annexInfo}.`
+      ? `AB Kozmetik Yönetmeliği Ek ${cosingEntry.a || 'III'} kapsamında koşul/limit kısıtlamasına tabi bileşen${annexInfo}.`
       : `AB CosIng veritabanında kayıtlı izinli kozmetik bileşen${annexInfo}.`,
     ed_tier: null,
     severity: severity,
@@ -143,6 +147,1177 @@ for (const item of sugarsData.rapid_carbohydrates_non_sugar) {
   }
 }
 
+const ALLOWED_PROFILES = new Set(['hassas_cilt', 'hamilelik', 'cocuk_metabolik', 'akne', 'astim_alerji']);
+
+function getSourceById(sid) {
+  if (!sid || typeof sid !== 'string' || !sourcesData || !sourcesData.sources) return null;
+  return Object.hasOwn(sourcesData.sources, sid) ? sourcesData.sources[sid] : null;
+}
+
+const TR_JURISDICTION_NOTE_I18N = {
+  tr: 'AB mevzuatı uyumsuzluğu tespit edildi; Türkiye pazarı için güncel TİTCK / Türk Gıda Kodeksi (TGK) geçiş hükümleri ayrıca teyit edilmelidir.',
+  en: 'EU regulatory non-compliance detected; current TITCK / Turkish Food Codex (TGK) transition rules should also be verified for the Turkish market.',
+  ar: 'تم رصد عدم مطابقة للوائح الاتحاد الأوروبي؛ يُرجى أيضاً التحقق من الأحكام الانتقالية الحالية لهيئة TITCK / مدونة الغذاء التركية (TGK) للسوق التركية.',
+  de: 'EU-Rechtsverstoß festgestellt; für den türkischen Markt sollten zudem die aktuellen Übergangsbestimmungen von TITCK / TGK geprüft werden.',
+  fr: 'Non-conformité réglementaire UE détectée ; pour le marché turc, veuillez également vérifier les dispositions transitoires TITCK / TGK en vigueur.',
+  id: 'Ketidaksesuaian regulasi UE terdeteksi; untuk pasar Turki, verifikasi juga ketentuan transisi TITCK / Kodeks Pangan Turki (TGK) yang berlaku.',
+  ms: 'Ketidakpatuhan peraturan EU dikesan; bagi pasaran Turki, sila sahkan juga peruntukan peralihan TITCK / Kod Makanan Turki (TGK) terkini.',
+  es: 'Incumplimiento normativo de la UE detectado; para el mercado turco deben verificarse también las disposiciones transitorias vigentes de TITCK / TGK.',
+  ru: 'Обнаружено несоответствие нормам ЕС; для рынка Турции следует также проверить действующие переходные положения TITCK / Турецкого пищевого кодекса (TGK).',
+  ur: 'یورپی یونین کے ضوابط سے عدم مطابقت پائی گئی؛ ترکی کی منڈی کے لیے موجودہ TITCK / ترک فوڈ کوڈیکس (TGK) کے عبوری احکام کی بھی تصدیق کی جانی چاہیے۔'
+};
+
+const CAFFEINE_TAURINE_ALERT_I18N = {
+  tr: {
+    cafName: 'Kafein / Enerji Bileşeni',
+    cafLoc: 'Kafein / Enerji Bileşeni',
+    cafHighName: 'Yüksek Kafein',
+    cafHighLoc: 'Yüksek Kafein',
+    tauName: 'Enerji İçeceği Uyarıcısı (Taurin/İnositol)',
+    tauLoc: 'Taurin / İnositol',
+    pregCafExp: 'EFSA Uyarısı: Hamilelik döneminde tüm kaynaklardan günlük toplam kafein alımı 200 mg ile sınırlandırılmalıdır (AB 1169/2011 Ek III).',
+    pregTauExp: 'Enerji içeceği uyarıcısı (Taurin/İnositol); hamilelik döneminde dikkatli tüketilmelidir.',
+    childCafExp: 'AB 1169/2011 Ek III Uyarısı: Yüksek kafein içeriği. Çocuklar için tavsiye edilmez (azami güvenli referans doz 3 mg/kg/gün).',
+    childTauExp: 'Enerji içeceği uyarıcısı (Taurin/İnositol); çocuklar için tavsiye edilmez.'
+  },
+  en: {
+    cafName: 'Caffeine / Energy Component',
+    cafLoc: 'Caffeine / Energy Component',
+    cafHighName: 'High Caffeine',
+    cafHighLoc: 'High Caffeine',
+    tauName: 'Energy Drink Stimulant (Taurine/Inositol)',
+    tauLoc: 'Taurine / Inositol',
+    pregCafExp: 'EFSA Warning: During pregnancy, total daily caffeine intake from all sources should be limited to 200 mg (EU 1169/2011 Annex III).',
+    pregTauExp: 'Energy drink stimulant (Taurine/Inositol); consume with caution during pregnancy.',
+    childCafExp: 'EU 1169/2011 Annex III Warning: High caffeine content. Not recommended for children (EFSA safe guidance 3 mg/kg bw/day).',
+    childTauExp: 'Energy drink stimulant (Taurine/Inositol); not recommended for children.'
+  },
+  ar: {
+    cafName: 'كافيين / مكوّن طاقة',
+    cafLoc: 'كافيين / مكوّن طاقة',
+    cafHighName: 'كافيين مرتفع',
+    cafHighLoc: 'كافيين مرتفع',
+    tauName: 'منبّه مشروب طاقة (تورين/إينوزيتول)',
+    tauLoc: 'تورين / إينوزيتول',
+    pregCafExp: 'تحذير EFSA: أثناء الحمل يجب ألا يتجاوز إجمالي الكافيين اليومي من جميع المصادر 200 ملغ (لائحة EU 1169/2011 الملحق III).',
+    pregTauExp: 'منبّه مشروبات الطاقة (تورين/إينوزيتول)؛ يُستهلك بحذر أثناء الحمل.',
+    childCafExp: 'تحذير EU 1169/2011 الملحق III: محتوى كافيين مرتفع. غير مُوصى به للأطفال (الحد المرجعي الآمن 3 ملغ/كغ/يوم).',
+    childTauExp: 'منبّه مشروبات الطاقة (تورين/إينوزيتول)؛ غير مُوصى به للأطفال.'
+  },
+  de: {
+    cafName: 'Koffein / Energiekomponente',
+    cafLoc: 'Koffein / Energiekomponente',
+    cafHighName: 'Erhöhter Koffeingehalt',
+    cafHighLoc: 'Erhöhter Koffeingehalt',
+    tauName: 'Energy-Drink-Stimulans (Taurin/Inosit)',
+    tauLoc: 'Taurin / Inosit',
+    pregCafExp: 'EFSA-Hinweis: In der Schwangerschaft sollte die gesamte tägliche Koffeinaufnahme aus allen Quellen auf 200 mg begrenzt werden (EU 1169/2011 Anhang III).',
+    pregTauExp: 'Energy-Drink-Zusatz (Taurin/Inosit); in der Schwangerschaft mit Vorsicht konsumieren.',
+    childCafExp: 'EU 1169/2011 Anhang III: Erhöhter Koffeingehalt. Für Kinder nicht empfohlen (EFSA-Richtwert max. 3 mg/kg KG/Tag).',
+    childTauExp: 'Energy-Drink-Zusatz (Taurin/Inosit); für Kinder nicht empfohlen.'
+  },
+  fr: {
+    cafName: 'Caféine / Composant énergétique',
+    cafLoc: 'Caféine / Composant énergétique',
+    cafHighName: 'Teneur élevée en caféine',
+    cafHighLoc: 'Teneur élevée en caféine',
+    tauName: 'Stimulant boisson énergisante (Taurine/Inositol)',
+    tauLoc: 'Taurine / Inositol',
+    pregCafExp: 'Alerte EFSA : Pendant la grossesse, l\'apport quotidien total en caféine toutes sources confondues doit être limité à 200 mg (UE 1169/2011 Annexe III).',
+    pregTauExp: 'Stimulant de boisson énergisante (Taurine/Inositol) ; à consommer avec prudence pendant la grossesse.',
+    childCafExp: 'UE 1169/2011 Annexe III : Teneur élevée en caféine. Déconseillé aux enfants (repère EFSA max. 3 mg/kg/jour).',
+    childTauExp: 'Stimulant de boisson énergisante (Taurine/Inositol) ; déconseillé aux enfants.'
+  },
+  id: {
+    cafName: 'Kafein / Komponen Energi',
+    cafLoc: 'Kafein / Komponen Energi',
+    cafHighName: 'Kafein Tinggi',
+    cafHighLoc: 'Kafein Tinggi',
+    tauName: 'Stimulan Minuman Energi (Taurin/Inositol)',
+    tauLoc: 'Taurin / Inositol',
+    pregCafExp: 'Peringatan EFSA: Selama kehamilan, total asupan kafein harian dari semua sumber sebaiknya dibatasi hingga 200 mg (UE 1169/2011 Lampiran III).',
+    pregTauExp: 'Stimulan minuman energi (Taurin/Inositol); konsumsi dengan hati-hati saat hamil.',
+    childCafExp: 'Peringatan UE 1169/2011 Lampiran III: Kandungan kafein tinggi. Tidak dianjurkan untuk anak-anak (batas aman EFSA 3 mg/kg BB/hari).',
+    childTauExp: 'Stimulan minuman energi (Taurin/Inositol); tidak dianjurkan untuk anak-anak.'
+  },
+  ms: {
+    cafName: 'Kafein / Komponen Tenaga',
+    cafLoc: 'Kafein / Komponen Tenaga',
+    cafHighName: 'Kafein Tinggi',
+    cafHighLoc: 'Kafein Tinggi',
+    tauName: 'Perangsang Minuman Tenaga (Taurina/Inositol)',
+    tauLoc: 'Taurina / Inositol',
+    pregCafExp: 'Amaran EFSA: Semasa hamil, jumlah pengambilan kafein harian daripada semua sumber hendaklah dihadkan kepada 200 mg (EU 1169/2011 Lampiran III).',
+    pregTauExp: 'Perangsang minuman tenaga (Taurina/Inositol); ambil dengan berhati-hati semasa hamil.',
+    childCafExp: 'Amaran EU 1169/2011 Lampiran III: Kandungan kafein tinggi. Tidak disyorkan untuk kanak-kanak (had rujukan selamat EFSA 3 mg/kg/hari).',
+    childTauExp: 'Perangsang minuman tenaga (Taurina/Inositol); tidak disyorkan untuk kanak-kanak.'
+  },
+  es: {
+    cafName: 'Cafeína / Componente energético',
+    cafLoc: 'Cafeína / Componente energético',
+    cafHighName: 'Alto contenido en cafeína',
+    cafHighLoc: 'Alto contenido en cafeína',
+    tauName: 'Estimulante energético (Taurina/Inositol)',
+    tauLoc: 'Taurina / Inositol',
+    pregCafExp: 'Advertencia EFSA: Durante el embarazo, la ingesta diaria total de cafeína de todas las fuentes debe limitarse a 200 mg (UE 1169/2011 Anexo III).',
+    pregTauExp: 'Estimulante de bebida energética (Taurina/Inositol); consumir con precaución durante el embarazo.',
+    childCafExp: 'UE 1169/2011 Anexo III: Contenido elevado de cafeína. No recomendado para niños (referencia segura EFSA 3 mg/kg/día).',
+    childTauExp: 'Estimulante de bebida energética (Taurina/Inositol); no recomendado para niños.'
+  },
+  ru: {
+    cafName: 'Кофеин / Энергетический компонент',
+    cafLoc: 'Кофеин / Энергетический компонент',
+    cafHighName: 'Высокое содержание кофеина',
+    cafHighLoc: 'Высокое содержание кофеина',
+    tauName: 'Стимулятор энергетика (Таурин/Инозитол)',
+    tauLoc: 'Таурин / Инозитол',
+    pregCafExp: 'Предупреждение EFSA: Во время беременности общее суточное потребление кофеина из всех источников должно быть ограничено 200 мг (ЕС 1169/2011 Приложение III).',
+    pregTauExp: 'Стимулятор энергетических напитков (Таурин/Инозитол); соблюдайте осторожность при беременности.',
+    childCafExp: 'ЕС 1169/2011 Приложение III: Высокое содержание кофеина. Не рекомендуется детям (безопасный ориентир EFSA 3 мг/кг/день).',
+    childTauExp: 'Стимулятор энергетических напитков (Таурин/Инозитол); не рекомендуется детям.'
+  },
+  ur: {
+    cafName: 'کیفین / توانائی کا جزو',
+    cafLoc: 'کیفین / توانائی کا جزو',
+    cafHighName: 'زیادہ کیفین',
+    cafHighLoc: 'زیادہ کیفین',
+    tauName: 'انرجی ڈرنک محرک (ٹورین/اینوسیٹول)',
+    tauLoc: 'ٹورین / اینوسیٹول',
+    pregCafExp: 'EFSA انتباہ: حمل کے دوران تمام ذرائع سے روزانہ کل کیفین کی مقدار 200 ملی گرام تک محدود ہونی چاہیے (EU 1169/2011 ضمیمہ III)۔',
+    pregTauExp: 'انرجی ڈرنک محرک (ٹورین/اینوسیٹول)؛ حمل کے دوران احتیاط سے استعمال کریں۔',
+    childCafExp: 'EU 1169/2011 ضمیمہ III انتباہ: زیادہ کیفین۔ بچوں کے لیے تجویز کردہ نہیں (EFSA محفوظ حد 3 ملی گرام/کلوگرام/دن)۔',
+    childTauExp: 'انرجی ڈرنک محرک (ٹورین/اینوسیٹول)؛ بچوں کے لیے تجویز کردہ نہیں۔'
+  }
+};
+
+const FALSE_POSITIVE_NOTE_I18N = {
+  aqua: {
+    en: 'Completely safe baseline solvent.',
+    ar: 'مذيب أساسي آمن تماماً.',
+    de: 'Vollständig sicheres Basis-Lösungsmittel.',
+    fr: 'Solvant de base totalement sûr.',
+    id: 'Pelarut dasar yang sepenuhnya aman.',
+    ms: 'Pelarut asas yang selamat sepenuhnya.',
+    es: 'Disolvente base completamente seguro.',
+    ru: 'Полностью безопасный базовый растворитель.',
+    ur: 'مکمل طور پر محفوظ بنیادی سالوینٹ۔'
+  },
+  glycerin: {
+    en: 'Cosmetically safe humectant; see the Halal Engine for plant/animal/synthetic origin context.',
+    ar: 'مرطب آمن تجميلياً؛ راجع محرك الحلال لتحديد المصدر النباتي أو الحيواني.',
+    de: 'Kosmetisch sicheres Feuchthaltemittel; siehe Halal-Analyse für Herkunftsdetails.',
+    fr: 'Humectant sûr en cosmétique ; voir le moteur Halal pour l\'origine végétale ou animale.',
+    id: 'Humektan kosmetik yang aman; lihat mesin Halal untuk konteks sumber nabati/hewani.',
+    ms: 'Humektan kosmetik yang selamat; rujuk enjin Halal untuk konteks sumber tumbuhan/haiwan.',
+    es: 'Humectante cosmético seguro; consulta el motor Halal para el origen vegetal o animal.',
+    ru: 'Безопасный увлажнитель; см. халяль-анализ для уточнения растительного или животного происхождения.',
+    ur: 'کاسمیٹک طور پر محفوظ موئسچرائزر؛ نباتاتی یا حیوانی ماخذ کے لیے حلال کارڈ دیکھیں۔'
+  },
+  cetyl_alcohol: {
+    en: 'FALSE-POSITIVE SHIELD: Not ethyl alcohol (ethanol); a conditioning fatty alcohol that does not dry skin.',
+    ar: 'حماية من الإنذار الكاذب: ليس كحولاً إيثيلياً (إيثانول)؛ بل كحول دهني مرطب لا يجفف البشرة.',
+    de: 'SCHUTZ VOR FEHLALARM: Kein Ethylalkohol (Ethanol), sondern ein pflegender Fettalkohol.',
+    fr: 'PROTECTION FAUX POSITIF : Ce n\'est pas de l\'éthanol, mais un alcool gras émollient non desséchant.',
+    id: 'PERLINDUNGAN POSITIF PALSU: Bukan etil alkohol (etanol); alkohol lemak pelembut yang tidak mengeringkan kulit.',
+    ms: 'PERISAI POSITIF PALSU: Bukan etil alkohol (etanol); alkohol lemak perapi yang tidak mengeringkan kulit.',
+    es: 'ESCUDO FALSO POSITIVO: No es alcohol etílico (etanol); es un alcohol graso emoliente.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: Не этиловый спирт (этанол), а смягчающий жирный спирт.',
+    ur: 'غلط انتباہ سے تحفظ: یہ ایتھائل الکحل (ایتھانول) نہیں بلکہ جلد کو نرم رکھنے والا فیٹی الکحل ہے۔'
+  },
+  cetearyl_alcohol: {
+    en: 'FALSE-POSITIVE SHIELD: Not ethyl alcohol (ethanol); skin-friendly waxy fatty alcohol blend.',
+    ar: 'حماية من الإنذار الكاذب: ليس كحولاً إيثيلياً؛ خليط كحولات دهنية لطيف على البشرة.',
+    de: 'SCHUTZ VOR FEHLALARM: Kein Ethylalkohol, sondern ein hautfreundliches Fettalkohol-Gemisch.',
+    fr: 'PROTECTION FAUX POSITIF : Ce n\'est pas de l\'éthanol ; mélange d\'alcools gras doux pour la peau.',
+    id: 'PERLINDUNGAN POSITIF PALSU: Bukan etil alkohol; campuran alkohol lemak yang ramah kulit.',
+    ms: 'PERISAI POSITIF PALSU: Bukan etil alkohol; campuran alkohol lemak yang mesra kulit.',
+    es: 'ESCUDO FALSO POSITIVO: No es etanol; mezcla de alcoholes grasos suave para la piel.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: Не этанол; мягкая смесь жирных спиртов.',
+    ur: 'غلط انتباہ سے تحفظ: یہ ایتھانول نہیں؛ جلد کے لیے موزوں فیٹی الکحل کا آمیزہ ہے۔'
+  },
+  stearyl_alcohol: {
+    en: 'FALSE-POSITIVE SHIELD: Not ethyl alcohol (ethanol); conditioning fatty alcohol.',
+    ar: 'حماية من الإنذار الكاذب: ليس كحولاً إيثيلياً؛ بل كحول دهني ملطف.',
+    de: 'SCHUTZ VOR FEHLALARM: Kein Ethylalkohol, sondern ein Fettalkohol.',
+    fr: 'PROTECTION FAUX POSITIF : Ce n\'est pas de l\'éthanol, mais un alcool gras.',
+    id: 'PERLINDUNGAN POSITIF PALSU: Bukan etil alkohol; alkohol lemak pelembut.',
+    ms: 'PERISAI POSITIF PALSU: Bukan etil alkohol; alkohol lemak pelembut.',
+    es: 'ESCUDO FALSO POSITIVO: No es etanol, sino un alcohol graso.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: Не этанол, а жирный спирт.',
+    ur: 'غلط انتباہ سے تحفظ: یہ ایتھانول نہیں بلکہ فیٹی الکحل ہے۔'
+  },
+  phenoxyethanol: {
+    en: 'FALSE-POSITIVE SHIELD: Despite containing "ethanol" in its name, it is a glycol ether preservative, not intoxicating ethyl alcohol.',
+    ar: 'حماية من الإنذار الكاذب: رغم احتواء اسمه على "ethanol"، فهو مادة حافظة من فئة إيثرات الجليكول وليس كحولاً إيثيلياً.',
+    de: 'SCHUTZ VOR FEHLALARM: Trotz „ethanol“ im Namen handelt es sich um einen Glykolether-Konservierungsstoff, nicht um Trinkalkohol.',
+    fr: 'PROTECTION FAUX POSITIF : Malgré « ethanol » dans son nom, c\'est un conservateur éther de glycol, pas de l\'alcool éthylique.',
+    id: 'PERLINDUNGAN POSITIF PALSU: Meski bernama "ethanol", ini pengawet glikol eter, bukan etil alkohol.',
+    ms: 'PERISAI POSITIF PALSU: Walaupun bernama "ethanol", ia pengawet glikol eter, bukan etil alkohol.',
+    es: 'ESCUDO FALSO POSITIVO: Pese a incluir "ethanol" en su nombre, es un conservante éter de glicol, no etanol.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: Несмотря на «ethanol» в названии, это консервант гликолевый эфир, а не этиловый спирт.',
+    ur: 'غلط انتباہ سے تحفظ: نام میں "ethanol" کے باوجود یہ گلائیکول ایتھر پریزرویٹو ہے، نشہ آور ایتھانول نہیں۔'
+  },
+  niacinamide: {
+    en: 'Safe active vitamin B3 derivative suitable across pregnancy and acne-prone profiles.',
+    ar: 'مكوّن نشط آمن مشتق من فيتامين B3 ومناسب للحمل والبشرة المعرضة لحب الشباب.',
+    de: 'Sicherer Vitamin-B3-Wirkstoff, auch in der Schwangerschaft und bei Akne geeignet.',
+    fr: 'Actif sûr dérivé de la vitamine B3, adapté pendant la grossesse et aux peaux à tendance acnéique.',
+    id: 'Bahan aktif turunan vitamin B3 yang aman termasuk untuk kehamilan dan kulit berjerawat.',
+    ms: 'Bahan aktif terbitan vitamin B3 yang selamat termasuk untuk kehamilan dan kulit berjerawat.',
+    es: 'Activo seguro derivado de vitamina B3 apto para embarazo y piel con tendencia acneica.',
+    ru: 'Безопасный активный компонент (витамин B3), подходит при беременности и акне.',
+    ur: 'وٹامن B3 کا محفوظ فعال جزو، حمل اور ایکنی والی جلد کے لیے بھی موزوں۔'
+  },
+  panthenol: {
+    en: 'FALSE-POSITIVE SHIELD: Despite the "-ol" suffix, Panthenol is provitamin B5, not drying alcohol.',
+    ar: 'حماية من الإنذار الكاذب: رغم اللاحقة "-ol"، فالبانثينول هو بروفيتامين B5 وليس كحولاً.',
+    de: 'SCHUTZ VOR FEHLALARM: Trotz der Endung „-ol“ ist Panthenol Provitamin B5 und kein Alkohol.',
+    fr: 'PROTECTION FAUX POSITIF : Malgré le suffixe « -ol », le panthénol est la provitamine B5, pas un alcool.',
+    id: 'PERLINDUNGAN POSITIF PALSU: Meski berakhiran "-ol", Panthenol adalah provitamin B5, bukan alkohol.',
+    ms: 'PERISAI POSITIF PALSU: Walaupun berakhir "-ol", Panthenol ialah provitamin B5, bukan alkohol.',
+    es: 'ESCUDO FALSO POSITIVO: Pese al sufijo "-ol", el pantenol es provitamina B5, no alcohol.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: Несмотря на суффикс «-ol», пантенол — это провитамин B5, а не спирт.',
+    ur: 'غلط انتباہ سے تحفظ: آخر میں "-ol" ہونے کے باوجود پینٹینول پرو وٹامن B5 ہے، الکحل نہیں۔'
+  },
+  tocopherol: {
+    en: 'Safe vitamin E antioxidant.',
+    ar: 'مضاد أكسدة آمن (فيتامين E).',
+    de: 'Sicheres Vitamin-E-Antioxidans.',
+    fr: 'Antioxydant sûr (vitamine E).',
+    id: 'Antioksidan vitamin E yang aman.',
+    ms: 'Antioksidan vitamin E yang selamat.',
+    es: 'Antioxidante seguro de vitamina E.',
+    ru: 'Безопасный антиоксидант (витамин E).',
+    ur: 'محفوظ وٹامن E اینٹی آکسیڈنٹ۔'
+  },
+  sodium_hyaluronate: {
+    en: 'FALSE-POSITIVE SHIELD: "Sodium" here denotes the salt form of hyaluronic acid, not table salt.',
+    ar: 'حماية من الإنذار الكاذب: كلمة "Sodium" تشير إلى الشكل الملحي لحمض الهيالورونيك وليس ملح الطعام.',
+    de: 'SCHUTZ VOR FEHLALARM: „Sodium“ bezeichnet die Salzform der Hyaluronsäure, kein Kochsalz.',
+    fr: 'PROTECTION FAUX POSITIF : « Sodium » désigne le sel d\'acide hyaluronique, pas du sel de table.',
+    id: 'PERLINDUNGAN POSITIF PALSU: "Sodium" merujuk pada bentuk garam asam hialuronat, bukan garam dapur.',
+    ms: 'PERISAI POSITIF PALSU: "Sodium" merujuk kepada bentuk garam asid hialuronik, bukan garam masakan.',
+    es: 'ESCUDO FALSO POSITIVO: "Sodium" indica la sal del ácido hialurónico, no sal común.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: «Sodium» означает натриевую соль гиалуроновой кислоты, а не поваренную соль.',
+    ur: 'غلط انتباہ سے تحفظ: "Sodium" سے مراد ہائیلورونک ایسڈ کی نمک والی شکل ہے، کھانے کا نمک نہیں۔'
+  },
+  dimethicone: {
+    en: 'FALSE-POSITIVE SHIELD: Linear silicone polymer; NOT subject to REACH 2024/1328 cyclic siloxane (D4/D5/D6) restrictions.',
+    ar: 'حماية من الإنذار الكاذب: بوليمر سيليكون خطي؛ غير خاضع لقيود السيلوكسانات الحلقية D4/D5/D6 (REACH 2024/1328).',
+    de: 'SCHUTZ VOR FEHLALARM: Lineares Silikonpolymer; NICHT von der REACH-Beschränkung 2024/1328 für D4/D5/D6 betroffen.',
+    fr: 'PROTECTION FAUX POSITIF : Silicone linéaire ; NON soumis à la restriction REACH 2024/1328 sur les siloxanes cycliques D4/D5/D6.',
+    id: 'PERLINDUNGAN POSITIF PALSU: Polimer silikon linear; TIDAK terkena pembatasan siloksan siklik D4/D5/D6 (REACH 2024/1328).',
+    ms: 'PERISAI POSITIF PALSU: Polimer silikon linear; TIDAK tertakluk kepada sekatan siloksana siklik D4/D5/D6 (REACH 2024/1328).',
+    es: 'ESCUDO FALSO POSITIVO: Silicona lineal; NO sujeta a la restricción REACH 2024/1328 sobre siloxanos cíclicos D4/D5/D6.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: Линейный силиконовый полимер; НЕ подпадает под ограничения REACH 2024/1328 для циклических D4/D5/D6.',
+    ur: 'غلط انتباہ سے تحفظ: لکیری سلیکون پولیمر؛ REACH 2024/1328 سائکلک سائلوکسین (D4/D5/D6) کی پابندیوں کے تابع نہیں۔'
+  },
+  squalane: {
+    en: 'Do not confuse saturated Squalane with unsaturated "Squalene" (shark/olive origin).',
+    ar: 'لا ينبغي الخلط بين السكوالان المشبع (Squalane) والسكوالين غير المشبع (Squalene).',
+    de: 'Gesättigtes Squalane nicht mit ungesättigtem „Squalene“ verwechseln.',
+    fr: 'Ne pas confondre le Squalane saturé avec le « Squalène » insaturé.',
+    id: 'Jangan samakan Squalane jenuh dengan "Squalene" tak jenuh.',
+    ms: 'Jangan kelirukan Squalane tepu dengan "Squalene" tak tepu.',
+    es: 'No confundir el escualano saturado (Squalane) con el «Squalene» insaturado.',
+    ru: 'Не путать насыщенный сквалан (Squalane) с ненасыщенным «скваленом» (Squalene).',
+    ur: 'سیر شدہ Squalane کو غیر سیر شدہ "Squalene" سے خلط ملط نہ کریں۔'
+  },
+  methylparaben: {
+    en: 'SCCS considers it safe within EU concentration limits; must not be conflated with banned parabens (Isobutyl/Isopropyl).',
+    ar: 'يعدّه SCCS آمناً ضمن الحدود الأوروبية؛ ولا يجوز خلطه مع البارابينات المحظورة.',
+    de: 'Laut SCCS innerhalb der EU-Grenzwerte sicher; nicht mit verbotenen Parabenen gleichsetzen.',
+    fr: 'Jugé sûr par le SCCS dans les limites de l\'UE ; ne pas confondre avec les parabènes interdits.',
+    id: 'Dinilai aman oleh SCCS dalam batas UE; jangan disamakan dengan paraben yang dilarang.',
+    ms: 'Dinilai selamat oleh SCCS dalam had EU; jangan disamakan dengan paraben yang diharamkan.',
+    es: 'El SCCS lo considera seguro dentro de los límites de la UE; no equiparar con parabenos prohibidos.',
+    ru: 'Признан SCCS безопасным в пределах лимитов ЕС; не путать с запрещёнными парабенами.',
+    ur: 'SCCS اسے یورپی یونین کی حدود کے اندر محفوظ قرار دیتا ہے؛ ممنوعہ پیرابینز سے خلط نہ کریں۔'
+  },
+  ethylparaben: {
+    en: 'SCCS considers it safe within EU Annex V concentration limits.',
+    ar: 'يعدّه SCCS آمناً ضمن حدود الملحق V الأوروبية.',
+    de: 'Laut SCCS innerhalb der EU-Anhang-V-Grenzwerte sicher.',
+    fr: 'Jugé sûr par le SCCS dans les limites de l\'Annexe V.',
+    id: 'Dinilai aman oleh SCCS dalam batas Lampiran V UE.',
+    ms: 'Dinilai selamat oleh SCCS dalam had Lampiran V EU.',
+    es: 'Considerado seguro por el SCCS dentro de los límites del Anexo V.',
+    ru: 'Признан SCCS безопасным в пределах Приложения V ЕС.',
+    ur: 'SCCS ضمیمہ V کی حدود کے اندر اسے محفوظ قرار دیتا ہے۔'
+  },
+  propylparaben: {
+    en: 'Assessed on the EC Priority List of Potential Endocrine Disruptors (Group A); SCCS 2021 found it safe up to 0.14%.',
+    ar: 'مُدرج في القائمة الأوروبية الأولوية لمختلات الغدد الصماء المحتملة (المجموعة A)؛ وجده SCCS 2021 آمناً حتى 0.14%.',
+    de: 'Auf der EU-Prioritätenliste potenzieller endokriner Disruptoren (Gruppe A); laut SCCS 2021 bis 0.14% sicher.',
+    fr: 'Évalué sur la liste prioritaire UE des perturbateurs endocriniens potentiels (Groupe A) ; SCCS 2021 sûr jusqu\'à 0.14%.',
+    id: 'Masuk daftar prioritas UE pengganggu endokrin potensial (Grup A); SCCS 2021 menilai aman hingga 0.14%.',
+    ms: 'Dinilai dalam senarai keutamaan EU pengganggu endokrin berpotensi (Kumpulan A); SCCS 2021 dapati selamat sehingga 0.14%.',
+    es: 'Evaluado en la lista prioritaria UE de posibles disruptores endocrinos (Grupo A); SCCS 2021 seguro hasta 0.14%.',
+    ru: 'Включён в приоритетный список ЕС потенциальных эндокринных разрушителей (Группа A); SCCS 2021 подтвердил безопасность до 0.14%.',
+    ur: 'ممکنہ اینڈوکرائن ڈسرپٹرز کی یورپی ترجیحی فہرست (گروپ A) میں شامل؛ SCCS 2021 نے 0.14% تک محفوظ قرار دیا۔'
+  },
+  banned_parabens: {
+    en: 'Presence in an EU-market product indicates regulatory non-compliance.',
+    ar: 'وجوده في منتج داخل سوق الاتحاد الأوروبي يشير إلى مخالفة تنظيمية.',
+    de: 'Ein Vorkommen in einem EU-Produkt weist auf einen Rechtsverstoß hin.',
+    fr: 'Sa présence dans un produit sur le marché de l\'UE indique une non-conformité réglementaire.',
+    id: 'Keberadaannya pada produk pasar UE menunjukkan ketidakpatuhan regulasi.',
+    ms: 'Kehadirannya dalam produk pasaran EU menunjukkan ketidakpatuhan peraturan.',
+    es: 'Su presencia en un producto del mercado de la UE indica incumplimiento normativo.',
+    ru: 'Наличие в продукте на рынке ЕС указывает на нарушение законодательства.',
+    ur: 'یورپی یونین کی منڈی کی مصنوعات میں موجودگی ضابطہ جاتی خلاف ورزی کی نشاندہی کرتی ہے۔'
+  },
+  lilial: {
+    en: 'Prohibited fragrance allergen frequently seen in old-stock products.',
+    ar: 'مكوّن عطري محظور يُعثر عليه غالباً في المنتجات ذات المخزون القديم.',
+    de: 'Verbotener Duftstoff, der häufig noch in Altbeständen vorkommt.',
+    fr: 'Allergène parfumé interdit fréquemment rencontré dans d\'anciens stocks.',
+    id: 'Alergen wewangian terlarang yang sering ditemukan pada stok lama.',
+    ms: 'Alergen wangian terlarang yang kerap ditemui dalam stok lama.',
+    es: 'Alérgeno de fragancia prohibido frecuente en productos de stock antiguo.',
+    ru: 'Запрещённый парфюмерный аллерген, часто встречающийся в старых партиях.',
+    ur: 'ممنوعہ خوشبو کا جزو جو پرانے اسٹاک کی مصنوعات میں اکثر ملتا ہے۔'
+  },
+  '4_mbc': {
+    en: 'Completely prohibited from sale on the EU market since 1 May 2026 (making-available deadline).',
+    ar: 'محظور بيعه تماماً في سوق الاتحاد الأوروبي منذ 1 مايو 2026.',
+    de: 'Seit 1. Mai 2026 auf dem EU-Markt vollständig verkaufsverboten.',
+    fr: 'Totalement interdit à la vente sur le marché de l\'UE depuis le 1er mai 2026.',
+    id: 'Dilarang sepenuhnya dijual di pasar UE sejak 1 Mei 2026.',
+    ms: 'Dilarang sepenuhnya dijual di pasaran EU sejak 1 Mei 2026.',
+    es: 'Completamente prohibida su venta en el mercado de la UE desde el 1 de mayo de 2026.',
+    ru: 'Полностью запрещён к продаже на рынке ЕС с 1 мая 2026 года.',
+    ur: 'یکم مئی 2026 سے یورپی یونین کی منڈی میں فروخت مکمل طور پر ممنوع ہے۔'
+  },
+  benzophenone_3: {
+    en: 'Listed in Group A of the European Commission Priority List of Potential Endocrine Disruptors.',
+    ar: 'مُدرج في المجموعة A من قائمة الأولوية الأوروبية لمختلات الغدد الصماء المحتملة.',
+    de: 'Aufgeführt in Gruppe A der EU-Prioritätenliste potenzieller endokriner Disruptoren.',
+    fr: 'Inscrit dans le Groupe A de la liste prioritaire UE des perturbateurs endocriniens potentiels.',
+    id: 'Masuk Grup A Daftar Prioritas Komisi UE untuk Pengganggu Endokrin Potensial.',
+    ms: 'Tersenarai dalam Kumpulan A Senarai Keutamaan Suruhanjaya EU bagi Pengganggu Endokrin Berpotensi.',
+    es: 'Incluido en el Grupo A de la lista prioritaria de la Comisión Europea de posibles disruptores endocrinos.',
+    ru: 'Включён в Группу A приоритетного списка Европейской комиссии потенциальных эндокринных разрушителей.',
+    ur: 'یورپی کمیشن کی ممکنہ اینڈوکرائن ڈسرپٹرز کی ترجیحی فہرست کے گروپ A میں شامل۔'
+  },
+  bht: {
+    en: 'Must not be conflated with BHA (IARC Group 2B) or labelled carcinogenic; BHT is IARC Group 3.',
+    ar: 'يجب عدم خلط BHT مع BHA (مجموعة IARC 2B)؛ إذ يُصنَّف BHT ضمن المجموعة 3.',
+    de: 'Nicht mit BHA (IARC-Gruppe 2B) verwechseln; BHT ist IARC-Gruppe 3.',
+    fr: 'Ne pas confondre avec le BHA (IARC Groupe 2B) ; le BHT est classé Groupe 3.',
+    id: 'Jangan disamakan dengan BHA (IARC Grup 2B); BHT termasuk IARC Grup 3.',
+    ms: 'Jangan disamakan dengan BHA (IARC Kumpulan 2B); BHT ialah IARC Kumpulan 3.',
+    es: 'No confundir con BHA (IARC Grupo 2B); el BHT es IARC Grupo 3.',
+    ru: 'Не путать с BHA (группа IARC 2B); BHT относится к группе 3.',
+    ur: 'اسے BHA (IARC گروپ 2B) سے خلط ملط نہ کریں؛ BHT گروپ 3 میں ہے۔'
+  },
+  bha_antioxidant: {
+    en: 'When written simply as "BHA", confirm whether it means antioxidant Butylated Hydroxyanisole or exfoliant Beta Hydroxy Acid (Salicylic Acid).',
+    ar: 'عند كتابة "BHA" وحدها، يجب التحقق مما إذا كان المقصود مضاد الأكسدة أم حمض الساليسيليك.',
+    de: 'Steht nur „BHA“ auf dem Etikett, muss zwischen Antioxidans und Salicylsäure unterschieden werden.',
+    fr: 'Si seul « BHA » figure sur l\'étiquette, confirmer s\'il s\'agit de l\'antioxydant ou de l\'acide salicylique.',
+    id: 'Jika hanya tertulis "BHA", pastikan apakah antioksidan BHA atau Asam Salisilat.',
+    ms: 'Jika hanya tertulis "BHA", sahkan sama ada antioksidan BHA atau Asid Salisilik.',
+    es: 'Si aparece solo «BHA», confirmar si corresponde al antioxidante o al ácido salicílico.',
+    ru: 'При одиночной записи «BHA» требуется подтвердить: антиоксидант это или салициловая кислота.',
+    ur: 'اگر صرف "BHA" لکھا ہو تو تصدیق کریں کہ آیا یہ اینٹی آکسیڈنٹ ہے یا سیلیسیلک ایسڈ۔'
+  },
+  retinol: {
+    en: 'Red alert in the Pregnancy profile reflects total Vitamin A exposure and the precautionary principle.',
+    ar: 'التنبيه الأحمر في ملف الحمل يعكس إجمالي التعرض لفيتامين A ومبدأ الاحتياط.',
+    de: 'Die rote Warnung im Schwangerschaftsprofil basiert auf der Gesamt-Vitamin-A-Exposition und dem Vorsorgeprinzip.',
+    fr: 'L\'alerte rouge dans le profil Grossesse reflète l\'exposition totale à la vitamine A et le principe de précaution.',
+    id: 'Peringatan merah pada profil Kehamilan mencerminkan total paparan Vitamin A dan prinsip kehati-hatian.',
+    ms: 'Amaran merah dalam profil Kehamilan mencerminkan jumlah pendedahan Vitamin A dan prinsip berjaga-jaga.',
+    es: 'La alerta roja en Embarazo refleja la exposición total a la vitamina A y el principio de precaución.',
+    ru: 'Красный сигнал в профиле беременности отражает суммарную нагрузку витамина A и принцип предосторожности.',
+    ur: 'حمل کے پروفائل میں سرخ انتباہ وٹامن A کی مجموعی مقدار اور احتیاطی اصول کی بنیاد پر ہے۔'
+  },
+  bakuchiol: {
+    en: 'Botanical meroterpene, not a retinoid; no verified official teratogenicity/safety dataset exists for pregnancy (unknown).',
+    ar: 'مركب نباتي وليس ريتينويد؛ لا تتوفر بيانات رسمية موثقة لسلامته أثناء الحمل (غير معروف).',
+    de: 'Pflanzliches Meroterpen, kein Retinoid; keine verifizierten offiziellen Sicherheitsdaten für die Schwangerschaft (unbekannt).',
+    fr: 'Méroterpène végétal, non rétinoïde ; aucune donnée officielle vérifiée pour la grossesse (inconnu).',
+    id: 'Meroterpen nabati, bukan retinoid; belum ada data keamanan resmi terverifikasi untuk kehamilan (tidak diketahui).',
+    ms: 'Meroterpen tumbuhan, bukan retinoid; tiada data keselamatan rasmi yang disahkan untuk kehamilan (tidak diketahui).',
+    es: 'Meroterpeno vegetal, no retinoide; sin datos oficiales verificados de seguridad en el embarazo (desconocido).',
+    ru: 'Растительный меротерпен, не ретиноид; официальных данных о безопасности при беременности нет (неизвестно).',
+    ur: 'نباتاتی مرکب ہے، ریٹینوائڈ نہیں؛ حمل کے دوران حفاظت کا کوئی مستند سرکاری ڈیٹا دستیاب نہیں (نامعلوم)۔'
+  },
+  salicylic_acid: {
+    en: 'Per MotherToBaby / ACOG, low-concentration limited topical use depends on concentration and application area; consult a physician.',
+    ar: 'وفق MotherToBaby / ACOG يعتمد الاستخدام الموضعي المحدود أثناء الحمل على التركيز ومساحة التطبيق؛ يُستشار الطبيب.',
+    de: 'Laut MotherToBaby / ACOG hängt eine kleinflächige niedrig dosierte Anwendung von Konzentration und Fläche ab; ärztlichen Rat einholen.',
+    fr: 'Selon MotherToBaby / ACOG, l\'usage topique limité dépend de la concentration et de la zone ; consulter un médecin.',
+    id: 'Menurut MotherToBaby / ACOG, penggunaan topikal terbatas bergantung pada konsentrasi dan area; konsultasikan dengan dokter.',
+    ms: 'Menurut MotherToBaby / ACOG, penggunaan topikal terhad bergantung pada kepekatan dan kawasan; rujuk doktor.',
+    es: 'Según MotherToBaby / ACOG, el uso tópico limitado depende de la concentración y la zona; consultar al médico.',
+    ru: 'По данным MotherToBaby / ACOG, ограниченное наружное применение зависит от концентрации и площади; проконсультируйтесь с врачом.',
+    ur: 'MotherToBaby / ACOG کے مطابق محدود مقامی استعمال ارتکاز اور حصے پر منحصر ہے؛ معالج سے مشورہ کریں۔'
+  },
+  formaldehyde_releasers: {
+    en: 'Strong contact allergen / sensitizer for sensitive skin and eczema-prone individuals.',
+    ar: 'مسبب قوي لحساسية التلامس للأشخاص ذوي البشرة الحساسة أو الأكزيما.',
+    de: 'Starkes Kontaktallergen für empfindliche oder zu Ekzemen neigende Haut.',
+    fr: 'Allergène de contact puissant pour les peaux sensibles ou sujettes à l\'eczéma.',
+    id: 'Alergen kontak kuat bagi kulit sensitif atau rentan eksim.',
+    ms: 'Alergen sentuhan kuat bagi kulit sensitif atau mudah ekzema.',
+    es: 'Alérgeno de contacto potente para pieles sensibles o con tendencia a eccema.',
+    ru: 'Сильный контактный аллерген для чувствительной и склонной к экземе кожи.',
+    ur: 'حساس جلد اور ایکزیما کے شکار افراد کے لیے شدید الرجن۔'
+  },
+  mi_mci: {
+    en: 'Potent contact allergen; presence in leave-on creams or wet wipes violates EU cosmetics law.',
+    ar: 'مسبب قوي لحساسية التلامس؛ وجوده في الكريمات التي لا تُشطف أو المناديل المبللة يخالف قانون الاتحاد الأوروبي.',
+    de: 'Starkes Kontaktallergen; in Leave-on-Cremes oder Feuchttüchern in der EU verboten.',
+    fr: 'Allergène de contact puissant ; sa présence dans les crèmes sans rinçage ou lingettes est illégale dans l\'UE.',
+    id: 'Alergen kontak kuat; keberadaannya di krim tanpa bilas atau tisu basah melanggar hukum UE.',
+    ms: 'Alergen sentuhan kuat; kehadirannya dalam krim tanpa bilas atau tisu basah melanggar undang-undang EU.',
+    es: 'Alérgeno de contacto potente; su presencia en cremas sin aclarado o toallitas infringe la ley de la UE.',
+    ru: 'Сильный контактный аллерген; наличие в несмываемых кремах или влажных салфетках запрещено в ЕС.',
+    ur: 'شدید الرجن؛ بغیر دھلنے والی کریموں یا گیلی وائپس میں موجودگی یورپی یونین کے قانون کی خلاف ورزی ہے۔'
+  },
+  fragrance_allergens: {
+    en: 'Not harmful to everyone; flagged to inform individuals with fragrance allergy or eczema.',
+    ar: 'ليس ضاراً بالجميع؛ يُعرض لتنبيه المصابين بحساسية العطور أو الأكزيما.',
+    de: 'Nicht für jeden schädlich; dient dem Schutz von Personen mit Duftstoffallergie oder Ekzem.',
+    fr: 'Pas nocif pour tous ; signalé pour informer les personnes allergiques aux parfums ou sujettes à l\'eczéma.',
+    id: 'Tidak berbahaya bagi semua orang; ditampilkan untuk memberi tahu penderita alergi wewangian atau eksim.',
+    ms: 'Tidak memudaratkan semua orang; ditunjukkan untuk memaklumkan penghidap alahan wangian atau ekzema.',
+    es: 'No es dañino para todos; se señala para informar a personas con alergia a fragancias o eccema.',
+    ru: 'Не вреден для всех; предупреждение предназначено для людей с аллергией на отдушки или экземой.',
+    ur: 'سب کے لیے نقصان دہ نہیں؛ خوشبو کی الرجی یا ایکزیما والے افراد کی آگاہی کے لیے ہے۔'
+  },
+  parfum: {
+    en: 'Listing "Parfum" does not automatically mean hidden phthalates are present; no speculative claims are inferred.',
+    ar: 'وجود "Parfum" لا يعني بالضرورة وجود فثالات مخفية؛ لا تُفترض مكونات غير معلنة.',
+    de: 'Die Angabe „Parfum“ bedeutet nicht automatisch versteckte Phthalate; keine Spekulation.',
+    fr: 'La mention « Parfum » n\'implique pas automatiquement la présence cachée de phtalates.',
+    id: 'Tercantumnya "Parfum" tidak otomatis berarti adanya ftalat tersembunyi.',
+    ms: 'Penyenaraian "Parfum" tidak bermakna wujudnya ftalat tersembunyi secara automatik.',
+    es: 'Incluir «Parfum» no implica automáticamente ftalatos ocultos; no se hacen suposiciones.',
+    ru: 'Наличие «Parfum» не означает автоматически присутствие скрытых фталатов.',
+    ur: '"Parfum" درج ہونے کا لازماً یہ مطلب نہیں کہ اس میں پوشیدہ فتھیلیٹس شامل ہیں۔'
+  },
+  alcohol_denat: {
+    en: 'When in the top 5 ingredients, high concentration can dry the skin barrier; check the Halal Card for religious ruling.',
+    ar: 'إذا كان ضمن أول 5 مكونات فقد يسبب جفاف الحاجز الجلدي؛ راجع بطاقة الحلال للحكم الشرعي.',
+    de: 'Unter den ersten 5 Inhaltsstoffen kann die hohe Konzentration die Hautbarriere austrocknen; siehe Halal-Karte.',
+    fr: 'Dans les 5 premiers ingrédients, sa concentration peut dessécher la barrière cutanée ; voir la carte Halal.',
+    id: 'Jika berada di 5 urutan teratas, dapat mengeringkan pelindung kulit; lihat Kartu Halal untuk hukumnya.',
+    ms: 'Jika dalam 5 ramuan teratas, boleh mengeringkan lapisan kulit; rujuk Kad Halal untuk hukum.',
+    es: 'En los 5 primeros ingredientes, puede resecar la barrera cutánea; consulta la Tarjeta Halal.',
+    ru: 'В первых 5 компонентах может сушить кожный барьер; религиозную оценку см. на карточке Халяль.',
+    ur: 'اگر ابتدائی 5 اجزاء میں ہو تو جلد کو خشک کر سکتا ہے؛ شرعی حکم کے لیے حلال کارڈ دیکھیں۔'
+  },
+  isopropyl_alcohol: {
+    en: 'When in the top 5 ingredients, it may dry sensitive skin.',
+    ar: 'إذا كان ضمن أول 5 مكونات فقد يسبب جفافاً للبشرة الحساسة.',
+    de: 'Unter den ersten 5 Inhaltsstoffen kann es empfindliche Haut austrocknen.',
+    fr: 'Dans les 5 premiers ingrédients, il peut dessécher les peaux sensibles.',
+    id: 'Jika berada di 5 urutan teratas, dapat mengeringkan kulit sensitif.',
+    ms: 'Jika berada dalam 5 ramuan teratas, boleh mengeringkan kulit sensitif.',
+    es: 'En los 5 primeros ingredientes, puede resecar las pieles sensibles.',
+    ru: 'В первых 5 компонентах может сушить чувствительную кожу.',
+    ur: 'اگر ابتدائی 5 اجزاء میں ہو تو حساس جلد کو خشک کر سکتا ہے۔'
+  },
+  sls: {
+    en: 'Strong surfactant used as a reference irritant in patch testing; may dry eczema/rosacea skin. Do not confuse with SLES.',
+    ar: 'مادة منظفة قوية قد تجفف البشرة المصابة بالأكزيما؛ لا ينبغي خلطها مع SLES.',
+    de: 'Starkes Tensid (Referenzreizstoff im Epikutantest); nicht mit SLES verwechseln.',
+    fr: 'Tensioactif fort pouvant irriter/dessécher les peaux réactives ; à ne pas confondre avec le SLES.',
+    id: 'Surfaktan kuat yang dapat mengeringkan kulit eksim; jangan disamakan dengan SLES.',
+    ms: 'Surfaktan kuat yang boleh mengeringkan kulit ekzema; jangan kelirukan dengan SLES.',
+    es: 'Tensioactivo fuerte que puede resecar pieles con eccema; no confundir con SLES.',
+    ru: 'Сильный ПАВ; может сушить кожу при экземе/розацеа. Не путать с SLES.',
+    ur: 'تیز سرفیکٹنٹ جو ایکزیما والی جلد کو خشک کر سکتا ہے؛ SLES سے خلط ملط نہ کریں۔'
+  },
+  sles: {
+    en: 'Significantly milder than SLS; not placed in the same irritation tier as SLS.',
+    ar: 'ألطف بكثير من SLS ولا يُصنَّف في نفس درجة التهيّج.',
+    de: 'Deutlich milder als SLS; wird nicht in derselben Reizstufe bewertet.',
+    fr: 'Nettement plus doux que le SLS ; n\'est pas classé au même niveau d\'irritation.',
+    id: 'Jauh lebih lembut daripada SLS dan tidak dinilai pada tingkat iritasi yang sama.',
+    ms: 'Jauh lebih lembut berbanding SLS dan tidak dinilai pada tahap kerengsaan yang sama.',
+    es: 'Significativamente más suave que el SLS; no se evalúa en el mismo nivel de irritación.',
+    ru: 'Значительно мягче SLS; не оценивается на том же уровне раздражения.',
+    ur: 'SLS کے مقابلے میں نمایاں طور پر نرم ہے اور اسی درجے میں نہیں رکھا جاتا۔'
+  },
+  comedogenic_esters_oils: {
+    en: 'Neat-ingredient pore-clogging potential reported (Fulton 1989), though final product comedogenicity depends on formulation (Draelos 2006). Does not lower general index.',
+    ar: 'احتمالية سد المسام تعتمد على الصيغة النهائية للمنتج (Draelos 2006)؛ لا يخفض المؤشر التنظيمي العام.',
+    de: 'Komedogenität hängt von der Gesamtformulierung ab (Draelos 2006); senkt den allgemeinen Index nicht.',
+    fr: 'La comédogénicité dépend de la formulation finale (Draelos 2006) ; ne réduit pas l\'indice général.',
+    id: 'Potensi menyumbat pori bergantung pada formulasi akhir (Draelos 2006); tidak menurunkan skor umum.',
+    ms: 'Potensi menyumbat pori bergantung pada formulasi akhir (Draelos 2006); tidak menurunkan skor umum.',
+    es: 'La comedogenicidad depende de la formulación final (Draelos 2006); no reduce el índice general.',
+    ru: 'Комедогенность зависит от итоговой рецептуры (Draelos 2006); общий индекс не снижает.',
+    ur: 'مسام بند ہونے کا انحصار حتمی فارمولیشن پر ہوتا ہے (Draelos 2006)؛ مجموعی اسکور کم نہیں کرتا۔'
+  },
+  southampton_dyes: {
+    en: 'FALSE-POSITIVE NOTE: E124 ("Cochineal Red A" / Ponceau 4R) is a synthetic azo dye, NOT insect-derived Carmine (E120).',
+    ar: 'ملاحظة إنذار كاذب: E124 (Ponceau 4R) صبغة آزو صناعية وليست القرمز الحشري (E120).',
+    de: 'FEHLALARM-HINWEIS: E124 (Ponceau 4R / „Cochenillerot A“) ist ein synthetischer Azofarbstoff, KEIN echtes Karmin (E120).',
+    fr: 'NOTE FAUX POSITIF : E124 (Ponceau 4R) est un colorant azoïque synthétique, PAS du carmin d\'insecte (E120).',
+    id: 'CATATAN POSITIF PALSU: E124 (Ponceau 4R) adalah pewarna azo sintetis, BUKAN Karmin serangga (E120).',
+    ms: 'NOTA POSITIF PALSU: E124 (Ponceau 4R) ialah pewarna azo sintetik, BUKAN Karmin serangga (E120).',
+    es: 'NOTA FALSO POSITIVO: E124 (Ponceau 4R) es un colorante azoico sintético, NO carmín de insecto (E120).',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: E124 (Понсо 4R) — синтетический азокраситель, НЕ кармин из насекомых (E120).',
+    ur: 'غلط انتباہ نوٹ: E124 (Ponceau 4R) مصنوعی رنگ ہے، کیڑے سے حاصل ہونے والا کارمین (E120) نہیں۔'
+  },
+  nitrites_e249_e250: {
+    en: 'Actual intake cannot be computed from ingredient presence alone; EFSA notes ADI may be exceeded with high processed-meat intake.',
+    ar: 'لا يمكن حساب الجرعة من مجرد وجود المكوّن؛ تشير EFSA لاحتمال تجاوز الجرعة اليومية عند الإفراط في اللحوم المصنعة.',
+    de: 'Die tatsächliche Dosis lässt sich aus der Zutatenliste allein nicht berechnen; laut EFSA kann der ADI bei viel Wurstwaren überschritten werden.',
+    fr: 'La dose réelle ne peut pas être déduite de la seule présence ; l\'EFSA note un dépassement possible en cas de forte consommation de charcuterie.',
+    id: 'Dosis tidak bisa dihitung hanya dari label; EFSA mencatat ADI dapat terlampaui pada konsumsi daging olahan tinggi.',
+    ms: 'Dos sebenar tidak boleh dikira daripada senarai ramuan sahaja; EFSA menyatakan ADI boleh melebihi had bagi pengambilan daging diproses yang tinggi.',
+    es: 'La dosis no puede calcularse solo por presencia; la EFSA señala posible superación de la IDA con alto consumo de carnes procesadas.',
+    ru: 'Дозу нельзя вычислить только по составу; EFSA отмечает риск превышения ДСП при высоком потреблении мясных изделий.',
+    ur: 'محض اجزاء کی فہرست سے مقدار کا حساب نہیں لگایا جا سکتا؛ EFSA کے مطابق زیادہ پراسیسڈ گوشت کھانے پر ADI سے تجاوز ہو سکتا ہے۔'
+  },
+  nitrates_e251_e252: {
+    en: 'Do not confuse E250 (Nitrite) with E252 (Nitrate) during OCR reading.',
+    ar: 'يجب عدم الخلط بين E250 (النيتريت) و E252 (النترات) أثناء القراءة الضوئية.',
+    de: 'Beim OCR-Scan E250 (Nitrit) nicht mit E252 (Nitrat) verwechseln.',
+    fr: 'Ne pas confondre E250 (Nitrite) et E252 (Nitrate) lors de la lecture OCR.',
+    id: 'Jangan tertukar antara E250 (Nitrit) dan E252 (Nitrat) saat pemindaian OCR.',
+    ms: 'Jangan kelirukan E250 (Nitrit) dengan E252 (Nitrat) semasa imbasan OCR.',
+    es: 'No confundir E250 (Nitrito) con E252 (Nitrato) en la lectura OCR.',
+    ru: 'Не путать E250 (нитрит) и E252 (нитрат) при OCR-распознавании.',
+    ur: 'OCR اسکن میں E250 (نائٹرائٹ) اور E252 (نائٹریٹ) کو خلط نہ کریں۔'
+  },
+  sulfites_e220_e228: {
+    en: 'Not carcinogenic; does not lower the general index, flagged as an asthma/sulfite-sensitivity alert.',
+    ar: 'ليس مسرطناً ولا يخفض المؤشر العام؛ يُعرض كتنبيه للربو وحساسية الكبريتيت.',
+    de: 'Nicht krebserregend; senkt den allgemeinen Index nicht, sondern dient als Asthma-/Sulfit-Warnung.',
+    fr: 'Non cancérogène ; ne réduit pas l\'indice général, sert d\'alerte asthme/sensibilité aux sulfites.',
+    id: 'Bukan karsinogen; tidak menurunkan skor umum, ditampilkan sebagai peringatan asma/sensitivitas sulfit.',
+    ms: 'Bukan karsinogen; tidak menurunkan skor umum, dipaparkan sebagai amaran asma/sensitiviti sulfit.',
+    es: 'No es carcinógeno; no baja el índice general, se muestra como alerta para asma/sensibilidad a sulfitos.',
+    ru: 'Не канцерогенен; не снижает общий индекс, служит предупреждением при астме и чувствительности к сульфитам.',
+    ur: 'سرطان پیدا کرنے والا نہیں؛ مجموعی اسکور کم نہیں کرتا، صرف دمہ اور سلفائٹ حساسیت کی تنبیہ ہے۔'
+  },
+  titanium_dioxide_e171_ci77891: {
+    en: 'The rule engine automatically distinguishes food (E171 banned) from cosmetic (CI 77891 permitted).',
+    ar: 'يميز محرك القواعد تلقائياً بين الغذاء (E171 محظور) ومستحضرات التجميل (CI 77891 مسموح).',
+    de: 'Die Regel-Engine unterscheidet automatisch zwischen Lebensmittel (E171 verboten) und Kosmetik (CI 77891 zulässig).',
+    fr: 'Le moteur distingue automatiquement l\'alimentaire (E171 interdit) du cosmétique (CI 77891 autorisé).',
+    id: 'Mesin aturan membedakan secara otomatis antara pangan (E171 dilarang) dan kosmetik (CI 77891 diizinkan).',
+    ms: 'Enjin peraturan membezakan secara automatik antara makanan (E171 dilarang) dan kosmetik (CI 77891 dibenarkan).',
+    es: 'El motor distingue automáticamente entre alimento (E171 prohibido) y cosmético (CI 77891 permitido).',
+    ru: 'Модуль автоматически различает пищу (E171 запрещён) и косметику (CI 77891 разрешён).',
+    ur: 'رول انجن خودکار طور پر خوراک (E171 ممنوع) اور کاسمیٹکس (CI 77891 مجاز) میں فرق کرتا ہے۔'
+  },
+  msg_e621: {
+    en: 'Does not generate an isolated "causes insulin resistance" verdict; EFSA group ADI reference is shown for high intake.',
+    ar: 'لا يُصدر حكماً بمفرده عن مقاومة الإنسولين؛ تُعرض قيمة ADI المرجعية للاستخدام المكثف.',
+    de: 'Erzeugt keine pauschale Aussage zur Insulinresistenz; gibt den EFSA-Gruppen-ADI als Orientierung an.',
+    fr: 'Ne génère pas d\'affirmation isolée sur l\'insulino-résistance ; indique la DJA de groupe EFSA.',
+    id: 'Tidak menghasilkan klaim tunggal resistensi insulin; menampilkan referensi ADI grup EFSA.',
+    ms: 'Tidak menghasilkan dakwaan tunggal rintangan insulin; memaparkan rujukan ADI kumpulan EFSA.',
+    es: 'No afirma de forma aislada que cause resistencia a la insulina; muestra la IDA de grupo EFSA.',
+    ru: 'Не выносит голословного вердикта об инсулинорезистентности; приводит групповую ДСП EFSA.',
+    ur: 'تنہا انسولین مزاحمت کا دعویٰ نہیں کیا جاتا؛ زیادہ استعمال کے لیے EFSA گروپ ADI حوالہ دیا جاتا ہے۔'
+  },
+  aha_glycolic_lactic_mandelic: {
+    en: 'When in the top 5 cosmetic ingredients, high concentration may cause stinging on sensitive skin; daily SPF is recommended.',
+    ar: 'عند وجوده في أول 5 مكونات تجميلية قد يسبب وخزاً للبشرة الحساسة؛ يُنصح باستخدام واقي شمس.',
+    de: 'In den Top 5 bei Kosmetika kann es auf empfindlicher Haut kribbeln; Sonnenschutz wird empfohlen.',
+    fr: 'Dans le top 5 des ingrédients cosmétiques, peut picoter les peaux sensibles ; protection solaire recommandée.',
+    id: 'Jika di 5 urutan teratas kosmetik, dapat menimbulkan rasa perih pada kulit sensitif; disarankan memakai SPF.',
+    ms: 'Jika dalam 5 ramuan teratas kosmetik, boleh menyebabkan rasa pedih pada kulit sensitif; SPF disyorkan.',
+    es: 'En los 5 primeros ingredientes cosméticos, puede causar escozor en piel sensible; se recomienda protector solar.',
+    ru: 'В первых 5 позициях косметики может вызывать пощипывание на чувствительной коже; рекомендуется SPF.',
+    ur: 'کاسمیٹکس میں ابتدائی 5 اجزاء میں ہونے پر حساس جلد پر چبھن ہو سکتی ہے؛ سن اسکرین کا مشورہ دیا جاتا ہے۔'
+  },
+  mexoryl_400_uv_filter: {
+    en: 'EU Annex VI/32: Max 3% concentration; prohibited in spray/aerosol inhalation applications.',
+    ar: 'ملحق الاتحاد الأوروبي VI/32: حد أقصى 3%؛ محظور في البخاخات والرذاذ القابل للاستنشاق.',
+    de: 'EU-Anhang VI/32: Max. 3%; in Sprays/Aerosolen mit Inhalationsrisiko verboten.',
+    fr: 'UE Annexe VI/32 : Max 3% ; interdit dans les sprays/aérosols inhalables.',
+    id: 'Lampiran VI/32 UE: Maks. 3%; dilarang pada aplikasi semprot/aerosol.',
+    ms: 'Lampiran VI/32 EU: Maks. 3%; dilarang dalam aplikasi semburan/aerosol.',
+    es: 'Anexo VI/32 UE: Máx. 3%; prohibido en sprays/aerosoles con riesgo de inhalación.',
+    ru: 'Приложение VI/32 ЕС: макс. 3%; запрещено в спреях и аэрозолях.',
+    ur: 'یورپی یونین ضمیمہ VI/32: زیادہ سے زیادہ 3%؛ اسپرے/ایروسول میں ممنوع۔'
+  },
+  benzyl_alcohol: {
+    en: 'FALSE-POSITIVE SHIELD: Despite containing "Alcohol" in its name, it is an aromatic preservative/solvent, not intoxicating ethyl alcohol (ethanol).',
+    ar: 'حماية من الإنذار الكاذب: رغم وجود "Alcohol" في اسمه، فهو مادة حافظة عطرية وليس كحولاً إيثيلياً مسكراً.',
+    de: 'SCHUTZ VOR FEHLALARM: Trotz „Alcohol“ im Namen ein aromatischer Konservierungsstoff, kein Ethylalkohol (Ethanol).',
+    fr: 'PROTECTION FAUX POSITIF : Malgré « Alcohol » dans son nom, c\'est un conservateur aromatique, pas de l\'éthanol.',
+    id: 'PERLINDUNGAN POSITIF PALSU: Meski mengandung kata "Alcohol", ini pengawet aromatik, bukan etil alkohol.',
+    ms: 'PERISAI POSITIF PALSU: Walaupun mengandungi perkataan "Alcohol", ia pengawet aromatik, bukan etil alkohol.',
+    es: 'ESCUDO FALSO POSITIVO: Pese a incluir «Alcohol», es un conservante aromático, no etanol.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: Несмотря на слово «Alcohol», это ароматический консервант, а не этиловый спирт.',
+    ur: 'غلط انتباہ سے تحفظ: نام میں "Alcohol" کے باوجود یہ خوشبودار پریزرویٹو ہے، نشہ آور ایتھانول نہیں۔'
+  },
+  stevia_polyol_sweeteners: {
+    en: 'FALSE-POSITIVE SHIELD: Sugar alcohols (-ol endings like Sorbitol, Xylitol, Maltitol, Erythritol) are NOT ethyl alcohol and are halal.',
+    ar: 'حماية من الإنذار الكاذب: الكحولات السكرية (البوليولات مثل سوربيتول وإكسيليتول) ليست كحولاً إيثيلياً وهي حلال.',
+    de: 'SCHUTZ VOR FEHLALARM: Zuckeralkohole (Polyole wie Sorbit, Xylit, Erythrit) sind KEIN Ethylalkohol und halal.',
+    fr: 'PROTECTION FAUX POSITIF : Les polyols (Sorbitol, Xylitol, Maltitol, Érythritol) ne sont PAS de l\'éthanol et sont halal.',
+    id: 'PERLINDUNGAN POSITIF PALSU: Alkohol gula (poliol seperti Sorbitol, Xylitol, Maltitol) BUKAN etil alkohol dan halal.',
+    ms: 'PERISAI POSITIF PALSU: Alkohol gula (poliol seperti Sorbitol, Xylitol, Maltitol) BUKAN etil alkohol dan halal.',
+    es: 'ESCUDO FALSO POSITIVO: Los polialcoholes (Sorbitol, Xilitol, Maltitol, Eritritol) NO son etanol y son halal.',
+    ru: 'ЗАЩИТА ОТ ЛОЖНОГО СРАБАТЫВАНИЯ: Сахарные спирты (сорбит, ксилит, мальтит, эритрит) НЕ являются этиловым спиртом и халяльны.',
+    ur: 'غلط انتباہ سے تحفظ: شوگر الکحل (سوربیٹول، زائلیٹول وغیرہ) ایتھائل الکحل نہیں ہیں اور حلال ہیں۔'
+  }
+};
+
+function localizeFalsePositiveNote(sub, lang) {
+  if (!sub || !sub.note) return null;
+  if (lang === 'tr') return sub.note;
+  const entry = Object.hasOwn(FALSE_POSITIVE_NOTE_I18N, sub.id) ? FALSE_POSITIVE_NOTE_I18N[sub.id] : null;
+  if (entry) return entry[lang] || entry.en;
+  return null;
+}
+
+const ANNEX_WORD_I18N = {
+  en: 'Annex',
+  de: 'Anhang',
+  fr: 'Annexe',
+  es: 'Anexo',
+  id: 'Lampiran',
+  ms: 'Lampiran',
+  ru: 'Приложение',
+  ar: 'الملحق',
+  ur: 'ضمیمہ'
+};
+
+function localizeExtendedRegulatoryText(d, euStatus, targetLang, engineText) {
+  // 11. TPHP (EU 2026/909)
+  if (d.includes('2026/909')) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2026/909 Annex II: Triphenyl Phosphate (TPHP) is prohibited in cosmetics (placing ban 2027-01-01, withdrawal 2028-07-01; Score capped at 10).',
+        de: 'EU 2026/909 Anhang II: Triphenylphosphat (TPHP) in Kosmetika verboten (Inverkehrbringen ab 2027-01-01, Bereitstellung ab 2028-07-01 untersagt; Maximalwert 10).',
+        fr: 'UE 2026/909 Annexe II : Le phosphate de triphényle (TPHP) est interdit dans les cosmétiques (mise sur le marché 2027-01-01, retrait 2028-07-01 ; Score plafonné à 10).',
+        es: 'UE 2026/909 Anexo II: El fosfato de trifenilo (TPHP) está prohibido en cosméticos (comercialización 2027-01-01, retirada 2028-07-01; Puntuación máx. 10).',
+        id: 'UE 2026/909 Lampiran II: Trifenil Fosfat (TPHP) dilarang pada kosmetik (pelarangan edar 2027-01-01, penarikan 2028-07-01; Skor maks. 10).',
+        ms: 'EU 2026/909 Lampiran II: Trifenil Fosfat (TPHP) dilarang dalam kosmetik (larangan pasaran 2027-01-01, penarikan 2028-07-01; Skor maks. 10).',
+        ru: 'ЕС 2026/909 Приложение II: Трифенилфосфат (TPHP) запрещён в косметике (выпуск на рынок с 2027-01-01, изъятие с 2028-07-01; Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2026/909 الملحق II: فوسفات ثلاثي الفينيل (TPHP) محظور في مستحضرات التجميل (حظر الطرح 2027-01-01، السحب 2028-07-01؛ الحد الأقصى 10).',
+        ur: 'یورپی یونین 2026/909 ضمیمہ II: کاسمیٹکس میں ٹرائی فینائل فاسفیٹ (TPHP) ممنوع ہے (مارکیٹ پابندی 2027-01-01، واپسی 2028-07-01؛ زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'Transition Alert (EU 2026/909 Annex II): Added to Annex II; placing on the EU market prohibited from 2027-01-01 and making available prohibited from 2028-07-01.',
+      de: 'Übergangswarnung (EU 2026/909 Anhang II): In Anhang II aufgenommen; Inverkehrbringen ab 2027-01-01 und Bereitstellung ab 2028-07-01 verboten.',
+      fr: 'Alerte de transition (UE 2026/909 Annexe II) : Ajouté à l\'Annexe II ; mise sur le marché interdite dès le 2027-01-01 et retrait le 2028-07-01.',
+      es: 'Aviso de transición (UE 2026/909 Anexo II): Añadido al Anexo II; prohibida su introducción desde 2027-01-01 y retirada el 2028-07-01.',
+      id: 'Peringatan Transisi (UE 2026/909 Lampiran II): Masuk Lampiran II; pelarangan pemasaran mulai 2027-01-01 dan penarikan 2028-07-01.',
+      ms: 'Amaran Peralihan (EU 2026/909 Lampiran II): Dimasukkan ke Lampiran II; larangan pemasaran bermula 2027-01-01 dan penarikan 2028-07-01.',
+      ru: 'Переходное предупреждение (ЕС 2026/909 Приложение II): Внесён в Приложение II; выпуск запрещён с 2027-01-01, продажа с 2028-07-01.',
+      ar: 'تنبيه فترة انتقالية (EU 2026/909 الملحق II): أُضيف إلى الملحق II؛ يُحظر طرحه اعتباراً من 2027-01-01 وسحبه في 2028-07-01.',
+      ur: 'عبوری تنبیہ (EU 2026/909 ضمیمہ II): ضمیمہ II میں شامل؛ 2027-01-01 سے مارکیٹ میں پیش کرنا اور 2028-07-01 سے دستیابی ممنوع ہے۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 12. TPO (EU 2025/877 Omnibus VII)
+  if (d.includes('2025/877')) {
+    return {
+      en: 'EU Omnibus VII Regulation (EU) 2025/877 (CLP 2024/197): Trimethylbenzoyl Diphenylphosphine Oxide (TPO) is banned as a CMR 1B substance in cosmetics and gel nails since 2025-09-01 (Annex II; Score capped at 10).',
+      de: 'EU-Omnibus VII (EU) 2025/877 (CLP 2024/197): TPO ist als CMR-1B-Stoff seit 2025-09-01 in Kosmetika und Gel-Nägeln verboten (Anhang II; Maximalwert 10).',
+      fr: 'Règlement UE Omnibus VII (UE) 2025/877 (CLP 2024/197) : Le TPO est interdit comme CMR 1B dans les cosmétiques et vernis gel depuis le 2025-09-01 (Annexe II ; Score plafonné à 10).',
+      es: 'Reglamento UE Ómnibus VII (UE) 2025/877 (CLP 2024/197): El TPO está prohibido como CMR 1B en cosméticos y esmaltes de gel desde el 2025-09-01 (Anexo II; Puntuación máx. 10).',
+      id: 'Regulasi UE Omnibus VII (UE) 2025/877 (CLP 2024/197): TPO dilarang sebagai zat CMR 1B pada kosmetik dan kuteks gel sejak 2025-09-01 (Lampiran II; Skor maks. 10).',
+      ms: 'Peraturan EU Omnibus VII (EU) 2025/877 (CLP 2024/197): TPO dilarang sebagai bahan CMR 1B dalam kosmetik dan pengilat kuku gel sejak 2025-09-01 (Lampiran II; Skor maks. 10).',
+      ru: 'Регламент ЕС Omnibus VII (ЕС) 2025/877 (CLP 2024/197): TPO запрещён как вещество CMR 1B в косметике и гель-лаках с 2025-09-01 (Приложение II; Макс. балл 10).',
+      ar: 'لائحة الاتحاد الأوروبي Omnibus VII (EU) 2025/877: يُحظر TPO كمادة CMR 1B في مستحضرات التجميل وطلاء الجل منذ 2025-09-01 (الملحق II؛ الحد الأقصى 10).',
+      ur: 'یورپی یونین Omnibus VII ضابطہ 2025/877: TPO بطور CMR 1B مادہ 2025-09-01 سے کاسمیٹکس اور جیل نیل میں ممنوع ہے (ضمیمہ II؛ زیادہ سے زیادہ اسکور 10)۔'
+    }[targetLang] || engineText.bannedGeneric;
+  }
+  // 13. 4-MBC (EU 2024/996 Annex II/1730)
+  if (d.includes('2024/996') && (d.includes('Mayıs 2025') || d.includes('1730') || d.includes('genotoksisite'))) {
+    return {
+      en: 'EU Regulation 2024/996 Annex II/1730: 4-Methylbenzylidene Camphor (4-MBC) is prohibited (placing ban 2025-05-01, withdrawal 2026-05-01; Score capped at 10).',
+      de: 'EU-Verordnung 2024/996 Anhang II/1730: 4-MBC ist verboten (Inverkehrbringen ab 2025-05-01, Abverkaufsende 2026-05-01; Maximalwert 10).',
+      fr: 'Règlement UE 2024/996 Annexe II/1730 : Le 4-MBC est interdit (mise sur le marché 2025-05-01, retrait 2026-05-01 ; Score plafonné à 10).',
+      es: 'Reglamento UE 2024/996 Anexo II/1730: El 4-MBC está prohibido (comercialización 2025-05-01, retirada 2026-05-01; Puntuación máx. 10).',
+      id: 'Regulasi UE 2024/996 Lampiran II/1730: 4-MBC dilarang (larangan edar 2025-05-01, penarikan 2026-05-01; Skor maks. 10).',
+      ms: 'Peraturan EU 2024/996 Lampiran II/1730: 4-MBC dilarang (larangan pasaran 2025-05-01, penarikan 2026-05-01; Skor maks. 10).',
+      ru: 'Регламент ЕС 2024/996 Приложение II/1730: 4-MBC запрещён (выпуск с 2025-05-01, изъятие с 2026-05-01; Макс. балл 10).',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق II/1730: يُحظر 4-MBC (حظر الطرح 2025-05-01، السحب 2026-05-01؛ الحد الأقصى 10).',
+      ur: 'یورپی یونین 2024/996 ضمیمہ II/1730: 4-MBC ممنوع ہے (مارکیٹ پابندی 2025-05-01، واپسی 2026-05-01؛ زیادہ سے زیادہ اسکور 10)۔'
+    }[targetLang] || engineText.bannedGeneric;
+  }
+  // 14. Retinol (EU 2024/996 Annex III/376)
+  if (d.includes('2024/996') && (d.includes('Retinol') || d.includes('Ek III/376'))) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2024/996 Annex III/376: Retinol & Vitamin A esters are limited to 0.05% RE in body lotions and 0.3% RE in other products; exceeding these limits is prohibited from 2025-11-01 (Score capped at 10).',
+        de: 'EU 2024/996 Anhang III/376: Retinol und Vitamin-A-Ester sind auf 0.05% RE in Körperlotionen und 0.3% RE in anderen Produkten begrenzt; Überschreitungen sind ab 2025-11-01 verboten (Maximalwert 10).',
+        fr: 'UE 2024/996 Annexe III/376 : Rétinol et esters de vitamine A limités à 0.05% RE en lait corporel et 0.3% RE dans les autres produits ; tout dépassement est interdit dès le 2025-11-01 (Score plafonné à 10).',
+        es: 'UE 2024/996 Anexo III/376: Retinol y ésteres de vitamina A limitados a 0.05% RE en lociones corporales y 0.3% RE en otros productos; superar el límite está prohibido desde 2025-11-01 (Puntuación máx. 10).',
+        id: 'UE 2024/996 Lampiran III/376: Retinol & ester vitamin A dibatasi 0.05% RE untuk losion tubuh dan 0.3% RE untuk produk lain; melebihi batas dilarang mulai 2025-11-01 (Skor maks. 10).',
+        ms: 'EU 2024/996 Lampiran III/376: Retinol & ester vitamin A dihadkan kepada 0.05% RE dalam losyen badan dan 0.3% RE dalam produk lain; melebihi had dilarang mulai 2025-11-01 (Skor maks. 10).',
+        ru: 'ЕС 2024/996 Приложение III/376: Ретинол и эфиры витамина A ограничены 0.05% RE для лосьонов для тела и 0.3% RE для прочих средств; превышение запрещено с 2025-11-01 (Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/376: يقتصر الريتينول وإسترات فيتامين A على 0.05% RE في لوشن الجسم و0.3% RE في المنتجات الأخرى؛ يُحظر التجاوز اعتباراً من 2025-11-01 (الحد الأقصى 10).',
+        ur: 'یورپی یونین 2024/996 ضمیمہ III/376: ریٹینول اور وٹامن A ایسٹرز باڈی لوشن میں 0.05% RE اور دیگر مصنوعات میں 0.3% RE تک محدود ہیں؛ تجاوز 2025-11-01 سے ممنوع ہے (زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'EU 2024/996 Annex III/376: Retinol & Vitamin A esters are restricted to max 0.05% RE in body lotions and 0.3% RE in other cosmetic products.',
+      de: 'EU 2024/996 Anhang III/376: Retinol und Vitamin-A-Ester sind auf max. 0.05% RE in Körperlotionen und 0.3% RE in anderen Produkten beschränkt.',
+      fr: 'UE 2024/996 Annexe III/376 : Rétinol et esters de vitamine A limités à max. 0.05% RE dans les laits corporels et 0.3% RE dans les autres produits.',
+      es: 'UE 2024/996 Anexo III/376: Retinol y ésteres de vitamina A restringidos a máx. 0.05% RE en lociones corporales y 0.3% RE en otros productos.',
+      id: 'UE 2024/996 Lampiran III/376: Retinol & ester vitamin A dibatasi maks. 0.05% RE pada losion tubuh dan 0.3% RE pada produk lain.',
+      ms: 'EU 2024/996 Lampiran III/376: Retinol & ester vitamin A dihadkan maks. 0.05% RE dalam losyen badan dan 0.3% RE dalam produk lain.',
+      ru: 'ЕС 2024/996 Приложение III/376: Ретинол и эфиры витамина A ограничены макс. 0.05% RE в лосьонах для тела и 0.3% RE в других средствах.',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/376: يقتصر الريتينول وإسترات فيتامين A على حد أقصى 0.05% RE في لوشن الجسم و0.3% RE في المنتجات الأخرى.',
+      ur: 'یورپی یونین 2024/996 ضمیمہ III/376: ریٹینول اور وٹامن A ایسٹرز باڈی لوشن میں زیادہ سے زیادہ 0.05% RE اور دیگر مصنوعات میں 0.3% RE تک محدود ہیں۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 15. Kojic Acid (EU 2024/996 Annex III/375)
+  if (d.includes('2024/996') && (d.includes('Kojik') || d.includes('Ek III/375') || d.includes('yüz ve el'))) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2024/996 Annex III/375: Kojic Acid is permitted only in face and hand products up to 1.0%; prohibited in body lotions or above 1.0% (Score capped at 10).',
+        de: 'EU 2024/996 Anhang III/375: Kojisäure ist nur in Gesichts- und Handprodukten bis 1.0% zulässig; in Körperlotionen oder über 1.0% verboten (Maximalwert 10).',
+        fr: 'UE 2024/996 Annexe III/375 : L\'acide kojique est autorisé uniquement dans les produits visage/mains jusqu\'à 1.0% ; interdit en lait corporel ou au-delà de 1.0% (Score plafonné à 10).',
+        es: 'UE 2024/996 Anexo III/375: El ácido kójico solo se permite en productos faciales y de manos hasta el 1.0%; prohibido en lociones corporales o por encima del 1.0% (Puntuación máx. 10).',
+        id: 'UE 2024/996 Lampiran III/375: Asam Kojat hanya diizinkan pada produk wajah dan tangan hingga 1.0%; dilarang pada losion tubuh atau di atas 1.0% (Skor maks. 10).',
+        ms: 'EU 2024/996 Lampiran III/375: Asid Kojik hanya dibenarkan dalam produk muka dan tangan sehingga 1.0%; dilarang dalam losyen badan atau melebihi 1.0% (Skor maks. 10).',
+        ru: 'ЕС 2024/996 Приложение III/375: Койевая кислота разрешена только в средствах для лица и рук до 1.0%; запрещена в лосьонах для тела или свыше 1.0% (Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/375: يُسمح بحمض الكوجيك فقط في منتجات الوجه واليدين حتى 1.0%؛ محظور في لوشن الجسم أو فوق 1.0% (الحد الأقصى 10).',
+        ur: 'یورپی یونین 2024/996 ضمیمہ III/375: کوجک ایسڈ صرف چہرے اور ہاتھوں کی مصنوعات میں 1.0% تک مجاز ہے؛ باڈی لوشن یا 1.0% سے زائد پر ممنوع (زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'EU 2024/996 Annex III/375: Kojic Acid is permitted in face and hand products up to a maximum concentration of 1.0%.',
+      de: 'EU 2024/996 Anhang III/375: Kojisäure ist in Gesichts- und Handprodukten bis maximal 1.0% zulässig.',
+      fr: 'UE 2024/996 Annexe III/375 : L\'acide kojique est autorisé dans les produits pour le visage et les mains jusqu\'à 1.0% max.',
+      es: 'UE 2024/996 Anexo III/375: El ácido kójico está permitido en productos faciales y de manos hasta un máximo del 1.0%.',
+      id: 'UE 2024/996 Lampiran III/375: Asam Kojat diizinkan pada produk wajah dan tangan hingga konsentrasi maksimum 1.0%.',
+      ms: 'EU 2024/996 Lampiran III/375: Asid Kojik dibenarkan dalam produk muka dan tangan sehingga kepekatan maksimum 1.0%.',
+      ru: 'ЕС 2024/996 Приложение III/375: Койевая кислота разрешена в средствах для лица и рук в концентрации до 1.0%.',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/375: يُسمح بحمض الكوجيك في منتجات الوجه واليدين بحد أقصى 1.0%.',
+      ur: 'یورپی یونین 2024/996 ضمیمہ III/375: کوجک ایسڈ چہرے اور ہاتھوں کی مصنوعات میں زیادہ سے زیادہ 1.0% تک مجاز ہے۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 16. Alpha-Arbutin (EU 2024/996 Annex III/377)
+  if (d.includes('III/377') || d.includes('Alpha-Arbutin')) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2024/996 Annex III/377: Alpha-Arbutin is limited to max 2.0% in face creams and 0.5% in body lotions; exceeding these limits is prohibited (Score capped at 10).',
+        de: 'EU 2024/996 Anhang III/377: Alpha-Arbutin ist auf max. 2.0% in Gesichtscremes und 0.5% in Körperlotionen begrenzt; Überschreitungen sind verboten (Maximalwert 10).',
+        fr: 'UE 2024/996 Annexe III/377 : Alpha-Arbutine limitée à max. 2.0% dans les crèmes visage et 0.5% dans les laits corporels ; tout dépassement est interdit (Score plafonné à 10).',
+        es: 'UE 2024/996 Anexo III/377: Alpha-Arbutin limitada a máx. 2.0% en cremas faciales y 0.5% en lociones corporales; superar el límite está prohibido (Puntuación máx. 10).',
+        id: 'UE 2024/996 Lampiran III/377: Alpha-Arbutin dibatasi maks. 2.0% di krim wajah dan 0.5% di losion tubuh; melebihi batas dilarang (Skor maks. 10).',
+        ms: 'EU 2024/996 Lampiran III/377: Alpha-Arbutin dihadkan maks. 2.0% dalam krim muka dan 0.5% dalam losyen badan; melebihi had dilarang (Skor maks. 10).',
+        ru: 'ЕС 2024/996 Приложение III/377: Альфа-арбутин ограничен 2.0% в кремах для лица и 0.5% в лосьонах для тела; превышение запрещено (Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/377: يقتصر ألفا أربوتين على 2.0% في كريمات الوجه و0.5% في لوشن الجسم؛ يُحظر التجاوز (الحد الأقصى 10).',
+        ur: 'یورپی یونین 2024/996 ضمیمہ III/377: الفا اربوٹین چہرے کی کریموں میں 2.0% اور باڈی لوشن میں 0.5% تک محدود ہے؛ تجاوز ممنوع (زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'EU 2024/996 Annex III/377: Alpha-Arbutin is permitted up to 2.0% in face creams and 0.5% in body lotions (placing 2025-02-01, withdrawal 2025-11-01).',
+      de: 'EU 2024/996 Anhang III/377: Alpha-Arbutin ist bis 2.0% in Gesichtscremes und 0.5% in Körperlotionen zulässig (Stichtage 2025-02-01 / 2025-11-01).',
+      fr: 'UE 2024/996 Annexe III/377 : Alpha-Arbutine autorisée jusqu\'à 2.0% en crème visage et 0.5% en lait corporel (2025-02-01 / 2025-11-01).',
+      es: 'UE 2024/996 Anexo III/377: Alpha-Arbutin permitida hasta 2.0% en cremas faciales y 0.5% en lociones corporales (2025-02-01 / 2025-11-01).',
+      id: 'UE 2024/996 Lampiran III/377: Alpha-Arbutin diizinkan hingga 2.0% di krim wajah dan 0.5% di losion tubuh (2025-02-01 / 2025-11-01).',
+      ms: 'EU 2024/996 Lampiran III/377: Alpha-Arbutin dibenarkan sehingga 2.0% dalam krim muka dan 0.5% dalam losyen badan (2025-02-01 / 2025-11-01).',
+      ru: 'ЕС 2024/996 Приложение III/377: Альфа-арбутин разрешён до 2.0% в кремах для лица и 0.5% в лосьонах для тела (2025-02-01 / 2025-11-01).',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/377: يُسمح بألفا أربوتين حتى 2.0% في كريمات الوجه و0.5% في لوشن الجسم (2025-02-01 / 2025-11-01).',
+      ur: 'یورپی یونین 2024/996 ضمیمہ III/377: الفا اربوٹین چہرے کی کریموں میں 2.0% اور باڈی لوشن میں 0.5% تک مجاز ہے (2025-02-01 / 2025-11-01)۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 17. Arbutin (EU 2024/996 Annex III/378)
+  if (d.includes('III/378') || d.includes('Arbutin')) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2024/996 Annex III/378: Arbutin is permitted only in face creams up to 7.0%; prohibited in body lotions or above 7.0% (Score capped at 10).',
+        de: 'EU 2024/996 Anhang III/378: Arbutin ist nur in Gesichtscremes bis 7.0% zulässig; in Körperlotionen oder über 7.0% verboten (Maximalwert 10).',
+        fr: 'UE 2024/996 Annexe III/378 : L\'arbutine est autorisée uniquement en crème visage jusqu\'à 7.0% ; interdite en lait corporel ou au-delà de 7.0% (Score plafonné à 10).',
+        es: 'UE 2024/996 Anexo III/378: Arbutin solo permitida en cremas faciales hasta el 7.0%; prohibida en lociones corporales o por encima del 7.0% (Puntuación máx. 10).',
+        id: 'UE 2024/996 Lampiran III/378: Arbutin hanya diizinkan pada krim wajah hingga 7.0%; dilarang di losion tubuh atau di atas 7.0% (Skor maks. 10).',
+        ms: 'EU 2024/996 Lampiran III/378: Arbutin hanya dibenarkan dalam krim muka sehingga 7.0%; dilarang dalam losyen badan atau melebihi 7.0% (Skor maks. 10).',
+        ru: 'ЕС 2024/996 Приложение III/378: Арбутин разрешён только в кремах для лица до 7.0%; запрещён в лосьонах для тела или свыше 7.0% (Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/378: يُسمح بالأربوتين فقط في كريمات الوجه حتى 7.0%؛ محظور في لوشن الجسم أو فوق 7.0% (الحد الأقصى 10).',
+        ur: 'یورپی یونین 2024/996 ضمیمہ III/378: اربوٹین صرف چہرے کی کریموں میں 7.0% تک مجاز ہے؛ باڈی لوشن یا 7.0% سے زائد پر ممنوع (زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'EU 2024/996 Annex III/378: Arbutin is permitted in face creams up to 7.0% (placing 2025-02-01, withdrawal 2025-11-01).',
+      de: 'EU 2024/996 Anhang III/378: Arbutin ist in Gesichtscremes bis 7.0% zulässig (Stichtage 2025-02-01 / 2025-11-01).',
+      fr: 'UE 2024/996 Annexe III/378 : L\'arbutine est autorisée dans les crèmes visage jusqu\'à 7.0% (2025-02-01 / 2025-11-01).',
+      es: 'UE 2024/996 Anexo III/378: Arbutin permitida en cremas faciales hasta el 7.0% (2025-02-01 / 2025-11-01).',
+      id: 'UE 2024/996 Lampiran III/378: Arbutin diizinkan pada krim wajah hingga 7.0% (2025-02-01 / 2025-11-01).',
+      ms: 'EU 2024/996 Lampiran III/378: Arbutin dibenarkan dalam krim muka sehingga 7.0% (2025-02-01 / 2025-11-01).',
+      ru: 'ЕС 2024/996 Приложение III/378: Арбутин разрешён в кремах для лица до 7.0% (2025-02-01 / 2025-11-01).',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/378: يُسمح بالأربوتين في كريمات الوجه حتى 7.0% (2025-02-01 / 2025-11-01).',
+      ur: 'یورپی یونین 2024/996 ضمیمہ III/378: اربوٹین چہرے کی کریموں میں 7.0% تک مجاز ہے (2025-02-01 / 2025-11-01)۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 18. Genistein (EU 2024/996 Annex III/373)
+  if (d.includes('III/373') || d.includes('Genistein')) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2024/996 Annex III/373: Genistein is limited to max 0.007% in cosmetics; exceeding this limit is prohibited (Score capped at 10).',
+        de: 'EU 2024/996 Anhang III/373: Genistein ist in Kosmetika auf max. 0.007% begrenzt; Überschreitungen sind verboten (Maximalwert 10).',
+        fr: 'UE 2024/996 Annexe III/373 : La génistéine est limitée à max. 0.007% en cosmétique ; tout dépassement est interdit (Score plafonné à 10).',
+        es: 'UE 2024/996 Anexo III/373: La genisteína se limita a máx. 0.007% en cosméticos; superar el límite está prohibido (Puntuación máx. 10).',
+        id: 'UE 2024/996 Lampiran III/373: Genistein dibatasi maks. 0.007% pada kosmetik; melebihi batas dilarang (Skor maks. 10).',
+        ms: 'EU 2024/996 Lampiran III/373: Genistein dihadkan maks. 0.007% dalam kosmetik; melebihi had dilarang (Skor maks. 10).',
+        ru: 'ЕС 2024/996 Приложение III/373: Генистеин ограничен макс. 0.007% в косметике; превышение запрещено (Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/373: يقتصر جينيستين على حد أقصى 0.007% في مستحضرات التجميل؛ يُحظر التجاوز (الحد الأقصى 10).',
+        ur: 'یورپی یونین 2024/996 ضمیمہ III/373: کاسمیٹکس میں جینیسٹین زیادہ سے زیادہ 0.007% تک محدود ہے؛ تجاوز ممنوع (زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'EU 2024/996 Annex III/373: Genistein is permitted in cosmetics up to a maximum concentration of 0.007% (2025-02-01 / 2025-11-01).',
+      de: 'EU 2024/996 Anhang III/373: Genistein ist in Kosmetika bis maximal 0.007% zulässig (2025-02-01 / 2025-11-01).',
+      fr: 'UE 2024/996 Annexe III/373 : La génistéine est autorisée dans les cosmétiques jusqu\'à 0.007% max. (2025-02-01 / 2025-11-01).',
+      es: 'UE 2024/996 Anexo III/373: La genisteína está permitida en cosméticos hasta un máximo del 0.007% (2025-02-01 / 2025-11-01).',
+      id: 'UE 2024/996 Lampiran III/373: Genistein diizinkan pada kosmetik hingga 0.007% (2025-02-01 / 2025-11-01).',
+      ms: 'EU 2024/996 Lampiran III/373: Genistein dibenarkan dalam kosmetik sehingga 0.007% (2025-02-01 / 2025-11-01).',
+      ru: 'ЕС 2024/996 Приложение III/373: Генистеин разрешён в косметике в концентрации до 0.007% (2025-02-01 / 2025-11-01).',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/373: يُسمح بجينيستين في مستحضرات التجميل حتى 0.007% (2025-02-01 / 2025-11-01).',
+      ur: 'یورپی یونین 2024/996 ضمیمہ III/373: کاسمیٹکس میں جینیسٹین 0.007% تک مجاز ہے (2025-02-01 / 2025-11-01)۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 19. Daidzein (EU 2024/996 Annex III/374)
+  if (d.includes('III/374') || d.includes('Daidzein')) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2024/996 Annex III/374: Daidzein is limited to max 0.02% in cosmetics; exceeding this limit is prohibited (Score capped at 10).',
+        de: 'EU 2024/996 Anhang III/374: Daidzein ist in Kosmetika auf max. 0.02% begrenzt; Überschreitungen sind verboten (Maximalwert 10).',
+        fr: 'UE 2024/996 Annexe III/374 : La daidzéine est limitée à max. 0.02% en cosmétique ; tout dépassement est interdit (Score plafonné à 10).',
+        es: 'UE 2024/996 Anexo III/374: La daidzeína se limita a máx. 0.02% en cosméticos; superar el límite está prohibido (Puntuación máx. 10).',
+        id: 'UE 2024/996 Lampiran III/374: Daidzein dibatasi maks. 0.02% pada kosmetik; melebihi batas dilarang (Skor maks. 10).',
+        ms: 'EU 2024/996 Lampiran III/374: Daidzein dihadkan maks. 0.02% dalam kosmetik; melebihi had dilarang (Skor maks. 10).',
+        ru: 'ЕС 2024/996 Приложение III/374: Даидзеин ограничен макс. 0.02% в косметике; превышение запрещено (Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/374: يقتصر دايدزين على حد أقصى 0.02% في مستحضرات التجميل؛ يُحظر التجاوز (الحد الأقصى 10).',
+        ur: 'یورپی یونین 2024/996 ضمیمہ III/374: کاسمیٹکس میں ڈائیڈزین زیادہ سے زیادہ 0.02% تک محدود ہے؛ تجاوز ممنوع (زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'EU 2024/996 Annex III/374: Daidzein is permitted in cosmetics up to a maximum concentration of 0.02% (2025-02-01 / 2025-11-01).',
+      de: 'EU 2024/996 Anhang III/374: Daidzein ist in Kosmetika bis maximal 0.02% zulässig (2025-02-01 / 2025-11-01).',
+      fr: 'UE 2024/996 Annexe III/374 : La daidzéine est autorisée dans les cosmétiques jusqu\'à 0.02% max. (2025-02-01 / 2025-11-01).',
+      es: 'UE 2024/996 Anexo III/374: La daidzeína está permitida en cosméticos hasta un máximo del 0.02% (2025-02-01 / 2025-11-01).',
+      id: 'UE 2024/996 Lampiran III/374: Daidzein diizinkan pada kosmetik hingga 0.02% (2025-02-01 / 2025-11-01).',
+      ms: 'EU 2024/996 Lampiran III/374: Daidzein dibenarkan dalam kosmetik sehingga 0.02% (2025-02-01 / 2025-11-01).',
+      ru: 'ЕС 2024/996 Приложение III/374: Даидзеин разрешён в косметике в концентрации до 0.02% (2025-02-01 / 2025-11-01).',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق III/374: يُسمح بدايدزين في مستحضرات التجميل حتى 0.02% (2025-02-01 / 2025-11-01).',
+      ur: 'یورپی یونین 2024/996 ضمیمہ III/374: کاسمیٹکس میں ڈائیڈزین 0.02% تک مجاز ہے (2025-02-01 / 2025-11-01)۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 20. Triclosan (EU 2024/996 Annex V/25)
+  if (d.includes('V/25') || d.includes('Triclosan')) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2024/996 Annex V/25: Triclosan is limited to max 0.3% in permitted products and banned in mouthwash, sprays/aerosols, and toothpaste for children under 3 (Score capped at 10).',
+        de: 'EU 2024/996 Anhang V/25: Triclosan ist in zulässigen Produkten auf max. 0.3% begrenzt und in Mundwasser, Sprays/Aerosolen sowie Zahnpasta für Kinder unter 3 Jahren verboten (Maximalwert 10).',
+        fr: 'UE 2024/996 Annexe V/25 : Le triclosan est limité à max. 0.3% et interdit dans les bains de bouche, sprays/aérosols et dentifrices pour moins de 3 ans (Score plafonné à 10).',
+        es: 'UE 2024/996 Anexo V/25: El triclosán se limita a máx. 0.3% y está prohibido en colutorios, aerosoles y dentífricos para menores de 3 años (Puntuación máx. 10).',
+        id: 'UE 2024/996 Lampiran V/25: Triclosan dibatasi maks. 0.3% dan dilarang pada obat kumur, semprotan/aerosol, serta pasta gigi anak di bawah 3 tahun (Skor maks. 10).',
+        ms: 'EU 2024/996 Lampiran V/25: Triclosan dihadkan maks. 0.3% dan dilarang dalam ubat kumur, semburan/aerosol serta ubat gigi kanak-kanak bawah 3 tahun (Skor maks. 10).',
+        ru: 'ЕС 2024/996 Приложение V/25: Триклозан ограничен 0.3% и запрещён в ополаскивателях рта, спреях/аэрозолях и детских пастах до 3 лет (Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق V/25: يقتصر التريكلوسان على 0.3% ويُحظر في غسول الفم والبخاخات ومعجون أسنان الأطفال دون 3 سنوات (الحد الأقصى 10).',
+        ur: 'یورپی یونین 2024/996 ضمیمہ V/25: ٹرائیکلوسان زیادہ سے زیادہ 0.3% تک محدود ہے اور ماؤتھ واش، اسپرے اور 3 سال سے کم عمر بچوں کے ٹوتھ پیسٹ میں ممنوع ہے (زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'EU 2024/996 Annex V/25: Triclosan is restricted to max 0.3% in listed cosmetics; prohibited in mouthwash and under-3 children\'s toothpaste (2024-12-31 / 2025-10-31).',
+      de: 'EU 2024/996 Anhang V/25: Triclosan ist auf max. 0.3% beschränkt; in Mundwasser und Zahnpasta unter 3 Jahren verboten (2024-12-31 / 2025-10-31).',
+      fr: 'UE 2024/996 Annexe V/25 : Triclosan limité à max. 0.3% ; interdit en bain de bouche et dentifrice <3 ans (2024-12-31 / 2025-10-31).',
+      es: 'UE 2024/996 Anexo V/25: Triclosán restringido a máx. 0.3%; prohibido en colutorios y dentífricos <3 años (2024-12-31 / 2025-10-31).',
+      id: 'UE 2024/996 Lampiran V/25: Triclosan dibatasi maks. 0.3%; dilarang pada obat kumur dan pasta gigi anak <3 tahun (2024-12-31 / 2025-10-31).',
+      ms: 'EU 2024/996 Lampiran V/25: Triclosan dihadkan maks. 0.3%; dilarang dalam ubat kumur dan ubat gigi kanak-kanak <3 tahun (2024-12-31 / 2025-10-31).',
+      ru: 'ЕС 2024/996 Приложение V/25: Триклозан ограничен 0.3%; запрещён в ополаскивателях и пастах для детей до 3 лет (2024-12-31 / 2025-10-31).',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق V/25: يقتصر التريكلوسان على 0.3%؛ محظور في غسول الفم ومعجون الأطفال دون 3 سنوات (2024-12-31 / 2025-10-31).',
+      ur: 'یورپی یونین 2024/996 ضمیمہ V/25: ٹرائیکلوسان زیادہ سے زیادہ 0.3% تک محدود؛ ماؤتھ واش اور 3 سال سے کم بچوں کے ٹوتھ پیسٹ میں ممنوع (2024-12-31 / 2025-10-31)۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 21. Triclocarban (EU 2024/996 Annex V/23 & Annex III)
+  if (d.includes('V/23') || d.includes('Triclocarban')) {
+    if (euStatus === 'yasak') {
+      return {
+        en: 'EU 2024/996 Annex V/23 & Annex III: Triclocarban exceeds the 0.2% preservative / 1.5% rinse-off limit or is used in banned mouthwash / under-6 children\'s toothpaste (Score capped at 10).',
+        de: 'EU 2024/996 Anhang V/23 & Anhang III: Triclocarban überschreitet das Limit (0.2% Konservierung / 1.5% Rinse-off) oder wird in verbotenem Mundwasser bzw. Zahnpasta unter 6 Jahren verwendet (Maximalwert 10).',
+        fr: 'UE 2024/996 Annexe V/23 & Annexe III : Triclocarban au-delà de 0.2% (conservateur) / 1.5% (à rincer) ou utilisé en bain de bouche / dentifrice <6 ans (Score plafonné à 10).',
+        es: 'UE 2024/996 Anexo V/23 y Anexo III: Triclocarbán supera 0.2% (conservante) / 1.5% (aclarado) o se usa en colutorio / dentífrico <6 años prohibido (Puntuación máx. 10).',
+        id: 'UE 2024/996 Lampiran V/23 & Lampiran III: Triclocarban melampaui batas 0.2% pengawet / 1.5% bilas atau pada obat kumur / pasta gigi <6 tahun yang dilarang (Skor maks. 10).',
+        ms: 'EU 2024/996 Lampiran V/23 & Lampiran III: Triclocarban melebihi had 0.2% pengawet / 1.5% bilas atau dalam ubat kumur / ubat gigi <6 tahun yang dilarang (Skor maks. 10).',
+        ru: 'ЕС 2024/996 Приложение V/23 и III: Триклокарбан превышает лимит 0.2% (консервант) / 1.5% (смываемый) или применён в ополаскивателе / пасте до 6 лет (Макс. балл 10).',
+        ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق V/23 و III: يتجاوز التريكلوكاربان حد 0.2% / 1.5% أو يُستخدم في غسول فم / معجون أطفال دون 6 سنوات محظور (الحد الأقصى 10).',
+        ur: 'یورپی یونین 2024/996 ضمیمہ V/23 اور III: ٹرائیکلوکاربن 0.2% / 1.5% کی حد سے متجاوز ہے یا ممنوعہ ماؤتھ واش / 6 سال سے کم بچوں کے ٹوتھ پیسٹ میں ہے (زیادہ سے زیادہ اسکور 10)۔'
+      }[targetLang] || engineText.bannedGeneric;
+    }
+    return {
+      en: 'EU 2024/996 Annex V/23 & Annex III: Triclocarban is limited to 0.2% as preservative (excl. mouthwash) and 1.5% in non-preservative rinse-off; banned in under-6 toothpaste (2024-12-31 / 2025-10-31).',
+      de: 'EU 2024/996 Anhang V/23 & Anhang III: Triclocarban ist auf 0.2% (Konservierung, außer Mundwasser) und 1.5% (Rinse-off nicht-konservierend) begrenzt; in Zahnpasta <6 Jahre verboten (2024-12-31 / 2025-10-31).',
+      fr: 'UE 2024/996 Annexe V/23 & Annexe III : Triclocarban limité à 0.2% (conservateur hors bain de bouche) et 1.5% (à rincer non conservateur) ; interdit en dentifrice <6 ans (2024-12-31 / 2025-10-31).',
+      es: 'UE 2024/996 Anexo V/23 y Anexo III: Triclocarbán limitado a 0.2% (conservante salvo colutorio) y 1.5% (aclarado no conservante); prohibido en dentífricos <6 años (2024-12-31 / 2025-10-31).',
+      id: 'UE 2024/996 Lampiran V/23 & III: Triclocarban dibatasi 0.2% (pengawet kecuali obat kumur) dan 1.5% (bilas non-pengawet); dilarang pada pasta gigi <6 tahun (2024-12-31 / 2025-10-31).',
+      ms: 'EU 2024/996 Lampiran V/23 & III: Triclocarban dihadkan 0.2% (pengawet kecuali ubat kumur) dan 1.5% (bilas bukan pengawet); dilarang dalam ubat gigi <6 tahun (2024-12-31 / 2025-10-31).',
+      ru: 'ЕС 2024/996 Приложение V/23 и III: Триклокарбан ограничен 0.2% (консервант, кроме ополаскивателей) и 1.5% (смываемый неконсервант); запрещён в пастах до 6 лет (2024-12-31 / 2025-10-31).',
+      ar: 'لائحة الاتحاد الأوروبي 2024/996 الملحق V/23 و III: يقتصر التريكلوكاربان على 0.2% كمادة حافظة و1.5% للشطف غير الحافظ؛ محظور في معجون دون 6 سنوات (2024-12-31 / 2025-10-31).',
+      ur: 'یورپی یونین 2024/996 ضمیمہ V/23 اور III: ٹرائیکلوکاربن بطور پریزرویٹو 0.2% اور دھلنے والی مصنوعات میں 1.5% تک محدود ہے؛ 6 سال سے کم ٹوتھ پیسٹ میں ممنوع (2024-12-31 / 2025-10-31)۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  // 22. Parabens (EU 358/2014, EU 1004/2014, Annex V)
+  if (d.includes('358/2014')) {
+    return {
+      en: 'EU Regulation 358/2014 (Annex II): Isopropyl-, Isobutyl-, Phenyl-, Benzyl- and Pentylparaben are prohibited in cosmetic products (Score capped at 10).',
+      de: 'EU-Verordnung 358/2014 (Anhang II): Isopropyl-, Isobutyl-, Phenyl-, Benzyl- und Pentylparaben sind in Kosmetika verboten (Maximalwert 10).',
+      fr: 'Règlement UE 358/2014 (Annexe II) : Les parabènes isopropylique, isobutylique, phénylique, benzylique et pentylique sont interdits en cosmétique (Score plafonné à 10).',
+      es: 'Reglamento UE 358/2014 (Anexo II): Isopropil-, isobutil-, fenil-, bencil- y pentilparabeno están prohibidos en cosméticos (Puntuación máx. 10).',
+      id: 'Regulasi UE 358/2014 (Lampiran II): Isopropil-, isobutil-, fenil-, benzil-, dan pentilparaben dilarang pada kosmetik (Skor maks. 10).',
+      ms: 'Peraturan EU 358/2014 (Lampiran II): Isopropil-, isobutil-, fenil-, benzil- dan pentilparaben dilarang dalam kosmetik (Skor maks. 10).',
+      ru: 'Регламент ЕС 358/2014 (Приложение II): Изопропил-, изобутил-, фенил-, бензил- и пентилпарабен запрещены в косметике (Макс. балл 10).',
+      ar: 'لائحة الاتحاد الأوروبي 358/2014 (الملحق II): يُحظر أيزوبروبيل وأيزوبوتيل وفينيل وبنزيل وبنتيل بارابين في مستحضرات التجميل (الحد الأقصى 10).',
+      ur: 'یورپی یونین 358/2014 (ضمیمہ II): آئسوپروپیل، آئسوبیوٹائل، فینائل، بینزائل اور پینٹائل پیرابین کاسمیٹکس میں ممنوع ہیں (زیادہ سے زیادہ اسکور 10)۔'
+    }[targetLang] || engineText.bannedGeneric;
+  }
+  if (d.includes('1004/2014')) {
+    return {
+      en: 'EU Regulation 1004/2014 (Annex V): Propylparaben + Butylparaben combined sum max 0.14%; prohibited in leave-on nappy area products for children under 3.',
+      de: 'EU-Verordnung 1004/2014 (Anhang V): Summe aus Propyl- und Butylparaben max. 0.14%; in Leave-on-Produkten für den Windelbereich unter 3 Jahren verboten.',
+      fr: 'Règlement UE 1004/2014 (Annexe V) : Somme propylparabène + butylparabène max. 0.14% ; interdit dans les produits sans rinçage pour le siège des moins de 3 ans.',
+      es: 'Reglamento UE 1004/2014 (Anexo V): Suma de propilparabeno + butilparabeno máx. 0.14%; prohibido en productos sin aclarado para la zona del pañal en menores de 3 años.',
+      id: 'Regulasi UE 1004/2014 (Lampiran V): Total propilparaben + butilparaben maks. 0.14%; dilarang pada produk tanpa bilas area popok anak di bawah 3 tahun.',
+      ms: 'Peraturan EU 1004/2014 (Lampiran V): Jumlah propilparaben + butilparaben maks. 0.14%; dilarang dalam produk tanpa bilas kawasan lampin kanak-kanak bawah 3 tahun.',
+      ru: 'Регламент ЕС 1004/2014 (Приложение V): Сумма пропил- и бутилпарабена макс. 0.14%; запрещено в несмываемых средствах для зоны подгузников до 3 лет.',
+      ar: 'لائحة الاتحاد الأوروبي 1004/2014 (الملحق V): مجموع بروبيل وبوتيل بارابين بحد أقصى 0.14%؛ محظور في منتجات منطقة الحفاض دون شطف للأطفال دون 3 سنوات.',
+      ur: 'یورپی یونین 1004/2014 (ضمیمہ V): پروپیل اور بیوٹائل پیرابین کا مجموعہ زیادہ سے زیادہ 0.14%؛ 3 سال سے کم بچوں کے ڈائپر ایریا کی بغیر دھلنے والی مصنوعات میں ممنوع۔'
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  if (d.includes('AB Ek V:') && d.includes('%0.4')) {
+    return {
+      en: 'EU Cosmetics Regulation Annex V: Permitted up to 0.4% for a single paraben ester and 0.8% total for ester mixtures.',
+      de: 'EU-Kosmetikverordnung Anhang V: Zulässig bis 0.4% für einen einzelnen Ester und 0.8% insgesamt für Estergemische.',
+      fr: 'Règlement Cosmétique UE Annexe V : Autorisé jusqu\'à 0.4% pour un ester seul et 0.8% au total pour les mélanges d\'esters.',
+      es: 'Reglamento Cosmético UE Anexo V: Permitido hasta 0.4% para un éster individual y 0.8% total para mezclas de ésteres.',
+      id: 'Regulasi Kosmetik UE Lampiran V: Diizinkan hingga 0.4% untuk ester tunggal dan 0.8% total untuk campuran ester.',
+      ms: 'Peraturan Kosmetik EU Lampiran V: Dibenarkan sehingga 0.4% bagi ester tunggal dan 0.8% jumlah bagi campuran ester.',
+      ru: 'Косметический регламент ЕС Приложение V: Разрешено до 0.4% для одного эфира и до 0.8% суммарно для смесей эфиров.',
+      ar: 'لائحة مستحضرات التجميل الأوروبية الملحق V: مسموح حتى 0.4% لإستر منفرد و0.8% إجمالاً لمزيج الإسترات.',
+      ur: 'یورپی یونین کاسمیٹکس ضمیمہ V: واحد ایسٹر کے لیے 0.4% اور ایسٹرز کے آمیزے کے لیے مجموعی طور پر 0.8% تک مجاز ہے۔'
+    }[targetLang] || engineText.permittedGeneric;
+  }
+  // 23. Dynamic CosIng Annex II/III/IV/V/VI rules from makeCosingSubstance
+  const cosingBanMatch = d.match(/^AB Kozmetik Yönetmeliği Ek II kapsamında doğrudan yasaklı bileşen(?:\s*\(([^)]+)\))?\.$/);
+  if (cosingBanMatch) {
+    const refTag = cosingBanMatch[1] ? ` (${cosingBanMatch[1]})` : '';
+    const aw = ANNEX_WORD_I18N[targetLang] || 'Annex';
+    return {
+      en: `EU Cosmetics Regulation ${aw} II: Directly prohibited cosmetic ingredient${refTag} (Score capped at 10).`,
+      de: `EU-Kosmetikverordnung ${aw} II: Direkt verbotener kosmetischer Inhaltsstoff${refTag} (Maximalwert 10).`,
+      fr: `Règlement Cosmétique UE ${aw} II : Ingrédient cosmétique directement interdit${refTag} (Score plafonné à 10).`,
+      es: `Reglamento Cosmético UE ${aw} II: Ingrediente cosmético directamente prohibido${refTag} (Puntuación máx. 10).`,
+      id: `Regulasi Kosmetik UE ${aw} II: Bahan kosmetik yang dilarang langsung${refTag} (Skor maks. 10).`,
+      ms: `Peraturan Kosmetik EU ${aw} II: Bahan kosmetik yang dilarang secara langsung${refTag} (Skor maks. 10).`,
+      ru: `Косметический регламент ЕС ${aw} II: Прямо запрещённый косметический ингредиент${refTag} (Макс. балл 10).`,
+      ar: `لائحة مستحضرات التجميل الأوروبية ${aw} II: مكوّن تجميلي محظور مباشرة${refTag} (الحد الأقصى 10).`,
+      ur: `یورپی یونین کاسمیٹکس ضابطہ ${aw} II: براہ راست ممنوع کاسمیٹک جزو${refTag} (زیادہ سے زیادہ اسکور 10)۔`
+    }[targetLang] || engineText.bannedGeneric;
+  }
+  const cosingRestrMatch = d.match(/^AB Kozmetik Yönetmeliği Ek ([^\s]+) kapsamında koşul\/limit kısıtlamasına tabi bileşen(?:\s*\(([^)]+)\))?\.$/);
+  if (cosingRestrMatch) {
+    const annexRef = cosingRestrMatch[1] || 'III';
+    const refTag = cosingRestrMatch[2] ? ` (${cosingRestrMatch[2]})` : '';
+    const aw = ANNEX_WORD_I18N[targetLang] || 'Annex';
+    return {
+      en: `EU Cosmetics Regulation ${aw} ${annexRef}: Ingredient subject to conditions/concentration limits${refTag}.`,
+      de: `EU-Kosmetikverordnung ${aw} ${annexRef}: Inhaltsstoff mit Anwendungsbedingungen/-grenzwerten${refTag}.`,
+      fr: `Règlement Cosmétique UE ${aw} ${annexRef} : Ingrédient soumis à des conditions ou limites d'utilisation${refTag}.`,
+      es: `Reglamento Cosmético UE ${aw} ${annexRef}: Ingrediente sujeto a condiciones o límites de uso${refTag}.`,
+      id: `Regulasi Kosmetik UE ${aw} ${annexRef}: Bahan tunduk pada syarat/batas konsentrasi${refTag}.`,
+      ms: `Peraturan Kosmetik EU ${aw} ${annexRef}: Bahan tertakluk kepada syarat/had kepekatan${refTag}.`,
+      ru: `Косметический регламент ЕС ${aw} ${annexRef}: Ингредиент с условиями или предельными концентрациями${refTag}.`,
+      ar: `لائحة مستحضرات التجميل الأوروبية ${aw} ${annexRef}: مكوّن خاضع لشروط أو حدود تركيز${refTag}.`,
+      ur: `یورپی یونین کاسمیٹکس ضابطہ ${aw} ${annexRef}: شرائط یا ارتکاز کی حدود کے تابع جزو${refTag}۔`
+    }[targetLang] || engineText.restrictedGeneric;
+  }
+  const cosingPermMatch = d.match(/^AB CosIng veritabanında kayıtlı izinli kozmetik bileşen(?:\s*\(([^)]+)\))?\.$/);
+  if (cosingPermMatch) {
+    const refTag = cosingPermMatch[1] ? ` (${cosingPermMatch[1]})` : '';
+    return {
+      en: `Permitted cosmetic ingredient listed in the EU CosIng database${refTag}.`,
+      de: `Zulässiger kosmetischer Inhaltsstoff aus der EU-CosIng-Datenbank${refTag}.`,
+      fr: `Ingrédient cosmétique autorisé répertorié dans la base EU CosIng${refTag}.`,
+      es: `Ingrediente cosmético permitido registrado en la base de datos EU CosIng${refTag}.`,
+      id: `Bahan kosmetik yang diizinkan dan terdaftar dalam basis data CosIng UE${refTag}.`,
+      ms: `Bahan kosmetik yang dibenarkan dan berdaftar dalam pangkalan data CosIng EU${refTag}.`,
+      ru: `Разрешённый косметический ингредиент, зарегистрированный в базе EU CosIng${refTag}.`,
+      ar: `مكوّن تجميلي مسموح ومُسجَّل في قاعدة بيانات CosIng الأوروبية${refTag}.`,
+      ur: `یورپی یونین CosIng ڈیٹا بیس میں درج مجاز کاسمیٹک جزو${refTag}۔`
+    }[targetLang] || engineText.permittedGeneric;
+  }
+  return null;
+}
+
+function isBodyLotionContext(explicitAppType, appType, rawText) {
+  return (
+    explicitAppType === 'body_lotion' ||
+    appType === 'body_lotion' ||
+    /\b(body[\s_-]*lotion|vücut\s+losyonu|vucut\s+losyonu|body\s+cream|body\s+milk|körperlotion|lait\s+corps|loción\s+corporal|losion\s+tubuh|лосьон\s+для\s+тела|لوشن\s+الجسم)\b/iu.test(rawText || '')
+  );
+}
+
+function stripNegatedTargets(rawStr) {
+  return String(rawStr || '')
+    .replace(/[\p{L}]+[\s\-]*(?:free|frei)(?=[^\p{L}]|$)/giu, ' ')
+    .replace(/(?:free\s+(?:of|from)|without|ohne|sans|sin|senza|tanpa|bebas|خالي\s+من|خالٍ\s+من|بدون|بغیر|без)\s+[\p{L}]+/giu, ' ')
+    .replace(/[\p{L}]+(?:siz|sız|suz|süz)(?=[^\p{L}]|$)/giu, ' ')
+    .replace(/[\p{L}]+\s+(?:içermez|icermez|yoktur|bulunmaz|içermeyen|icermeyen)(?=[^\p{L}]|$)/giu, ' ');
+}
+
+const EU_14_FOOD_ALLERGENS = [
+  { id: 'gluten', names: /(?:^|[^\p{L}\p{N}])(wheat|buğday|bugday|gluten|weizen|weizenmehl|roggenmehl|gerstenmehl|dinkelmehl|hafermehl|bl[ée]|farine\s+de\s+(?:bl[ée]|seigle|froment|kamut|[ée]peautre)|farine\s+d['’](?:orge|avoine)|trigo|harina\s+de\s+(?:trigo|cebada|centeno|avena)|gandum|tepung\s+(?:terigu|gandum|barli)|пшениц[а-я]*|пшеничн[а-я]*\s+мук[аи]|ржан[а-я]*\s+мук[аи]|ячменн[а-я]*\s+мук[аи]|овсян[а-я]*\s+мук[аи]|دقيق\s+(?:القمح|الشعير|الجاودار|الشوفان)|قمح|گندم|گندم\s+کا\s+آٹا|میدہ|arpa|barley|çavdar|cavdar|rye|oats|oat|yulaf|spelt|kamut|(?:wheat|rye|barley|spelt|oat)\s+flour|(?:buğday|bugday|çavdar|cavdar|arpa|yulaf|siyez)\s+unu)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Gluten / Buğday' },
+  { id: 'crustaceans', names: /(?:^|[^\p{L}\p{N}])(crustacean[s]?|kabuklu[lar]*|shrimp|karides|udang|prawn[s]?|crab|yengeç|kepiting|ketam|lobster|ıstakoz|istakoz|crawfish|crayfish|langoustine[s]?|krill|crevette[s]?|krabbe[n]?|garnelen|langostinos|mariscos|homard|langosta|ракообразн[а-я]*|креветк[а-я]*|омар|лангуст|قشريات|كركند|جھینگا)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Kabuklular' },
+  { id: 'egg', names: /(?:^|[^\p{L}\p{N}])(egg[s]?|yumurta|oeuf[s]?|ei|eier|huevo[s]?|uovo|telur|яйц[а-я]*|بيض|انڈہ|انڈے)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Yumurta' },
+  { id: 'fish', names: /(?:^|[^\p{L}\p{N}])(fish|balık|balik|poisson|fisch|pescado|pesce|ikan|рыб[а-я]*|سمك|مچھلی|cod|morina|kabeljau|cabillaud|bacalao|merluzzo|треск[аи]|salmon|somon|lachs|saumon|salmón|лосос[ья]|سلمون|tuna|ton\s+balığ[ıi]|thunfisch|thon|atún|tonno|тунец|تونة|anchov(?:y|ies)|hamsi|sardelle|anchois|anchoa|sardine[s]?|sardalya|mackerel|uskumru|makrele|maquereau|caballa|trout|alabalık|forelle|truite|trucha|haddock|pollock|halibut|herring|ringa)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Balık' },
+  { id: 'peanut', names: /(?:^|[^\p{L}\p{N}])(peanut[s]?|yer\s*fıst[ıi]ğ[ıi]|arachide[s]?|erdnuss|erdnüsse|cacahuete[s]?|cacahuate[s]?|kacang\s+tanah|арахис|فول\s+سوداني|مونگ\s*پھلی)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Yer Fıstığı' },
+  { id: 'soy', names: /(?:^|[^\p{L}\p{N}])(soy|soya|soja|kedelai|соя|соев[а-я]*|صويا|سویا|sojalecithin|soybean[s]?)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Soya' },
+  { id: 'milk', names: /(?:^|[^\p{L}\p{N}])(milk|süt|sut|lait|leche|milch|latte|susu|молок[а-я]*|حليب|دودھ|whey|casein|lactose|laktoz|kazein|peynir\s*altı\s*suyu)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Süt / Süt Ürünleri' },
+  { id: 'tree_nuts', names: /(?:^|[^\p{L}\p{N}])(hazelnut[s]?|haseln[üu]ss[e]?|fındık|findik|noisette[s]?|avellana[s]?|фундук|بندق|ہیزل|almond[s]?|badem|mandel[n]?|amande[s]?|almendra[s]?|миндаль|لوز|بادام|walnut[s]?|ceviz|walnuss|noix|nuez|nueces|грецк[а-я]*\s*орех|جوز|اخروٹ|cashew[s]?|kaju|pistachio[s]?|antep\s*fıstığı|fıstık|fistik|fistigi|pecan[s]?|pekan|macadamia)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Sert Kabuklu Yemişler (Fındık/Badem)' },
+  { id: 'celery', names: /(?:^|[^\p{L}\p{N}])(celery|kereviz|sellerie|céleri|celeri|apio|sedano|seleri|сельдерей|كرفس|اجوائن)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Kereviz' },
+  { id: 'mustard', names: /(?:^|[^\p{L}\p{N}])(mustard|hardal|senf|moutarde|mostaza|senape|горчиц[а-я]*|خردل|رائی)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Hardal' },
+  { id: 'sesame', names: /(?:^|[^\p{L}\p{N}])(sesame|susam|tahin|tahini|sésame|sesam|sésamo|bijan|wijen|кунжут|سمسم|تل)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Susam' },
+  { id: 'sulphites', names: /(?:^|[^\p{L}\p{N}])(sulphite[s]?|sulfite[s]?|bisulphite[s]?|bisulfite[s]?|metabisulphite[s]?|metabisulfite[s]?|pyrosulphite[s]?|pyrosulfite[s]?|hydrosulphite[s]?|hydrosulfite[s]?|disulphite[s]?|disulfite[s]?|sülfit|sulfit|bisülfit|bisulfit|metabisülfit|metabisulfit|metabisulfito|bisulfito|schwefeldioxid|dioxyde\s+de\s+soufre|dióxido\s+de\s+azufre|диоксид\s+серы|метабисульфит|бисульфит|сульфит[а-я]*|كبريتيت|ميتابيسلفيت|سلفائٹ|میٹابیسلفائٹ|بیسلفائٹ|e220|e221|e222|e223|e224|e226|e227|e228)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Sülfitler' },
+  { id: 'lupin', names: /(?:^|[^\p{L}\p{N}])(lupin[e]?|ac[ıi]\s*bakla|lüpen|lupini|altramuz|люпин|ترمس|لوپن)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Acıbakla (Lüpen)' },
+  { id: 'molluscs', names: /(?:^|[^\p{L}\p{N}])(mollusc[s]?|mollusk[s]?|yumuşakça[lar]*|weichtier[e]?|mollusque[s]?|molusco[s]?|istiridye|midye|kalamar|ahtapot|mussel[s]?|oyster[s]?|squid|octopus|clam[s]?|scallop[s]?|cockle[s]?|abalone|escargot|almeja|vongole|moule[s]?|pulpo|calamar|cumi|sotong|kerang|tiram|миди[ия]|кальмар|осьминог|устриц[аы]|رخويات|صدف)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Yumuşakçalar' }
+];
+
+const UMBRELLA_RULE_IDS = new Set([
+  'safe_alcohol_like_non_ethanol',
+  'common_whole_food_ingredients',
+  'non_comedogenic_botanical_oils_butters',
+  'soothing_botanical_extracts',
+  'safe_amino_acids_peptides_ferments',
+  'safe_vitamins_minerals_salts',
+  'safe_emollients_silicones_polymers',
+  'safe_surfactants_cleansers',
+  'safe_food_acids_stabilizers_spices'
+]);
+
+function escapeRegexLiteral(str) {
+  return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+const WATCH_STEM_INDEX = new Map();
+function registerWatchStemGroup(rawNames) {
+  const names = rawNames.filter(Boolean).map((x) => String(x).trim().toLowerCase()).filter(Boolean);
+  if (names.length === 0) return;
+  const longStems = [];
+  for (const n of names) {
+    if (n.length >= 3) {
+      longStems.push(n, foldTurkish(n));
+    }
+  }
+  const uniqueLongStems = Array.from(new Set(longStems)).filter((s) => s.length >= 2);
+  if (uniqueLongStems.length === 0) return;
+  for (const n of names) {
+    const keys = [n, foldTurkish(n)];
+    for (const key of keys) {
+      if (!key) continue;
+      let bucket = WATCH_STEM_INDEX.get(key);
+      if (!bucket) {
+        bucket = [];
+        WATCH_STEM_INDEX.set(key, bucket);
+      }
+      bucket.push(uniqueLongStems);
+    }
+  }
+}
+
+for (const sub of substancesData.substances || []) {
+  if (UMBRELLA_RULE_IDS.has(sub.id)) continue;
+  const aliases = Array.isArray(sub.aliases) ? sub.aliases : [];
+  registerWatchStemGroup([sub.name, sub.e_code, sub.ci_code, ...aliases]);
+}
+for (const hr of halalData.rules || []) {
+  if (UMBRELLA_RULE_IDS.has(hr.id) || hr.category === 'SAFE_NON_ETHANOL') continue;
+  const aliases = Array.isArray(hr.aliases) ? hr.aliases : [];
+  const codes = Array.isArray(hr.codes) ? hr.codes : [];
+  registerWatchStemGroup([hr.canonical, ...codes, ...aliases]);
+}
+
+const WATCH_TERM_CACHE = new Map();
+const MAX_WATCH_TERM_CACHE = 1000;
+
+function expandWatchTermStems(watchTerm) {
+  const wLower = String(watchTerm || '').trim().toLowerCase();
+  const wFold = foldTurkish(wLower);
+  const stems = new Set([wLower, wFold].filter(Boolean));
+  const buckets = [];
+  const exactBucket = WATCH_STEM_INDEX.get(wLower);
+  if (exactBucket) buckets.push(...exactBucket);
+  if (wFold && wFold !== wLower) {
+    const foldBucket = WATCH_STEM_INDEX.get(wFold);
+    if (foldBucket) buckets.push(...foldBucket);
+  }
+  for (const group of buckets) {
+    for (const s of group) {
+      stems.add(s);
+    }
+  }
+  return Array.from(stems).filter((s) => s.length >= 2);
+}
+
+function buildNegationRegexes(watchStems) {
+  const cleanStems = Array.from(new Set((watchStems || []).map((s) => String(s || '').trim()).filter((s) => s.length >= 2)))
+    .sort((a, b) => b.length - a.length);
+  if (cleanStems.length === 0) return { negSuffixRe: null, negPrefixRe: null };
+  const alt = cleanStems.map(escapeRegexLiteral).join('|');
+  return {
+    negSuffixRe: new RegExp(`(?<![\\p{L}\\p{N}])(?:${alt})[\\s\\-]*(?:free|frei|siz|sız|suz|süz|içermez|icermez)(?![\\p{L}\\p{N}])`, 'iu'),
+    negPrefixRe: new RegExp(`(?<![\\p{L}\\p{N}])(?:without|no|ohne|sans|sin|tanpa|bebas|free\\s+of|free\\s+from|libre\\s+de|خالي\\s+من|خالٍ\\s+من|بدون|بغیر|без)\\s+(?:${alt})(?![\\p{L}\\p{N}])`, 'iu')
+  };
+}
+
+function getPreparedWatchTerm(watchTerm) {
+  const key = String(watchTerm || '').trim().toLowerCase();
+  const cached = WATCH_TERM_CACHE.get(key);
+  if (cached) return cached;
+  const lowerWatch = key;
+  const normWatch = normalizeToken(watchTerm);
+  const foldWatch = foldTurkish(lowerWatch);
+  const watchStems = expandWatchTermStems(lowerWatch);
+  const { negSuffixRe, negPrefixRe } = buildNegationRegexes(watchStems);
+  const wordRe = foldWatch.length >= 3 ? new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegexLiteral(foldWatch)}(?![\\p{L}\\p{N}])`, 'iu') : null;
+  const wordReRaw = foldWatch.length >= 3 ? new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegexLiteral(lowerWatch)}(?![\\p{L}\\p{N}])`, 'iu') : null;
+  const entry = { lowerWatch, normWatch, foldWatch, watchStems, negSuffixRe, negPrefixRe, wordRe, wordReRaw };
+  if (WATCH_TERM_CACHE.size >= MAX_WATCH_TERM_CACHE) {
+    const oldestKey = WATCH_TERM_CACHE.keys().next().value;
+    if (oldestKey !== undefined) WATCH_TERM_CACHE.delete(oldestKey);
+  }
+  WATCH_TERM_CACHE.set(key, entry);
+  return entry;
+}
+
+function isWatchTermNegatedInRaw(rawLower, rawFold, prepOrStems) {
+  if (!rawLower) return false;
+  const { negSuffixRe, negPrefixRe } = Array.isArray(prepOrStems)
+    ? buildNegationRegexes(prepOrStems)
+    : prepOrStems;
+  if (negSuffixRe && (negSuffixRe.test(rawLower) || negSuffixRe.test(rawFold))) return true;
+  if (negPrefixRe && (negPrefixRe.test(rawLower) || negPrefixRe.test(rawFold))) return true;
+  return false;
+}
+
+const HAS_WATCH_NEGATION_HINT_RE = /free|frei|siz|sız|suz|süz|içermez|icermez|without|\bno\b|ohne|sans|sin|tanpa|bebas|libre|خالي|خال|بدون|بغیر|без/iu;
+
+const ENTITY_ALIAS_CACHE = new WeakMap();
+function getEntityAliasData(entity) {
+  if (!entity || typeof entity !== 'object') return null;
+  const cached = ENTITY_ALIAS_CACHE.get(entity);
+  if (cached) return cached;
+  const nameStr = entity.name || entity.canonical || '';
+  const nameLower = nameStr ? String(nameStr).trim().toLowerCase() : '';
+  const foldName = nameLower ? foldTurkish(nameLower) : '';
+  const rawAliases = Array.isArray(entity.aliases) ? entity.aliases : [];
+  const lowerAliases = rawAliases.map((a) => String(a || '').toLowerCase()).filter(Boolean);
+  const foldedAliases = lowerAliases.map((a) => foldTurkish(a));
+  const data = { nameLower, foldName, lowerAliases, foldedAliases };
+  ENTITY_ALIAS_CACHE.set(entity, data);
+  return data;
+}
+
 /**
  * Detects OCR character corruptions in E-codes and CI codes (e.g. "C1 7547O" -> "CI 75470", "E12O" -> "E120").
  * Also supports Cyrillic 'Е' (U+0415 / U+0435) on Russian labels without false OCR corruption alert.
@@ -198,13 +1373,17 @@ export function detectCodeOcrCandidate(rawToken) {
 function extractEmbeddedCodeAndName(str) {
   if (!str) return [];
   const results = [];
-  const trailingCode = str.match(/^(.+?)\s+([EЕ]\s*[-:]?\s*[0-9]{3,4}[a-f]?)$/iu);
-  if (trailingCode) {
-    results.push(trailingCode[1].trim(), trailingCode[2].replace(/^[Ее]/u, 'E').replace(/\s+/g, '').toUpperCase());
+  if (/\d[a-f]?$/iu.test(str)) {
+    const trailingCode = str.match(/^(.+\S)\s+([EЕ]\s*[-:]?\s*[0-9]{3,4}[a-f]?)$/iu);
+    if (trailingCode) {
+      results.push(trailingCode[1].trim(), trailingCode[2].replace(/^[Ее]/u, 'E').replace(/\s+/g, '').toUpperCase());
+    }
   }
-  const leadingCode = str.match(/^([EЕ]\s*[-:]?\s*[0-9]{3,4}[a-f]?)\s+(.+?)$/iu);
-  if (leadingCode) {
-    results.push(leadingCode[1].replace(/^[Ее]/u, 'E').replace(/\s+/g, '').toUpperCase(), leadingCode[2].trim());
+  if (/^[EЕ]/iu.test(str)) {
+    const leadingCode = str.match(/^([EЕ]\s*[-:]?\s*[0-9]{3,4}[a-f]?)\s+(.+)$/iu);
+    if (leadingCode) {
+      results.push(leadingCode[1].replace(/^[Ее]/u, 'E').replace(/\s+/g, '').toUpperCase(), leadingCode[2].trim());
+    }
   }
   return results;
 }
@@ -234,7 +1413,7 @@ export function parseIngredientList(rawText) {
       const joined = `${p1}${p2}`;
       const f = foldTurkish(joined);
       const cosKey = joined.toLowerCase().replace(/[\s\-_/]+/g, ' ').trim();
-      if (substanceByAlias.has(f) || halalByAlias.has(f) || freeSugarByAlias.has(f) || rapidCarbByAlias.has(f) || (cosingData && cosingData[cosKey])) {
+      if (substanceByAlias.has(f) || halalByAlias.has(f) || freeSugarByAlias.has(f) || rapidCarbByAlias.has(f) || (cosingData && Object.hasOwn(cosingData, cosKey))) {
         return joined;
       }
       return `${p1}-${p2}`;
@@ -271,7 +1450,7 @@ export function parseIngredientList(rawText) {
   rawTokens.forEach((tok) => {
     // Strip trailing dots/asterisks/Urdu full stop and numeric percentages / ppm / mg/kg like (%13), (13.5%), (20 ppm), %13, 13%, 20 ppm, ٪١٣
     let cleanedTok = tok
-      .replace(/\(\s*[%٪]?\s*[\d\u0660-\u0669\u06F0-\u06F9]+(?:[.,٫][\d\u0660-\u0669\u06F0-\u06F9]+)?\s*(?:[%٪]|ppm|mg\s*\/\s*kg)?\s*\)/giu, '')
+      .replace(/\(\s*(?:[%٪]\s*)?[\d\u0660-\u0669\u06F0-\u06F9]+(?:[.,٫][\d\u0660-\u0669\u06F0-\u06F9]+)?\s*(?:(?:[%٪]|ppm|mg\s*\/\s*kg)\s*)?\)/giu, '')
       .replace(/(?:^|\s)[%٪]?[\d\u0660-\u0669\u06F0-\u06F9]+(?:[.,٫][\d\u0660-\u0669\u06F0-\u06F9]+)?\s*(?:[%٪]|ppm\b|mg\s*\/\s*kg\b)(?=\s|$)/giu, '')
       .replace(/[*•.۔]+$/u, '')
       .trim();
@@ -287,7 +1466,17 @@ export function parseIngredientList(rawText) {
       }
     }
 
-    const parenMatch = cleanedTok.match(/^(.+?)\s*\((.+?)\)$/);
+    let parenMatch = null;
+    if (cleanedTok.endsWith(')')) {
+      const openIdx = cleanedTok.indexOf('(');
+      if (openIdx > 0 && openIdx < cleanedTok.length - 2) {
+        const before = cleanedTok.slice(0, openIdx).trim();
+        const inside = cleanedTok.slice(openIdx + 1, -1);
+        if (before && inside) {
+          parenMatch = [cleanedTok, before, inside];
+        }
+      }
+    }
     let primary = cleanedTok;
     let secondary = null;
     if (parenMatch) {
@@ -931,38 +2120,40 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
     return `${localLabel} (${rawToken})`;
   };
 
+  if (entity.id === 'alpha_arbutin') {
+    const map = {
+      tr: 'Alfa-Arbutin',
+      en: 'Alpha-Arbutin',
+      ar: 'ألفا أربوتين',
+      de: 'Alpha-Arbutin',
+      fr: 'Alpha-Arbutine',
+      id: 'Alfa-Arbutin',
+      ms: 'Alfa-Arbutin',
+      es: 'Alfa-Arbutina',
+      ru: 'Альфа-арбутин',
+      ur: 'الفا اربوٹین'
+    };
+    return withRawSuffix(map[lang] || 'Alpha-Arbutin');
+  }
+
+  if (entity.id === 'arbutin') {
+    const map = {
+      tr: 'Arbutin',
+      en: 'Arbutin',
+      ar: 'أربوتين',
+      de: 'Arbutin',
+      fr: 'Arbutine',
+      id: 'Arbutin',
+      ms: 'Arbutin',
+      es: 'Arbutina',
+      ru: 'Арбутин',
+      ur: 'اربوٹین'
+    };
+    return withRawSuffix(map[lang] || 'Arbutin');
+  }
+
   if (entity.id === 'tranexamic_azelaic_arbutin') {
-    if (/(?:^|[^\p{L}\p{N}])(alpha[\s\-]*arbutin|alfa[\s\-]*arbutin|ألفا[\s\-]*أربوتين|альфа[\s\-]*арбутин|الفا[\s\-]*اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
-      const map = {
-        tr: 'Alfa-Arbutin',
-        en: 'Alpha-Arbutin',
-        ar: 'ألفا أربوتين',
-        de: 'Alpha-Arbutin',
-        fr: 'Alpha-Arbutine',
-        id: 'Alfa-Arbutin',
-        ms: 'Alfa-Arbutin',
-        es: 'Alfa-Arbutina',
-        ru: 'Альфа-арбутин',
-        ur: 'الفا اربوٹین'
-      };
-      return withRawSuffix(map[lang] || 'Alpha-Arbutin');
-    }
-    if (/(?:^|[^\p{L}\p{N}])(arbutin|beta[\s\-]*arbutin|أربوتين|арбутин|اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
-      const map = {
-        tr: 'Arbutin',
-        en: 'Arbutin',
-        ar: 'أربوتين',
-        de: 'Arbutin',
-        fr: 'Arbutine',
-        id: 'Arbutin',
-        ms: 'Arbutin',
-        es: 'Arbutina',
-        ru: 'Арбутин',
-        ur: 'اربوٹین'
-      };
-      return withRawSuffix(map[lang] || 'Arbutin');
-    }
-    if (/(?:^|[^\p{L}\p{N}])(tranexamic\s+acid|traneksamik\s+asit|tranexamsäure|acide\s+tranexamique|ácido\s+tranexámico|транексамовая\s+кислота|حمض\s+الترانيكساميك|ترانيكساميك|ٹرانیکسامک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
+    if (/(?:^|[^\p{L}\p{N}])(tranexamic\s+acid|traneksamik\s+asit|tranexamsäure|acide\s+tranexamique|ácido\s+tranexámico|asam\s+traneksamat|asid\s+traneksamik|транексамовая\s+кислота|حمض\s+الترانيكساميك|ترانيكساميك|ٹرانیکسامک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
       const map = {
         tr: 'Traneksamik Asit',
         en: 'Tranexamic Acid',
@@ -977,7 +2168,7 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
       };
       return withRawSuffix(map[lang] || 'Tranexamic Acid');
     }
-    if (/(?:^|[^\p{L}\p{N}])(azelaic\s+acid|azelaik\s+asit|azelainsäure|acide\s+azélaïque|ácido\s+azelaico|азелаиновая\s+кислота|حمض\s+الأزيليك|ازیلائک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
+    if (/(?:^|[^\p{L}\p{N}])(azelaic\s+acid|azelaik\s+asit|azelainsäure|acide\s+azélaïque|ácido\s+azelaico|asam\s+azelaic|asid\s+azelaik|азелаиновая\s+кислота|حمض\s+الأزيليك|ازیلائک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawToken)) {
       const map = {
         tr: 'Azelaik Asit',
         en: 'Azelaic Acid',
@@ -993,6 +2184,70 @@ function resolveLocalizedDisplayName(rawToken, sub, halalRule, sugar, rapidCarb,
       return withRawSuffix(map[lang] || 'Azelaic Acid');
     }
     return rawToken;
+  }
+
+  if (entity.id === 'triclosan') {
+    const map = {
+      tr: 'Triklosan',
+      en: 'Triclosan',
+      ar: 'تريكلوسان',
+      de: 'Triclosan',
+      fr: 'Triclosan',
+      id: 'Triclosan',
+      ms: 'Triclosan',
+      es: 'Triclosán',
+      ru: 'Триклозан',
+      ur: 'ٹرائیکلوسان'
+    };
+    return withRawSuffix(map[lang] || 'Triclosan');
+  }
+
+  if (entity.id === 'triclocarban') {
+    const map = {
+      tr: 'Triklokarban',
+      en: 'Triclocarban',
+      ar: 'تريكلوكاربان',
+      de: 'Triclocarban',
+      fr: 'Triclocarban',
+      id: 'Triclocarban',
+      ms: 'Triclocarban',
+      es: 'Triclocarbán',
+      ru: 'Триклокарбан',
+      ur: 'ٹرائیکلوکاربن'
+    };
+    return withRawSuffix(map[lang] || 'Triclocarban');
+  }
+
+  if (entity.id === 'genistein') {
+    const map = {
+      tr: 'Genistein',
+      en: 'Genistein',
+      ar: 'جينيستين',
+      de: 'Genistein',
+      fr: 'Génistéine',
+      id: 'Genistein',
+      ms: 'Genistein',
+      es: 'Genisteína',
+      ru: 'Генистеин',
+      ur: 'جینیسٹین'
+    };
+    return withRawSuffix(map[lang] || 'Genistein');
+  }
+
+  if (entity.id === 'daidzein') {
+    const map = {
+      tr: 'Daidzein',
+      en: 'Daidzein',
+      ar: 'دايدزين',
+      de: 'Daidzein',
+      fr: 'Daidzéine',
+      id: 'Daidzein',
+      ms: 'Daidzein',
+      es: 'Daidzeína',
+      ru: 'Даидзеин',
+      ur: 'ڈائیڈزین'
+    };
+    return withRawSuffix(map[lang] || 'Daidzein');
   }
 
   if (entity.id === 'kojic_acid') {
@@ -1264,6 +2519,7 @@ export function evaluateProduct({
   } else if (!Array.isArray(userProfiles)) {
     userProfiles = [];
   }
+  userProfiles = userProfiles.filter((p) => typeof p === 'string' && ALLOWED_PROFILES.has(p));
 
   const explicitAppType = (productForm || applicationType || '').toString().toLowerCase().replace(/-/g, '_').trim();
   const effectiveAppType = (explicitAppType || detectApplicationType(rawText, productType) || '').toLowerCase().replace(/-/g, '_').trim();
@@ -1381,7 +2637,7 @@ export function evaluateProduct({
       // CosIng Lookup for this specific candidate (Annex II / III precedence)
       if (productType === 'cosmetic' && cosingData) {
         const cosKey = candidateStr.toLowerCase().replace(/[\s\-_/]+/g, ' ').trim();
-        const found = cosingData[cosKey];
+        const found = Object.hasOwn(cosingData, cosKey) ? cosingData[cosKey] : null;
         if (found) {
           const cosSub = makeCosingSubstance(found);
           const ANNEX_II_REFINING_EXEMPTIONS = new Set(['mineral_oils_petrolatum']);
@@ -1528,14 +2784,7 @@ export function evaluateProduct({
     // Resolve productType-dependent status (e.g. Titanium Dioxide E171 vs CI 77891, Fragrance/Vanillin in Food, Phosphates in Cosmetic)
     let effectiveEuStatus = sub.eu_status;
     let effectiveSeverity = sub.severity;
-    let effectiveDetail =
-      lang === 'tr'
-        ? sub.eu_detail
-        : effectiveEuStatus === 'yasak'
-        ? et.bannedGeneric
-        : effectiveSeverity !== 'bilgi'
-        ? et.restrictedGeneric
-        : et.permittedGeneric;
+    let effectiveDetail = sub.eu_detail;
 
     const appType = effectiveAppType;
 
@@ -1696,6 +2945,130 @@ export function evaluateProduct({
         effectiveSeverity = 'yuksek';
         effectiveDetail = 'AB 1223/2009 Ek III: Saç boyalarında azami kısıt sınırını aşıyor; kullanıma hazır karışımda bu konsantrasyonda kullanımı YASAKTIR.';
       }
+    } else if (sub.id === 'alpha_arbutin') {
+      const conc = parseConcentration(obs.raw);
+      const isBodyLotion = isBodyLotionContext(explicitAppType, appType, rawText);
+      if ((isBodyLotion && conc !== null && conc > 0.5) || (!isBodyLotion && conc !== null && conc > 2.0)) {
+        effectiveEuStatus = 'yasak';
+        effectiveSeverity = 'yuksek';
+        effectiveDetail = isBodyLotion
+          ? 'AB 2024/996 Ek III/377: Alpha-Arbutin vücut losyonlarında azami %0.5 sınırıyla izinlidir; bu sınırın üzerindeki kullanım YASAKTIR.'
+          : 'AB 2024/996 Ek III/377: Alpha-Arbutin yüz kremlerinde azami %2.0 sınırıyla izinlidir; bu sınırın üzerindeki kullanım YASAKTIR.';
+      } else {
+        effectiveEuStatus = 'kisitli';
+        effectiveSeverity = 'dusuk';
+      }
+    } else if (sub.id === 'arbutin') {
+      const conc = parseConcentration(obs.raw);
+      const isBodyLotion = isBodyLotionContext(explicitAppType, appType, rawText);
+      if (isBodyLotion || (conc !== null && conc > 7.0)) {
+        effectiveEuStatus = 'yasak';
+        effectiveSeverity = 'yuksek';
+        effectiveDetail = isBodyLotion
+          ? 'AB 2024/996 Ek III/378: Arbutin yalnızca yüz kremlerinde (%7.0) izinlidir; vücut losyonlarında kullanımı YASAKTIR.'
+          : 'AB 2024/996 Ek III/378: Arbutin yüz kremlerinde azami %7.0 sınırıyla izinlidir; bu sınırın üzerindeki kullanım YASAKTIR.';
+      } else {
+        effectiveEuStatus = 'kisitli';
+        effectiveSeverity = 'dusuk';
+      }
+    } else if (sub.id === 'triclosan') {
+      const conc = parseConcentration(obs.raw);
+      const isBannedForm =
+        explicitAppType === 'mouthwash' ||
+        explicitAppType === 'oral_rinse' ||
+        explicitAppType === 'spray' ||
+        appType === 'mouthwash' ||
+        appType === 'oral_rinse' ||
+        appType === 'spray' ||
+        /\b(mouthwash|mouth\s*wash|oral\s*rinse|gargara|ağız\s*çalkalama|agiz\s*calkalama|spray|sprey|aerosol)\b/iu.test(rawText);
+      const isUnder3Toothpaste =
+        /\b(toothpaste|diş\s*macunu|dis\s*macunu)\b/iu.test(rawText) &&
+        /\b(under\s*3|0[\s\-]*3|<\s*3|3\s*yaş\s*altı|3\s*yas\s*alti|baby|bebek|toddler)\b/iu.test(rawText);
+      if (isBannedForm || isUnder3Toothpaste || (conc !== null && conc > 0.3)) {
+        effectiveEuStatus = 'yasak';
+        effectiveSeverity = 'yuksek';
+        effectiveDetail = isBannedForm || isUnder3Toothpaste
+          ? 'AB 2024/996 Ek V/25: Triclosan gargaralarda (mouthwash), sprey/aerosollerde ve 3 yaş altı çocuk diş macunlarında YASAKTIR.'
+          : 'AB 2024/996 Ek V/25: Triclosan izinli kozmetik ürünlerde azami %0.3 sınırıyla izinlidir; bu sınırın üzerindeki kullanım YASAKTIR.';
+      } else {
+        effectiveEuStatus = 'kisitli';
+        effectiveSeverity = 'orta';
+      }
+    } else if (sub.id === 'triclocarban') {
+      const conc = parseConcentration(obs.raw);
+      const isMouthwash =
+        explicitAppType === 'mouthwash' ||
+        explicitAppType === 'oral_rinse' ||
+        appType === 'mouthwash' ||
+        appType === 'oral_rinse' ||
+        /\b(mouthwash|mouth\s*wash|oral\s*rinse|gargara|ağız\s*çalkalama|agiz\s*calkalama)\b/iu.test(rawText);
+      const isUnder6Toothpaste =
+        /\b(toothpaste|diş\s*macunu|dis\s*macunu)\b/iu.test(rawText) &&
+        /\b(under\s*6|0[\s\-]*6|<\s*6|6\s*yaş\s*altı|6\s*yas\s*alti|under\s*3|0[\s\-]*3|<\s*3|3\s*yaş\s*altı|baby|bebek|toddler|kids|çocuk)\b/iu.test(rawText);
+      const labelSaysRinseOff = /\b(rinse[_\s-]?off|shampoo|cleanser|wash[_\s-]?off|soap|sabun|şampuan)\b/iu.test(rawText);
+      const isRinseOff = explicitAppType ? explicitAppType === 'rinse_off' : (appType === 'rinse_off' || labelSaysRinseOff);
+      const isNonPreservativeRinseOff =
+        isRinseOff &&
+        /\b(non[\s\-]*preservative|koruyucu[\s\-]*dışı|koruyucu[\s\-]*disi|amaç\s*dışı|soap|sabun)\b/iu.test(rawText);
+      const maxLimit = isNonPreservativeRinseOff ? 1.5 : 0.2;
+      if (isMouthwash || isUnder6Toothpaste || (conc !== null && conc > maxLimit)) {
+        effectiveEuStatus = 'yasak';
+        effectiveSeverity = 'yuksek';
+        effectiveDetail = isMouthwash || isUnder6Toothpaste
+          ? 'AB 2024/996 Ek V/23 & Ek III: Triclocarban gargaralarda (mouthwash) ve 6 yaş altı çocuk diş macunlarında YASAKTIR.'
+          : `AB 2024/996 Ek V/23 & Ek III: Triclocarban bu ürün tipi için azami %${maxLimit} sınırını aşıyor; kullanımı YASAKTIR.`;
+      } else {
+        effectiveEuStatus = 'kisitli';
+        effectiveSeverity = 'orta';
+      }
+    } else if (sub.id === 'genistein') {
+      const conc = parseConcentration(obs.raw);
+      if (conc !== null && conc > 0.007) {
+        effectiveEuStatus = 'yasak';
+        effectiveSeverity = 'yuksek';
+        effectiveDetail = 'AB 2024/996 Ek III/373: Genistein kozmetik ürünlerde azami %0.007 sınırıyla izinlidir; bu sınırın üzerindeki kullanım YASAKTIR.';
+      } else {
+        effectiveEuStatus = 'kisitli';
+        effectiveSeverity = 'dusuk';
+      }
+    } else if (sub.id === 'daidzein') {
+      const conc = parseConcentration(obs.raw);
+      if (conc !== null && conc > 0.02) {
+        effectiveEuStatus = 'yasak';
+        effectiveSeverity = 'yuksek';
+        effectiveDetail = 'AB 2024/996 Ek III/374: Daidzein kozmetik ürünlerde azami %0.02 sınırıyla izinlidir; bu sınırın üzerindeki kullanım YASAKTIR.';
+      } else {
+        effectiveEuStatus = 'kisitli';
+        effectiveSeverity = 'dusuk';
+      }
+    } else if (sub.id === 'kojic_acid') {
+      const conc = parseConcentration(obs.raw);
+      const isBodyLotion = isBodyLotionContext(explicitAppType, appType, rawText);
+      if (isBodyLotion || (conc !== null && conc > 1.0)) {
+        effectiveEuStatus = 'yasak';
+        effectiveSeverity = 'yuksek';
+        effectiveDetail = isBodyLotion
+          ? 'AB 2024/996 Ek III/375: Kojik asit yalnızca yüz ve el bakım ürünlerinde (%1.0) izinlidir; vücut losyonlarında kullanımı YASAKTIR.'
+          : 'AB 2024/996 Ek III/375: Kojik asit yüz ve el ürünlerinde azami %1.0 sınırıyla izinlidir; bu sınırın üzerindeki kullanım YASAKTIR.';
+      } else {
+        effectiveEuStatus = 'kisitli';
+        effectiveSeverity = 'dusuk';
+      }
+    } else if (sub.id === 'retinol') {
+      const conc = parseConcentration(obs.raw);
+      const isBodyLotion = isBodyLotionContext(explicitAppType, appType, rawText);
+      const isPostNov2025 = isValidDate(effectiveTargetDate) && effectiveTargetDate >= '2025-11-01';
+      const isEnforcedRetinol = strictFutureRules === true || isPostNov2025;
+      if (conc !== null && ((isBodyLotion && conc > 0.05) || (!isBodyLotion && conc > 0.3)) && isEnforcedRetinol) {
+        effectiveEuStatus = 'yasak';
+        effectiveSeverity = 'yuksek';
+        effectiveDetail = isBodyLotion
+          ? 'AB 2024/996 Ek III/376: Retinol ve A vitamini esterleri vücut losyonlarında azami %0.05 Retinol Eşdeğeri (RE) sınırıyla izinlidir; bu sınırın üzerindeki kullanım 1 Kasım 2025 itibarıyla YASAKTIR.'
+          : 'AB 2024/996 Ek III/376: Retinol ve A vitamini esterleri diğer ürünlerde azami %0.3 Retinol Eşdeğeri (RE) sınırıyla izinlidir; bu sınırın üzerindeki kullanım 1 Kasım 2025 itibarıyla YASAKTIR.';
+      } else {
+        effectiveEuStatus = 'kisitli';
+        effectiveSeverity = 'orta';
+      }
     } else if (productType === 'food' && sub.class === 'fragrance_allergen') {
       effectiveEuStatus = 'izinli';
       effectiveSeverity = 'bilgi';
@@ -1736,7 +3109,7 @@ export function evaluateProduct({
         capScore = Math.min(capScore, 40);
       }
 
-      const mappedSources = (sub.sources || []).map((sid) => sourcesData.sources[sid]).filter(Boolean);
+      const mappedSources = (sub.sources || []).map((sid) => getSourceById(sid)).filter(Boolean);
       const localizeRegulatoryLegalText = (detail, euStatus, severity, targetLang, engineText) => {
         if (targetLang === 'tr' || detail === engineText.e171FoodBanned || detail === engineText.ci77891CosmeticOk) {
           return detail;
@@ -1938,6 +3311,8 @@ export function evaluateProduct({
             ur: 'یورپی یونین 1223/2009 ضمیمہ III: بالوں کے رنگ میں زیادہ سے زیادہ ارتکاز کی حد سے متجاوز ہے؛ ضمیمہ III کے تحت ممنوع (زیادہ سے زیادہ اسکور 10)۔'
           }[targetLang] || engineText.bannedGeneric;
         }
+        const extLocalized = localizeExtendedRegulatoryText(d, euStatus, targetLang, engineText);
+        if (extLocalized) return extLocalized;
         return euStatus === 'yasak'
           ? engineText.bannedGeneric
           : euStatus === 'kisitli' || severity !== 'bilgi'
@@ -1963,10 +3338,10 @@ export function evaluateProduct({
         severity: effectiveSeverity,
         jurisdictionNote:
           jurisdiction === 'TR' && effectiveEuStatus === 'yasak'
-            ? 'AB mevzuatı uyumsuzluğu tespit edildi; Türkiye pazarı için güncel TİTCK / Türk Gıda Kodeksi (TGK) geçiş hükümleri ayrıca teyit edilmelidir.'
+            ? (TR_JURISDICTION_NOTE_I18N[lang] || TR_JURISDICTION_NOTE_I18N.en)
             : null,
         legalText: finalLegalText,
-        falsePositiveNote: lang === 'tr' ? sub.note : null,
+        falsePositiveNote: localizeFalsePositiveNote(sub, lang),
         verification: sub.verification,
         sources: mappedSources
       });
@@ -2014,7 +3389,7 @@ export function evaluateProduct({
     if (!sub || !sub.profiles) continue;
 
     for (const prof of userProfiles) {
-      const ruleVal = sub.profiles[prof];
+      const ruleVal = Object.hasOwn(sub.profiles, prof) ? sub.profiles[prof] : null;
       if (!ruleVal) continue;
 
       if (productType === 'food' && (prof === 'hassas_cilt' || prof === 'akne')) {
@@ -2042,7 +3417,7 @@ export function evaluateProduct({
         profileStatuses[prof] = 'false';
       }
 
-      const mappedSources = (sub.sources || []).map((sid) => sourcesData.sources[sid]).filter(Boolean);
+      const mappedSources = (sub.sources || []).map((sid) => getSourceById(sid)).filter(Boolean);
 
       profileAlerts.push({
         profile: prof,
@@ -2122,23 +3497,6 @@ export function evaluateProduct({
       ru: (aName, item) => `${aName} (Основной пищевой аллерген по Приложению II Регламента ЕС 1169/2011): Продукт содержит ${item}. Опасно при аллергии или непереносимости.`,
       ur: (aName, item) => `${aName} (یورپی یونین 1169/2011 ضمیمہ II بڑا غذائی الرجن): پروڈکٹ میں ${item} شامل ہے۔ الرجی کے شکار افراد کے لیے خطرناک ہے۔`
     };
-    const MAJOR_FOOD_ALLERGENS = [
-      { id: 'gluten', names: /(?:^|[^\p{L}\p{N}])(wheat|buğday|gluten|flour|un|weizen|farine|trigo|пшениц[а-я]*|دقيق|قمح|arpa|barley|çavdar|rye|oats|yulaf|spelt|kamut)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Gluten / Buğday' },
-      { id: 'crustaceans', names: /(?:^|[^\p{L}\p{N}])(crustacean[s]?|kabuklu[lar]*|shrimp|karides|prawn[s]?|crab|yengeç|lobster|ıstakoz|istakoz|crevette[s]?|krabbe[n]?|garnelen|langostinos|mariscos|ракообразн[а-я]*|креветк[а-я]*|قشريات|جھینگا)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Kabuklular' },
-      { id: 'egg', names: /(?:^|[^\p{L}\p{N}])(egg[s]?|yumurta|oeuf[s]?|ei|eier|huevo[s]?|uovo|яйц[а-я]*|بيض|انڈہ|انڈے)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Yumurta' },
-      { id: 'fish', names: /(?:^|[^\p{L}\p{N}])(fish|balık|balik|poisson|fisch|pescado|pesce|рыб[а-я]*|سمك|مچھلی)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Balık' },
-      { id: 'peanut', names: /(?:^|[^\p{L}\p{N}])(peanut[s]?|yer\s*fıst[ıi]ğ[ıi]|arachide[s]?|erdnuss|erdnüsse|cacahuete[s]?|cacahuate[s]?|арахис|فول\s+سوداني|مونگ\s*پھلی)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Yer Fıstığı' },
-      { id: 'soy', names: /(?:^|[^\p{L}\p{N}])(soy|soya|soja|соя|соев[а-я]*|صويا|سویا|sojalecithin|soybean[s]?)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Soya' },
-      { id: 'milk', names: /(?:^|[^\p{L}\p{N}])(milk|süt|sut|lait|leche|milch|latte|молок[а-я]*|حليب|دودھ|whey|casein|lactose|laktoz|kazein|peynir\s*altı\s*suyu)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Süt / Süt Ürünleri' },
-      { id: 'tree_nuts', names: /(?:^|[^\p{L}\p{N}])(hazelnut[s]?|haseln[üu]ss[e]?|fındık|findik|noisette[s]?|avellana[s]?|фундук|بندق|ہیزل|almond[s]?|badem|mandel[n]?|amande[s]?|almendra[s]?|миндаль|لوز|بادام|walnut[s]?|ceviz|walnuss|noix|nuez|nueces|грецк[а-я]*\s*орех|جوز|اخروٹ|cashew[s]?|kaju|pistachio[s]?|antep\s*fıstığı|fıstık|fistik|fistigi|pecan[s]?|pekan|macadamia)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Sert Kabuklu Yemişler (Fındık/Badem)' },
-      { id: 'celery', names: /(?:^|[^\p{L}\p{N}])(celery|kereviz|sellerie|céleri|celeri|apio|sedano|сельдерей|كرفس|اجوائن)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Kereviz' },
-      { id: 'mustard', names: /(?:^|[^\p{L}\p{N}])(mustard|hardal|senf|moutarde|mostaza|senape|горчиц[а-я]*|خردل|رائی)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Hardal' },
-      { id: 'sesame', names: /(?:^|[^\p{L}\p{N}])(sesame|susam|tahin|tahini|sésame|sesam|sésamo|кунжут|سمسم|تل)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Susam' },
-      { id: 'sulphites', names: /(?:^|[^\p{L}\p{N}])(sulphite[s]?|sulfite[s]?|sülfit|sulfit|schwefeldioxid|dioxyde\s+de\s+soufre|dióxido\s+de\s+azufre|диоксид\s+серы|كبريتيت|سلفائٹ|e220|e221|e222|e223|e224|e226|e227|e228)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Sülfitler' },
-      { id: 'lupin', names: /(?:^|[^\p{L}\p{N}])(lupin[e]?|ac[ıi]\s*bakla|lüpen|lupini|altramuz|люпин|ترمس|لوپن)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Acıbakla (Lüpen)' },
-      { id: 'molluscs', names: /(?:^|[^\p{L}\p{N}])(mollusc[s]?|mollusk[s]?|yumuşakça[lar]*|weichtier[e]?|mollusque[s]?|molusco[s]?|istiridye|midye|kalamar|ahtapot|mussel[s]?|oyster[s]?|squid|octopus|moule[s]?|pulpo|calamar|миди[ия]|кальмар|осьминог|رخويات|صدف)(?=[^\p{L}\p{N}]|$)/iu, tr: 'Yumuşakçalar' }
-    ];
-
     for (const obs of observations) {
       const isCrossContactToken = /(?:may\s+contain|traces?\s+of|eser\s+miktarda|kann\s+spuren|peut\s+contenir|puede\s+contener|قد\s+يحتوي|может\s+содержать|میں\s+شامل)/iu.test(obs.raw);
       if (isCrossContactToken) continue;
@@ -2146,12 +3504,8 @@ export function evaluateProduct({
       // Scan ONLY the label's own wording. The localized display name comes from a broader data group
       // (e.g. "Buğday Unu") and must never create an allergen that is not on the label.
       // Negation is target-bound: only the negated word is removed ("Milk-free Soy Lecithin" still contains soy).
-      const scanText = obs.raw
-        .replace(/[\p{L}]+[\s\-]*(?:free|frei)(?=[^\p{L}]|$)/giu, ' ')
-        .replace(/(?:free\s+(?:of|from)|without|ohne|sans|sin|senza|tanpa|bebas)\s+[\p{L}]+/giu, ' ')
-        .replace(/[\p{L}]+(?:siz|sız|suz|süz)(?=[^\p{L}]|$)/giu, ' ')
-        .replace(/[\p{L}]+\s+(?:içermez|icermez|yoktur|bulunmaz)(?=[^\p{L}]|$)/giu, ' ');
-      const matchedAllergens = MAJOR_FOOD_ALLERGENS.filter((a) => {
+      const scanText = stripNegatedTargets(obs.raw);
+      const matchedAllergens = EU_14_FOOD_ALLERGENS.filter((a) => {
         if (!a.names.test(scanText)) return false;
         // "Glutensiz un" / "gluten-free flour": a generic flour word alone is not a gluten source once gluten is negated.
         // Explicitly named gluten cereals (wheat, barley, rye, spelt…) still require the EU 1169/2011 declaration.
@@ -2176,7 +3530,7 @@ export function evaluateProduct({
           position: obs.position,
           level: 'kirmizi',
           explanation: expFn(aName, itemLabel),
-          sources: [sourcesData.sources.EU_1169_2011].filter(Boolean)
+          sources: [getSourceById('EU_1169_2011')].filter(Boolean)
         });
       }
     }
@@ -2186,7 +3540,7 @@ export function evaluateProduct({
     if (crossContactMatch) {
       profileStatuses['astim_alerji'] = 'false';
       const rawTraceTarget = crossContactMatch[1].trim();
-      const matchedTraceAllergens = MAJOR_FOOD_ALLERGENS.filter((a) => a.names.test(rawTraceTarget));
+      const matchedTraceAllergens = EU_14_FOOD_ALLERGENS.filter((a) => a.names.test(rawTraceTarget));
       const traceTarget =
         matchedTraceAllergens.length > 0
           ? matchedTraceAllergens
@@ -2219,7 +3573,7 @@ export function evaluateProduct({
         position: observations.length + 1,
         level: 'sari',
         explanation: traceI18n.exp,
-        sources: [sourcesData.sources.EU_1169_2011].filter(Boolean)
+        sources: [getSourceById('EU_1169_2011')].filter(Boolean)
       });
     }
   }
@@ -2232,34 +3586,32 @@ export function evaluateProduct({
       /\b(taurine|taurin|таурин|تورين|inositol|inosit)\b/iu.test(rawText);
 
     if (hasCaffeine || hasTaurineOrInositol) {
+      const ctAlert = CAFFEINE_TAURINE_ALERT_I18N[lang] || CAFFEINE_TAURINE_ALERT_I18N.en;
+      const ctSources = [getSourceById('EU_1169_2011'), getSourceById('EFSA')].filter(Boolean);
       if (userProfiles.includes('hamilelik')) {
         profileStatuses['hamilelik'] = 'false';
         profileAlerts.push({
           profile: 'hamilelik',
-          substanceName: hasCaffeine ? 'Kafein / Enerji Bileşeni' : 'Enerji İçeceği Uyarıcısı (Taurin/İnositol)',
-          localizedName: hasCaffeine ? 'Kafein / Enerji Bileşeni' : 'Taurin / İnositol',
+          substanceName: hasCaffeine ? ctAlert.cafName : ctAlert.tauName,
+          localizedName: hasCaffeine ? ctAlert.cafLoc : ctAlert.tauLoc,
           rawToken: hasCaffeine ? 'Caffeine' : 'Taurine/Inositol',
           position: 1,
           level: 'sari',
-          explanation: hasCaffeine
-            ? 'EFSA Uyarısı: Hamilelik döneminde tüm kaynaklardan günlük toplam kafein alımı 200 mg ile sınırlandırılmalıdır (AB 1169/2011 Ek III).'
-            : 'Enerji içeceği uyarıcısı (Taurin/İnositol); hamilelik döneminde dikkatli tüketilmelidir.',
-          sources: [sourcesData.sources.EU_1169_2011, sourcesData.sources.EFSA].filter(Boolean)
+          explanation: hasCaffeine ? ctAlert.pregCafExp : ctAlert.pregTauExp,
+          sources: ctSources
         });
       }
       if (userProfiles.includes('cocuk_metabolik')) {
         profileStatuses['cocuk_metabolik'] = 'false';
         profileAlerts.push({
           profile: 'cocuk_metabolik',
-          substanceName: hasCaffeine ? 'Yüksek Kafein' : 'Enerji İçeceği Uyarıcısı (Taurin/İnositol)',
-          localizedName: hasCaffeine ? 'Yüksek Kafein' : 'Taurin / İnositol',
+          substanceName: hasCaffeine ? ctAlert.cafHighName : ctAlert.tauName,
+          localizedName: hasCaffeine ? ctAlert.cafHighLoc : ctAlert.tauLoc,
           rawToken: hasCaffeine ? 'Caffeine' : 'Taurine/Inositol',
           position: 1,
           level: hasCaffeine ? 'kirmizi' : 'sari',
-          explanation: hasCaffeine
-            ? 'AB 1169/2011 Ek III Uyarısı: Yüksek kafein içeriği. Çocuklar için tavsiye edilmez (azami güvenli referans doz 3 mg/kg/gün).'
-            : 'Enerji içeceği uyarıcısı (Taurin/İnositol); çocuklar için tavsiye edilmez.',
-          sources: [sourcesData.sources.EU_1169_2011, sourcesData.sources.EFSA].filter(Boolean)
+          explanation: hasCaffeine ? ctAlert.childCafExp : ctAlert.childTauExp,
+          sources: ctSources
         });
       }
     }
@@ -2296,72 +3648,6 @@ export function evaluateProduct({
     ur: (term, item) => `آپ کی ذاتی بلیک لسٹ ("${term}") سے مطابقت: اجزاء میں "${item}" پایا گیا۔`
   };
 
-  function escapeRegexLiteral(str) {
-    return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  const UMBRELLA_RULE_IDS = new Set([
-    'safe_alcohol_like_non_ethanol',
-    'common_whole_food_ingredients',
-    'non_comedogenic_botanical_oils_butters',
-    'soothing_botanical_extracts',
-    'safe_amino_acids_peptides_ferments',
-    'safe_vitamins_minerals_salts',
-    'safe_emollients_silicones_polymers',
-    'safe_surfactants_cleansers',
-    'safe_food_acids_stabilizers_spices'
-  ]);
-
-  function expandWatchTermStems(watchTerm) {
-    const wLower = String(watchTerm || '').trim().toLowerCase();
-    const wFold = foldTurkish(wLower);
-    const stems = new Set([wLower, wFold].filter(Boolean));
-    // Expand known synonyms if the watch term matches a specific single-substance entry (not an umbrella class)
-    for (const sub of substancesData.substances || []) {
-      if (UMBRELLA_RULE_IDS.has(sub.id)) continue;
-      const aliases = Array.isArray(sub.aliases) ? sub.aliases : [];
-      const names = [sub.name, sub.e_code, sub.ci_code, ...aliases].filter(Boolean).map((x) => x.toLowerCase());
-      if (names.some((n) => n === wLower || foldTurkish(n) === wFold)) {
-        for (const n of names) {
-          if (n.length >= 3 || n === wLower || foldTurkish(n) === wFold) {
-            stems.add(n);
-            stems.add(foldTurkish(n));
-          }
-        }
-      }
-    }
-    for (const hr of halalData.rules || []) {
-      if (UMBRELLA_RULE_IDS.has(hr.id) || hr.category === 'SAFE_NON_ETHANOL') continue;
-      const aliases = Array.isArray(hr.aliases) ? hr.aliases : [];
-      const codes = Array.isArray(hr.codes) ? hr.codes : [];
-      const names = [hr.canonical, ...codes, ...aliases].filter(Boolean).map((x) => x.toLowerCase());
-      if (names.some((n) => n === wLower || foldTurkish(n) === wFold)) {
-        for (const n of names) {
-          if (n.length >= 3 || n === wLower || foldTurkish(n) === wFold) {
-            stems.add(n);
-            stems.add(foldTurkish(n));
-          }
-        }
-      }
-    }
-    return Array.from(stems).filter((s) => s.length >= 2);
-  }
-
-  function isWatchTermNegatedInRaw(rawStr, watchStems) {
-    const rawLower = String(rawStr || '').trim().toLowerCase();
-    const rawFold = foldTurkish(rawLower);
-    for (const stem of watchStems) {
-      const esc = escapeRegexLiteral(stem);
-      // Suffix negation bound directly to the watched stem (e.g. "Niacinamide-free", "Parfümsüz", "Paraben-free")
-      const suffixRe = new RegExp(`(?<![\\p{L}\\p{N}])${esc}[\\s\\-]*(?:free|frei|siz|sız|suz|süz|içermez|icermez)(?![\\p{L}\\p{N}])`, 'iu');
-      if (suffixRe.test(rawLower) || suffixRe.test(rawFold)) return true;
-      // Prefix negation bound directly to the watched stem (e.g. "without Parfum", "ohne Parfum", "sans parfum", "sin perfume", "بدون عطر")
-      const prefixRe = new RegExp(`(?<![\\p{L}\\p{N}])(?:without|no|ohne|sans|sin|tanpa|bebas|free\\s+of|free\\s+from|libre\\s+de|خالي\\s+من|خالٍ\\s+من|بدون|بغیر|без)\\s+${esc}(?![\\p{L}\\p{N}])`, 'iu');
-      if (prefixRe.test(rawLower) || prefixRe.test(rawFold)) return true;
-    }
-    return false;
-  }
-
   const GENERIC_ALCOHOL_WATCH_TERMS = new Set([
     'alcohol',
     'alkol',
@@ -2393,42 +3679,86 @@ export function evaluateProduct({
 
   if (sanitizedWatchlist.length > 0) {
     profileStatuses['ozel_kara_liste'] = 'true';
+    const preparedWatchlist = sanitizedWatchlist
+      .map((watchTerm) => ({ watchTerm, prep: getPreparedWatchTerm(watchTerm) }))
+      .filter(({ prep }) => prep.normWatch || prep.lowerWatch);
+
+    const obsWatchMemo = new Map();
     for (const obs of observations) {
       const rawFull = String(obs.raw || '').trim().toLowerCase();
-      const rawBase = rawFull.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
-      const normRaw = normalizeToken(obs.raw || '');
-      const normBase = normalizeToken(rawBase);
-      const foldedRaw = foldTurkish(obs.raw || '');
-      const foldBase = foldTurkish(rawBase);
       const locLower = String(obs.localizedName || '').trim().toLowerCase();
-      const locBase = locLower.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      const subIdKey = obs.substance ? obs.substance.id : '';
+      const halalIdKey = obs.halalRule ? obs.halalRule.id : '';
+      const sugarKey = obs.sugar ? obs.sugar.canonical || '' : '';
+      const memoKey = `${rawFull}\u0001${locLower}\u0001${subIdKey}\u0001${halalIdKey}\u0001${sugarKey}`;
+
+      if (obsWatchMemo.has(memoKey)) {
+        const hit = obsWatchMemo.get(memoKey);
+        if (hit) {
+          profileStatuses['ozel_kara_liste'] = 'false';
+          const msgFn = WATCHLIST_ALERT_I18N[lang] || WATCHLIST_ALERT_I18N.en;
+          profileAlerts.push({
+            profile: 'ozel_kara_liste',
+            watchTerm: hit.watchTerm,
+            substanceName: obs.substance ? obs.substance.name : hit.watchTerm,
+            localizedName: obs.localizedName || obs.raw,
+            rawToken: obs.raw,
+            position: obs.position,
+            level: 'kirmizi',
+            explanation: msgFn(hit.watchTerm, obs.localizedName || obs.raw),
+            sources: []
+          });
+        }
+        continue;
+      }
+
+      const rawBase = rawFull.includes('(') ? rawFull.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim() : rawFull;
+      const normRaw = normalizeToken(rawFull);
+      const normBase = rawBase === rawFull ? normRaw : normalizeToken(rawBase);
+      const foldedRaw = foldTurkish(rawFull);
+      const foldBase = rawBase === rawFull ? foldedRaw : foldTurkish(rawBase);
+      const locBase = locLower.includes('(') ? locLower.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim() : locLower;
+      const foldLocBase = locBase === rawBase ? foldBase : foldTurkish(locBase);
       const isUmbrellaSub = Boolean(obs.substance && UMBRELLA_RULE_IDS.has(obs.substance.id));
       const isUmbrellaHalal = Boolean(
         obs.halalRule && (UMBRELLA_RULE_IDS.has(obs.halalRule.id) || obs.halalRule.category === 'SAFE_NON_ETHANOL')
       );
-      const subNameLower = obs.substance && !isUmbrellaSub ? String(obs.substance.name || '').trim().toLowerCase() : '';
-      const subAliases =
-        obs.substance && !isUmbrellaSub && Array.isArray(obs.substance.aliases)
-          ? obs.substance.aliases.map((a) => a.toLowerCase())
-          : [];
-      const halalAliases =
-        obs.halalRule && !isUmbrellaHalal && Array.isArray(obs.halalRule.aliases)
-          ? obs.halalRule.aliases.map((a) => a.toLowerCase())
-          : [];
-      const sugarAliases = obs.sugar && Array.isArray(obs.sugar.aliases) ? obs.sugar.aliases.map((a) => a.toLowerCase()) : [];
-      const allKnownAliases = [rawBase, locLower, locBase, subNameLower, ...subAliases, ...halalAliases, ...sugarAliases].filter(Boolean);
+      const subData = obs.substance && !isUmbrellaSub ? getEntityAliasData(obs.substance) : null;
+      const halalDataCached = obs.halalRule && !isUmbrellaHalal ? getEntityAliasData(obs.halalRule) : null;
+      const sugarDataCached = obs.sugar ? getEntityAliasData(obs.sugar) : null;
+      const subNameLower = subData ? subData.nameLower : '';
+      const foldSubNameLower = subData ? subData.foldName : '';
+      const allKnownAliases = [
+        rawBase,
+        locLower,
+        locBase,
+        subNameLower,
+        ...(subData ? subData.lowerAliases : []),
+        ...(halalDataCached ? halalDataCached.lowerAliases : []),
+        ...(sugarDataCached ? sugarDataCached.lowerAliases : [])
+      ].filter(Boolean);
+      const foldedKnownAliases = [
+        foldBase,
+        locLower === locBase ? foldLocBase : foldTurkish(locLower),
+        foldLocBase,
+        foldSubNameLower,
+        ...(subData ? subData.foldedAliases : []),
+        ...(halalDataCached ? halalDataCached.foldedAliases : []),
+        ...(sugarDataCached ? sugarDataCached.foldedAliases : [])
+      ].filter(Boolean);
+      const exactAliasSet = new Set(allKnownAliases);
+      const exactFoldedAliasSet = new Set(foldedKnownAliases);
+      const joinedFoldedAliases = `\u0000${foldedKnownAliases.join('\u0000')}\u0000`;
+      const hasNegHint = HAS_WATCH_NEGATION_HINT_RE.test(foldedRaw);
 
       const isFattyAlcoholShielded = Boolean(obs.halalRule && obs.halalRule.category === 'SAFE_NON_ETHANOL');
+      let matchedHit = null;
 
-      for (const watchTerm of sanitizedWatchlist) {
-        const lowerWatch = watchTerm.trim().toLowerCase();
-        const normWatch = normalizeToken(watchTerm);
-        const foldWatch = foldTurkish(lowerWatch);
-        if (!normWatch && !lowerWatch) continue;
+      for (const { watchTerm, prep } of preparedWatchlist) {
+        const { lowerWatch, normWatch, foldWatch, wordRe, wordReRaw } = prep;
 
         // 1. Target-bound negation check: only exempt if the negation is bound to this watched term (not a different parenthetical term)
-        const watchStems = expandWatchTermStems(watchTerm);
-        if (isWatchTermNegatedInRaw(obs.raw || '', watchStems)) {
+        if (hasNegHint && isWatchTermNegatedInRaw(rawFull, foldedRaw, prep)) {
           continue;
         }
 
@@ -2444,18 +3774,17 @@ export function evaluateProduct({
           foldedRaw === foldWatch ||
           foldBase === foldWatch ||
           (normWatch.length >= 3 && (normRaw === normWatch || normBase === normWatch)) ||
-          allKnownAliases.some((al) => al === lowerWatch || foldTurkish(al) === foldWatch);
+          exactAliasSet.has(lowerWatch) ||
+          exactFoldedAliasSet.has(foldWatch);
 
         // 4. Whole-word boundary match (for terms >= 3 chars, e.g. "Sinensis", "Lysine", "Tyrosine", "Freesia") — never matches 2-char substrings like "ni" or "in"
-        if (!matched && foldWatch.length >= 3) {
-          const wordRe = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegexLiteral(foldWatch)}(?![\\p{L}\\p{N}])`, 'iu');
-          const wordReRaw = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegexLiteral(lowerWatch)}(?![\\p{L}\\p{N}])`, 'iu');
+        if (!matched && wordRe) {
           if (
             wordRe.test(foldBase) ||
             wordReRaw.test(rawBase) ||
-            wordRe.test(foldTurkish(locBase)) ||
-            wordRe.test(foldTurkish(subNameLower)) ||
-            allKnownAliases.some((al) => wordRe.test(foldTurkish(al)))
+            wordRe.test(foldLocBase) ||
+            wordRe.test(foldSubNameLower) ||
+            wordRe.test(joinedFoldedAliases)
           ) {
             matched = true;
           }
@@ -2465,18 +3794,19 @@ export function evaluateProduct({
         if (!matched && CHEMICAL_FAMILY_ROOTS.has(foldWatch)) {
           if (
             foldBase.includes(foldWatch) ||
-            foldTurkish(locBase).includes(foldWatch) ||
-            foldTurkish(subNameLower).includes(foldWatch) ||
-            allKnownAliases.some((al) => foldTurkish(al).includes(foldWatch))
+            foldLocBase.includes(foldWatch) ||
+            foldSubNameLower.includes(foldWatch) ||
+            joinedFoldedAliases.includes(foldWatch)
           ) {
             // Double-check that the family root itself is not negated in rawFull (e.g. "Paraben-free")
-            if (!isWatchTermNegatedInRaw(obs.raw || '', [foldWatch, lowerWatch])) {
+            if (!hasNegHint || !isWatchTermNegatedInRaw(rawFull, foldedRaw, prep)) {
               matched = true;
             }
           }
         }
 
         if (matched) {
+          matchedHit = { watchTerm };
           profileStatuses['ozel_kara_liste'] = 'false';
           const msgFn = WATCHLIST_ALERT_I18N[lang] || WATCHLIST_ALERT_I18N.en;
           profileAlerts.push({
@@ -2493,6 +3823,7 @@ export function evaluateProduct({
           break;
         }
       }
+      obsWatchMemo.set(memoKey, matchedHit);
     }
   }
 
@@ -2705,7 +4036,7 @@ export function evaluateProduct({
         localizedName: obs.localizedName,
         canonical: rule.canonical,
         explanation: lang === 'tr' ? rule.template_tr : et.shieldDesc,
-        source: sourcesData.sources[rule.source_id]
+        source: getSourceById(rule.source_id)
       });
       continue;
     }
@@ -2772,7 +4103,7 @@ export function evaluateProduct({
       authorityMatrix,
       hasAuthorityDifference,
       authorityDiffReason,
-      source: sourcesData.sources[rule.source_id]
+      source: getSourceById(rule.source_id)
     });
   }
 
@@ -2805,7 +4136,9 @@ export function evaluateProduct({
       rawToken: o.raw,
       localizedName: o.localizedName,
       canonical: o.rapidCarb.canonical,
-      explanation: o.rapidCarb.explanation,
+      explanation:
+        (o.rapidCarb.explanations && (o.rapidCarb.explanations[lang] || o.rapidCarb.explanations.en)) ||
+        o.rapidCarb.explanation,
       position: o.position
     }));
 
@@ -4116,6 +5449,8 @@ function resolveSubstanceSwapKey(substanceId, productType = 'cosmetic') {
     case 'phenoxyethanol':
     case 'benzyl_alcohol':
     case 'chlorphenesin_ipbc_chlorhexidine':
+    case 'triclosan':
+    case 'triclocarban':
       return 'swap_preservatives_mi_parabens';
     case 'sls':
     case 'sles':
@@ -4134,6 +5469,10 @@ function resolveSubstanceSwapKey(substanceId, productType = 'cosmetic') {
     case 'benzoyl_peroxide':
     case 'hydroquinone_banned':
     case 'kojic_acid':
+    case 'alpha_arbutin':
+    case 'arbutin':
+    case 'genistein':
+    case 'daidzein':
     case 'aha_glycolic_lactic_mandelic':
     case 'boric_acid_borates_restricted':
     case 'mercury_compounds_banned':
@@ -4318,7 +5657,7 @@ function buildSwapGuideCard({
       { id: 'mustard', re: /(?:^|[^\p{L}\p{N}])(mustard|hardal|senf|moutarde|mostaza|горчиц[а-я]*|خردل|رائی)(?=[^\p{L}\p{N}]|$)/iu },
       { id: 'celery', re: /(?:^|[^\p{L}\p{N}])(celery|kereviz|sellerie|céleri|apio|сельдерей|كرفس|اجوائن)(?=[^\p{L}\p{N}]|$)/iu },
       { id: 'lupin', re: /(?:^|[^\p{L}\p{N}])(lupin[e]?|ac[ıi]\s*bakla|lüpen|altramuz|люпин|ترمس|لوپن)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'sulphites', re: /(?:^|[^\p{L}\p{N}])(sulphite[s]?|sulfite[s]?|sülfit|sulfit|schwefeldioxid|كبريتيت|سلفائٹ|e220|e221|e222|e223|e224|e226|e227|e228)(?=[^\p{L}\p{N}]|$)/iu }
+      { id: 'sulphites', re: /(?:^|[^\p{L}\p{N}])(sulphite[s]?|sulfite[s]?|bisulphite[s]?|bisulfite[s]?|metabisulphite[s]?|metabisulfite[s]?|pyrosulphite[s]?|pyrosulfite[s]?|sülfit|sulfit|bisülfit|bisulfit|metabisülfit|metabisulfit|schwefeldioxid|كبريتيت|ميتابيسلفيت|سلفائٹ|میٹابیسلفائٹ|e220|e221|e222|e223|e224|e226|e227|e228)(?=[^\p{L}\p{N}]|$)/iu }
     ];
 
     for (const obs of observations || []) {
@@ -4351,11 +5690,11 @@ function buildSwapGuideCard({
       const isGlutenNegated = /gluten[\s\-]*(?:free|frei|siz|sız)|(?:free\s+(?:of|from)|without|ohne|sans|sin)\s+gluten/iu.test(rawStr);
       const hasGlutenCereal = isGlutenNegated
         ? /(?:^|[^\p{L}\p{N}])(wheat|buğday|bugday|weizen|blé|ble|trigo|пшениц[а-я]*|قمح|barley|arpa|rye|çavdar|cavdar|spelt|kamut|oats|yulaf)(?=[^\p{L}\p{N}]|$)/iu.test(scanText)
-        : /(?:^|[^\p{L}\p{N}])(wheat|buğday|bugday|gluten|flour|un|weizen|farine|trigo|gandum|пшениц[а-я]*|دقيق|قمح|گندم|arpa|barley|çavdar|rye|oats|yulaf|spelt|kamut)(?=[^\p{L}\p{N}]|$)/iu.test(scanText);
+        : /(?:^|[^\p{L}\p{N}])(wheat|buğday|bugday|gluten|weizen|weizenmehl|roggenmehl|gerstenmehl|dinkelmehl|hafermehl|bl[ée]|farine\s+de\s+(?:bl[ée]|seigle|froment|kamut|[ée]peautre)|farine\s+d['’](?:orge|avoine)|trigo|harina\s+de\s+(?:trigo|cebada|centeno|avena)|gandum|tepung\s+(?:terigu|gandum|barli)|пшениц[а-я]*|пшеничн[а-я]*\s+мук[аи]|ржан[а-я]*\s+мук[аи]|ячменн[а-я]*\s+мук[аи]|овсян[а-я]*\s+мук[аи]|دقيق\s+(?:القمح|الشعير|الجاودار|الشوفان)|قمح|گندم|گندم\s+کا\s+آٹا|میدہ|arpa|barley|çavdar|cavdar|rye|oats|oat|yulaf|spelt|kamut|(?:wheat|rye|barley|spelt|oat)\s+flour|(?:buğday|bugday|çavdar|cavdar|arpa|yulaf|siyez)\s+unu)(?=[^\p{L}\p{N}]|$)/iu.test(scanText);
       if (hasGlutenCereal) {
         addSwapTrigger('swap_allergen_gluten_wheat', obs.localizedName || obs.raw, 'sari');
       }
-      if (/(?:^|[^\p{L}\p{N}])(hazelnut[s]?|haseln[üu]ss[e]?|fındık|findik|noisette[s]?|avellana[s]?|фундук|بندق|ہیزل|almond[s]?|badem|mandel[n]?|amande[s]?|almendra[s]?|миндаль|لوز|بادام|walnut[s]?|ceviz|walnuss|noix|nuez|nueces|cashew[s]?|kaju|pistachio[s]?|fıstık|fistik|peanut[s]?|arachide[s]?|erdnuss|erdnüsse|cacahuete[s]?|арахис|مونگ\s*پھلی|egg[s]?|yumurta|oeuf[s]?|huevo[s]?|яйц[а-я]*|بيض|انڈہ|sesame|susam|tahin|tahini|кунжут|سمسم|تل|sulphite[s]?|sulfite[s]?|sülfit|sulfit|e220|e221|e222|e223|e224)(?=[^\p{L}\p{N}]|$)/iu.test(scanText)) {
+      if (/(?:^|[^\p{L}\p{N}])(hazelnut[s]?|haseln[üu]ss[e]?|fındık|findik|noisette[s]?|avellana[s]?|фундук|بندق|ہیزل|almond[s]?|badem|mandel[n]?|amande[s]?|almendra[s]?|миндаль|لوز|بادام|walnut[s]?|ceviz|walnuss|noix|nuez|nueces|cashew[s]?|kaju|pistachio[s]?|fıstık|fistik|peanut[s]?|arachide[s]?|erdnuss|erdnüsse|cacahuete[s]?|арахис|مونگ\s*پھلی|egg[s]?|yumurta|oeuf[s]?|huevo[s]?|яйц[а-я]*|بيض|انڈہ|sesame|susam|tahin|tahini|кунжут|سمسم|تل|sulphite[s]?|sulfite[s]?|bisulphite[s]?|bisulfite[s]?|metabisulphite[s]?|metabisulfite[s]?|pyrosulphite[s]?|pyrosulfite[s]?|sülfit|sulfit|bisülfit|bisulfit|metabisülfit|metabisulfit|e220|e221|e222|e223|e224)(?=[^\p{L}\p{N}]|$)/iu.test(scanText)) {
         addSwapTrigger('swap_allergen_nuts_other', obs.localizedName || obs.raw, 'sari');
       }
     }
@@ -4687,7 +6026,7 @@ const ROUTINE_CONFLICT_RULES_10LANG = {
     ms: {
       title: 'Peptida Kuprum + Vitamin C Tulen / Asid Langsung',
       why: 'Asid ber-pH rendah dan Asid L-Askorbik boleh menjejaskan kestabilan ion kuprum dalam Copper Tripeptide-1.',
-      advice: 'Asingkan penggunaan Peptida Kuprum dan asid / Vitamin C между rutin pagi dan malam.'
+      advice: 'Asingkan penggunaan Peptida Kuprum dan asid / Vitamin C antara rutin pagi dan malam.'
     },
     es: {
       title: 'Péptidos de Cobre + Vitamina C Pura / Ácidos Directos',
@@ -4776,7 +6115,8 @@ function detectCosmeticActiveGroups(observations = []) {
     const label = obs.localizedName || (obs.substance ? obs.substance.name : raw);
 
     if (
-      subId === 'retinoids_vitamin_a_eu2024_996' ||
+      subId === 'retinol' ||
+      subId === 'tretinoin' ||
       /(?:^|[^\p{L}\p{N}])(retinol|retinal|retinaldehyde|retinyl\s+palmitate|retinyl\s+acetate|retinyl\s+propionate|hydroxypinacolone\s+retinoate|adapalene|tretinoin|ريتينول|ریٹینول|ретинол)(?=[^\p{L}\p{N}]|$)/iu.test(raw)
     ) {
       groups.retinoids.push(label);
@@ -4784,7 +6124,7 @@ function detectCosmeticActiveGroups(observations = []) {
 
     if (
       subId === 'salicylic_acid' ||
-      subId === 'aha_glycolic_lactic_acids' ||
+      subId === 'aha_glycolic_lactic_mandelic' ||
       /(?:^|[^\p{L}\p{N}])(glycolic\s+acid|lactic\s+acid|mandelic\s+acid|salicylic\s+acid|glikolik\s+asit|laktik\s+asit|mandelik\s+asit|salisilik\s+asit|glykolsäure|milchsäure|salicylsäure|acide\s+glycolique|acide\s+lactique|acide\s+salicylique|ácido\s+glicólico|ácido\s+láctico|ácido\s+salicílico|гликолевая\s+кислота|молочная\s+кислота|салициловая\s+кислота|حمض\s+الجليكوليك|حمض\s+اللاكتيك|حمض\s+الساليسيليك|گلائیکولک\s+ایسڈ|سیلیسیلک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(raw)
     ) {
       groups.aha_bha_acids.push(label);
@@ -4811,7 +6151,7 @@ function detectCosmeticActiveGroups(observations = []) {
 
     if (
       obs.position <= 5 &&
-      (subId === 'alcohol_denat_ethanol' ||
+      (subId === 'alcohol_denat' ||
         (/(?:^|[^\p{L}\p{N}])(alcohol\s+denat\.?|denatured\s+alcohol|ethanol|ethyl\s+alcohol|etanol)(?=[^\p{L}\p{N}]|$)/iu.test(raw) &&
           !/(cetyl|cetearyl|stearyl|behenyl|arachidyl|myristyl|lauryl|lanolin|benzyl|phenethyl|cinnamyl|anisyl|amyl)/iu.test(raw)))
     ) {
@@ -5179,7 +6519,6 @@ function buildRegulatoryReportCard({
     const itemName = obs.localizedName || (obs.substance ? obs.substance.name : obs.raw);
     if (
       subId === 'tpo_nail_banned_2025' ||
-      subId === 'tpo_nail_initiator_eu2025' ||
       /\btrimethylbenzoyl\s+diphenylphosphine\s+oxide\b/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
@@ -5194,8 +6533,7 @@ function buildRegulatoryReportCard({
       });
     } else if (
       subId === 'tphp_triphenyl_phosphate_banned' ||
-      subId === 'tphp_triphenyl_phosphate_eu2026_909' ||
-      /\btriphenyl\s+phosphate\b/iu.test(rawStr)
+      /(?:^|[^\p{L}\p{N}])(triphenyl\s+phosphate|triphenylphosphat|phosphate\s+de\s+triphényle|fosfato\s+de\s+trifenilo|trifenil\s+fosfat|трифенилфосфат|فوسفات\s+ثلاثي\s+الفينيل|ٹرائی\s+فینائل\s+فاسفیٹ)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
         name: itemName,
@@ -5209,9 +6547,8 @@ function buildRegulatoryReportCard({
       });
     } else if (
       subId === 'retinol' ||
-      subId === 'retinoids_vitamin_a_eu2024_996' ||
-      subId === 'retinol_retinoids' ||
-      /(?:^|[^\p{L}\p{N}])(retinol|retinyl\s+palmitate|retinyl\s+acetate|retinyl\s+propionate|vitamin\s+a)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+      subId === 'tretinoin' ||
+      /(?:^|[^\p{L}\p{N}])(retinol|rétinol|ретинол|ريتينول|ریٹینول|retinyl\s+palmitate|retinyl\s+acetate|retinyl\s+propionate|vitamin\s+a)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
         name: itemName,
@@ -5225,7 +6562,7 @@ function buildRegulatoryReportCard({
       });
     } else if (
       subId === 'kojic_acid' ||
-      /(?:^|[^\p{L}\p{N}])(kojic\s+acid|kojik\s+asit|kojisäure|acide\s+kojique|ácido\s+kójico|койевая\s+кислота|حمض\s+الكوجيك|کوجک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+      /(?:^|[^\p{L}\p{N}])(kojic\s+acid|kojik\s+asit|kojisäure|acide\s+kojique|ácido\s+kójico|asam\s+kojat|asid\s+kojik|койевая\s+кислота|حمض\s+الكوجيك|کوجک\s+ایسڈ)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
         name: itemName,
@@ -5238,7 +6575,8 @@ function buildRegulatoryReportCard({
         status: 'enforced_limit_1pct_face_hand_placing_2025_02_01_withdrawal_2025_11_01'
       });
     } else if (
-      /(?:^|[^\p{L}\p{N}])(alpha[\s\-]*arbutin|alfa[\s\-]*arbutin|ألفا[\s\-]*أربوتين|альфа[\s\-]*арбутин|الفا[\s\-]*اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+      subId === 'alpha_arbutin' ||
+      /(?:^|[^\p{L}\p{N}])(alpha[\s\-]*arbutin[ea]?|alfa[\s\-]*arbutin[ea]?|ألفا[\s\-]*أربوتين|альфа[\s\-]*арбутин|الفا[\s\-]*اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
         name: itemName,
@@ -5251,7 +6589,8 @@ function buildRegulatoryReportCard({
         status: 'enforced_limit_2pct_face_0_5pct_body_placing_2025_02_01_withdrawal_2025_11_01'
       });
     } else if (
-      /(?:^|[^\p{L}\p{N}])(arbutin|beta[\s\-]*arbutin|أربوتين|арбутин|اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+      subId === 'arbutin' ||
+      /(?:^|[^\p{L}\p{N}])(arbutin[ea]?|beta[\s\-]*arbutin[ea]?|أربوتين|арбутин|اربوٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
         name: itemName,
@@ -5264,8 +6603,35 @@ function buildRegulatoryReportCard({
         status: 'enforced_limit_7pct_face_placing_2025_02_01_withdrawal_2025_11_01'
       });
     } else if (
+      subId === 'genistein' ||
+      /(?:^|[^\p{L}\p{N}])(genistein[ea]?|genisteína|генистеин|جينيستين|جینیسٹین)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex III/373 — Max 0.007% in Cosmetics)',
+        placingOnMarketDate: '2025-02-01',
+        makingAvailableDate: '2025-11-01',
+        deadline: '2025-02-01 (Placing) / 2025-11-01 (Withdrawal)',
+        effectiveDate: '2025-11-01',
+        status: 'enforced_limit_0_007pct_placing_2025_02_01_withdrawal_2025_11_01'
+      });
+    } else if (
+      subId === 'daidzein' ||
+      /(?:^|[^\p{L}\p{N}])(daidzein[ea]?|daidzeína|даидзеин|دايدزين|ڈائیڈزین)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex III/374 — Max 0.02% in Cosmetics)',
+        placingOnMarketDate: '2025-02-01',
+        makingAvailableDate: '2025-11-01',
+        deadline: '2025-02-01 (Placing) / 2025-11-01 (Withdrawal)',
+        effectiveDate: '2025-11-01',
+        status: 'enforced_limit_0_02pct_placing_2025_02_01_withdrawal_2025_11_01'
+      });
+    } else if (
       subId === '4_mbc' ||
-      subId === '4_mbc_uv_filter' ||
       /(?:^|[^\p{L}\p{N}])(4[\s\-]*methylbenzylidene\s+camphor|4[\s\-]*mbc|enzacamene)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
@@ -5279,13 +6645,27 @@ function buildRegulatoryReportCard({
         status: 'enforced_ban_placing_2025_05_01_withdrawal_2026_05_01'
       });
     } else if (
-      subId === 'triclosan_triclocarban' ||
-      /(?:^|[^\p{L}\p{N}])(triclosan|triclocarban|triklosan|triklokarban|триклозан|триклокарбан|تريكلوسان|تريكلوكاربان|ٹرائیکلوسان)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+      subId === 'triclosan' ||
+      /(?:^|[^\p{L}\p{N}])(triclosan|triklosan|triclosán|триклозан|تريكلوسان|ٹرائیکلوسان)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
         name: itemName,
         substance: itemName,
-        regulation: 'EU 2024/996 (Annex V/25 & V/23 — Max 0.3% Triclosan / 0.2% Triclocarban)',
+        regulation: 'EU 2024/996 (Annex V/25 — Max 0.3% in Permitted Products; Banned in Mouthwash & Under-3 Toothpaste)',
+        placingOnMarketDate: '2024-12-31',
+        makingAvailableDate: '2025-10-31',
+        deadline: '2024-12-31 (Placing) / 2025-10-31 (Withdrawal)',
+        effectiveDate: '2025-10-31',
+        status: 'enforced_limit_placing_2024_12_31_withdrawal_2025_10_31'
+      });
+    } else if (
+      subId === 'triclocarban' ||
+      /(?:^|[^\p{L}\p{N}])(triclocarban|triklokarban|triclocarbán|триклокарбан|تريكلوكاربان|ٹرائیکلوکاربن)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
+    ) {
+      transitionCalendarItems.push({
+        name: itemName,
+        substance: itemName,
+        regulation: 'EU 2024/996 (Annex V/23 & Annex III — Max 0.2% Preservative / 1.5% Rinse-off Non-Preservative; Banned in Mouthwash)',
         placingOnMarketDate: '2024-12-31',
         makingAvailableDate: '2025-10-31',
         deadline: '2024-12-31 (Placing) / 2025-10-31 (Withdrawal)',
@@ -5295,7 +6675,6 @@ function buildRegulatoryReportCard({
     } else if (
       subId === 'cyclosiloxanes_d5_d6' ||
       subId === 'cyclotetrasiloxane_d4' ||
-      subId === 'cyclic_siloxanes_d4_d5_d6' ||
       /(?:^|[^\p{L}\p{N}])(cyclopentasiloxane|cyclohexasiloxane|cyclotetrasiloxane)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr)
     ) {
       transitionCalendarItems.push({
@@ -5314,33 +6693,16 @@ function buildRegulatoryReportCard({
   // 2. Collect mandatory food allergens, cross-contact traces, and cosmetic sensitizers (even when user profile toggles are off)
   const detectedAllergens = [];
   if (productType === 'food') {
-    const FOOD_ALLERGEN_PATTERNS = [
-      { id: 'gluten', re: /(?:^|[^\p{L}\p{N}])(wheat|buğday|bugday|gluten|flour|un|weizen|farine|trigo|gandum|пшениц[а-я]*|دقيق|قمح|گندم|arpa|barley|çavdar|rye|oats|yulaf|spelt|kamut)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'milk', re: /(?:^|[^\p{L}\p{N}])(milk|süt|sut|lait|leche|milch|latte|susu|молок[а-я]*|حليب|دودھ|whey|casein|lactose|laktoz|kazein|peynir\s*altı\s*suyu)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'soy', re: /(?:^|[^\p{L}\p{N}])(soy|soya|soja|kedelai|соя|соев[а-я]*|صويا|سویا|sojalecithin|soybean[s]?)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'tree_nuts', re: /(?:^|[^\p{L}\p{N}])(hazelnut[s]?|haseln[üu]ss[e]?|fındık|findik|noisette[s]?|avellana[s]?|фундук|بندق|ہیزل|almond[s]?|badem|mandel[n]?|amande[s]?|almendra[s]?|миндаль|لوز|بادام|walnut[s]?|ceviz|cashew[s]?|kaju|pistachio[s]?|fıstık|fistik|pecan[s]?|macadamia)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'peanut', re: /(?:^|[^\p{L}\p{N}])(peanut[s]?|yer\s*fıst[ıi]ğ[ıi]|arachide[s]?|erdnuss|erdnüsse|cacahuete[s]?|арахис|فول\s+سوداني|مونگ\s*پھلی)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'egg', re: /(?:^|[^\p{L}\p{N}])(egg[s]?|yumurta|oeuf[s]?|ei|eier|huevo[s]?|яйц[а-я]*|بيض|انڈہ|انڈے)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'sesame', re: /(?:^|[^\p{L}\p{N}])(sesame|susam|tahin|tahini|sésame|sesam|sésamo|кунжут|سمسم|تل)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'mustard', re: /(?:^|[^\p{L}\p{N}])(mustard|hardal|senf|moutarde|mostaza|горчиц[а-я]*|خردل|رائی)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'celery', re: /(?:^|[^\p{L}\p{N}])(celery|kereviz|sellerie|céleri|apio|сельдерей|كرفس|اجوائن)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'lupin', re: /(?:^|[^\p{L}\p{N}])(lupin[e]?|ac[ıi]\s*bakla|lüpen|altramuz|люпин|ترمس|لوپن)(?=[^\p{L}\p{N}]|$)/iu },
-      { id: 'sulphites', re: /(?:^|[^\p{L}\p{N}])(sulphite[s]?|sulfite[s]?|sülfit|sulfit|schwefeldioxid|كبريتيت|سلفائٹ|e220|e221|e222|e223|e224|e226|e227|e228)(?=[^\p{L}\p{N}]|$)/iu }
-    ];
     for (const obs of observations || []) {
       const rawStr = String(obs.raw || '');
-      const scanText = rawStr
-        .replace(/[\p{L}]+[\s\-]*(?:free|frei)(?=[^\p{L}]|$)/giu, ' ')
-        .replace(/(?:free\s+(?:of|from)|without|ohne|sans|sin|senza|tanpa|bebas)\s+[\p{L}]+/giu, ' ')
-        .replace(/[\p{L}]+(?:siz|sız|suz|süz)(?=[^\p{L}]|$)/giu, ' ')
-        .replace(/[\p{L}]+\s+(?:içermez|icermez|yoktur|bulunmaz)(?=[^\p{L}]|$)/giu, ' ');
-      for (const pat of FOOD_ALLERGEN_PATTERNS) {
+      const scanText = stripNegatedTargets(rawStr);
+      for (const pat of EU_14_FOOD_ALLERGENS) {
         if (pat.id === 'gluten' && /gluten[\s\-]*(?:free|frei|siz|sız)|(?:free\s+(?:of|from)|without|ohne|sans|sin)\s+gluten/iu.test(rawStr)) {
           if (!/(?:^|[^\p{L}])(wheat|buğday|bugday|weizen|blé|ble|trigo|пшениц[а-я]*|قمح|barley|arpa|rye|çavdar|cavdar|spelt|kamut|oats|yulaf)(?=[^\p{L}]|$)/iu.test(scanText)) {
             continue;
           }
         }
-        if (pat.re.test(scanText)) {
+        if (pat.names.test(scanText)) {
           const ingName = obs.localizedName || obs.raw;
           detectedAllergens.push({
             type: 'direct_food_allergen',
@@ -5367,20 +6729,24 @@ function buildRegulatoryReportCard({
       });
     }
   } else {
+    const fragSensitizerRe = /(?:^|[^\p{L}\p{N}])(linalool|limonene|geraniol|citronellol|citral|eugenol|isoeugenol|coumarin|cinnamal|cinnamyl\s+alcohol|benzyl\s+salicylate|benzyl\s+benzoate|benzyl\s+cinnamate|farnesol|hexyl\s+cinnamal|alpha[\s\-]*isomethyl\s+ionone|parfum|fragrance)(?=[^\p{L}\p{N}]|$)/iu;
     for (const obs of observations || []) {
       const subId = obs.substance ? obs.substance.id : '';
       const rawStr = String(obs.raw || '');
+      const scanText = stripNegatedTargets(rawStr);
+      const scanTrimmed = scanText.trim();
+      if (!scanTrimmed) continue;
+      const isFragNegated = fragSensitizerRe.test(rawStr) && !fragSensitizerRe.test(scanText);
       const isFragAllergen =
-        subId === 'fragrance_allergens_26' ||
-        subId === 'linalool_limonene' ||
-        subId === 'parfum_fragrance' ||
-        /(?:^|[^\p{L}\p{N}])(linalool|limonene|geraniol|citronellol|citral|eugenol|isoeugenol|coumarin|cinnamal|cinnamyl\s+alcohol|benzyl\s+salicylate|benzyl\s+benzoate|benzyl\s+cinnamate|farnesol|hexyl\s+cinnamal|alpha[\s\-]*isomethyl\s+ionone|parfum|fragrance)(?=[^\p{L}\p{N}]|$)/iu.test(rawStr);
+        !isFragNegated &&
+        (subId === 'fragrance_allergens' ||
+          subId === 'parfum' ||
+          fragSensitizerRe.test(scanText));
       const isOtherSensitizer =
-        subId === 'mi_mci_isothiazolinones' ||
         subId === 'mi_mci' ||
         subId === 'formaldehyde_releasers' ||
         subId === 'hair_dye_sensitizers_ppd_resorcinol' ||
-        subId === 'hema_di_hema_nail_monomers';
+        subId === 'hema_dihema_nail';
       if (isFragAllergen || isOtherSensitizer) {
         const ingName = obs.localizedName || obs.raw;
         const cat = isFragAllergen ? 'fragrance_allergen' : (subId || 'cosmetic_sensitizer');
@@ -5400,7 +6766,7 @@ function buildRegulatoryReportCard({
   const sourceMap = new Map();
   const addSourceById = (sid) => {
     if (!sid) return;
-    const sObj = typeof sid === 'string' ? sourcesData.sources[sid] : sid;
+    const sObj = typeof sid === 'string' ? getSourceById(sid) : sid;
     if (sObj && sObj.id && !sourceMap.has(sObj.id)) {
       const inst = sObj.institution || sObj.jurisdiction || 'EU / Official Standard';
       const chk = sObj.checked_at || sourcesData.version || '2026-10-12';
@@ -5496,7 +6862,7 @@ function buildRegulatoryReportCard({
       datasetVersion: '2026.10-omnibus',
       sourcesSnapshotDate: sourcesData.version || '2026-10-12',
       ruleEngineVersion: '2026-10-31-v4-omnibus-10lang',
-      cosingDictionaryCount: 30609,
+      cosingDictionaryCount: Object.keys(cosingData || {}).length,
       activeJurisdiction: jurisdiction,
       selectedHalalAuthority: halalAuthority,
       verifiedSourceCount: citedOfficialSources.length
@@ -6188,7 +7554,7 @@ export const VERIFIED_BARCODE_CATALOG = {
       ms: 'Pringles Original Kerepek Kentang',
       es: 'Pringles Original Patatas Fritas',
       ru: 'Pringles Original Картофельные чипсы',
-      ur: 'پرنپگلز اوریجنل آلو کے چپس'
+      ur: 'پرنگلز اوریجنل آلو کے چپس'
     },
     rawText: 'Potato Starch, Corn Starch, Rice Flour, E471, Salt, Maltodextrin, Citric Acid, Wheat Starch'
   },
@@ -6366,10 +7732,11 @@ export function lookupBarcodeProduct({
   }
 
   const customHit =
-    customCatalog && typeof customCatalog === 'object' && customCatalog[norm.code]
+    customCatalog && typeof customCatalog === 'object' && Object.hasOwn(customCatalog, norm.code)
       ? customCatalog[norm.code]
       : null;
-  const entry = VERIFIED_BARCODE_CATALOG[norm.code] || customHit || externalProduct || null;
+  const verifiedHit = Object.hasOwn(VERIFIED_BARCODE_CATALOG, norm.code) ? VERIFIED_BARCODE_CATALOG[norm.code] : null;
+  const entry = verifiedHit || customHit || externalProduct || null;
   if (!entry || !entry.rawText || !String(entry.rawText).trim()) {
     return {
       valid: true,
@@ -6460,6 +7827,16 @@ export function createCustomBarcodeEntry({
     lang
   });
   const coveragePercent = evaluation.cards.regulatoryCard.coveragePercent;
+  if (Array.isArray(evaluation.unresolvedConfirmations) && evaluation.unresolvedConfirmations.length > 0) {
+    return {
+      ok: false,
+      reason: 'unresolved_ocr_confirmations',
+      barcode: norm.code,
+      coveragePercent,
+      unresolvedConfirmations: evaluation.unresolvedConfirmations,
+      entry: null
+    };
+  }
   if (coveragePercent < 80) {
     return {
       ok: false,

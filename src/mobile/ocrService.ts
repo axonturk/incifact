@@ -1,5 +1,5 @@
 /**
- * InciFact — On-Device Camera & Photo OCR Service (expo-image-picker / expo-camera + Native Vision / ML Kit bridge)
+ * InciFact — On-Device Camera & Photo OCR Service (expo-image-picker + Native Vision / ML Kit bridge)
  * Zero-Cloud-Token Cost: Extracts raw ingredient text from product packaging photos locally on device.
  */
 
@@ -18,9 +18,10 @@ export interface OcrCaptureResult {
  * - Preserves hyphenated line breaks so ruleEngine's dictionary-verified hyphenation resolver can inspect them
  * - Strips barcode / net weight noise ("e 50 ml", "1.7 FL. OZ.", "Made in France")
  */
-export function cleanRawOcrBlock(ocrLines: string[]): string {
-  if (!ocrLines || ocrLines.length === 0) return '';
+export function cleanRawOcrBlock(ocrLines: unknown): string {
+  if (!Array.isArray(ocrLines) || ocrLines.length === 0) return '';
   const filtered = ocrLines
+    .filter((line): line is string => typeof line === 'string')
     .map((line) => line.trim())
     .filter((line) => {
       if (!line) return false;
@@ -49,7 +50,7 @@ export async function captureAndRecognizeLabel(mode: 'camera' | 'gallery' = 'cam
           ? await ImagePicker.requestCameraPermissionsAsync()
           : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-      if (!perm.granted) {
+      if (!perm || perm.granted !== true) {
         return {
           cancelled: true,
           error: 'Camera / photo permission was not granted.'
@@ -69,21 +70,32 @@ export async function captureAndRecognizeLabel(mode: 'camera' | 'gallery' = 'cam
               allowsEditing: true
             });
 
-      if (pickerResult.canceled || !pickerResult.assets?.[0]?.uri) {
+      const firstAsset =
+        pickerResult && !pickerResult.canceled && Array.isArray(pickerResult.assets) ? pickerResult.assets[0] : null;
+      const imageUri = firstAsset && typeof firstAsset.uri === 'string' ? firstAsset.uri.trim() : '';
+      if (!imageUri) {
         return { cancelled: true };
       }
-
-      const imageUri = pickerResult.assets[0].uri;
 
       // Attempt native Vision / ML Kit OCR if linked in custom dev client via NativeModules (Metro-safe)
       const rn = await import('react-native').catch(() => null);
       const nativeOcrModule = (rn as any)?.NativeModules?.MlkitOcr || (globalThis as any).__INCIFACT_NATIVE_OCR__;
       if (nativeOcrModule && typeof nativeOcrModule.detectFromUri === 'function') {
         const blocks = await nativeOcrModule.detectFromUri(imageUri);
-        const lines = Array.isArray(blocks) ? blocks.map((b: any) => b.text) : [];
-        const measuredConfidence = Array.isArray(blocks) && blocks.length > 0 && typeof blocks[0]?.confidence === 'number'
-          ? blocks.reduce((acc: number, b: any) => acc + (b.confidence || 0), 0) / blocks.length
-          : null;
+        const lines: string[] = Array.isArray(blocks)
+          ? blocks
+              .map((b: any) => (b && typeof b.text === 'string' ? b.text : typeof b === 'string' ? b : ''))
+              .filter((s: string) => s.length > 0)
+          : [];
+        const confidenceScores: number[] = Array.isArray(blocks)
+          ? blocks
+              .map((b: any) => b?.confidence)
+              .filter((v: any): v is number => typeof v === 'number' && Number.isFinite(v))
+          : [];
+        const measuredConfidence =
+          confidenceScores.length > 0
+            ? confidenceScores.reduce((acc, v) => acc + v, 0) / confidenceScores.length
+            : null;
         return {
           cancelled: false,
           imageUri,

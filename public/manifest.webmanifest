@@ -12,16 +12,22 @@
   "categories": ["health", "medical", "lifestyle", "shopping"],
   "icons": [
     {
-      "src": "./assets/incifact-app-icon.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "src": "./assets/incifact-app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "./assets/incifact-corporate-seal.jpg",
+      "src": "./assets/incifact-app-icon.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "./assets/incifact-app-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

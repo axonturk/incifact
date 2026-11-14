@@ -132,7 +132,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'Hamilelik & Emzirme', desc: 'Retinoidler, yüksek konsantrasyon salisilik asit ve şüpheli UV filtrelerini işaretler.' },
         cocuk_metabolik: { name: 'Bebek & Çocuk', desc: 'Southampton 6 sentetik boyaları, nitritleri, boratları ve sert koruyucuları öne çıkarır.' },
-        hassas_cilt: { name: 'Hassas / Atopik Cilt', desc: '26 parfüm alerjeni, MI/MCI, SLS ve ilk 5 sıradaki kurutucu alkolü yakalar.' },
+        hassas_cilt: { name: 'Hassas / Atopik Cilt', desc: '80+ (AB 2023/1545) parfüm alerjeni, MI/MCI, SLS ve ilk 5 sıradaki kurutucu alkolü yakalar.' },
         astim_alerji: { name: 'Alerji & Astım', desc: 'Sülfitler (E220-E228), formaldehit salıcılar ve saç boyası duyarlılaştırıcılarını bildirir.' },
         akne: { name: 'Akneye Meyilli Cilt', desc: 'Genel puanı düşürmeden yalnız komedojenik ester ve ağır yağları uyarır.' }
       },
@@ -215,7 +215,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'Pregnancy & Nursing', desc: 'Flags retinoids, high-concentration salicylic acid, and suspected endocrine UV filters.' },
         cocuk_metabolik: { name: 'Baby & Child', desc: 'Highlights Southampton 6 synthetic dyes, nitrites, borates, and harsh preservatives.' },
-        hassas_cilt: { name: 'Sensitive / Eczema Skin', desc: 'Catches 26 EU fragrance allergens, MI/MCI, SLS, and top-5 drying denatured alcohol.' },
+        hassas_cilt: { name: 'Sensitive / Eczema Skin', desc: 'Catches 80+ (EU 2023/1545) fragrance allergens, MI/MCI, SLS, and top-5 drying denatured alcohol.' },
         astim_alerji: { name: 'Allergy & Asthma', desc: 'Flags sulfites (E220–E228), formaldehyde releasers, and hair-dye sensitizers.' },
         akne: { name: 'Acne-Prone Skin', desc: 'Warns about comedogenic esters and heavy oils without distorting the general safety score.' }
       },
@@ -298,7 +298,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'الحمل والرضاعة', desc: 'ينبهك من الريتينويدات وحمض الساليسيليك بتركيز عالٍ وفلاتر الشمس المشتبه بها.' },
         cocuk_metabolik: { name: 'الأطفال والرضع', desc: 'يكشف ألوان ساوثهامبتون الستة والنيتريت والبورات والمواد الحافظة القوية.' },
-        hassas_cilt: { name: 'البشرة الحساسة والأكزيما', desc: 'يرصد ٢٦ مادة عطرية مسببة للحساسية و SLS والكحول المجفف في أول ٥ مكونات.' },
+        hassas_cilt: { name: 'البشرة الحساسة والأكزيما', desc: 'يرصد 80+ (EU 2023/1545) مادة عطرية مسببة للحساسية و MI/MCI و SLS والكحول المجفف في أول ٥ مكونات.' },
         astim_alerji: { name: 'الحساسية والربو', desc: 'ينبهك من الكبريتيت (E220-E228) ومحررات الفورمالديهايد ومسببات حساسية صبغات الشعر.' },
         akne: { name: 'البشرة المعرضة لحب الشباب', desc: 'يحذر من الإسترات والزيوت السادة للمسام دون خفض المؤشر التنظيمي العام.' }
       },
@@ -381,7 +381,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'Schwangerschaft & Stillzeit', desc: 'Markiert Retinoide, hochdosierte Salicylsäure und bedenkliche UV-Filter.' },
         cocuk_metabolik: { name: 'Baby & Kinder', desc: 'Warnt vor Southampton-Azofarbstoffen, Nitriten, Boraten und starken Konservierern.' },
-        hassas_cilt: { name: 'Empfindliche Haut / Neurodermitis', desc: 'Erkennt 26 Duftstoffallergene, MI/MCI, SLS und Alcohol Denat. in den Top 5.' },
+        hassas_cilt: { name: 'Empfindliche Haut / Neurodermitis', desc: 'Erkennt 80+ (EU 2023/1545) Duftstoffallergene, MI/MCI, SLS und Alcohol Denat. in den Top 5.' },
         astim_alerji: { name: 'Allergie & Asthma', desc: 'Meldet Sulfite (E220–E228), Formaldehydabspalter und Haarfärbe-Sensibilisierer.' },
         akne: { name: 'Zu Akne neigende Haut', desc: 'Warnt vor komedogenen Estern und Ölen ohne den allgemeinen Regulierungs-Score zu verzerren.' }
       },
@@ -464,7 +464,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'Grossesse & Allaitement', desc: 'Signale les rétinoïdes, l\'acide salicylique concentré et les filtres UV préoccupants.' },
         cocuk_metabolik: { name: 'Bébé & Enfant', desc: 'Met en évidence les 6 colorants de Southampton, nitrites, borates et conservateurs irritants.' },
-        hassas_cilt: { name: 'Peau Sensible / Atopique', desc: 'Détecte les 26 allergènes parfumés, MI/MCI, SLS et l\'alcool dénaturé dans le top 5.' },
+        hassas_cilt: { name: 'Peau Sensible / Atopique', desc: 'Détecte les 80+ (UE 2023/1545) allergènes parfumés, MI/MCI, SLS et l\'alcool dénaturé dans le top 5.' },
         astim_alerji: { name: 'Allergies & Asthme', desc: 'Signale les sulfites (E220–E228), libérateurs de formaldéhyde et colorants capillaires.' },
         akne: { name: 'Peau à Tendance Acnéique', desc: 'Avertit des esters et huiles comédogènes sans fausser le score réglementaire général.' }
       },
@@ -547,7 +547,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'Ibu Hamil & Menyusui', desc: 'Menandai retinoid, asam salisilat dosis tinggi, dan filter UV yang dicurigai.' },
         cocuk_metabolik: { name: 'Bayi & Anak-Anak', desc: 'Menyoroti 6 pewarna sintetis Southampton, nitrit, borat, dan pengawet keras.' },
-        hassas_cilt: { name: 'Kulit Sensitif / Eksim', desc: 'Mendeteksi 26 alergen wewangian, MI/MCI, SLS, dan alkohol denat di 5 urutan teratas.' },
+        hassas_cilt: { name: 'Kulit Sensitif / Eksim', desc: 'Mendeteksi 80+ (UE 2023/1545) alergen wewangian, MI/MCI, SLS, dan alkohol denat di 5 urutan teratas.' },
         astim_alerji: { name: 'Alergi & Asma', desc: 'Menandai sulfit (E220–E228), pelepas formaldehida, dan pemicu alergi cat rambut.' },
         akne: { name: 'Kulit Rentan Berjerawat', desc: 'Memperingatkan ester dan minyak komedogenik tanpa menurunkan skor regulasi umum.' }
       },
@@ -630,7 +630,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'Kehamilan & Penyusuan', desc: 'Menandakan retinoid, asid salisilik kepekatan tinggi dan penapis UV yang dicurigai.' },
         cocuk_metabolik: { name: 'Bayi & Kanak-kanak', desc: 'Menyerlahkan 6 pewarna tiruan Southampton, nitrit, borat dan pengawet keras.' },
-        hassas_cilt: { name: 'Kulit Sensitif / Ekzema', desc: 'Mengesan 26 alergen wangian, MI/MCI, SLS dan alkohol denat dalam 5 ramuan teratas.' },
+        hassas_cilt: { name: 'Kulit Sensitif / Ekzema', desc: 'Mengesan 80+ (EU 2023/1545) alergen wangian, MI/MCI, SLS dan alkohol denat dalam 5 ramuan teratas.' },
         astim_alerji: { name: 'Alahan & Asma', desc: 'Menandakan sulfit (E220–E228), pelepas formaldehid dan pemeka pewarna rambut.' },
         akne: { name: 'Kulit Mudah Berjerawat', desc: 'Memberi amaran tentang ester dan minyak komedogenik tanpa menjejaskan skor regulasi umum.' }
       },
@@ -713,7 +713,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'Embarazo y Lactancia', desc: 'Señala retinoides, ácido salicílico concentrado y filtros UV sospechosos.' },
         cocuk_metabolik: { name: 'Bebés y Niños', desc: 'Destaca los 6 colorantes de Southampton, nitritos, boratos y conservantes fuertes.' },
-        hassas_cilt: { name: 'Piel Sensible / Atópica', desc: 'Detecta 26 alérgenos de fragancia, MI/MCI, SLS y alcohol desnaturalizado en el top 5.' },
+        hassas_cilt: { name: 'Piel Sensible / Atópica', desc: 'Detecta 80+ (UE 2023/1545) alérgenos de fragancia, MI/MCI, SLS y alcohol desnaturalizado en el top 5.' },
         astim_alerji: { name: 'Alergias y Asma', desc: 'Advierte sobre sulfitos (E220–E228), liberadores de formaldehído y tintes capilares.' },
         akne: { name: 'Piel Propensa al Acné', desc: 'Advierte sobre ésteres y aceites comedogénicos sin distorsionar la puntuación general.' }
       },
@@ -796,7 +796,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'Беременность и ГВ', desc: 'Отмечает ретиноиды, высокую концентрацию салициловой кислоты и спорные УФ-фильтры.' },
         cocuk_metabolik: { name: 'Дети и малыши', desc: 'Выявляет 6 красителей Саутгемптона, нитриты, бораты и жесткие консерванты.' },
-        hassas_cilt: { name: 'Чувствительная кожа / Атопия', desc: 'Находит 26 отдушек-аллергенов, MI/MCI, SLS и денатурированный спирт в топ-5.' },
+        hassas_cilt: { name: 'Чувствительная кожа / Атопия', desc: 'Находит 80+ (ЕС 2023/1545) отдушек-аллергенов, MI/MCI, SLS и денатурированный спирт в топ-5.' },
         astim_alerji: { name: 'Аллергия и астма', desc: 'Предупреждает о сульфитах (E220–E228), релизерах формальдегида и красителях для волос.' },
         akne: { name: 'Склонная к акне кожа', desc: 'Предупреждает о комедогенных эфирах и маслах без занижения общего рейтинга.' }
       },
@@ -879,7 +879,7 @@ export const UI_STRINGS = {
       profiles: {
         hamilelik: { name: 'حمل اور دودھ پلانے والی مائیں', desc: 'ریٹینوئڈز، تیز سیلیسیلک ایسڈ اور مشتبہ یو وی فلٹرز کی نشاندہی کرتا ہے۔' },
         cocuk_metabolik: { name: 'بچے اور شیر خوار', desc: 'ساؤتھمپٹن کے 6 مصنوعی رنگوں، نائٹرائٹس، بوریٹس اور تیز پریزرویٹوز سے آگاہ کرتا ہے۔' },
-        hassas_cilt: { name: 'حساس جلد / ایکزیما', desc: '26 خوشبو کے الرجن، SLS اور ابتدائی 5 اجزاء میں خشک کرنے والے الکحل کو پکڑتا ہے۔' },
+        hassas_cilt: { name: 'حساس جلد / ایکزیما', desc: '80+ (EU 2023/1545) خوشبو کے الرجن، MI/MCI، SLS اور ابتدائی 5 اجزاء میں خشک کرنے والے الکحل کو پکڑتا ہے۔' },
         astim_alerji: { name: 'الرجی اور دمہ', desc: 'سلفائٹس (E220-E228)، فارملڈیہائیڈ اور ہیئر ڈائی الرجن کی نشاندہی کرتا ہے۔' },
         akne: { name: 'مہاسوں (Acne) والی جلد', desc: 'عمومی اسکور کو کم کیے بغیر مسام بند کرنے والے تیل اور ایسٹرز سے خبردار کرتا ہے۔' }
       },

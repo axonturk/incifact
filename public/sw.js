@@ -1,10 +1,14 @@
-const CACHE_NAME = 'incifact-pwa-v2026.10';
+const CACHE_NAME = 'incifact-pwa-v2026.10-2';
 const CORE_ASSETS = [
   './',
   './index.html',
   './privacy.html',
   './manifest.webmanifest',
+  './assets/hero-shield-crest.jpg',
   './assets/incifact-app-icon.jpg',
+  './assets/incifact-app-icon.png',
+  './assets/incifact-app-icon-192.png',
+  './assets/incifact-app-icon-maskable-512.png',
   './assets/incifact-corporate-seal.jpg',
   './src/engine/ruleEngine.mjs',
   './src/i18n/locales.mjs',
@@ -19,7 +23,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(CORE_ASSETS).catch(() => {}))
+      .then((cache) => cache.addAll(CORE_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
@@ -52,12 +56,20 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
-        if (response && response.status === 200) {
+        if (response && response.status === 200 && response.type === 'basic') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone)).catch(() => {});
         }
         return response;
       })
-      .catch(() => caches.match(request).then((cached) => cached || caches.match('./index.html')))
+      .catch(async () => {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        if (request.mode === 'navigate') {
+          const fallback = await caches.match('./index.html');
+          if (fallback) return fallback;
+        }
+        return Response.error();
+      })
   );
 });

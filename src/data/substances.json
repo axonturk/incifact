@@ -821,9 +821,33 @@
       "name": "Retinol & Vitamin A Esters (Retinyl Palmitate / Acetate)",
       "aliases": [
         "retinol",
+        "rétinol",
+        "ретинол",
+        "ريتينول",
+        "ریٹینول",
         "vitamin a",
+        "vitamine a",
+        "vitamina a",
+        "a vitamini",
+        "فيتامين أ",
+        "витамин а",
+        "وٹامن a",
         "retinyl palmitate",
+        "retinil palmitat",
+        "retinylpalmitat",
+        "palmitate de rétinyle",
+        "palmitato de retinilo",
+        "ретинилпальмитат",
+        "بالميتات الريتينيل",
+        "ریٹینائل پامٹیٹ",
         "retinyl acetate",
+        "retinil asetat",
+        "retinylacetat",
+        "acétate de rétinyle",
+        "acetato de retinilo",
+        "ретинилацетат",
+        "أسيتات الريتينيل",
+        "ریٹینائل ایسیٹیٹ",
         "retinyl propionate"
       ],
       "domain": "cosmetic",
@@ -831,7 +855,7 @@
       "e_code": null,
       "ci_code": null,
       "eu_status": "kisitli",
-      "eu_detail": "AB Yönetmeliği 2024/996: Retinol eşdeğeri olarak vücut losyonlarında maks. %0.05, diğer ürünlerde %0.3 (Toplam A vitamini maruziyeti sınırı).",
+      "eu_detail": "AB Yönetmeliği 2024/996 (Ek III/376): Retinol eşdeğeri olarak vücut losyonlarında maks. %0.05, diğer ürünlerde %0.3 (Toplam A vitamini maruziyeti sınırı).",
       "ed_tier": null,
       "severity": "orta",
       "profiles": {
@@ -2252,35 +2276,105 @@
     },
     {
       "id": "tranexamic_azelaic_arbutin",
-      "name": "Brightening Actives (Azelaic Acid / Tranexamic Acid / Alpha-Arbutin)",
+      "name": "Brightening Actives (Azelaic Acid / Tranexamic Acid / Niacin)",
       "aliases": [
         "azelaic acid",
         "azelaik asit",
+        "azelainsäure",
+        "acide azélaïque",
+        "ácido azelaico",
+        "asam azelaic",
+        "asid azelaik",
+        "حمض الأزيليك",
+        "азелаиновая кислота",
+        "ازیلائک ایسڈ",
         "potassium azeloyl diglycinate",
         "tranexamic acid",
         "traneksamik asit",
-        "alpha-arbutin",
-        "alfa arbutin",
-        "arbutin",
-        "niacin",
-        "азелаиновая кислота",
+        "tranexamsäure",
+        "acide tranexamique",
+        "ácido tranexámico",
+        "asam traneksamat",
+        "asid traneksamik",
+        "حمض الترانيكساميك",
         "ترانيكساميك",
-        "أربوتين"
+        "транексамовая кислота",
+        "ٹرانیکسامک ایسڈ",
+        "niacin"
       ],
       "domain": "cosmetic",
       "class": "active",
       "e_code": null,
       "ci_code": null,
       "eu_status": "izinli",
-      "eu_detail": "Leke ve cilt tonu eşitsizliği bakımında kullanılan aktif bileşenler (Alpha-Arbutin AB 2024/996 kapsamında yüz kremlerinde %2, vücut losyonlarında %0.5 sınırıyla izinlidir).",
+      "eu_detail": "Leke ve cilt tonu eşitsizliği bakımında kullanılan izinli aydınlatıcı aktif bileşenler (Azelaik asit, Traneksamik asit, Niacin).",
       "ed_tier": null,
       "severity": "bilgi",
       "profiles": {},
       "sources": [
-        "EU_2024_996",
-        "COSING"
+        "COSING",
+        "EU_1223_2009"
       ],
       "verification": "ikincil_kontrol",
+      "note": null
+    },
+    {
+      "id": "alpha_arbutin",
+      "name": "Alpha-Arbutin",
+      "aliases": [
+        "alpha-arbutin",
+        "alpha arbutin",
+        "alfa-arbutin",
+        "alfa arbutin",
+        "alpha-arbutine",
+        "alfa-arbutina",
+        "ألفا أربوتين",
+        "альфа-арбутин",
+        "الفا اربوٹین"
+      ],
+      "domain": "cosmetic",
+      "class": "active",
+      "e_code": null,
+      "ci_code": null,
+      "eu_status": "kisitli",
+      "eu_detail": "AB Yönetmeliği 2024/996 (Ek III/377): Yüz kremlerinde azami %2.0, vücut losyonlarında azami %0.5 sınırıyla izinlidir (1 Şubat 2025 piyasaya arz, 1 Kasım 2025 piyasada bulundurma son tarihi).",
+      "ed_tier": null,
+      "severity": "dusuk",
+      "profiles": {},
+      "sources": [
+        "EU_2024_996",
+        "EU_1223_2009"
+      ],
+      "verification": "birincil_kaynak",
+      "note": null
+    },
+    {
+      "id": "arbutin",
+      "name": "Arbutin",
+      "aliases": [
+        "arbutin",
+        "beta-arbutin",
+        "beta arbutin",
+        "arbutine",
+        "arbutina",
+        "أربوتين",
+        "арбутин",
+        "اربوٹین"
+      ],
+      "domain": "cosmetic",
+      "class": "active",
+      "e_code": null,
+      "ci_code": null,
+      "eu_status": "kisitli",
+      "eu_detail": "AB Yönetmeliği 2024/996 (Ek III/378): Yüz kremlerinde azami %7.0 sınırıyla izinlidir (1 Şubat 2025 piyasaya arz, 1 Kasım 2025 piyasada bulundurma son tarihi).",
+      "ed_tier": null,
+      "severity": "dusuk",
+      "profiles": {},
+      "sources": [
+        "EU_2024_996",
+        "EU_1223_2009"
+      ],
+      "verification": "birincil_kaynak",
       "note": null
     },
     {
@@ -2289,15 +2383,21 @@
       "aliases": [
         "kojic acid",
         "kojik asit",
+        "kojisäure",
+        "acide kojique",
+        "ácido kójico",
+        "asam kojat",
+        "asid kojik",
         "койевая кислота",
-        "حمض الكوجيك"
+        "حمض الكوجيك",
+        "کوجک ایسڈ"
       ],
       "domain": "cosmetic",
       "class": "active",
       "e_code": null,
       "ci_code": null,
       "eu_status": "kisitli",
-      "eu_detail": "AB Yönetmeliği 2024/996 kapsamında yüz ve el ürünlerinde maksimum %1 konsantrasyon sınırıyla izinlidir.",
+      "eu_detail": "AB Yönetmeliği 2024/996 (Ek III/375) kapsamında yüz ve el ürünlerinde maksimum %1 konsantrasyon sınırıyla izinlidir.",
       "ed_tier": null,
       "severity": "dusuk",
       "profiles": {
@@ -4984,7 +5084,13 @@
       "aliases": [
         "triphenyl phosphate",
         "tphp",
-        "trifenil fosfat"
+        "trifenil fosfat",
+        "triphenylphosphat",
+        "phosphate de triphényle",
+        "fosfato de trifenilo",
+        "трифенилфосфат",
+        "فوسفات ثلاثي الفينيل",
+        "ٹرائی فینائل فاسفیٹ"
       ],
       "domain": "cosmetic",
       "class": "plasticizer",
@@ -5827,6 +5933,116 @@
         "EU_2022_1181"
       ],
       "verification": "ikincil_kontrol",
+      "note": null
+    },
+    {
+      "id": "triclosan",
+      "name": "Triclosan",
+      "aliases": [
+        "triclosan",
+        "triklosan",
+        "triclosán",
+        "триклозан",
+        "تريكلوسان",
+        "ٹرائیکلوسان",
+        "5-chloro-2-(2,4-dichlorophenoxy)phenol"
+      ],
+      "domain": "cosmetic",
+      "class": "preservative",
+      "e_code": null,
+      "ci_code": null,
+      "eu_status": "kisitli",
+      "eu_detail": "AB Yönetmeliği 2024/996 (Ek V/25): Diş macunu, el/vücut sabunu, duş jeli, deodorant, yüz pudrası, kapatıcı ve tırnak ürünlerinde azami %0.3 sınırıyla izinlidir; gargaralarda (mouthwash) ve 3 yaş altı çocuk diş macunlarında YASAKTIR (31 Aralık 2024 piyasaya arz, 31 Ekim 2025 piyasada bulundurma son tarihi).",
+      "ed_tier": "EC_grup_A",
+      "severity": "orta",
+      "profiles": {},
+      "sources": [
+        "EU_2024_996",
+        "EU_1223_2009"
+      ],
+      "verification": "birincil_kaynak",
+      "note": null
+    },
+    {
+      "id": "triclocarban",
+      "name": "Triclocarban",
+      "aliases": [
+        "triclocarban",
+        "triklokarban",
+        "triclocarbán",
+        "триклокарбан",
+        "تريكلوكاربان",
+        "ٹرائیکلوکاربن",
+        "3,4,4'-trichlorocarbanilide"
+      ],
+      "domain": "cosmetic",
+      "class": "preservative",
+      "e_code": null,
+      "ci_code": null,
+      "eu_status": "kisitli",
+      "eu_detail": "AB Yönetmeliği 2024/996 (Ek V/23 & Ek III): Koruyucu olarak (gargara hariç) tüm kozmetik ürünlerde azami %0.2; durulanan koruyucu-dışı kullanımda azami %1.5 sınırıyla izinlidir; gargaralarda ve 6 yaş altı çocuk diş macunlarında YASAKTIR (31 Aralık 2024 piyasaya arz, 31 Ekim 2025 piyasada bulundurma son tarihi).",
+      "ed_tier": null,
+      "severity": "orta",
+      "profiles": {},
+      "sources": [
+        "EU_2024_996",
+        "EU_1223_2009"
+      ],
+      "verification": "birincil_kaynak",
+      "note": null
+    },
+    {
+      "id": "genistein",
+      "name": "Genistein",
+      "aliases": [
+        "genistein",
+        "genisteine",
+        "genisteína",
+        "генистеин",
+        "جينيستين",
+        "جینیسٹین"
+      ],
+      "domain": "cosmetic",
+      "class": "active",
+      "e_code": null,
+      "ci_code": null,
+      "eu_status": "kisitli",
+      "eu_detail": "AB Yönetmeliği 2024/996 (Ek III/373): Kozmetik ürünlerde azami %0.007 konsantrasyon sınırıyla izinlidir (1 Şubat 2025 piyasaya arz, 1 Kasım 2025 piyasada bulundurma son tarihi).",
+      "ed_tier": null,
+      "severity": "dusuk",
+      "profiles": {},
+      "sources": [
+        "EU_2024_996",
+        "EU_1223_2009"
+      ],
+      "verification": "birincil_kaynak",
+      "note": null
+    },
+    {
+      "id": "daidzein",
+      "name": "Daidzein",
+      "aliases": [
+        "daidzein",
+        "daidzeine",
+        "daidzeína",
+        "даидзеин",
+        "دايدزين",
+        "ڈائیڈزین"
+      ],
+      "domain": "cosmetic",
+      "class": "active",
+      "e_code": null,
+      "ci_code": null,
+      "eu_status": "kisitli",
+      "eu_detail": "AB Yönetmeliği 2024/996 (Ek III/374): Kozmetik ürünlerde azami %0.02 konsantrasyon sınırıyla izinlidir (1 Şubat 2025 piyasaya arz, 1 Kasım 2025 piyasada bulundurma son tarihi).",
+      "ed_tier": null,
+      "severity": "dusuk",
+      "profiles": {},
+      "sources": [
+        "EU_2024_996",
+        "EU_1223_2009"
+      ],
+      "verification": "birincil_kaynak",
       "note": null
     }
   ]
