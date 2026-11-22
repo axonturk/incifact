@@ -103,6 +103,7 @@ t('[Plugins/Android] withAndroidHardening sets allowBackup=false, R8/minify, shr
   ]);
   const props2 = withAndroidHardening.applyAndroidGradlePropertiesHardening(props1);
   const byKey = Object.fromEntries(props2.map((p) => [p.key, p.value]));
+  assert.equal(byKey['android.enableProguardInReleaseBuilds'], 'true');
   assert.equal(byKey['android.enableMinifyInReleaseBuilds'], 'true');
   assert.equal(byKey['android.enableShrinkResourcesInReleaseBuilds'], 'true');
   assert.equal(byKey['reactNativeArchitectures'], 'armeabi-v7a,arm64-v8a');

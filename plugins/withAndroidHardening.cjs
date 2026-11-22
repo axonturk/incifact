@@ -69,6 +69,7 @@ function patchProguardRules(contents, packageName = 'com.incifact.app') {
 function applyAndroidGradlePropertiesHardening(properties) {
   const list = Array.isArray(properties) ? [...properties] : [];
   const hardenedEntries = [
+    ['android.enableProguardInReleaseBuilds', 'true'],
     ['android.enableMinifyInReleaseBuilds', 'true'],
     ['android.enableShrinkResourcesInReleaseBuilds', 'true'],
     ['reactNativeArchitectures', 'armeabi-v7a,arm64-v8a']

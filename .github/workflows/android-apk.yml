@@ -41,13 +41,17 @@ jobs:
           npm run typecheck
 
       - name: Expo Android Prebuild
-        run: npx expo prebuild --platform android --non-interactive --clean
+        env:
+          CI: '1'
+        run: npx expo prebuild --platform android --clean
 
       - name: Verify prebuild native plugins and hardening files
         run: |
           test -n "$(find android/app/src -name 'MlkitOcrModule.kt' -print -quit)"
           test -f android/app/src/main/res/xml/data_extraction_rules.xml
           test -f android/app/proguard-rules.pro
+          grep -q '^android.enableProguardInReleaseBuilds=true$' android/gradle.properties
+          grep -q '^android.enableShrinkResourcesInReleaseBuilds=true$' android/gradle.properties
 
       - name: Assemble Release APK
         env:
