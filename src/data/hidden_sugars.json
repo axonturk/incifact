@@ -22,7 +22,18 @@
         "gula pasir",
         "сахар",
         "چینی",
-        "شکر"
+        "شکر",
+        "سكر أبيض",
+        "سفید چینی",
+        "karamellzuckersirup",
+        "sukrosa",
+        "açúcar",
+        "azúcar caramelizado en polvo",
+        "сахар белый",
+        "karamelize şeker",
+        "white sugar",
+        "granulated sugar",
+        "сахарный сироп"
       ]
     },
     {
@@ -41,7 +52,16 @@
         "glukosa",
         "глюкоза",
         "декстроза",
-        "گلوکوز"
+        "گلوکوز",
+        "غلوكوز",
+        "ديكستروز",
+        "ڈیکسٹروز",
+        "dextrose de blé",
+        "dextrose de pomme de terre",
+        "سكر العنب",
+        "traubenzucker",
+        "dextrosa",
+        "dekstrosa"
       ]
     },
     {
@@ -56,7 +76,11 @@
         "fructosa",
         "fruktosa",
         "фруктоза",
-        "فرکٹوز"
+        "فرکٹوز",
+        "فروکٹوز",
+        "jarabe de fructosa",
+        "fructose syrup",
+        "fruktose"
       ]
     },
     {
@@ -72,7 +96,8 @@
         "инвертный сироп",
         "инвертный сахар",
         "شراب السكر المحول",
-        "sirup gula invert"
+        "sirup gula invert",
+        "inverted sugar syrup"
       ]
     },
     {
@@ -88,7 +113,16 @@
         "jarabe de glucosa",
         "sirup glukosa",
         "сироп глюкозы",
-        "патока"
+        "патока",
+        "شراب الغلوكوز",
+        "گلوکوز سیرپ",
+        "sirop de glucose de pomme de terre",
+        "sirop de glucose de blé",
+        "sirop de glucose de maïs",
+        "sirap glukosa",
+        "جلوكوز سائل",
+        "liquid glucose",
+        "glukose-sirup"
       ]
     },
     {
@@ -99,6 +133,13 @@
         "fructose-glucose syrup",
         "glikoz-fruktoz şurubu",
         "fruktoz-glikoz şurubu",
+        "glukoz-fruktoz şurubu",
+        "fruktoz-glukoz şurubu",
+        "glukoz fruktoz şurubu",
+        "fruktoz glukoz şurubu",
+        "glikoz fruktoz şurubu",
+        "fruktoz glikoz şurubu",
+        "fruktoz-glukoz şurubu (*f)",
         "high-fructose corn syrup",
         "hfcs",
         "yüksek fruktozlu mısır şurubu",
@@ -107,7 +148,14 @@
         "شراب الجلوكوز والفركتوز",
         "jarabe de glucosa y fructosa",
         "jarabe de maíz de alta fructosa",
-        "сироп глюкозы-фруктозы"
+        "сироп глюкозы-фруктозы",
+        "high fructose syrup",
+        "high fructose corn syrup",
+        "ہائی فرکٹوز کارن سیرپ",
+        "شراب الذرة عالي الفركتوز",
+        "fruktose-glukose-sirup",
+        "sirop de glucose-fructose",
+        "sirop de glucose - fructose"
       ]
     },
     {
@@ -123,7 +171,8 @@
         "شراب الذرة",
         "jarabe de maíz",
         "sirup jagung",
-        "sirop de maïs"
+        "sirop de maïs",
+        "کارن سیرپ"
       ]
     },
     {
@@ -140,7 +189,8 @@
         "سكر القصب",
         "azúcar de caña",
         "gula tebu",
-        "گنے کی چینی"
+        "گنے کی چینی",
+        "rohrohrzucker"
       ]
     },
     {
@@ -174,7 +224,9 @@
         "azúcar moreno",
         "gula merah",
         "gula aren",
-        "براؤن شوگر"
+        "براؤن شوگر",
+        "گڑ",
+        "demerara sugar"
       ]
     },
     {
@@ -189,7 +241,10 @@
         "сахарная пудра",
         "سكر بودرة",
         "azúcar glas",
-        "gula halus"
+        "gula halus",
+        "سكر مسحوق",
+        "پسی ہوئی چینی",
+        "آئسنگ شوگر"
       ]
     },
     {
@@ -226,7 +281,12 @@
         "gerstenmalzextrakt",
         "extracto de malta",
         "солодовый экстракт",
-        "خلاصة الشعير"
+        "خلاصة الشعير",
+        "خلاصة المالت",
+        "مالٹ ایکسٹریکٹ",
+        "extracto de malta de cebada",
+        "экстракт солодовый",
+        "экстракт ячменного карамельного солода темный"
       ]
     },
     {
@@ -269,7 +329,13 @@
         "عسل",
         "madu",
         "мед",
-        "شہد"
+        "شہد",
+        "miel de espliego",
+        "miel de espliego de la meseta castellana",
+        "miel de lavande",
+        "عسل نحل طبيعي",
+        "natural bee honey",
+        "acacia honey"
       ]
     },
     {
@@ -286,7 +352,11 @@
         "melaza",
         "molase",
         "меласса",
-        "патока"
+        "патока",
+        "شیرہ",
+        "pekmezler",
+        "black treacle",
+        "treacle"
       ]
     },
     {
@@ -307,7 +377,11 @@
         "концентрат фруктового сока",
         "مركز عصير الفاكهة",
         "concentrado de jugo de frutas",
-        "konsentrat sari buah"
+        "konsentrat sari buah",
+        "konsentrat jeruk",
+        "konsentrat buah apel",
+        "vişne suyu konsantresi",
+        "concentrated peach juice"
       ]
     },
     {
@@ -364,7 +438,9 @@
         "maltodekstrina",
         "мальтодекстрин",
         "مالتوديكسترين",
-        "مالٹوڈیکسٹرین"
+        "مالٹوڈیکسٹرین",
+        "мальтодекстрин из риса",
+        "مالطودكسترين"
       ],
       "explanation": "Kimyasal olarak şeker sınıfında değildir ancak yüksek glisemik indeksli, hızlı sindirilen bir polisakkarittir. İnsülin direnci / metabolik sağlık profilinde bilgi olarak gösterilir.",
       "explanations": {

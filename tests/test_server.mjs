@@ -1,8 +1,10 @@
 import http from 'node:http';
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
+import { DATASET_VERSION, RULE_ENGINE_VERSION } from '../src/engine/ruleEngine.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,13 +49,15 @@ const baseUrl = await new Promise((resolve, reject) => {
 
 const port = Number(new URL(baseUrl).port);
 
-function request(method, reqPath, body = null) {
+function request(method, reqPath, body = null, extraHeaders = {}) {
   return new Promise((resolve, reject) => {
-    const headers = {};
+    const headers = { ...extraHeaders };
     let payload = null;
     if (body !== null) {
       payload = typeof body === 'string' ? body : JSON.stringify(body);
-      headers['Content-Type'] = 'application/json';
+      if (!Object.keys(headers).some((k) => k.toLowerCase() === 'content-type')) {
+        headers['Content-Type'] = 'application/json';
+      }
       headers['Content-Length'] = Buffer.byteLength(payload);
     }
 
@@ -69,10 +73,12 @@ function request(method, reqPath, body = null) {
         const chunks = [];
         res.on('data', (c) => chunks.push(c));
         res.on('end', () => {
+          const rawBuffer = Buffer.concat(chunks);
           resolve({
             status: res.statusCode,
             headers: res.headers,
-            body: Buffer.concat(chunks).toString('utf8')
+            rawBuffer,
+            body: rawBuffer.toString('utf8')
           });
         });
       }
@@ -92,12 +98,14 @@ const REQUIRED_BASE_HEADERS = {
   'referrer-policy': 'strict-origin-when-cross-origin',
   'permissions-policy': 'camera=(self), microphone=(), geolocation=()',
   'cross-origin-opener-policy': 'same-origin',
+  'cross-origin-resource-policy': 'same-origin',
   'strict-transport-security': 'max-age=31536000; includeSubDomains'
 };
 
 const EXPECTED_HTML_CSP =
-  "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'";
+  "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'";
 const EXPECTED_SW_CSP = "default-src 'self'; connect-src 'self'";
+const EXPECTED_SVG_CSP = "default-src 'none'; sandbox; frame-ancestors 'none'";
 const EXPECTED_API_CSP = "default-src 'none'; frame-ancestors 'none'";
 
 function assertSecurityHeaders(res, expectedCsp, label) {
@@ -206,6 +214,10 @@ try {
   assert.equal(resAsset.status, 200);
   assertSecurityHeaders(resAsset, EXPECTED_API_CSP, 'HEAD /assets/hero-shield-crest.jpg');
 
+  const resSvgAsset = await request('HEAD', '/assets/incifact-app-icon.svg');
+  assert.equal(resSvgAsset.status, 200);
+  assertSecurityHeaders(resSvgAsset, EXPECTED_SVG_CSP, 'HEAD /assets/incifact-app-icon.svg');
+
   // 8. Blocked /src/* extensions and subdirectories -> 404
   for (const blockedSrc of [
     '/src/data/cosing_ingredients.json',
@@ -219,12 +231,13 @@ try {
     assertSecurityHeaders(resBlocked, EXPECTED_API_CSP, `GET ${blockedSrc}`);
   }
 
-  // 9. Traversal, malformed URI, null byte & Windows drive rejections -> 400/404
+  // 9. Traversal, malformed URI, null byte, colon/NTFS ADS & Windows drive rejections -> 400/404
   for (const badPath of [
     '/assets/../../package.json',
     '/assets/%2e%2e%2fpackage.json',
     '/assets/%E0%A4%A',
     '/assets/incifact-app-icon.png%00.jpg',
+    '/assets/incifact-app-icon.png:ads',
     '/assets/C:/Windows/win.ini',
     '/assets//etc/passwd',
     '/src/%2e%2e/package.json'
@@ -244,6 +257,143 @@ try {
   const resHuge = await request('POST', '/api/evaluate', hugePayload);
   assert.equal(resHuge.status, 413);
   assertSecurityHeaders(resHuge, EXPECTED_API_CSP, 'POST /api/evaluate 413');
+
+  // 12. Phase 1 Security Regressions: Content-Type 415, Sec-Fetch-Site 403, Deep JSON 400
+  const resBadCt = await request('POST', '/api/evaluate', JSON.stringify({ rawText: 'Aqua' }), { 'Content-Type': 'text/plain' });
+  assert.equal(resBadCt.status, 415);
+  assertSecurityHeaders(resBadCt, EXPECTED_API_CSP, 'POST /api/evaluate text/plain 415');
+
+  const resCrossSite = await request('POST', '/api/evaluate', { rawText: 'Aqua' }, { 'Sec-Fetch-Site': 'cross-site' });
+  assert.equal(resCrossSite.status, 403);
+  assertSecurityHeaders(resCrossSite, EXPECTED_API_CSP, 'POST /api/evaluate cross-site 403');
+
+  let deepObj = { rawText: 'Aqua' };
+  for (let i = 0; i < 16; i++) deepObj = { nested: deepObj };
+  const resDeepJson = await request('POST', '/api/evaluate', deepObj);
+  assert.equal(resDeepJson.status, 400);
+  assertSecurityHeaders(resDeepJson, EXPECTED_API_CSP, 'POST /api/evaluate deep JSON 400');
+
+  // 13. Phase 4 REST endpoints: /api/household, /api/shelf, /api/dossier, /api/alternatives
+  assert.ok(Array.isArray(healthJson.endpoints) && healthJson.endpoints.includes('/api/household'));
+
+  const resHouse = await request('POST', '/api/household', {
+    product: { rawText: 'Aqua, Retinol, Methyl Glucose Sesquistearate', productType: 'cosmetic', lang: 'en' },
+    members: [
+      { id: 'm1', name: 'Me', userProfiles: [] },
+      { id: 'm2', name: 'Partner', userProfiles: ['hamilelik'] }
+    ]
+  });
+  assert.equal(resHouse.status, 200);
+  assertSecurityHeaders(resHouse, EXPECTED_API_CSP, 'POST /api/household');
+  const houseJson = JSON.parse(resHouse.body);
+  assert.equal(houseJson.memberCount, 2);
+  assert.equal(houseJson.members[1].overallColor, 'kirmizi');
+
+  const resHouseBad = await request('POST', '/api/household', { product: { rawText: 'Aqua' } });
+  assert.equal(resHouseBad.status, 400);
+  const resHouseCsrf = await request('POST', '/api/household', { rawText: 'Aqua', members: [] }, { 'Sec-Fetch-Site': 'cross-site' });
+  assert.equal(resHouseCsrf.status, 403);
+
+  const resShelf = await request('POST', '/api/shelf', {
+    items: [
+      { id: 's1', name: 'Vit C', slot: 'AM', productType: 'cosmetic', applicationType: 'leave_on', rawText: 'Aqua, Ascorbic Acid' },
+      { id: 's2', name: 'Copper', slot: 'AM', productType: 'cosmetic', applicationType: 'leave_on', rawText: 'Aqua, Copper Tripeptide-1' }
+    ],
+    options: { lang: 'en' }
+  });
+  assert.equal(resShelf.status, 200);
+  assertSecurityHeaders(resShelf, EXPECTED_API_CSP, 'POST /api/shelf');
+  const shelfJson = JSON.parse(resShelf.body);
+  assert.ok(Array.isArray(shelfJson.amConflicts) && shelfJson.amConflicts.length >= 1);
+
+  const resShelfBad = await request('POST', '/api/shelf', { items: 'not-array' });
+  assert.equal(resShelfBad.status, 400);
+  const resShelfCsrf = await request('POST', '/api/shelf', { items: [] }, { 'Sec-Fetch-Site': 'cross-site' });
+  assert.equal(resShelfCsrf.status, 403);
+
+  const resDossier = await request('POST', '/api/dossier', {
+    query: 'Niacinamide',
+    options: { lang: 'en', productType: 'cosmetic' }
+  });
+  assert.equal(resDossier.status, 200);
+  assertSecurityHeaders(resDossier, EXPECTED_API_CSP, 'POST /api/dossier');
+  const dossierJson = JSON.parse(resDossier.body);
+  assert.equal(dossierJson.isSuperstar, true);
+
+  const resDossierBad = await request('POST', '/api/dossier', { query: '   ' });
+  assert.equal(resDossierBad.status, 400);
+  const resDossierCsrf = await request('POST', '/api/dossier', { query: 'Aqua' }, { 'Sec-Fetch-Site': 'cross-site' });
+  assert.equal(resDossierCsrf.status, 403);
+
+  const resAlts = await request('POST', '/api/alternatives', {
+    product: { rawText: 'Aqua, Glycerin, Lilial', productType: 'cosmetic', lang: 'en' },
+    options: { lang: 'en' }
+  });
+  assert.equal(resAlts.status, 200);
+  assertSecurityHeaders(resAlts, EXPECTED_API_CSP, 'POST /api/alternatives');
+  const altsJson = JSON.parse(resAlts.body);
+  assert.ok(Array.isArray(altsJson.cleanerAlternatives));
+
+  const resAltsBad = await request('POST', '/api/alternatives', {});
+  assert.equal(resAltsBad.status, 400);
+  const resAltsCsrf = await request('POST', '/api/alternatives', { rawText: 'Aqua' }, { 'Sec-Fetch-Site': 'cross-site' });
+  assert.equal(resAltsCsrf.status, 403);
+
+  // 14. Phase 6 Boost Server Hardening: Cache-Control no-store, Brotli/Gzip, ETag 304, dynamic version sync
+  assert.equal(healthJson.datasetVersion, DATASET_VERSION, 'GET /api/health datasetVersion must match ruleEngine.mjs');
+  assert.equal(healthJson.ruleEngineVersion, RULE_ENGINE_VERSION, 'GET /api/health ruleEngineVersion must match ruleEngine.mjs');
+  assert.equal(resHealth.headers['cache-control'], 'no-store', 'API responses must set Cache-Control: no-store');
+  assert.equal(resEval.headers['cache-control'], 'no-store', 'POST /api/evaluate must set Cache-Control: no-store');
+
+  // Brotli & Gzip compression on responses > 1 KB
+  const resLocBr = await request('GET', '/api/locales', null, { 'Accept-Encoding': 'br, gzip' });
+  assert.equal(resLocBr.status, 200);
+  assert.equal(resLocBr.headers['content-encoding'], 'br', 'Expected Brotli encoding on /api/locales');
+  const locBrJson = JSON.parse(zlib.brotliDecompressSync(resLocBr.rawBuffer).toString('utf8'));
+  assert.equal(locBrJson.supportedLanguages.length, 10);
+
+  const resLocGz = await request('GET', '/api/locales', null, { 'Accept-Encoding': 'gzip' });
+  assert.equal(resLocGz.status, 200);
+  assert.equal(resLocGz.headers['content-encoding'], 'gzip', 'Expected Gzip encoding on /api/locales');
+  const locGzJson = JSON.parse(zlib.gunzipSync(resLocGz.rawBuffer).toString('utf8'));
+  assert.equal(locGzJson.supportedLanguages.length, 10);
+
+  const resEngineBr = await request('GET', '/src/engine/ruleEngine.mjs', null, { 'Accept-Encoding': 'br' });
+  assert.equal(resEngineBr.status, 200);
+  assert.equal(resEngineBr.headers['content-encoding'], 'br');
+  assert.match(zlib.brotliDecompressSync(resEngineBr.rawBuffer).toString('utf8'), /RULE_ENGINE_VERSION/);
+
+  // ETag + 304 Not Modified on GET /
+  const etag = resHome.headers['etag'];
+  assert.ok(typeof etag === 'string' && etag.length > 4, 'GET / must return ETag header');
+  const resHomeBr = await request('GET', '/', null, { 'Accept-Encoding': 'br' });
+  assert.equal(resHomeBr.status, 200);
+  assert.equal(resHomeBr.headers['content-encoding'], 'br');
+  assert.match(zlib.brotliDecompressSync(resHomeBr.rawBuffer).toString('utf8'), /InciFact/);
+
+  const resHome304 = await request('GET', '/', null, { 'If-None-Match': etag });
+  assert.equal(resHome304.status, 304, 'Matching If-None-Match on GET / must return 304');
+  assertSecurityHeaders(resHome304, EXPECTED_HTML_CSP, 'GET / 304');
+  assert.equal(resHome304.body, '');
+
+  const resHome304List = await request('GET', '/', null, { 'If-None-Match': `W/"stale", ${etag}` });
+  assert.equal(resHome304List.status, 304, 'Comma-separated If-None-Match containing ETag must return 304');
+
+  // RFC 9110 Accept-Encoding q=0 negotiation & HEAD / Content-Length parity
+  const resLocQ0 = await request('GET', '/api/locales', null, { 'Accept-Encoding': 'br;q=0, gzip;q=0' });
+  assert.equal(resLocQ0.status, 200);
+  assert.equal(resLocQ0.headers['content-encoding'], undefined, 'br;q=0, gzip;q=0 must NOT compress response');
+  assert.equal(JSON.parse(resLocQ0.body).supportedLanguages.length, 10);
+
+  const resLocBr0Gz1 = await request('GET', '/api/locales', null, { 'Accept-Encoding': 'br;q=0, gzip;q=1' });
+  assert.equal(resLocBr0Gz1.status, 200);
+  assert.equal(resLocBr0Gz1.headers['content-encoding'], 'gzip', 'br;q=0, gzip;q=1 must select gzip');
+  assert.equal(JSON.parse(zlib.gunzipSync(resLocBr0Gz1.rawBuffer).toString('utf8')).supportedLanguages.length, 10);
+
+  const resHeadGz = await request('HEAD', '/', null, { 'Accept-Encoding': 'gzip' });
+  assert.equal(resHeadGz.status, 200);
+  assert.equal(resHeadGz.headers['content-encoding'], 'gzip');
+  assert.ok(Number(resHeadGz.headers['content-length']) > 1000, 'HEAD / must return accurate compressed Content-Length');
 
   console.log('✅ ALL SERVER TESTS PASSED!');
 } catch (err) {

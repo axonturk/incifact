@@ -1,16 +1,23 @@
-// Fails if src/data/generated/*.mjs is out of sync with the JSON sources, or if the engine imports Node built-ins.
+// Fails if src/data/generated/*.mjs is out of sync with the JSON sources, has non-ASCII in CosIng bundles, or if the engine imports Node built-ins.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DATA_FILES, renderModule } from '../scripts/build_data_modules.mjs';
+import { GENERATED_MODULES, renderModule } from '../scripts/build_data_modules.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 let bad = 0;
-for (const name of DATA_FILES) {
+for (const name of GENERATED_MODULES) {
   const p = path.join(root, 'src/data/generated', `${name}.mjs`);
-  const ok = fs.existsSync(p) && fs.readFileSync(p, 'utf8') === renderModule(name);
+  const src = fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
+  const ok = src !== null && src === renderModule(name);
   if (!ok) bad++;
   console.log(ok ? '✅' : '❌', `generated/${name}.mjs ${ok ? 'in sync' : 'OUT OF DATE — run: npm run build:data'}`);
+
+  if (src !== null && name.startsWith('cosing_')) {
+    const pureAscii = !/[^\x00-\x7F]/.test(src);
+    if (!pureAscii) bad++;
+    console.log(pureAscii ? '✅' : '❌', `generated/${name}.mjs ${pureAscii ? 'is pure-ASCII (Hermes 1-byte safe)' : 'contains non-ASCII characters (Hermes UTF-16LE bloat)'}`);
+  }
 }
 for (const f of ['src/engine/ruleEngine.mjs', 'src/i18n/locales.mjs']) {
   const src = fs.readFileSync(path.join(root, f), 'utf8');

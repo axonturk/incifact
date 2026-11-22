@@ -57,6 +57,7 @@ for (const file of publicRootFiles) {
 
 const activeAssets = new Set([
   'hero-shield-crest.jpg',
+  'incifact-app-icon.svg',
   'incifact-app-icon.jpg',
   'incifact-app-icon.png',
   'incifact-app-icon-192.png',
@@ -72,6 +73,8 @@ for (const assetName of activeAssets) {
 
 const engineModules = [
   'src/engine/ruleEngine.mjs',
+  'src/engine/barcode1dDecoder.mjs',
+  'src/engine/nutriScore.mjs',
   'src/i18n/locales.mjs'
 ];
 for (const modPath of engineModules) {
@@ -89,6 +92,22 @@ for (const entry of fs.readdirSync(generatedDir, { withFileTypes: true })) {
 }
 
 fs.writeFileSync(path.join(OUT_DIR, '.nojekyll'), '', 'utf8');
+totalFiles++;
+
+const headersContent = [
+  '/*',
+  "  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'",
+  '  X-Frame-Options: SAMEORIGIN',
+  '  X-Content-Type-Options: nosniff',
+  '  Referrer-Policy: no-referrer',
+  '  Permissions-Policy: camera=(self), microphone=(), geolocation=()',
+  '  Cross-Origin-Resource-Policy: same-origin',
+  '  Cross-Origin-Opener-Policy: same-origin',
+  ''
+].join('\n');
+const headersDest = path.join(OUT_DIR, '_headers');
+fs.writeFileSync(headersDest, headersContent, 'utf8');
+totalBytes += fs.statSync(headersDest).size;
 totalFiles++;
 
 if (totalBytes >= MAX_SITE_BYTES) {

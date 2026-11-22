@@ -107,14 +107,6 @@
       "checked_at": "2026-10-12",
       "type": "agency_assessment"
     },
-    "REACH_2024_1328": {
-      "id": "REACH_2024_1328",
-      "institution": "European Commission / REACH",
-      "title": "Commission Regulation (EU) 2024/1328 (Restriction on Cyclic Siloxanes D4, D5, D6)",
-      "url": "https://eur-lex.europa.eu/eli/reg/2024/1328/oj",
-      "checked_at": "2026-10-12",
-      "type": "binding_regulation"
-    },
     "COSING": {
       "id": "COSING",
       "institution": "European Commission",
@@ -286,6 +278,33 @@
       "url": "https://www.efsa.europa.eu/en/topics/topic/food-additives",
       "checked_at": "2026-10-12",
       "type": "official_opinion"
+    },
+    "EU_2019_649": {
+      "id": "EU_2019_649",
+      "institution": "European Commission",
+      "title": "Commission Regulation (EU) 2019/649 amending Annex III to Regulation (EC) No 1925/2006 (Industrial Trans Fat Limit < 2 g per 100 g Fat)",
+      "jurisdiction": "EU",
+      "type": "binding_regulation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2019/649/oj",
+      "checked_at": "2026-11-22"
+    },
+    "NOVA_MONTEIRO": {
+      "id": "NOVA_MONTEIRO",
+      "institution": "FAO / WHO (Monteiro et al.)",
+      "title": "FAO Ultra-Processed Foods, Diet Quality and Health using the NOVA Classification System (NOVA 1–4)",
+      "jurisdiction": "GLOBAL",
+      "type": "official_classification",
+      "url": "https://www.fao.org/3/ca5644en/ca5644en.pdf",
+      "checked_at": "2026-11-22"
+    },
+    "SANTE_PUBLIQUE_NUTRISCORE_2023": {
+      "id": "SANTE_PUBLIQUE_NUTRISCORE_2023",
+      "institution": "Santé publique France / International Nutri-Score Scientific Committee",
+      "title": "Nutri-Score Updated Algorithm 2023 (General Foods, Beverages & Fats/Oils — Grades A–E)",
+      "jurisdiction": "EU",
+      "type": "official_classification",
+      "url": "https://www.santepubliquefrance.fr/en/nutri-score",
+      "checked_at": "2026-11-22"
     }
   }
 }

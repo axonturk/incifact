@@ -3,58 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0F291E" />
+  <meta name="theme-color" content="#006241" />
   <title>InciFact — Göz Yormayan 5 Ekranlı Mobil Deneyim & Karşılaştırma Motoru</title>
   <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="./assets/incifact-app-icon.svg" />
   <link rel="apple-touch-icon" href="./assets/incifact-app-icon.jpg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" />
   <style>
     :root {
-      --bg: #F7F4EF;
+      --bg: #F2F0EB;
       --surface: #FFFFFF;
-      --surface2: #EFECE6;
-      --ink: #0F291E;
-      --muted: #4A5568;
-      --line: #6E7670;
-      --divider: #DCD7CD;
-      --accent: #0F291E;
-      --accent-gold: #C5A059;
-      --gold-ink: #6E5015;
+      --surface2: #EDEBE9;
+      --ink: #14261D;
+      --muted: #52615A;
+      --line: #E2DED6;
+      --line-strong: #8C857A;
+      --divider: #E8E5DE;
+      --accent: #00754A;
+      --accent-deep: #006241;
+      --accent-hover: #005E3B;
+      --accent-gold: #CBA258;
+      --gold-ink: #7A5917;
       --on-accent: #FFFFFF;
-      --soft: #E9EFEA;
-      --ok: #145A32;
+      --soft: #E4F3EC;
+      --ok: #0F5132;
       --on-ok: #FFFFFF;
-      --ok-bg: #E6F4EA;
-      --warn: #8A3B08;
-      --warn-bg: #FEF3C7;
-      --bad: #991B1B;
-      --bad-bg: #FEE2E2;
+      --ok-bg: #E4F3EC;
+      --warn: #8A5300;
+      --warn-bg: #FEF4DB;
+      --bad: #B42318;
+      --bad-bg: #FDEAEA;
       --info: #1E3A8A;
       --info-bg: #EFF6FF;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --shadow-card: 0 2px 10px rgba(20, 38, 29, 0.05);
+      --shadow-fab: 0 6px 18px rgba(0, 117, 74, 0.28);
     }
     body.dark {
-      --bg: #07120E;
-      --surface: #0F291E;
-      --surface2: #163829;
-      --ink: #F7F4EF;
-      --muted: #A3B8B0;
-      --line: #5E8C76;
-      --divider: #234B39;
-      --accent: #C5A059;
-      --accent-gold: #E6C98A;
+      color-scheme: dark;
+      --bg: #091410;
+      --surface: #11221B;
+      --surface2: #183026;
+      --ink: #F3EFE6;
+      --muted: #A4B5AC;
+      --line: #254739;
+      --line-strong: #34604E;
+      --divider: #1D3A2E;
+      --accent: #2FA877;
+      --accent-deep: #34C38B;
+      --accent-hover: #3BC18A;
+      --accent-gold: #D9B972;
       --gold-ink: #E6C98A;
       --on-accent: #07120E;
-      --soft: #183A2C;
-      --ok: #34D399;
+      --soft: #0D3526;
+      --ok: #6EE7B7;
       --on-ok: #07120E;
-      --ok-bg: #064E3B;
+      --ok-bg: #0D3526;
       --warn: #FBBF24;
-      --warn-bg: #451A03;
+      --warn-bg: #3A270B;
       --bad: #FCA5A5;
-      --bad-bg: #450A0A;
+      --bad-bg: #3D1418;
       --info: #93C5FD;
       --info-bg: #172554;
+      --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.26);
+      --shadow-fab: 0 6px 20px rgba(47, 168, 119, 0.28);
     }
     .watch-chip {
       display: inline-flex;
@@ -97,20 +108,26 @@
       gap: 8px;
     }
     * { box-sizing: border-box; }
+    html[lang="ur"] { line-height: 1.65; }
     body {
       margin: 0;
-      font-family: 'Figtree', system-ui, -apple-system, sans-serif;
-      background: #E8ECF2;
+      font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Arabic', 'Noto Nastaliq Urdu', sans-serif;
+      background: #E9E6DF;
       color: var(--ink);
-      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px 16px 40px;
-      transition: background 0.2s;
+      padding: 14px 16px 24px;
+      transition: background-color 180ms var(--ease-out), color 180ms ease;
     }
-    body.dark { background: #050811; }
-    button { font: inherit; cursor: pointer; }
+    body.dark { background: #060D0A; }
+    button { font: inherit; cursor: pointer; touch-action: manipulation; }
+    select { height: 44px; min-height: 44px; line-height: 1.25; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
     .studio-bar {
       width: 100%;
       max-width: 960px;
@@ -119,10 +136,11 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
       background: var(--surface);
       border: 1px solid var(--line);
-      padding: 12px 18px;
+      box-shadow: var(--shadow-card);
+      padding: 10px 16px;
       border-radius: 20px;
     }
     .brand-mark { display: flex; align-items: center; gap: 10px; }
@@ -134,10 +152,13 @@
     }
     .screen-pills { display: flex; gap: 6px; flex-wrap: wrap; }
     .screen-pill {
-      min-height: 44px; min-width: 44px; padding: 8px 14px; border-radius: 22px;
+      min-height: 44px; min-width: 44px; padding: 8px 15px; border-radius: 9999px;
       border: 1px solid var(--line); background: transparent;
       color: var(--muted); font-size: 13.5px; font-weight: 700;
+      transition: background-color 160ms var(--ease-out), border-color 160ms ease, color 160ms ease, transform 120ms var(--ease-out);
     }
+    .screen-pill:hover { border-color: var(--line-strong); color: var(--ink); }
+    .screen-pill:active { transform: scale(0.97); }
     .screen-pill.active {
       background: var(--accent); color: var(--on-accent); border-color: var(--accent);
     }
@@ -154,14 +175,15 @@
       max-width: 960px;
       width: 100%;
     }
-    /* 390x844 iPhone Frame */
+    /* 390x844 iPhone Frame (fits laptop viewports cleanly above the fold) */
     .phone-frame {
       width: 390px;
-      height: 844px;
+      height: min(796px, calc(100dvh - 104px));
+      min-height: 620px;
       background: var(--bg);
       color: var(--ink);
       border-radius: 44px;
-      box-shadow: 0 20px 50px rgba(10, 24, 18, 0.16), 0 0 0 8px var(--surface2);
+      box-shadow: 0 24px 60px rgba(20, 38, 29, 0.14), 0 0 0 8px var(--surface2);
       position: relative;
       overflow: hidden;
       flex: none;
@@ -190,35 +212,47 @@
       min-width: 44px; min-height: 44px; width: 68px; border: none; background: transparent;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
       font-size: 11.5px; font-weight: 600; color: var(--muted);
+      transition: color 150ms ease, transform 120ms var(--ease-out);
     }
-    .nav-btn.active { color: var(--accent); font-weight: 800; }
+    .nav-btn:active { transform: scale(0.96); }
+    .nav-btn.active { color: var(--accent-deep); font-weight: 800; }
     .nav-scan-fab {
       width: 58px; height: 58px; margin-top: -22px;
-      border-radius: 29px; border: none;
+      border-radius: 9999px; border: 3px solid var(--bg);
       background: var(--accent); color: var(--on-accent);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 6px 18px rgba(15, 93, 78, 0.3);
+      box-shadow: var(--shadow-fab);
+      transition: transform 130ms var(--ease-out), background-color 150ms ease;
     }
+    .nav-scan-fab:hover { background: var(--accent-hover); }
+    .nav-scan-fab:active { transform: scale(0.95); }
     .side-inspector {
       flex: 1;
       min-width: 310px;
       background: var(--surface);
       border: 1px solid var(--line);
+      box-shadow: var(--shadow-card);
       border-radius: 24px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
-    .mono { font-family: 'IBM Plex Mono', monospace; }
+    .mono { font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
     .preset-chip {
       min-height: 44px;
       text-align: start; padding: 10px 12px; border-radius: 14px;
       border: 1px solid var(--line); background: var(--bg);
       color: var(--ink); font-size: 13px; font-weight: 600;
       display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      transition: border-color 150ms ease, background-color 150ms ease, transform 120ms var(--ease-out);
     }
-    .preset-chip:hover { border-color: var(--accent); }
+    .preset-chip:hover { border-color: var(--accent); background: var(--surface2); }
+    .preset-chip:active { transform: scale(0.985); }
+    @media (prefers-reduced-motion: reduce) {
+      body, .screen-pill, .nav-btn, .nav-scan-fab, .preset-chip { transition: none; }
+      .screen-pill:active, .nav-btn:active, .nav-scan-fab:active, .preset-chip:active { transform: none; }
+    }
     textarea.ocr-box {
       width: 100%; min-height: 92px; border-radius: 14px;
       border: 1.5px solid var(--line); background: var(--bg);
@@ -344,7 +378,7 @@
   <!-- Top Studio Controls -->
   <div class="studio-bar">
     <div class="brand-mark">
-      <img src="./assets/incifact-app-icon.png" width="38" height="38" style="border-radius:10px; display:block; flex:none; box-shadow: 0 2px 8px rgba(11, 19, 43, 0.25);" alt="InciFact Logo" />
+      <img src="./assets/incifact-app-icon-192.png" width="38" height="38" style="border-radius:10px; display:block; flex:none; box-shadow: 0 2px 8px rgba(11, 19, 43, 0.25);" alt="InciFact Logo" />
       <div>
         <div style="font-weight: 800; font-size: 17px; letter-spacing: -0.01em; display:flex; align-items:center; gap:8px;">
           <span>InciFact</span>
@@ -363,29 +397,29 @@
     <button class="screen-pill" onclick="toggleDark()" id="darkBtn">🌙 Koyu Tema</button>
   </div>
 
-  <div class="workspace">
+  <main class="workspace" id="mainContent">
     <!-- 390x844 Phone Frame -->
     <div class="phone-frame" id="phoneFrame">
-      <div class="phone-scroll" id="screenContent"></div>
+      <div class="phone-scroll" id="screenContent" aria-live="polite"></div>
 
       <!-- 5-Item Bottom Navigation -->
-      <nav class="phone-nav" id="bottomNav" aria-label="Ana menü">
-        <button class="nav-btn" id="nav-compare" onclick="switchScreen('compare')">
+      <nav class="phone-nav" id="bottomNav" role="tablist" aria-label="Ana menü">
+        <button class="nav-btn" id="nav-compare" role="tab" aria-selected="false" onclick="switchScreen('compare')">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 4v16M16 4v16M4 8h4M16 16h4"/></svg>
           <span id="navLbl-compare">Karşılaştır</span>
         </button>
-        <button class="nav-btn active" id="nav-result" onclick="switchScreen('result')">
+        <button class="nav-btn active" id="nav-result" role="tab" aria-selected="true" onclick="switchScreen('result')">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6"/></svg>
           <span id="navLbl-result">Sonuç</span>
         </button>
-        <button class="nav-scan-fab" id="nav-scan" onclick="switchScreen('scan')" aria-label="Tara">
+        <button class="nav-scan-fab" id="nav-scan" role="tab" aria-selected="false" onclick="switchScreen('scan')" aria-label="Tara">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5h3M17 5h3v3M20 16v3h-3M7 19H4v-3M8 12h8"/></svg>
         </button>
-        <button class="nav-btn" id="nav-halal" onclick="switchScreen('halal')">
+        <button class="nav-btn" id="nav-halal" role="tab" aria-selected="false" onclick="switchScreen('halal')">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
           <span id="navLbl-halal">Helal</span>
         </button>
-        <button class="nav-btn" id="nav-main" onclick="switchScreen('main')">
+        <button class="nav-btn" id="nav-main" role="tab" aria-selected="false" onclick="switchScreen('main')">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
           <span id="navLbl-main">Profil</span>
         </button>
@@ -446,14 +480,14 @@
       <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
         <div>
           <label for="prodType" id="prodTypeLbl" style="display:block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">ÜRÜN TÜRÜ</label>
-          <select id="prodType" onchange="refreshAll()" style="width:100%; min-height:44px; border-radius:10px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
+          <select id="prodType" onchange="refreshAll()" style="width:100%; height:44px; min-height:44px; line-height:1.25; border-radius:10px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
             <option value="cosmetic" id="optCosmetic">Kozmetik (INCI)</option>
             <option value="food" id="optFood">Gıda (E-Kodu)</option>
           </select>
         </div>
         <div>
           <label for="halalAuth" id="halalAuthLbl" style="display:block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px;">HELAL KURUMU</label>
-          <select id="halalAuth" onchange="refreshAll()" style="width:100%; min-height:44px; border-radius:10px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
+          <select id="halalAuth" onchange="persistWebPrefs(); refreshAll()" style="width:100%; height:44px; min-height:44px; line-height:1.25; border-radius:10px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:13px; font-weight:600;">
             <option value="GIMDES" id="optAuth-GIMDES">GİMDES (Türkiye)</option>
             <option value="MUI" id="optAuth-MUI">MUI (Indonesia)</option>
             <option value="JAKIM" id="optAuth-JAKIM">JAKIM (Malaysia)</option>
@@ -462,11 +496,11 @@
         </div>
       </div>
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding-top:8px; border-top:1px solid var(--divider); font-size:12px;">
-        <span style="color:var(--muted); font-weight:600;">EU 2023/1545 (80+ Alerjen) · 30.594 CosIng</span>
+        <span id="sideDatasetMeta" style="color:var(--muted); font-weight:600;">EU 2023/1545 (80+ Allergens) · 30,594 CosIng</span>
         <a id="sidePrivacyLink" href="./privacy.html" target="_blank" rel="noopener noreferrer" style="min-height:44px; min-width:44px; display:inline-flex; align-items:center; gap:5px; padding:4px 8px; color:var(--accent); font-weight:700; text-decoration:underline;">🔒 Gizlilik Politikası</a>
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
     const SAMPLES = [
@@ -757,6 +791,31 @@
       return out;
     }
 
+    const VALID_JURISDICTIONS = new Set(['TR', 'EU', 'US']);
+    const VALID_AUTHORITIES = new Set(['GIMDES', 'JAKIM', 'MUI', 'IFANCA']);
+    const VALID_MADHHABS = new Set(['general', 'hanafi', 'shafii', 'maliki', 'hanbali']);
+    const VALID_WEB_LANGS = new Set(Object.keys(MARKET_STRUCTURES));
+    const WEB_PREFS_STORAGE_KEY = 'incifact_web_prefs_v1';
+    const WEB_HOUSEHOLD_STORAGE_KEY = 'incifact_household_v1';
+    const WEB_SHELF_STORAGE_KEY = 'incifact_shelf_v1';
+
+    function sanitizeNutritionObject(raw) {
+      if (!isPlainObject(raw)) return null;
+      const out = {};
+      for (const k of ['energyKcal', 'energyKj', 'totalFatG', 'fatG', 'sugarsG', 'saturatedFatG', 'saltG', 'sodiumMg', 'fiberG', 'proteinG', 'fruitVegLegumePct']) {
+        const v = raw[k];
+        if (typeof v === 'number' && Number.isFinite(v) && v >= 0) out[k] = v;
+      }
+      if (raw.isBeverage === true) out.isBeverage = true;
+      if (raw.isWater === true) out.isWater = true;
+      if (raw.hasNonNutritiveSweetener === true) out.hasNonNutritiveSweetener = true;
+      if (raw.isEligibleOil === true) out.isEligibleOil = true;
+      if (raw.category === 'beverage' || raw.category === 'fats_oils_nuts' || raw.category === 'general_food') {
+        out.category = raw.category;
+      }
+      return Object.keys(out).length > 0 ? out : null;
+    }
+
     function sanitizeScanHistorySchema(arr) {
       if (!Array.isArray(arr)) return [];
       const out = [];
@@ -768,9 +827,10 @@
           id: typeof h.id === 'string' ? h.id.slice(0, 240) : '',
           title: typeof h.title === 'string' ? h.title.slice(0, 140) : '',
           sampleIdx: typeof h.sampleIdx === 'number' && Number.isInteger(h.sampleIdx) && h.sampleIdx >= 0 ? h.sampleIdx : null,
-          rawText: h.rawText,
+          rawText: h.rawText.slice(0, 65536),
           productType: h.productType === 'food' ? 'food' : 'cosmetic',
-          jurisdiction: typeof h.jurisdiction === 'string' ? h.jurisdiction : 'EU',
+          jurisdiction: typeof h.jurisdiction === 'string' && VALID_JURISDICTIONS.has(h.jurisdiction) ? h.jurisdiction : 'EU',
+          nutritionPer100g: h.productType === 'food' ? sanitizeNutritionObject(h.nutritionPer100g) : null,
           claims: isPlainObject(h.claims)
             ? {
                 halalCertified: Boolean(h.claims.halalCertified),
@@ -788,7 +848,7 @@
           score: cleanScore,
           canShowScore: Boolean(h.canShowScore),
           halalStatus: typeof h.halalStatus === 'string' ? h.halalStatus : 'unknown',
-          halalAuthority: typeof h.halalAuthority === 'string' ? h.halalAuthority : 'GIMDES',
+          halalAuthority: typeof h.halalAuthority === 'string' && VALID_AUTHORITIES.has(h.halalAuthority) ? h.halalAuthority : 'GIMDES',
           ts: typeof h.ts === 'number' && Number.isFinite(h.ts) ? h.ts : 0
         });
         if (out.length >= 10) break;
@@ -814,6 +874,49 @@
       return out;
     }
 
+    const SAFE_ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
+
+    function sanitizeHouseholdSchema(arr) {
+      if (!Array.isArray(arr)) return [];
+      const allowedProfSet = new Set(['hassas_cilt', 'hamilelik', 'cocuk_metabolik', 'akne', 'astim_alerji', 'fungal_acne', 'egzama_rosacea']);
+      const out = [];
+      for (const m of arr) {
+        if (!isPlainObject(m) || typeof m.name !== 'string' || !m.name.trim()) continue;
+        const profs = Array.isArray(m.userProfiles) ? m.userProfiles.filter((p) => typeof p === 'string' && allowedProfSet.has(p)) : [];
+        const rawId = typeof m.id === 'string' ? m.id.trim() : '';
+        out.push({
+          id: SAFE_ID_RE.test(rawId) ? rawId : `hh_${out.length + 1}`,
+          name: m.name.trim().slice(0, 48),
+          userProfiles: profs,
+          halalAuthority: typeof m.halalAuthority === 'string' && VALID_AUTHORITIES.has(m.halalAuthority) ? m.halalAuthority : 'GIMDES',
+          madhhab: typeof m.madhhab === 'string' && VALID_MADHHABS.has(m.madhhab) ? m.madhhab : 'general'
+        });
+        if (out.length >= 4) break;
+      }
+      return out;
+    }
+
+    function sanitizeShelfSchema(arr) {
+      if (!Array.isArray(arr)) return [];
+      const out = [];
+      for (const s of arr) {
+        if (!isPlainObject(s) || typeof s.rawText !== 'string' || !s.rawText.trim()) continue;
+        const slot = s.slot === 'PM' || s.slot === 'Pantry' ? s.slot : 'AM';
+        const rawId = typeof s.id === 'string' ? s.id.trim() : '';
+        out.push({
+          id: SAFE_ID_RE.test(rawId) ? rawId : `sh_${out.length + 1}`,
+          name: typeof s.name === 'string' && s.name.trim() ? s.name.trim().slice(0, 80) : 'Saved Product',
+          slot,
+          productType: s.productType === 'food' ? 'food' : 'cosmetic',
+          applicationType: typeof s.applicationType === 'string' ? s.applicationType.slice(0, 24) : null,
+          rawText: s.rawText.slice(0, 65536),
+          ts: typeof s.ts === 'number' && Number.isFinite(s.ts) ? s.ts : 0
+        });
+        if (out.length >= 30) break;
+      }
+      return out;
+    }
+
     function loadSavedJson(key, fallback) {
       try {
         const raw = localStorage.getItem(key);
@@ -826,6 +929,8 @@
           if (key === 'incifact_custom_watchlist_v1') return sanitizeWatchlistSchema(parsed);
           if (key === 'incifact_scan_history_v1') return sanitizeScanHistorySchema(parsed);
           if (key === 'incifact_barcode_cache_v1') return sanitizeBarcodeCacheSchema(parsed);
+          if (key === WEB_HOUSEHOLD_STORAGE_KEY) return sanitizeHouseholdSchema(parsed);
+          if (key === WEB_SHELF_STORAGE_KEY) return sanitizeShelfSchema(parsed);
           return parsed.filter((item) => item !== null && item !== undefined);
         }
         if (isPlainObject(fallback)) {
@@ -845,31 +950,92 @@
       } catch (_) {}
     }
 
+    const DEFAULT_WEB_PROFILES = {
+      hamilelik: false,
+      akne: true,
+      fungal_acne: false,
+      egzama_rosacea: false,
+      hassas_cilt: true,
+      cocuk_metabolik: false,
+      astim_alerji: false,
+      vegan: false,
+      halal: true
+    };
+
+    function sanitizeWebPrefsSchema(obj) {
+      if (!isPlainObject(obj)) return null;
+      const cleanProfiles = { ...DEFAULT_WEB_PROFILES };
+      if (isPlainObject(obj.profiles)) {
+        for (const k of Object.keys(DEFAULT_WEB_PROFILES)) {
+          if (typeof obj.profiles[k] === 'boolean') {
+            cleanProfiles[k] = obj.profiles[k];
+          }
+        }
+      }
+      const cleanLang = typeof obj.lang === 'string' && VALID_WEB_LANGS.has(obj.lang) ? obj.lang : initialDeviceLang;
+      const fallbackStruct = MARKET_STRUCTURES[cleanLang] || MARKET_STRUCTURES.tr;
+      const cleanJur = typeof obj.jurisdiction === 'string' && VALID_JURISDICTIONS.has(obj.jurisdiction)
+        ? obj.jurisdiction
+        : fallbackStruct.jurisdiction;
+      const cleanAuth = typeof obj.halalAuthority === 'string' && VALID_AUTHORITIES.has(obj.halalAuthority)
+        ? obj.halalAuthority
+        : null;
+      const cleanMadhhab = typeof obj.madhhab === 'string' && VALID_MADHHABS.has(obj.madhhab)
+        ? obj.madhhab
+        : 'general';
+      return {
+        dark: typeof obj.dark === 'boolean' ? obj.dark : null,
+        lang: cleanLang,
+        autoDetected: typeof obj.autoDetected === 'boolean' ? obj.autoDetected : true,
+        jurisdiction: cleanJur,
+        halalAuthority: cleanAuth,
+        madhhab: cleanMadhhab,
+        profiles: cleanProfiles
+      };
+    }
+
+    const _loadedWebPrefs = (() => {
+      try {
+        const raw = localStorage.getItem(WEB_PREFS_STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (getJsonDepth(parsed) > 12) return null;
+        return sanitizeWebPrefsSchema(parsed);
+      } catch (_) {
+        return null;
+      }
+    })();
+    const _prefersDark =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+
     let state = {
       screen: 'result',
-      lang: initialDeviceLang,
-      autoDetected: true,
-      jurisdiction: initialStruct.jurisdiction,
+      lang: _loadedWebPrefs ? _loadedWebPrefs.lang : initialDeviceLang,
+      autoDetected: _loadedWebPrefs ? _loadedWebPrefs.autoDetected : true,
+      jurisdiction: _loadedWebPrefs ? _loadedWebPrefs.jurisdiction : initialStruct.jurisdiction,
+      madhhab: _loadedWebPrefs && _loadedWebPrefs.madhhab ? _loadedWebPrefs.madhhab : 'general',
       settingsExpanded: false,
-      dark: false,
+      dark: _loadedWebPrefs && typeof _loadedWebPrefs.dark === 'boolean' ? _loadedWebPrefs.dark : Boolean(_prefersDark),
       activeSampleIdx: 0,
       productTitle: 'Nemlendirici krem',
       showAllIngredients: false,
-      profiles: {
-        hamilelik: false,
-        akne: true,
-        hassas_cilt: true,
-        cocuk_metabolik: false,
-        astim_alerji: false,
-        vegan: false,
-        halal: true
-      },
+      profiles: _loadedWebPrefs ? _loadedWebPrefs.profiles : { ...DEFAULT_WEB_PROFILES },
       customWatchlist: loadSavedJson('incifact_custom_watchlist_v1', []),
+      householdMembers: loadSavedJson(WEB_HOUSEHOLD_STORAGE_KEY, []),
+      householdEval: null,
+      routineShelf: loadSavedJson(WEB_SHELF_STORAGE_KEY, []),
+      shelfEval: null,
+      alternativesData: null,
+      shelfToast: null,
+      camScannerMsg: null,
       scanHistory: loadSavedJson('incifact_scan_history_v1', []),
       customCompareA: null,
       customCompareB: null,
       compareSlotToast: null,
       shareToast: false,
+      eraseDataToast: false,
       claims: { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'none' },
       userConfirmations: {},
       evalData: null,
@@ -877,10 +1043,55 @@
       copiedToast: false,
       lastCopiedMsg: null,
       activeBarcodeMeta: null,
+      nutritionPer100g: null,
+      nutritionDraftStrings: {},
       barcodeInputVal: '',
       barcodeStatusBanner: null,
       apiError: null
     };
+
+    function persistWebPrefs() {
+      const authEl = typeof document !== 'undefined' ? document.getElementById('halalAuth') : null;
+      const halalAuthority = authEl && VALID_AUTHORITIES.has(authEl.value) ? authEl.value : 'GIMDES';
+      saveJson(WEB_PREFS_STORAGE_KEY, {
+        dark: Boolean(state.dark),
+        lang: state.lang,
+        autoDetected: Boolean(state.autoDetected),
+        jurisdiction: state.jurisdiction,
+        halalAuthority,
+        madhhab: state.madhhab || 'general',
+        profiles: state.profiles
+      });
+    }
+
+    function eraseAllWebData() {
+      try {
+        [
+          WEB_PREFS_STORAGE_KEY,
+          'incifact_custom_watchlist_v1',
+          'incifact_scan_history_v1',
+          'incifact_barcode_cache_v1',
+          'incifact_custom_barcodes_v1',
+          WEB_HOUSEHOLD_STORAGE_KEY,
+          WEB_SHELF_STORAGE_KEY
+        ].forEach((k) => localStorage.removeItem(k));
+      } catch (_) {}
+      state.customWatchlist = [];
+      state.householdMembers = [];
+      state.householdEval = null;
+      state.routineShelf = [];
+      state.shelfEval = null;
+      state.alternativesData = null;
+      state.nutritionPer100g = null;
+      state.nutritionDraftStrings = {};
+      state.scanHistory = [];
+      state.madhhab = 'general';
+      state.profiles = { ...DEFAULT_WEB_PROFILES };
+      state.watchlistLimitWarning = false;
+      state.eraseDataToast = true;
+      renderScreen();
+      refreshAll();
+    }
 
     function getSampleTitle(idx, lang) {
       const s = SAMPLES[idx] || SAMPLES[0];
@@ -1285,6 +1496,8 @@
           })
           .catch(() => {});
       }
+      state.eraseDataToast = false;
+      persistWebPrefs();
       refreshAll();
     }
 
@@ -1293,15 +1506,596 @@
       state.regionNoticeHighlight = false;
       const authSelect = document.getElementById('halalAuth');
       if (authSelect) authSelect.value = newAuth;
+      persistWebPrefs();
       refreshAll();
     }
 
     function changeJurisdictionFromSettings(newJur) {
       state.autoDetected = false;
       state.regionNoticeHighlight = false;
-      state.jurisdiction = newJur;
+      if (VALID_JURISDICTIONS.has(newJur)) {
+        state.jurisdiction = newJur;
+      }
+      persistWebPrefs();
       refreshAll();
     }
+
+    const PHASE1_WEB_I18N = {
+      tr: {
+        datasetMeta: 'AB 2023/1545 (80+ Alerjen) · 30.594 CosIng',
+        eraseBtn: '🗑️ Tüm Yerel Verileri Sil (Tercihler, Geçmiş, Kara Liste)',
+        eraseDone: 'Tüm tarayıcı verileri ve tercihler silindi.',
+        sugarTotalLbl: 'Gizli Şeker Yükü',
+        freeSugarsLbl: 'Serbest Şekerler',
+        rapidCarbsLbl: 'Hızlı Karbonhidrat / Maltodekstrin',
+        veganConcernLbl: 'Vegan / Vejetaryen Uyumsuz veya Belirsiz',
+        veganOkNote: 'Hayvansal bileşen saptanmadı.',
+        halalMutedNote: 'Profil ayarında Helal vurgusu kapalı'
+      },
+      en: {
+        datasetMeta: 'EU 2023/1545 (80+ Allergens) · 30,594 CosIng',
+        eraseBtn: '🗑️ Erase All Local Data (Prefs, History, Blacklist)',
+        eraseDone: 'All local browser data and preferences erased.',
+        sugarTotalLbl: 'Hidden Sugar Flags',
+        freeSugarsLbl: 'Free Sugars',
+        rapidCarbsLbl: 'Rapid Carbs / Maltodextrin',
+        veganConcernLbl: 'Non-Vegan / Uncertain Origin',
+        veganOkNote: 'No explicit animal ingredients detected.',
+        halalMutedNote: 'Halal emphasis disabled in profile'
+      },
+      ar: {
+        datasetMeta: 'لائحة 2023/1545 (80+ مسبب حساسية) · 30,594 CosIng',
+        eraseBtn: '🗑️ مسح جميع البيانات المحلية بنقرة واحدة',
+        eraseDone: 'تم مسح جميع البيانات والتفضيلات المحلية.',
+        sugarTotalLbl: 'السكريات المخفية',
+        freeSugarsLbl: 'السكريات الحرة',
+        rapidCarbsLbl: 'كربوهيدرات سريعة الامتصاص',
+        veganConcernLbl: 'غير نباتي / مصدر غير مؤكد',
+        veganOkNote: 'لم يتم رصد مكونات حيوانية صريحة.',
+        halalMutedNote: 'تم إيقاف إبراز الحلال في الملف الشخصي'
+      },
+      de: {
+        datasetMeta: 'EU 2023/1545 (80+ Allergene) · 30.594 CosIng',
+        eraseBtn: '🗑️ Alle lokalen Daten löschen',
+        eraseDone: 'Alle lokalen Browserdaten wurden gelöscht.',
+        sugarTotalLbl: 'Versteckte Zucker',
+        freeSugarsLbl: 'Freie Zucker',
+        rapidCarbsLbl: 'Schnelle Kohlenhydrate',
+        veganConcernLbl: 'Nicht-vegan / Herkunft unklar',
+        veganOkNote: 'Keine eindeutigen tierischen Stoffe erkannt.',
+        halalMutedNote: 'Halal-Hervorhebung im Profil deaktiviert'
+      },
+      fr: {
+        datasetMeta: 'UE 2023/1545 (80+ Allergènes) · 30 594 CosIng',
+        eraseBtn: '🗑️ Effacer toutes les données locales',
+        eraseDone: 'Toutes les données locales ont été effacées.',
+        sugarTotalLbl: 'Sucres cachés',
+        freeSugarsLbl: 'Sucres libres',
+        rapidCarbsLbl: 'Glucides rapides',
+        veganConcernLbl: 'Non végan / Origine incertaine',
+        veganOkNote: 'Aucun ingrédient animal détecté.',
+        halalMutedNote: 'Mise en avant Halal désactivée dans le profil'
+      },
+      id: {
+        datasetMeta: 'UE 2023/1545 (80+ Alergen) · 30.594 CosIng',
+        eraseBtn: '🗑️ Hapus Semua Data Lokal',
+        eraseDone: 'Semua data dan preferensi lokal telah dihapus.',
+        sugarTotalLbl: 'Gula Tersembunyi',
+        freeSugarsLbl: 'Gula Bebas',
+        rapidCarbsLbl: 'Karbohidrat Cepat',
+        veganConcernLbl: 'Non-Vegan / Sumber Belum Jelas',
+        veganOkNote: 'Tidak ada bahan hewani yang terdeteksi.',
+        halalMutedNote: 'Sorotan Halal dimatikan di profil'
+      },
+      ms: {
+        datasetMeta: 'EU 2023/1545 (80+ Alergen) · 30,594 CosIng',
+        eraseBtn: '🗑️ Padam Semua Data Setempat',
+        eraseDone: 'Semua data dan keutamaan tempatan telah dipadam.',
+        sugarTotalLbl: 'Gula Tersembunyi',
+        freeSugarsLbl: 'Gula Bebas',
+        rapidCarbsLbl: 'Karbohidrat Pantas',
+        veganConcernLbl: 'Bukan Vegan / Sumber Tidak Pasti',
+        veganOkNote: 'Tiada ramuan haiwan dikesan.',
+        halalMutedNote: 'Penekanan Halal dimatikan dalam profil'
+      },
+      es: {
+        datasetMeta: 'UE 2023/1545 (80+ Alérgenos) · 30.594 CosIng',
+        eraseBtn: '🗑️ Borrar todos los datos locales',
+        eraseDone: 'Todos los datos locales fueron eliminados.',
+        sugarTotalLbl: 'Azúcares ocultos',
+        freeSugarsLbl: 'Azúcares libres',
+        rapidCarbsLbl: 'Carbohidratos rápidos',
+        veganConcernLbl: 'No vegano / Origen incierto',
+        veganOkNote: 'No se detectaron ingredientes animales.',
+        halalMutedNote: 'Énfasis Halal desactivado en el perfil'
+      },
+      ru: {
+        datasetMeta: 'ЕС 2023/1545 (80+ аллергенов) · 30 594 CosIng',
+        eraseBtn: '🗑️ Удалить все локальные данные',
+        eraseDone: 'Все локальные данные и настройки удалены.',
+        sugarTotalLbl: 'Скрытые сахара',
+        freeSugarsLbl: 'Свободные сахара',
+        rapidCarbsLbl: 'Быстрые углеводы',
+        veganConcernLbl: 'Не веган / Неясное происхождение',
+        veganOkNote: 'Явных животных компонентов не найдено.',
+        halalMutedNote: 'Акцент на Халяль отключён в профиле'
+      },
+      ur: {
+        datasetMeta: 'یورپی یونین 2023/1545 (80+ الرجین) · 30,594 CosIng',
+        eraseBtn: '🗑️ تمام مقامی ڈیٹا ایک کلک میں مٹائیں',
+        eraseDone: 'تمام مقامی براؤزر ڈیٹا اور ترجیحات مٹا دی گئیں۔',
+        sugarTotalLbl: 'چھپی ہوئی شوگر',
+        freeSugarsLbl: 'آزاد شکر',
+        rapidCarbsLbl: 'تیز کاربوہائیڈریٹ',
+        veganConcernLbl: 'نان ویگن / غیر یقینی ماخذ',
+        veganOkNote: 'کوئی واضح حیوانی جزو نہیں ملا۔',
+        halalMutedNote: 'پروفائل میں حلال نمائش بند ہے'
+      }
+    };
+
+    const PHASE34_WEB_I18N = {
+      tr: {
+        madhhabLbl: 'Fıkıh Mezhebi (Opsiyonel)',
+        madhhabs: { general: 'Genel (Yalnız Seçili Kurum)', hanafi: 'Hanefi', shafii: 'Şafii', maliki: 'Maliki', hanbali: 'Hanbeli' },
+        curatedCovLbl: 'Derin Kürasyon',
+        householdTitle: '👨‍👩‍👧‍👦 Aile / Hane Çoklu Profili (En Fazla 4 Kişi)',
+        householdSub: 'Aynı taramada eşiniz, hamilelik veya bebek profiliniz için yan yana karar alın (yalnız cihazda tutulur).',
+        householdAddPartnerPreg: '+ Hamile Eş',
+        householdAddBaby: '+ Bebek / Çocuk',
+        householdAddFungal: '+ Fungal Akne (Hanefi)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 Aile Profilleri İçin Tek Bakışta Sonuç',
+        shelfSaveTitle: '🧴 / 🥫 Rutin & Kiler Rafına Kaydet',
+        shelfAmBtn: '+ Sabah (AM)',
+        shelfPmBtn: '+ Akşam (PM)',
+        shelfPantryBtn: '+ Gıda Kileri',
+        shelfSavedToast: (n, s) => `"${n}" → ${s} rafına eklendi`,
+        shelfPanelTitle: '🧴 AM/PM Rutin & Kiler Çakışma Matrisi',
+        shelfEmpty: 'Henüz rafa ürün eklenmedi. Sonuç ekranından AM/PM veya Kiler rafına ekleyin.',
+        omnibusAlertsLbl: 'AB Omnibus & Yasak Takibi',
+        altTitle: '✨ Daha Temiz & Helal Alternatifler ve Muadiller',
+        altCleanSub: 'Katalogda Profil + Helal uyumlu (80+ puan)',
+        altDupeSub: 'En Yüksek INCI Formül Benzerliği (Muadil %)',
+        inciSimLbl: 'INCI Benzerliği',
+        sharedActivesLbl: 'Ortak Aktifler',
+        camBarcodeBtn: '📷 Canlı Kamera ile Barkod Tara',
+        camModalTitle: '📷 Canlı Barkod Tarayıcı (Cihaz İçi)',
+        camUnsupported: 'Kamera erişimi reddedildi veya bu cihazda/tarayıcıda canlı kamera tarayıcısı kullanılamıyor. Barkod numarasını yukarıya girebilir veya etiketi yapıştırabilirsiniz.',
+        camFallbackScan: 'Safari/Firefox uyumluluk modu aktif (saf JS 1D EAN/UPC tarayıcı). Barkodu yatay veya dikey hizalayın.',
+        statusUnknown: 'Bilinmiyor',
+        nutriToggle: '📊 100 g Besin Tablosu & Nutri-Score (Opsiyonel)',
+        nutriKcal: 'Enerji (kcal)',
+        nutriSugars: 'Şeker (g)',
+        nutriSatFat: 'Doymuş Yağ (g)',
+        nutriSalt: 'Tuz (g)',
+        nutriFiber: 'Lif (g)',
+        nutriProtein: 'Protein (g)',
+        nutriBev: 'İçecek / Sıvı ürün (2023 İçecek ölçeği)',
+        nutriClear: 'Temizle',
+        dossierRoleLbl: 'Fayda / Etki Rolü',
+        dossierFuncLbl: 'AB CosIng Fonksiyonu',
+        dossierZoneLbl: 'Formül Konsantrasyon Bölgesi',
+        dossierProfileLbl: '7 Kişisel Profil Etkisi',
+        dossierHalalLbl: 'Helal & 4 Kurum Matrisi',
+        dossierSourceLbl: 'Doğrulanmış Resmi Kaynaklar',
+        tapRowHint: 'Detay için tıkla ↗',
+        nativeShareBtn: '📤 Kartı Paylaş / İndir'
+      },
+      en: {
+        madhhabLbl: 'Jurisprudential Madhhab (Optional)',
+        madhhabs: { general: 'General (Selected Board Only)', hanafi: 'Hanafi', shafii: 'Shafi\'i', maliki: 'Maliki', hanbali: 'Hanbali' },
+        curatedCovLbl: 'Deep Curated',
+        householdTitle: '👨‍👩‍👧‍👦 Family / Household Profiles (Up to 4)',
+        householdSub: 'Evaluate partner, pregnancy, and baby profiles simultaneously in a single scan (stored locally only).',
+        householdAddPartnerPreg: '+ Pregnant Partner',
+        householdAddBaby: '+ Baby / Child',
+        householdAddFungal: '+ Fungal Acne (Hanafi)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 Household Verdict at a Glance',
+        shelfSaveTitle: '🧴 / 🥫 Save to Routine / Pantry Shelf',
+        shelfAmBtn: '+ AM Routine',
+        shelfPmBtn: '+ PM Routine',
+        shelfPantryBtn: '+ Food Pantry',
+        shelfSavedToast: (n, s) => `"${n}" saved to ${s} shelf`,
+        shelfPanelTitle: '🧴 AM / PM Routine & Pantry Conflict Shelf',
+        shelfEmpty: 'No shelf items yet. Save products from Result screen into AM, PM, or Pantry.',
+        omnibusAlertsLbl: 'EU Omnibus & Ban Tracker',
+        altTitle: '✨ Cleaner & Halal Catalog Swaps + INCI Dupes',
+        altCleanSub: 'Verified Halal & Profile-compatible swaps (Score ≥80)',
+        altDupeSub: 'Highest INCI Formula Overlap (Dupe Match %)',
+        inciSimLbl: 'INCI Similarity',
+        sharedActivesLbl: 'Shared Actives',
+        camBarcodeBtn: '📷 Scan Barcode with Live Camera',
+        camModalTitle: '📷 Live In-Device Barcode Scanner',
+        camUnsupported: 'Camera access was denied or live camera scanning is unavailable in this browser. Type the barcode above or paste ingredients.',
+        camFallbackScan: 'Safari/Firefox compatibility mode active (pure-JS 1D EAN/UPC scanner). Align barcode horizontally or vertically.',
+        statusUnknown: 'Unknown',
+        nutriToggle: '📊 Per-100g Nutrition & Nutri-Score (Optional)',
+        nutriKcal: 'Energy (kcal)',
+        nutriSugars: 'Sugars (g)',
+        nutriSatFat: 'Sat. Fat (g)',
+        nutriSalt: 'Salt (g)',
+        nutriFiber: 'Fiber (g)',
+        nutriProtein: 'Protein (g)',
+        nutriBev: 'Beverage (2023 drink threshold scale)',
+        nutriClear: 'Clear',
+        dossierRoleLbl: 'Ingredient Roles & Benefits',
+        dossierFuncLbl: 'EU CosIng Function',
+        dossierZoneLbl: 'Concentration Zone',
+        dossierProfileLbl: '7-Profile Compatibility',
+        dossierHalalLbl: 'Halal & 4-Board Matrix',
+        dossierSourceLbl: 'Verified Official Sources',
+        tapRowHint: 'Tap for dossier ↗',
+        nativeShareBtn: '📤 Share / Save PNG'
+      },
+      ar: {
+        madhhabLbl: 'المذهب الفقهي (اختياري)',
+        madhhabs: { general: 'عام (الهيئة المختارة)', hanafi: 'حنفي', shafii: 'شافعي', maliki: 'مالكي', hanbali: 'حنبلي' },
+        curatedCovLbl: 'تغطية محققة',
+        householdTitle: '👨‍👩‍👧‍👦 ملفات العائلة (حتى 4 أفراد)',
+        householdSub: 'قيّم المنتج للزوجة أو الحمل أو الطفل في مسح واحد (محفوظ محلياً فقط).',
+        householdAddPartnerPreg: '+ زوجة (حمل)',
+        householdAddBaby: '+ رضيع / طفل',
+        householdAddFungal: '+ حب شباب فطري (حنفي)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 نتائج أفراد العائلة في لمحة',
+        shelfSaveTitle: '🧴 / 🥫 حفظ في رف الروتين أو المؤونة',
+        shelfAmBtn: '+ صباحي AM',
+        shelfPmBtn: '+ مسائي PM',
+        shelfPantryBtn: '+ مؤونة غذائية',
+        shelfSavedToast: (n, s) => `تم حفظ "${n}" في رف ${s}`,
+        shelfPanelTitle: '🧴 رف الروتين الصباحي والمسائي والمؤونة',
+        shelfEmpty: 'الرف فارغ حالياً. احفظ المنتجات من شاشة النتيجة.',
+        omnibusAlertsLbl: 'تنبيهات الحظر والمهل',
+        altTitle: '✨ بدائل أنظف وحلال + شبيهات INCI',
+        altCleanSub: 'بدائل نظيفة وحلال من الدليل (الدرجة ≥80)',
+        altDupeSub: 'أعلى نسبة تطابق في التركيبة (%)',
+        inciSimLbl: 'تطابق المكونات',
+        sharedActivesLbl: 'المكونات النشطة المشتركة',
+        camBarcodeBtn: '📷 مسح الباركود بالكاميرا المباشرة',
+        camModalTitle: '📷 ماسح الباركود بالكاميرا (محلي)',
+        camUnsupported: 'تعذر الوصول إلى الكاميرا أو الماسح المباشر غير متاح في هذا المتصفح. أدخل رقم الباركود أو الصق المكونات.',
+        camFallbackScan: 'وضع التوافق مع Safari/Firefox نشط (ماسح JS 1D). وجّه الباركود أفقياً أو عمودياً.',
+        statusUnknown: 'غير معروف',
+        nutriToggle: '📊 القيم الغذائية لكل 100غ و Nutri-Score (اختياري)',
+        nutriKcal: 'الطاقة (kcal)',
+        nutriSugars: 'السكر (g)',
+        nutriSatFat: 'دهون مشبعة (g)',
+        nutriSalt: 'ملح (g)',
+        nutriFiber: 'ألياف (g)',
+        nutriProtein: 'بروتين (g)',
+        nutriBev: 'مشروب / سائل (مقياس 2023)',
+        nutriClear: 'مسح',
+        dossierRoleLbl: 'الدور التجميلي والفوائد',
+        dossierFuncLbl: 'وظيفة CosIng الأوروبية',
+        dossierZoneLbl: 'منطقة التركيز',
+        dossierProfileLbl: 'التوافق مع الملفات السبعة',
+        dossierHalalLbl: 'الحكم الحلال ومقارنة الهيئات',
+        dossierSourceLbl: 'المصادر الرسمية الموثقة',
+        tapRowHint: 'اضغط للتفاصيل ↗',
+        nativeShareBtn: '📤 مشاركة / حفظ البطاقة'
+      },
+      de: {
+        madhhabLbl: 'Rechtsschule / Madhhab (Optional)',
+        madhhabs: { general: 'Allgemein (Gewählte Behörde)', hanafi: 'Hanafi', shafii: 'Schafi\'i', maliki: 'Maliki', hanbali: 'Hanbali' },
+        curatedCovLbl: 'Kuratiert',
+        householdTitle: '👨‍👩‍👧‍👦 Familien-Profile (Bis zu 4)',
+        householdSub: 'Partner, Schwangerschaft und Baby in einem Scan gleichzeitig prüfen.',
+        householdAddPartnerPreg: '+ Schwanger',
+        householdAddBaby: '+ Baby / Kind',
+        householdAddFungal: '+ Fungal Akne (Hanafi)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 Familien-Übersicht auf einen Blick',
+        shelfSaveTitle: '🧴 / 🥫 Im Routine-/Vorratsregal speichern',
+        shelfAmBtn: '+ Morgens (AM)',
+        shelfPmBtn: '+ Abends (PM)',
+        shelfPantryBtn: '+ Vorrat (Food)',
+        shelfSavedToast: (n, s) => `„${n}“ im ${s}-Regal gespeichert`,
+        shelfPanelTitle: '🧴 AM/PM-Routine- & Vorratsregal',
+        shelfEmpty: 'Noch keine Produkte im Regal gespeichert.',
+        omnibusAlertsLbl: 'EU-Omnibus-Fristen',
+        altTitle: '✨ Saubere/Halal Alternativen & INCI-Dupes',
+        altCleanSub: 'Geprüfte saubere Alternativen (Score ≥80)',
+        altDupeSub: 'Höchste INCI-Übereinstimmung (Dupe %)',
+        inciSimLbl: 'INCI-Ähnlichkeit',
+        sharedActivesLbl: 'Gemeinsame Wirkstoffe',
+        camBarcodeBtn: '📷 Barcode per Live-Kamera scannen',
+        camModalTitle: '📷 Lokaler Live-Barcode-Scanner',
+        camUnsupported: 'Kamerazugriff verweigert oder Live-Kamera-Scan in diesem Browser nicht verfügbar. Code oben eingeben oder Zutaten einfügen.',
+        camFallbackScan: 'Safari/Firefox-Kompatibilitätsmodus aktiv (reiner JS-1D-Scanner). Barcode waagerecht oder senkrecht ausrichten.',
+        statusUnknown: 'Unbekannt',
+        nutriToggle: '📊 Nährwerte pro 100 g & Nutri-Score (Optional)',
+        nutriKcal: 'Energie (kcal)',
+        nutriSugars: 'Zucker (g)',
+        nutriSatFat: 'Ges. Fett (g)',
+        nutriSalt: 'Salz (g)',
+        nutriFiber: 'Ballaststoffe (g)',
+        nutriProtein: 'Eiweiß (g)',
+        nutriBev: 'Getränk (Skala 2023)',
+        nutriClear: 'Leeren',
+        dossierRoleLbl: 'Wirkstoff-Rollen',
+        dossierFuncLbl: 'EU-CosIng-Funktion',
+        dossierZoneLbl: 'Konzentrationsbereich',
+        dossierProfileLbl: '7-Profil-Matrix',
+        dossierHalalLbl: 'Halal- & 4-Behörden-Matrix',
+        dossierSourceLbl: 'Offizielle Quellen',
+        tapRowHint: 'Details öffnen ↗',
+        nativeShareBtn: '📤 Teilen / PNG sichern'
+      },
+      fr: {
+        madhhabLbl: 'École juridique / Madhhab (Optionnel)',
+        madhhabs: { general: 'Général (Organisme choisi)', hanafi: 'Hanafite', shafii: 'Chaféite', maliki: 'Malikite', hanbali: 'Hanbalite' },
+        curatedCovLbl: 'Couverture experte',
+        householdTitle: '👨‍👩‍👧‍👦 Profils Famille (Jusqu\'à 4)',
+        householdSub: 'Évaluez partenaire, grossesse et bébé simultanément en un scan.',
+        householdAddPartnerPreg: '+ Grossesse',
+        householdAddBaby: '+ Bébé / Enfant',
+        householdAddFungal: '+ Acné fongique (Hanafi)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 Bilan Foyer en un coup d\'œil',
+        shelfSaveTitle: '🧴 / 🥫 Enregistrer dans ma Routine / Garde-manger',
+        shelfAmBtn: '+ Matin (AM)',
+        shelfPmBtn: '+ Soir (PM)',
+        shelfPantryBtn: '+ Alimentation',
+        shelfSavedToast: (n, s) => `« ${n} » ajouté à l'étagère ${s}`,
+        shelfPanelTitle: '🧴 Étagère Routine AM/PM & Garde-manger',
+        shelfEmpty: 'Aucun produit enregistré sur l\'étagère.',
+        omnibusAlertsLbl: 'Échéances EU Omnibus',
+        altTitle: '✨ Alternatives Saines/Halal & Dupes INCI',
+        altCleanSub: 'Alternatives vérifiées (Score ≥80)',
+        altDupeSub: 'Meilleure similarité INCI (Dupe %)',
+        inciSimLbl: 'Similarité INCI',
+        sharedActivesLbl: 'Actifs communs',
+        camBarcodeBtn: '📷 Scanner le code-barres par caméra',
+        camModalTitle: '📷 Scanner Code-Barres Caméra',
+        camUnsupported: 'Accès caméra refusé ou scan caméra indisponible dans ce navigateur. Saisissez le code ci-dessus ou collez les ingrédients.',
+        camFallbackScan: 'Mode compatibilité Safari/Firefox actif (scanner JS 1D). Alignez le code-barres horizontalement ou verticalement.',
+        statusUnknown: 'Inconnu',
+        nutriToggle: '📊 Valeurs nutritionnelles 100 g & Nutri-Score (Optionnel)',
+        nutriKcal: 'Énergie (kcal)',
+        nutriSugars: 'Sucres (g)',
+        nutriSatFat: 'Ac. gras sat. (g)',
+        nutriSalt: 'Sel (g)',
+        nutriFiber: 'Fibres (g)',
+        nutriProtein: 'Protéines (g)',
+        nutriBev: 'Boisson (barème 2023)',
+        nutriClear: 'Effacer',
+        dossierRoleLbl: 'Rôles & Bénéfices',
+        dossierFuncLbl: 'Fonction EU CosIng',
+        dossierZoneLbl: 'Zone de concentration',
+        dossierProfileLbl: 'Matrice 7 Profils',
+        dossierHalalLbl: 'Statut Halal & 4 Autorités',
+        dossierSourceLbl: 'Sources officielles',
+        tapRowHint: 'Voir fiche ↗',
+        nativeShareBtn: '📤 Partager / Enregistrer PNG'
+      },
+      id: {
+        madhhabLbl: 'Mazhab Fikih (Opsional)',
+        madhhabs: { general: 'Umum (Lembaga Dipilih)', hanafi: 'Hanafi', shafii: 'Syafi\'i', maliki: 'Maliki', hanbali: 'Hanbali' },
+        curatedCovLbl: 'Kurasi Mendalam',
+        householdTitle: '👨‍👩‍👧‍👦 Profil Keluarga (Maks 4)',
+        householdSub: 'Nilai keamanan produk untuk pasangan, ibu hamil, dan bayi sekaligus.',
+        householdAddPartnerPreg: '+ Ibu Hamil',
+        householdAddBaby: '+ Bayi / Anak',
+        householdAddFungal: '+ Jerawat Jamur (Hanafi)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 Ringkasan Keluarga Sekilas',
+        shelfSaveTitle: '🧴 / 🥫 Simpan ke Rak Rutinitas / Dapur',
+        shelfAmBtn: '+ Pagi (AM)',
+        shelfPmBtn: '+ Malam (PM)',
+        shelfPantryBtn: '+ Dapur Pangan',
+        shelfSavedToast: (n, s) => `"${n}" disimpan ke rak ${s}`,
+        shelfPanelTitle: '🧴 Rak Rutinitas AM/PM & Konflik',
+        shelfEmpty: 'Belum ada item di rak.',
+        omnibusAlertsLbl: 'Pantauan EU Omnibus',
+        altTitle: '✨ Alternatif Bersih/Halal & Dupe INCI',
+        altCleanSub: 'Alternatif Halal & ramah profil (Skor ≥80)',
+        altDupeSub: 'Kemiripan Formula INCI Tertinggi (%)',
+        inciSimLbl: 'Kemiripan INCI',
+        sharedActivesLbl: 'Bahan Aktif Sama',
+        camBarcodeBtn: '📷 Pindai Barcode via Kamera',
+        camModalTitle: '📷 Pemindai Barcode Kamera',
+        camUnsupported: 'Akses kamera ditolak atau pemindai kamera tidak tersedia di browser ini. Ketik angka barcode di atas atau tempel komposisi.',
+        camFallbackScan: 'Mode kompatibilitas Safari/Firefox aktif (pemindai JS 1D). Sejajarkan barcode mendatar atau tegak.',
+        statusUnknown: 'Tidak diketahui',
+        nutriToggle: '📊 Tabel Gizi 100 g & Nutri-Score (Opsional)',
+        nutriKcal: 'Energi (kcal)',
+        nutriSugars: 'Gula (g)',
+        nutriSatFat: 'Lemak Jenuh (g)',
+        nutriSalt: 'Garam (g)',
+        nutriFiber: 'Serat (g)',
+        nutriProtein: 'Protein (g)',
+        nutriBev: 'Minuman (skala 2023)',
+        nutriClear: 'Bersihkan',
+        dossierRoleLbl: 'Peran Bahan Aktif',
+        dossierFuncLbl: 'Fungsi CosIng UE',
+        dossierZoneLbl: 'Zona Konsentrasi',
+        dossierProfileLbl: 'Matriks 7 Profil',
+        dossierHalalLbl: 'Hukum Halal 4 Lembaga',
+        dossierSourceLbl: 'Sumber Resmi',
+        tapRowHint: 'Lihat detail ↗',
+        nativeShareBtn: '📤 Bagikan / Simpan PNG'
+      },
+      ms: {
+        madhhabLbl: 'Mazhab Fiqh (Pilihan)',
+        madhhabs: { general: 'Umum (Badan Dipilih)', hanafi: 'Hanafi', shafii: 'Syafii', maliki: 'Maliki', hanbali: 'Hanbali' },
+        curatedCovLbl: 'Kurasi Terperinci',
+        householdTitle: '👨‍👩‍👧‍👦 Profil Isi Rumah (Maks 4)',
+        householdSub: 'Nilai kesesuaian produk untuk pasangan, kehamilan dan bayi serentak.',
+        householdAddPartnerPreg: '+ Ibu Hamil',
+        householdAddBaby: '+ Bayi / Kanak-kanak',
+        householdAddFungal: '+ Jerawat Kulat (Hanafi)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 Keputusan Keluarga Sekilas',
+        shelfSaveTitle: '🧴 / 🥫 Simpan ke Rak Rutin / Pantri',
+        shelfAmBtn: '+ Pagi (AM)',
+        shelfPmBtn: '+ Malam (PM)',
+        shelfPantryBtn: '+ Pantri Makanan',
+        shelfSavedToast: (n, s) => `"${n}" disimpan ke rak ${s}`,
+        shelfPanelTitle: '🧴 Rak Rutin AM/PM & Pantri',
+        shelfEmpty: 'Tiada produk di rak.',
+        omnibusAlertsLbl: 'Amaran EU Omnibus',
+        altTitle: '✨ Alternatif Bersih/Halal & Dupe INCI',
+        altCleanSub: 'Alternatif Halal & serasi profil (Skor ≥80)',
+        altDupeSub: 'Persamaan Formula INCI Tertinggi (%)',
+        inciSimLbl: 'Persamaan INCI',
+        sharedActivesLbl: 'Bahan Aktif Sama',
+        camBarcodeBtn: '📷 Imbas Kod Bar dengan Kamera',
+        camModalTitle: '📷 Pengimbas Kod Bar Kamera',
+        camUnsupported: 'Akses kamera ditolak atau pengimbas kamera tidak tersedia pada pelayar ini. Masukkan kod di atas atau tampal ramuan.',
+        camFallbackScan: 'Mod keserasian Safari/Firefox aktif (pengimbas JS 1D). Jajarkan kod bar secara melintang atau menegak.',
+        statusUnknown: 'Tidak diketahui',
+        nutriToggle: '📊 Jadual Pemakanan 100 g & Nutri-Score (Pilihan)',
+        nutriKcal: 'Tenaga (kcal)',
+        nutriSugars: 'Gula (g)',
+        nutriSatFat: 'Lemak Tepu (g)',
+        nutriSalt: 'Garam (g)',
+        nutriFiber: 'Serat (g)',
+        nutriProtein: 'Protein (g)',
+        nutriBev: 'Minuman (skala 2023)',
+        nutriClear: 'Kosongkan',
+        dossierRoleLbl: 'Peranan Bahan Aktif',
+        dossierFuncLbl: 'Fungsi CosIng EU',
+        dossierZoneLbl: 'Zon Kepekatan',
+        dossierProfileLbl: 'Matriks 7 Profil',
+        dossierHalalLbl: 'Status Halal 4 Badan',
+        dossierSourceLbl: 'Sumber Rasmi',
+        tapRowHint: 'Ketik untuk info ↗',
+        nativeShareBtn: '📤 Kongsi / Simpan PNG'
+      },
+      es: {
+        madhhabLbl: 'Escuela jurídica / Madhhab (Opcional)',
+        madhhabs: { general: 'General (Entidad elegida)', hanafi: 'Hanafí', shafii: 'Shafi\'í', maliki: 'Malikí', hanbali: 'Hanbalí' },
+        curatedCovLbl: 'Curación profunda',
+        householdTitle: '👨‍👩‍👧‍👦 Perfiles Familiares (Hasta 4)',
+        householdSub: 'Evalúa pareja, embarazo y bebé simultáneamente en un escaneo.',
+        householdAddPartnerPreg: '+ Embarazo',
+        householdAddBaby: '+ Bebé / Niño',
+        householdAddFungal: '+ Acné fúngico (Hanafí)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 Veredicto Familiar',
+        shelfSaveTitle: '🧴 / 🥫 Guardar en Estante Rutina / Despensa',
+        shelfAmBtn: '+ Mañana (AM)',
+        shelfPmBtn: '+ Noche (PM)',
+        shelfPantryBtn: '+ Despensa',
+        shelfSavedToast: (n, s) => `"${n}" guardado en ${s}`,
+        shelfPanelTitle: '🧴 Estante de Rutina AM/PM y Despensa',
+        shelfEmpty: 'Sin productos guardados en el estante.',
+        omnibusAlertsLbl: 'Plazos EU Omnibus',
+        altTitle: '✨ Alternativas Limpias/Halal y Dupes INCI',
+        altCleanSub: 'Alternativas verificadas (Puntuación ≥80)',
+        altDupeSub: 'Mayor similitud de fórmula INCI (%)',
+        inciSimLbl: 'Similitud INCI',
+        sharedActivesLbl: 'Activos compartidos',
+        camBarcodeBtn: '📷 Escanear código con cámara en vivo',
+        camModalTitle: '📷 Escáner de Código en Vivo',
+        camUnsupported: 'Permiso de cámara denegado o escáner de cámara no disponible en este navegador. Ingresa el código arriba o pega los ingredientes.',
+        camFallbackScan: 'Modo compatibilidad Safari/Firefox activo (escáner JS 1D). Alinea el código horizontal o verticalmente.',
+        statusUnknown: 'Desconocido',
+        nutriToggle: '📊 Tabla Nutricional 100 g y Nutri-Score (Opcional)',
+        nutriKcal: 'Energía (kcal)',
+        nutriSugars: 'Azúcares (g)',
+        nutriSatFat: 'Grasas sat. (g)',
+        nutriSalt: 'Sal (g)',
+        nutriFiber: 'Fibra (g)',
+        nutriProtein: 'Proteínas (g)',
+        nutriBev: 'Bebida (escala 2023)',
+        nutriClear: 'Limpiar',
+        dossierRoleLbl: 'Roles y Beneficios',
+        dossierFuncLbl: 'Función EU CosIng',
+        dossierZoneLbl: 'Zona de concentración',
+        dossierProfileLbl: 'Matriz de 7 Perfiles',
+        dossierHalalLbl: 'Dictamen Halal 4 Entidades',
+        dossierSourceLbl: 'Fuentes Oficiales',
+        tapRowHint: 'Ver ficha ↗',
+        nativeShareBtn: '📤 Compartir / Guardar PNG'
+      },
+      ru: {
+        madhhabLbl: 'Мазхаб (Опционально)',
+        madhhabs: { general: 'Общий (Выбранный орган)', hanafi: 'Ханафитский', shafii: 'Шафиитский', maliki: 'Маликитский', hanbali: 'Ханбалитский' },
+        curatedCovLbl: 'Экспертная база',
+        householdTitle: '👨‍👩‍👧‍👦 Профили семьи (До 4)',
+        householdSub: 'Проверьте продукт сразу для себя, беременной супруги и ребёнка.',
+        householdAddPartnerPreg: '+ Беременность',
+        householdAddBaby: '+ Ребёнок',
+        householdAddFungal: '+ Грибк. акне (Ханафи)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 Вердикт для семьи',
+        shelfSaveTitle: '🧴 / 🥫 Сохранить на полку AM/PM',
+        shelfAmBtn: '+ Утро (AM)',
+        shelfPmBtn: '+ Вечер (PM)',
+        shelfPantryBtn: '+ Продукты',
+        shelfSavedToast: (n, s) => `«${n}» сохранено в ${s}`,
+        shelfPanelTitle: '🧴 Полка рутины AM/PM и конфликты',
+        shelfEmpty: 'На полке пока нет товаров.',
+        omnibusAlertsLbl: 'Сроки EU Omnibus',
+        altTitle: '✨ Чистые/Халяль альтернативы и Дюпы INCI',
+        altCleanSub: 'Подходящие чистые аналоги (Оценка ≥80)',
+        altDupeSub: 'Максимальное совпадение состава (%)',
+        inciSimLbl: 'Сходство INCI',
+        sharedActivesLbl: 'Общие активы',
+        camBarcodeBtn: '📷 Сканировать штрихкод камерой',
+        camModalTitle: '📷 Камера штрихкодов (локально)',
+        camUnsupported: 'Доступ к камере отклонён или сканер камеры недоступен в этом браузере. Введите код выше или вставьте состав.',
+        camFallbackScan: 'Режим совместимости Safari/Firefox активен (JS 1D-сканер). Выровняйте штрихкод горизонтально или вертикально.',
+        statusUnknown: 'Неизвестно',
+        nutriToggle: '📊 Пищевая ценность 100 г и Nutri-Score (Опц.)',
+        nutriKcal: 'Калории (kcal)',
+        nutriSugars: 'Сахар (g)',
+        nutriSatFat: 'Нас. жиры (g)',
+        nutriSalt: 'Соль (g)',
+        nutriFiber: 'Клетчатка (g)',
+        nutriProtein: 'Белки (g)',
+        nutriBev: 'Напиток (шкала 2023)',
+        nutriClear: 'Очистить',
+        dossierRoleLbl: 'Роль и польза',
+        dossierFuncLbl: 'Функция EU CosIng',
+        dossierZoneLbl: 'Зона концентрации',
+        dossierProfileLbl: 'Матрица 7 профилей',
+        dossierHalalLbl: 'Халяль по 4 стандартам',
+        dossierSourceLbl: 'Официальные источники',
+        tapRowHint: 'Открыть досье ↗',
+        nativeShareBtn: '📤 Поделиться / Скачать PNG'
+      },
+      ur: {
+        madhhabLbl: 'فقہی مسلک / مذہب (اختیاری)',
+        madhhabs: { general: 'عمومی (منتخب ادارہ)', hanafi: 'حنفی', shafii: 'شافعی', maliki: 'مالکی', hanbali: 'حنبلی' },
+        curatedCovLbl: 'تحقیق شدہ',
+        householdTitle: '👨‍👩‍👧‍👦 خاندانی پروفائلز (زیادہ سے زیادہ 4)',
+        householdSub: 'ایک ہی اسکین میں شریک حیات، حمل اور بچے کے لیے مطابقت جانچیں۔',
+        householdAddPartnerPreg: '+ حمل پروفائل',
+        householdAddBaby: '+ بچہ پروفائل',
+        householdAddFungal: '+ فنگل ایکنی (حنفی)',
+        householdVerdictTitle: '👨‍👩‍👧‍👦 خاندانی جائزہ ایک نظر میں',
+        shelfSaveTitle: '🧴 / 🥫 روٹین / پینٹری شیلف میں محفوظ کریں',
+        shelfAmBtn: '+ صبح (AM)',
+        shelfPmBtn: '+ شام (PM)',
+        shelfPantryBtn: '+ خوراک شیلف',
+        shelfSavedToast: (n, s) => `"${n}" کو ${s} شیلف میں شامل کیا گیا`,
+        shelfPanelTitle: '🧴 صبح/شام روٹین اور پینٹری شیلف',
+        shelfEmpty: 'شیلف ابھی خالی ہے۔ نتیجے سے مصنوعات محفوظ کریں۔',
+        omnibusAlertsLbl: 'EU اومنی بس پابندی الرٹ',
+        altTitle: '✨ صاف اور حلال متبادل + INCI ہم شکل مصنوعات',
+        altCleanSub: 'حلال و محفوظ متبادل (اسکور ≥80)',
+        altDupeSub: 'اجزاء میں سب سے زیادہ مماثلت (%)',
+        inciSimLbl: 'INCI مماثلت',
+        sharedActivesLbl: 'مشترکہ فعال اجزاء',
+        camBarcodeBtn: '📷 لائیو کیمرے سے بارکوڈ اسکین کریں',
+        camModalTitle: '📷 لائیو کیمرہ بارکوڈ اسکینر',
+        camUnsupported: 'کیمرے کی اجازت مسترد کر دی گئی یا اس براؤزر میں لائیو کیمرہ اسکینر دستیاب نہیں۔ اوپر نمبر لکھیں یا اجزاء چسپاں کریں۔',
+        camFallbackScan: 'Safari/Firefox مطابقت موڈ فعال ہے (خالص JS 1D اسکینر)۔ بارکوڈ کو افقی یا عمودی سیدھ میں رکھیں۔',
+        statusUnknown: 'نامعلوم',
+        nutriToggle: '📊 فی 100 گرام غذائی جدول اور Nutri-Score (اختیاری)',
+        nutriKcal: 'توانائی (kcal)',
+        nutriSugars: 'شکر (g)',
+        nutriSatFat: 'سیر شدہ چکنائی (g)',
+        nutriSalt: 'نمک (g)',
+        nutriFiber: 'فائبر (g)',
+        nutriProtein: 'پروٹین (g)',
+        nutriBev: 'مشروب / مائع (2023 پیمانہ)',
+        nutriClear: 'صاف کریں',
+        dossierRoleLbl: 'جزو کا کردار اور فوائد',
+        dossierFuncLbl: 'EU CosIng فنکشن',
+        dossierZoneLbl: 'مقدار کا درجہ',
+        dossierProfileLbl: '7 پروفائلز پر اثر',
+        dossierHalalLbl: 'حلال اور 4 اداروں کی رائے',
+        dossierSourceLbl: 'مصدقہ سرکاری ذرائع',
+        tapRowHint: 'تفصیل دیکھیں ↗',
+        nativeShareBtn: '📤 کارڈ شیئر / محفوظ کریں'
+      }
+    };
+    function getP34Text(lang) { return PHASE34_WEB_I18N[lang] || PHASE34_WEB_I18N.en; }
 
     const PRIVACY_LINK_I18N = {
       tr: 'Gizlilik Politikası',
@@ -1332,7 +2126,7 @@
     function syncThemeColorMeta() {
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) {
-        meta.setAttribute('content', state.dark ? '#07120E' : '#0F291E');
+        meta.setAttribute('content', state.dark ? '#091410' : '#006241');
       }
     }
 
@@ -1342,16 +2136,23 @@
       syncThemeColorMeta();
       const u = getUiText(state.lang);
       document.getElementById('darkBtn').textContent = state.dark ? u.lightThemeBtn : u.darkThemeBtn;
+      persistWebPrefs();
       renderScreen();
     }
 
     function switchScreen(scr) {
+      if (state.screen === 'scan' && scr !== 'scan') {
+        stopWebBarcodeCamera();
+      }
       state.screen = scr;
       ['main', 'scan', 'result', 'halal', 'compare'].forEach((k) => {
         const top = document.getElementById('topTab-' + k);
         if (top) top.classList.toggle('active', k === scr);
         const nav = document.getElementById('nav-' + k);
-        if (nav && k !== 'scan') nav.classList.toggle('active', k === scr);
+        if (nav) {
+          if (k !== 'scan') nav.classList.toggle('active', k === scr);
+          nav.setAttribute('aria-selected', k === scr ? 'true' : 'false');
+        }
       });
       renderScreen();
     }
@@ -1360,6 +2161,8 @@
       const s = SAMPLES[idx];
       state.activeSampleIdx = idx;
       state.activeBarcodeMeta = null;
+      state.nutritionPer100g = null;
+      state.nutritionDraftStrings = {};
       state.barcodeStatusBanner = null;
       if (idx === 7 && state.lang === 'tr') {
         state.autoDetected = false;
@@ -1382,6 +2185,8 @@
     function onInputChanged() {
       state.activeSampleIdx = null;
       state.activeBarcodeMeta = null;
+      state.nutritionPer100g = null;
+      state.nutritionDraftStrings = {};
       if (!(state.barcodeStatusBanner && state.barcodeStatusBanner.canSaveCustom)) {
         state.barcodeStatusBanner = null;
       }
@@ -1393,8 +2198,78 @@
       }, 300);
     }
 
+    function onScanInputChanged(val) {
+      const liveEl = document.getElementById('liveInput');
+      if (liveEl && liveEl.value !== val) {
+        liveEl.value = val;
+      }
+      onInputChanged();
+    }
+
+    function setProductTypeFromScan(pt) {
+      const nextPt = pt === 'food' ? 'food' : 'cosmetic';
+      const ptEl = document.getElementById('prodType');
+      if (ptEl) ptEl.value = nextPt;
+      refreshAll();
+    }
+
+    async function onScanAnalyzeNow() {
+      if (window._liveInputDebounce) {
+        clearTimeout(window._liveInputDebounce);
+        window._liveInputDebounce = null;
+      }
+      await refreshAll();
+      switchScreen('result');
+    }
+
+    function onWebNutritionChanged(field, value) {
+      const next = { ...(state.nutritionPer100g || {}) };
+      if (!state.nutritionDraftStrings || typeof state.nutritionDraftStrings !== 'object') {
+        state.nutritionDraftStrings = {};
+      }
+      if (field === 'isBeverage') {
+        if (value) next.isBeverage = true;
+        else {
+          delete next.isBeverage;
+          delete next.isWater;
+        }
+      } else {
+        const rawStr = String(value === undefined || value === null ? '' : value);
+        state.nutritionDraftStrings[field] = rawStr;
+        if (field === 'energyKcal') delete next.energyKj;
+        if (field === 'saltG') delete next.sodiumMg;
+        const trimmed = rawStr.trim();
+        if (!trimmed) {
+          delete next[field];
+        } else {
+          const normalized = trimmed.replace(',', '.');
+          if (/^\d*(?:\.\d*)?$/.test(normalized) && normalized !== '.' && normalized !== '') {
+            const parsed = Number(normalized);
+            if (Number.isFinite(parsed) && parsed >= 0) {
+              next[field] = parsed;
+            }
+          }
+        }
+      }
+      state.nutritionPer100g = Object.keys(next).length > 0 ? next : null;
+      if (window._liveInputDebounce) clearTimeout(window._liveInputDebounce);
+      window._liveInputDebounce = setTimeout(() => {
+        window._liveInputDebounce = null;
+        refreshAll({ preserveNutritionInputFocus: true });
+      }, 280);
+    }
+
+    function clearWebNutritionInputs() {
+      state.nutritionPer100g = null;
+      state.nutritionDraftStrings = {};
+      renderScreen();
+      refreshAll();
+    }
+
     function toggleProfile(key) {
       state.profiles[key] = !state.profiles[key];
+      state.eraseDataToast = false;
+      persistWebPrefs();
       return refreshAll();
     }
 
@@ -1501,12 +2376,12 @@
         const pb = document.getElementById('presetBadge-' + idx);
         if (!s || !pb) return;
         try {
-          const res = await fetch('/api/evaluate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ rawText: (s.texts && s.texts[state.lang]) || s.text, productType: s.type, halalAuthority, lang: state.lang })
+          const r = await callInciFactApi('/api/evaluate', {
+            rawText: (s.texts && s.texts[state.lang]) || s.text,
+            productType: s.type,
+            halalAuthority,
+            lang: state.lang
           });
-          const r = await res.json();
           if (token !== presetBadgeToken || !r.cards) return; // a newer refresh superseded this one
           const reg = r.cards.regulatoryCard;
           let text, color;
@@ -1941,6 +2816,7 @@
         rawText: trimmedRaw,
         productType: productType || 'cosmetic',
         jurisdiction: state.jurisdiction || 'EU',
+        nutritionPer100g: productType === 'food' ? sanitizeNutritionObject(state.nutritionPer100g) : null,
         claims: { ...(state.claims || { halalCertified: false, veganStatus: 'none', vegetarianStatus: 'none' }) },
         userConfirmations: { ...(state.userConfirmations || {}) },
         score: reg.score,
@@ -1985,6 +2861,7 @@
           productType: h.productType,
           rawText: h.rawText,
           jurisdiction: h.jurisdiction || state.jurisdiction || 'EU',
+          nutritionPer100g: h.productType === 'food' ? sanitizeNutritionObject(h.nutritionPer100g) : null,
           claims: h.claims ? { ...h.claims } : { ...state.claims },
           userConfirmations: h.userConfirmations ? { ...h.userConfirmations } : {}
         };
@@ -1996,6 +2873,7 @@
           productType,
           rawText,
           jurisdiction: state.jurisdiction || 'EU',
+          nutritionPer100g: productType === 'food' ? sanitizeNutritionObject(state.nutritionPer100g) : null,
           claims: { ...state.claims },
           userConfirmations: { ...(state.userConfirmations || {}) }
         };
@@ -2028,9 +2906,11 @@
       }
       state.activeSampleIdx = null;
       state.activeBarcodeMeta = null;
+      state.nutritionPer100g = h.productType === 'food' ? sanitizeNutritionObject(h.nutritionPer100g) : null;
+      state.nutritionDraftStrings = {};
       state.barcodeStatusBanner = null;
       state.productTitle = h.title || deriveCustomProductTitle(h.rawText, state.lang);
-      if (h.jurisdiction) state.jurisdiction = h.jurisdiction;
+      if (h.jurisdiction && VALID_JURISDICTIONS.has(h.jurisdiction)) state.jurisdiction = h.jurisdiction;
       if (h.claims) state.claims = { ...h.claims };
       if (h.userConfirmations) state.userConfirmations = { ...h.userConfirmations };
       document.getElementById('prodType').value = h.productType || 'cosmetic';
@@ -2042,7 +2922,7 @@
 
     const BARCODE_UI_I18N = {
       tr: {
-        title: '📦 Hibrit Barkod Okuyucu (22+ Doğrulanmış Katalog + Cihaz Kaydı)',
+        title: '📦 Hibrit Barkod Okuyucu (43+ Doğrulanmış Katalog + Cihaz Kaydı)',
         placeholder: '8–14 haneli barkod (Örn: 3017620422003)',
         btn: 'Barkod Sorgula',
         quickLbl: 'Hazır Barkodlar:',
@@ -2051,7 +2931,7 @@
         savedCustomLowCov: 'Barkodu kaydetmek için ekrandaki içindekiler etiketinin en az %80 tanınmış olması gerekir.'
       },
       en: {
-        title: '📦 Hybrid Barcode Lookup (22+ Verified Catalog + Device Save)',
+        title: '📦 Hybrid Barcode Lookup (43+ Verified Catalog + Device Save)',
         placeholder: '8–14 digit barcode (e.g. 3017620422003)',
         btn: 'Lookup Barcode',
         quickLbl: 'Quick Barcodes:',
@@ -2060,7 +2940,7 @@
         savedCustomLowCov: 'At least 80% ingredient recognition coverage is required to save a custom barcode.'
       },
       ar: {
-        title: '📦 قارئ الباركود الهجين (كتالوج موثق + حفظ على الجهاز)',
+        title: '📦 قارئ الباركود الهجين (كتالوج +43 موثق + حفظ على الجهاز)',
         placeholder: 'باركود من 8 إلى 14 رقماً (مثال: 3017620422003)',
         btn: 'فحص الباركود',
         quickLbl: 'باركودات جاهزة:',
@@ -2069,7 +2949,7 @@
         savedCustomLowCov: 'يتطلب حفظ الباركود تغطية تعرف على المكونات بنسبة 80% على الأقل.'
       },
       de: {
-        title: '📦 Hybrider Barcode-Scanner (22+ Katalog + Gerätespeicher)',
+        title: '📦 Hybrider Barcode-Scanner (43+ Katalog + Gerätespeicher)',
         placeholder: '8–14-stelliger Barcode (z. B. 3017620422003)',
         btn: 'Barcode prüfen',
         quickLbl: 'Schnellwahl:',
@@ -2078,7 +2958,7 @@
         savedCustomLowCov: 'Zum Speichern eines Barcodes sind mindestens 80 % erkannte Inhaltsstoffe erforderlich.'
       },
       fr: {
-        title: '📦 Lecteur Code-Barres Hybride (Catalogue 22+ & Sauvegarde)',
+        title: '📦 Lecteur Code-Barres Hybride (Catalogue 43+ & Sauvegarde)',
         placeholder: 'Code-barres 8–14 chiffres (ex. 3017620422003)',
         btn: 'Vérifier Code',
         quickLbl: 'Codes rapides :',
@@ -2087,7 +2967,7 @@
         savedCustomLowCov: 'Une couverture d\'au moins 80 % est requise pour enregistrer un code-barres.'
       },
       id: {
-        title: '📦 Pemindai Barcode Hibrida (Katalog 22+ & Simpan ke Perangkat)',
+        title: '📦 Pemindai Barcode Hibrida (Katalog 43+ & Simpan ke Perangkat)',
         placeholder: '8–14 digit barcode (Mis: 3017620422003)',
         btn: 'Cari Barcode',
         quickLbl: 'Barcode Cepat:',
@@ -2096,7 +2976,7 @@
         savedCustomLowCov: 'Minimal 80% cakupan komposisi diperlukan untuk menyimpan barcode.'
       },
       ms: {
-        title: '📦 Pengimbas Kod Bar Hibrid (Katalog 22+ & Simpan Peranti)',
+        title: '📦 Pengimbas Kod Bar Hibrid (Katalog 43+ & Simpan Peranti)',
         placeholder: '8–14 digit kod bar (Cth: 3017620422003)',
         btn: 'Semak Kod Bar',
         quickLbl: 'Kod Bar Pantas:',
@@ -2105,7 +2985,7 @@
         savedCustomLowCov: 'Sekurang-kurangnya 80% liputan ramuan diperlukan untuk menyimpan kod bar.'
       },
       es: {
-        title: '📦 Lector Híbrido de Código de Barras (Catálogo 22+ y Guardado)',
+        title: '📦 Lector Híbrido de Código de Barras (Catálogo 43+ y Guardado)',
         placeholder: 'Código de 8–14 dígitos (Ej. 3017620422003)',
         btn: 'Buscar Código',
         quickLbl: 'Códigos rápidos:',
@@ -2114,7 +2994,7 @@
         savedCustomLowCov: 'Se requiere al menos un 80% de cobertura para guardar un código personalizado.'
       },
       ru: {
-        title: '📦 Гибридный поиск по штрихкоду (Каталог 22+ и сохранение)',
+        title: '📦 Гибридный поиск по штрихкоду (Каталог 43+ и сохранение)',
         placeholder: '8–14 цифр штрихкода (напр. 3017620422003)',
         btn: 'Найти штрихкод',
         quickLbl: 'Быстрые коды:',
@@ -2123,7 +3003,7 @@
         savedCustomLowCov: 'Для сохранения штрихкода требуется распознавание не менее 80% состава.'
       },
       ur: {
-        title: '📦 ہائبرڈ بارکوڈ اسکینر (22+ تصدیق شدہ کیٹلاگ اور ڈیوائس سیو)',
+        title: '📦 ہائبرڈ بارکوڈ اسکینر (43+ تصدیق شدہ کیٹلاگ اور ڈیوائس سیو)',
         placeholder: '8 تا 14 ہندسوں کا بارکوڈ (مثلاً: 3017620422003)',
         btn: 'بارکوڈ چیک کریں',
         quickLbl: 'فوری بارکوڈز:',
@@ -2134,25 +3014,41 @@
     };
 
     const QUICK_BARCODES = [
-      { code: '3017620422003', label: 'Nutella' },
+      { code: '2010000000106', label: 'Water · A' },
+      { code: '2010000000144', label: 'Oat Flour · A' },
+      { code: '2010000000137', label: 'Olive Oil · B' },
+      { code: '2010000000120', label: 'Yogurt · B' },
+      { code: '2010000000113', label: 'Zero Cola · C' },
+      { code: '3017620422003', label: 'Nutella · E' },
       { code: '3337875597388', label: 'CeraVe' },
       { code: '8809598450653', label: 'COSRX Snail' },
       { code: '7622210449283', label: 'Oreo' },
       { code: '3337872411991', label: 'LRP Cicaplast' },
       { code: '0769915190977', label: 'TO Glycolic 7%' },
       { code: '3337875696586', label: 'LRP Retinol B3' },
-      { code: '3600542154727', label: 'Garnier Vit C' },
       { code: '9002490100070', label: 'Red Bull' },
-      { code: '8000500037560', label: 'Kinder Bueno' },
-      { code: '5900000202501', label: 'TPO Gel' },
-      { code: '0000000000017', label: '<80% OCR' }
+      { code: '2000000000022', label: 'TPO Gel' },
+      { code: '2000000000046', label: '<80% OCR' }
     ];
 
     let _browserRuleEnginePromise = null;
+    let _browserBarcode1dPromise = null;
     let _clientEngineCooldownUntil = 0;
     const CLIENT_ENGINE_COOLDOWN_MS = 30000;
     const API_TIMEOUT_MS = 8000;
     let _savingCustomBarcode = false;
+
+    async function getBrowserBarcode1dDecoder() {
+      if (!_browserBarcode1dPromise) {
+        _browserBarcode1dPromise = import('./src/engine/barcode1dDecoder.mjs')
+          .catch(() => import('../src/engine/barcode1dDecoder.mjs'))
+          .catch((err) => {
+            _browserBarcode1dPromise = null;
+            throw err;
+          });
+      }
+      return _browserBarcode1dPromise;
+    }
 
     async function getBrowserRuleEngine() {
       if (!_browserRuleEnginePromise) {
@@ -2282,6 +3178,7 @@
               applicationType: hit.applicationType || null,
               rawText: hit.rawText,
               allergenStatement: hit.allergenStatement || '',
+              nutritionPer100g: hit.nutritionPer100g || null,
               source: hit.source || 'Local Barcode Cache',
               updatedAt: hit.updatedAt || '',
               coveragePercent: hit.coveragePercent,
@@ -2331,6 +3228,7 @@
                 applicationType: data.applicationType || null,
                 rawText: data.rawText,
                 allergenStatement: data.allergenStatement || '',
+                nutritionPer100g: data.nutritionPer100g || null,
                 source: data.source,
                 updatedAt: data.updatedAt,
                 coveragePercent: data.coveragePercent,
@@ -2363,6 +3261,8 @@
           message: data.message
         };
         state.productTitle = data.productName;
+        state.nutritionPer100g = data.nutritionPer100g || null;
+        state.nutritionDraftStrings = {};
         document.getElementById('prodType').value = data.productType || 'cosmetic';
         document.getElementById('liveInput').value = data.rawText;
 
@@ -2475,11 +3375,17 @@
       const reg = state.evalData.cards.regulatoryCard;
       const prof = state.evalData.cards.profileCard;
       const halal = state.evalData.cards.halalCard;
+      const vsCard = state.evalData.cards.veganSugarCard;
       const hasPendingOcr = Array.isArray(state.evalData.unresolvedConfirmations) && state.evalData.unresolvedConfirmations.length > 0;
       const isLowCov = reg.coveragePercent < 80;
       const profStValues = Object.values(prof.profileStatuses || {});
-      const hasRedProf = prof.alerts.some((a) => a.level === 'kirmizi') || profStValues.includes('false');
-      const hasYellowProf = prof.alerts.some((a) => a.level === 'sari');
+      const hasVeganAlert =
+        Boolean(state.profiles.vegan && vsCard && ((vsCard.nonVeganItems && vsCard.nonVeganItems.length > 0) || (vsCard.uncertainVeganItems && vsCard.uncertainVeganItems.length > 0)));
+      const hasRedProf =
+        prof.alerts.some((a) => a.level === 'kirmizi') ||
+        profStValues.includes('false') ||
+        Boolean(state.profiles.vegan && vsCard && vsCard.nonVeganItems && vsCard.nonVeganItems.length > 0);
+      const hasYellowProf = prof.alerts.some((a) => a.level === 'sari') || hasVeganAlert;
 
       // 1. Halal presentation
       let halalText = loc.badges.halalOk;
@@ -2489,7 +3395,7 @@
       if (halal.overallStatus === 'conflict' || halal.overallStatus === 'uygunsuz_bulgu') {
         halalText = loc.badges.halalRed;
         halalEmoji = '🔴';
-        halalColorHex = '#EF4444';
+        halalColorHex = '#FCA5A5';
         halalTone = 'bad';
       } else if (halal.overallStatus === 'unknown' || hasPendingOcr) {
         halalText = fTxt.statusPendingOcr;
@@ -2514,9 +3420,14 @@
       let profColorHex = '#10B981';
       let profTone = 'ok';
       if (hasRedProf) {
-        profText = u.itemsAttentionFmt(prof.alerts.length || 1);
+        const veganIssueCount =
+          state.profiles.vegan && vsCard
+            ? ((vsCard.nonVeganItems && vsCard.nonVeganItems.length) || 0) +
+              ((vsCard.uncertainVeganItems && vsCard.uncertainVeganItems.length) || 0)
+            : 0;
+        profText = u.itemsAttentionFmt(prof.alerts.length + veganIssueCount || 1);
         profEmoji = '🔴';
-        profColorHex = '#EF4444';
+        profColorHex = '#FCA5A5';
         profTone = 'bad';
       } else if (hasPendingOcr) {
         profText = fTxt.statusPendingOcr;
@@ -2600,9 +3511,21 @@
         ...halal.findings.filter((hf) => hf.status !== 'yesil').map((hf) => `• 🌙 ${hf.localizedName || hf.canonical} (${hf.status === 'kirmizi' || hf.status === 'conflict' ? loc.badges.halalRed : loc.badges.musbooh})`)
       ].slice(0, 4);
 
+      const nutri = state.evalData.cards.nutriScoreCard;
+      const nova = state.evalData.cards.novaCard;
+      const foodSummaryParts = [];
+      if (nutri && nutri.available && nutri.grade) {
+        foodSummaryParts.push(`Nutri-Score ${nutri.grade}`);
+      }
+      if (nova && nova.applicable && nova.group) {
+        foodSummaryParts.push(`NOVA ${formatDigits(nova.group, state.lang)}`);
+      }
+      const foodSummaryLine = foodSummaryParts.length > 0 ? `🥗 *${foodSummaryParts.join(' · ')}*` : '';
+
       return [
         `🛡️ *INCIFACT — ${state.productTitle}*`,
         `📊 ${loc.resultScreen.scoreLabel}: *${scoreStr}* (${state.jurisdiction || 'EU'})`,
+        foodSummaryLine,
         `🌙 ${loc.resultScreen.halalSummaryLabel} (${halal.selectedAuthority}): *${halalStr}*`,
         `👤 ${loc.resultScreen.profileStatusLabel}: *${profStr}*`,
         topFlags.length > 0 ? `\n🔍 *${u.attentionTab}:*\n${topFlags.join('\n')}` : '',
@@ -2830,7 +3753,18 @@
 
       ctx.fillStyle = '#94A3B8';
       ctx.font = '600 18px system-ui, -apple-system, sans-serif';
-      ctx.fillText(fitCanvasText(ctx, fTxt.regIndexNote, W - 160), cx, cy + 135);
+      const nutriShare = state.evalData.cards.nutriScoreCard;
+      const novaShare = state.evalData.cards.novaCard;
+      const foodBadgeParts = [];
+      if (nutriShare && nutriShare.available && nutriShare.grade) foodBadgeParts.push(`Nutri-Score ${nutriShare.grade}`);
+      if (novaShare && novaShare.applicable && novaShare.group) foodBadgeParts.push(`NOVA ${formatDigits(novaShare.group, state.lang)}`);
+      if (foodBadgeParts.length > 0) {
+        ctx.fillStyle = nutriShare && nutriShare.available && nutriShare.gradeColor ? nutriShare.gradeColor : '#E6C98A';
+        ctx.font = '800 22px system-ui, -apple-system, sans-serif';
+        ctx.fillText(fitCanvasText(ctx, `🥗 ${foodBadgeParts.join(' · ')}`, W - 160), cx, cy + 138);
+      } else {
+        ctx.fillText(fitCanvasText(ctx, fTxt.regIndexNote, W - 160), cx, cy + 135);
+      }
 
       // 2 Summary Pill Boxes (Halal & Personal Profile)
       const drawPillBox = (x, y, w, h, label, value, color) => {
@@ -2946,7 +3880,7 @@
       ctx.fillText(fitCanvasText(ctx, footerLine, W - 120), W / 2, H - 56);
     }
 
-    function downloadShareCardPng() {
+    function downloadShareCardPng(preferNativeShare = false) {
       const canvas = document.getElementById('shareCardCanvas');
       if (!canvas) return;
       const safeName = (state.productTitle || 'incifact')
@@ -2955,8 +3889,23 @@
         .slice(0, 40);
       const filename = `InciFact-${safeName || 'Analiz'}.png`;
       if (typeof canvas.toBlob === 'function') {
-        canvas.toBlob((blob) => {
+        canvas.toBlob(async (blob) => {
           if (!blob) return;
+          if (preferNativeShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function' && typeof File === 'function') {
+            try {
+              const pngFile = new File([blob], filename, { type: 'image/png' });
+              if (typeof navigator.canShare !== 'function' || navigator.canShare({ files: [pngFile] })) {
+                await navigator.share({
+                  files: [pngFile],
+                  title: state.productTitle || 'InciFact',
+                  text: generateShareSummaryText()
+                });
+                return;
+              }
+            } catch (_) {
+              // User cancelled or Web Share unavailable; fall back to download
+            }
+          }
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.download = filename;
@@ -2977,8 +3926,11 @@
     }
 
     let refreshReqToken = 0;
+    let _lastHouseholdKey = '';
+    let _lastShelfKey = '';
+    let _lastAlternativesKey = '';
 
-    async function refreshAll() {
+    async function refreshAll(refreshOptions = {}) {
       const myReqToken = ++refreshReqToken;
       const activeProfiles = Object.entries(state.profiles)
         .filter(([k, v]) => v && k !== 'vegan' && k !== 'halal')
@@ -3008,6 +3960,27 @@
         state.productTitle = deriveCustomProductTitle(rawText, state.lang);
       }
 
+      // Auto-extract per-100g nutrition block when pasted into food rawText (zero-hallucination)
+      let effectiveNutrition = productType === 'food' ? state.nutritionPer100g : null;
+      if (
+        productType === 'food' &&
+        !effectiveNutrition &&
+        Object.keys(state.nutritionDraftStrings || {}).length === 0 &&
+        /100\s*(?:g|gr|ml|г|غ|мл|مل)/iu.test(rawText)
+      ) {
+        try {
+          const engPre = await getBrowserRuleEngine();
+          if (myReqToken !== refreshReqToken) return;
+          if (engPre && typeof engPre.extractSmartLabelContext === 'function') {
+            const smartPre = engPre.extractSmartLabelContext(rawText);
+            if (smartPre && smartPre.detectedNutritionPer100g) {
+              effectiveNutrition = smartPre.detectedNutritionPer100g;
+              state.nutritionPer100g = effectiveNutrition;
+            }
+          }
+        } catch (_) {}
+      }
+
       let nextEvalData;
       let nextCompareData;
       try {
@@ -3020,8 +3993,10 @@
           userProfiles: activeProfiles,
           customWatchlist: state.customWatchlist || [],
           halalAuthority,
+          madhhab: state.madhhab || 'general',
           claims: state.claims,
           userConfirmations: state.userConfirmations,
+          nutritionPer100g: effectiveNutrition,
           lang: state.lang
         });
         if (myReqToken !== refreshReqToken) return;
@@ -3037,10 +4012,108 @@
             userProfiles: activeProfiles,
             customWatchlist: state.customWatchlist || [],
             halalAuthority,
+            madhhab: state.madhhab || 'general',
             lang: state.lang
           }
         });
         if (myReqToken !== refreshReqToken) return;
+
+        // Compute Phase 4 Household, AM/PM Shelf, & Cleaner Alternatives 100% client-side (memoized to skip unchanged recomputation)
+        try {
+          const eng = await getBrowserRuleEngine();
+          if (myReqToken !== refreshReqToken) return;
+          const appTypeVal = (state.activeBarcodeMeta && state.activeBarcodeMeta.applicationType) || '';
+          const allergenStmtVal = (state.activeBarcodeMeta && state.activeBarcodeMeta.allergenStatement) || '';
+          const claimsKey = JSON.stringify(state.claims || {});
+
+          const householdKey = JSON.stringify([
+            rawText,
+            allergenStmtVal,
+            appTypeVal,
+            productType,
+            state.jurisdiction || 'EU',
+            halalAuthority,
+            state.madhhab || 'general',
+            claimsKey,
+            state.lang,
+            state.householdMembers || []
+          ]);
+          if ((state.householdMembers || []).length === 0) {
+            state.householdEval = null;
+            _lastHouseholdKey = '';
+          } else if (eng && typeof eng.evaluateHouseholdProfiles === 'function' && householdKey !== _lastHouseholdKey) {
+            state.householdEval = eng.evaluateHouseholdProfiles(
+              {
+                rawText,
+                allergenStatement: allergenStmtVal,
+                applicationType: appTypeVal || undefined,
+                productType,
+                jurisdiction: state.jurisdiction || 'EU',
+                halalAuthority,
+                madhhab: state.madhhab || 'general',
+                claims: state.claims,
+                lang: state.lang
+              },
+              state.householdMembers
+            );
+            _lastHouseholdKey = householdKey;
+          }
+
+          const shelfKey = JSON.stringify([
+            state.routineShelf || [],
+            state.lang,
+            state.jurisdiction || 'EU',
+            halalAuthority,
+            state.madhhab || 'general'
+          ]);
+          if ((state.routineShelf || []).length === 0) {
+            state.shelfEval = null;
+            _lastShelfKey = '';
+          } else if (eng && typeof eng.evaluateRoutineShelf === 'function' && shelfKey !== _lastShelfKey) {
+            state.shelfEval = eng.evaluateRoutineShelf(state.routineShelf, {
+              lang: state.lang,
+              jurisdiction: state.jurisdiction || 'EU',
+              halalAuthority,
+              madhhab: state.madhhab || 'general'
+            });
+            _lastShelfKey = shelfKey;
+          }
+
+          const altKey = JSON.stringify([
+            rawText,
+            allergenStmtVal,
+            appTypeVal,
+            productType,
+            state.lang,
+            state.jurisdiction || 'EU',
+            halalAuthority,
+            state.madhhab || 'general',
+            activeProfiles,
+            state.customWatchlist || [],
+            claimsKey,
+            (state.activeBarcodeMeta && state.activeBarcodeMeta.barcode) || '',
+            (state.routineShelf || []).map((sh) => [sh.id, sh.productType, sh.rawText])
+          ]);
+          if (eng && typeof eng.findCleanerAlternativesAndDupes === 'function' && altKey !== _lastAlternativesKey) {
+            const extraCatalog = (state.routineShelf || []).map((sh) => ({
+              name: sh.name,
+              productType: sh.productType,
+              applicationType: sh.applicationType,
+              rawText: sh.rawText
+            }));
+            state.alternativesData = eng.findCleanerAlternativesAndDupes(nextEvalData, {
+              lang: state.lang,
+              jurisdiction: state.jurisdiction || 'EU',
+              halalAuthority,
+              madhhab: state.madhhab || 'general',
+              userProfiles: activeProfiles,
+              customWatchlist: state.customWatchlist || [],
+              barcode: (state.activeBarcodeMeta && state.activeBarcodeMeta.barcode) || '',
+              extraCatalog
+            });
+            _lastAlternativesKey = altKey;
+          }
+        } catch (_) {}
       } catch (err) {
         if (myReqToken !== refreshReqToken) return;
         const isFileCors =
@@ -3123,9 +4196,17 @@
         if (aI) aI.textContent = authOpts.IFANCA;
         const privLink = document.getElementById('sidePrivacyLink');
         if (privLink) privLink.textContent = '🔒 ' + (PRIVACY_LINK_I18N[state.lang] || PRIVACY_LINK_I18N.en);
+        const datasetMeta = document.getElementById('sideDatasetMeta');
+        if (datasetMeta) datasetMeta.textContent = (PHASE1_WEB_I18N[state.lang] || PHASE1_WEB_I18N.en).datasetMeta;
       }
 
-      renderScreen();
+      const keepNutritionInputIntact =
+        Boolean(refreshOptions && refreshOptions.preserveNutritionInputFocus) &&
+        state.screen === 'scan' &&
+        Boolean(document.activeElement && document.activeElement.closest && document.activeElement.closest('#foodNutritionDetails'));
+      if (!keepNutritionInputIntact) {
+        renderScreen();
+      }
     }
 
     const I18N_PHONE = {
@@ -3412,7 +4493,7 @@
         ambiguousTitle: 'Ligne ambiguë détectée',
         confirmCodeBtn: (c) => `Confirmer "${c}"`,
         allClearTitle: 'Lecture OCR nette',
-        allClearSub: ' aucune ambiguïté détectée.',
+        allClearSub: 'Aucune ambiguïté détectée.',
         goResultBtn: 'Voir le résultat →',
         compareBtnTop: '⇄ Comparer',
         myPrefsBtnTop: '⚙ Préférences',
@@ -3964,12 +5045,459 @@
       };
     }
 
-    function localizeItemExplanation(kind, euStatus, rawText, lang) {
+    function localizeItemExplanation(kind, euStatus, rawText, lang, obs = null) {
       if (lang === 'tr') return rawText;
       const u = getUiText(lang);
-      if (euStatus === 'yasak') return u.bannedDesc;
-      if (kind === 'warn') return u.restrictedDesc;
+      const funcs = obs && obs.substance && Array.isArray(obs.substance.cosing_functions) && obs.substance.cosing_functions.length > 0
+        ? `CosIng: ${obs.substance.cosing_functions.join(' / ')}`
+        : '';
+      if (euStatus === 'yasak') {
+        return funcs ? `${u.bannedDesc} (${funcs})` : u.bannedDesc;
+      }
+      if (kind === 'warn') {
+        return funcs ? `${u.restrictedDesc} (${funcs})` : u.restrictedDesc;
+      }
+      if (funcs) {
+        return `${u.stdIngredientDesc} · ${funcs}`;
+      }
+      if (rawText && typeof rawText === 'string' && !/[ğüşıöçĞÜŞİÖÇ]/.test(rawText) && rawText.length <= 220) {
+        return rawText;
+      }
       return u.stdIngredientDesc;
+    }
+
+    function changeMadhhab(val) {
+      state.madhhab = VALID_MADHHABS.has(val) ? val : 'general';
+      persistWebPrefs();
+      return refreshAll();
+    }
+
+    function addHouseholdPreset(presetType) {
+      const p34 = getP34Text(state.lang);
+      const current = Array.isArray(state.householdMembers) ? state.householdMembers.slice() : [];
+      if (current.length >= 4) return;
+      let nextMember = null;
+      if (presetType === 'preg') {
+        nextMember = {
+          id: `hh_preg_${Date.now()}`,
+          name: p34.householdAddPartnerPreg.replace(/^\+\s*/, ''),
+          userProfiles: ['hamilelik', 'hassas_cilt'],
+          halalAuthority: (document.getElementById('halalAuth') && document.getElementById('halalAuth').value) || 'GIMDES',
+          madhhab: state.madhhab || 'general'
+        };
+      } else if (presetType === 'baby') {
+        nextMember = {
+          id: `hh_baby_${Date.now()}`,
+          name: p34.householdAddBaby.replace(/^\+\s*/, ''),
+          userProfiles: ['cocuk_metabolik', 'egzama_rosacea', 'hassas_cilt'],
+          halalAuthority: (document.getElementById('halalAuth') && document.getElementById('halalAuth').value) || 'GIMDES',
+          madhhab: state.madhhab || 'general'
+        };
+      } else {
+        nextMember = {
+          id: `hh_fungal_${Date.now()}`,
+          name: p34.householdAddFungal.replace(/^\+\s*/, ''),
+          userProfiles: ['fungal_acne', 'akne'],
+          halalAuthority: 'IFANCA',
+          madhhab: 'hanafi'
+        };
+      }
+      current.push(nextMember);
+      state.householdMembers = current;
+      saveJson(WEB_HOUSEHOLD_STORAGE_KEY, current);
+      return refreshAll();
+    }
+
+    function removeHouseholdMember(idx) {
+      const next = (state.householdMembers || []).filter((_, i) => i !== idx);
+      state.householdMembers = next;
+      saveJson(WEB_HOUSEHOLD_STORAGE_KEY, next);
+      return refreshAll();
+    }
+
+    function saveCurrentProductToShelf(slot) {
+      const liveEl = document.getElementById('liveInput');
+      const rawText = (liveEl && liveEl.value) || '';
+      if (!rawText.trim() || !state.evalData) return;
+      const cleanSlot = slot === 'PM' || slot === 'Pantry' ? slot : 'AM';
+      const title = state.productTitle || 'Saved Product';
+      const entry = {
+        id: `sh_${Date.now()}`,
+        name: title.slice(0, 80),
+        slot: cleanSlot,
+        productType: state.evalData.productType || 'cosmetic',
+        applicationType: state.evalData.applicationType || null,
+        rawText: rawText.slice(0, 65536),
+        ts: Date.now()
+      };
+      const filtered = (state.routineShelf || []).filter((x) => !(x.slot === cleanSlot && x.rawText === entry.rawText));
+      const next = [entry, ...filtered].slice(0, 30);
+      state.routineShelf = next;
+      saveJson(WEB_SHELF_STORAGE_KEY, next);
+      const p34 = getP34Text(state.lang);
+      state.shelfToast = p34.shelfSavedToast(entry.name, cleanSlot);
+      if (window._shelfToastTimer) clearTimeout(window._shelfToastTimer);
+      window._shelfToastTimer = setTimeout(() => {
+        state.shelfToast = null;
+        renderScreen();
+      }, 3000);
+      return refreshAll();
+    }
+
+    function removeShelfItem(id) {
+      const next = (state.routineShelf || []).filter((x) => x.id !== id);
+      state.routineShelf = next;
+      saveJson(WEB_SHELF_STORAGE_KEY, next);
+      return refreshAll();
+    }
+
+    function loadAlternativeProduct(rawText, prodType, name, meta = null) {
+      const liveEl = document.getElementById('liveInput');
+      const ptEl = document.getElementById('prodType');
+      const resolvedType = prodType === 'food' ? 'food' : 'cosmetic';
+      if (liveEl) liveEl.value = rawText;
+      if (ptEl) ptEl.value = resolvedType;
+      state.activeSampleIdx = null;
+      state.userConfirmations = {};
+      state.nutritionDraftStrings = {};
+      state.nutritionPer100g = resolvedType === 'food' && meta && meta.nutritionPer100g ? { ...meta.nutritionPer100g } : null;
+      state.activeBarcodeMeta = meta
+        ? {
+            barcode: meta.barcode || '',
+            productName: name || meta.name || 'Product',
+            productType: resolvedType,
+            applicationType: meta.applicationType || null,
+            allergenStatement: meta.allergenStatement || '',
+            rawText
+          }
+        : null;
+      state.productTitle = name || 'Product';
+      switchScreen('result');
+      return refreshAll();
+    }
+
+    function loadAlternativeProductFromList(kind, idx) {
+      const list =
+        kind === 'dupe'
+          ? (state.alternativesData && state.alternativesData.dupes) || []
+          : (state.alternativesData && state.alternativesData.cleanerAlternatives) || [];
+      const item = list[Number(idx)];
+      if (!item || !item.rawText) return;
+      return loadAlternativeProduct(item.rawText, item.productType, item.name, item);
+    }
+
+    let _webCamStream = null;
+    let _webCamRaf = null;
+    let _webCamTimer = null;
+    let _webCamSessionToken = 0;
+
+    function stopWebCamTracksOnly() {
+      if (_webCamRaf) {
+        cancelAnimationFrame(_webCamRaf);
+        _webCamRaf = null;
+      }
+      if (_webCamTimer) {
+        clearTimeout(_webCamTimer);
+        _webCamTimer = null;
+      }
+      if (_webCamStream) {
+        try {
+          _webCamStream.getTracks().forEach((t) => t.stop());
+        } catch (_) {}
+        _webCamStream = null;
+      }
+      const vid = document.getElementById('webBarcodeVideo');
+      if (vid) vid.srcObject = null;
+    }
+
+    function stopWebBarcodeCamera() {
+      _webCamSessionToken++;
+      stopWebCamTracksOnly();
+      const modal = document.getElementById('webBarcodeCameraModal');
+      if (modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    async function openWebBarcodeCameraModal() {
+      const modal = document.getElementById('webBarcodeCameraModal');
+      if (!modal) return;
+      stopWebCamTracksOnly();
+      const mySession = ++_webCamSessionToken;
+      const p34 = getP34Text(state.lang);
+      const titleEl = document.getElementById('webBarcodeModalTitle');
+      const msgEl = document.getElementById('webBarcodeCamStatus');
+      const vid = document.getElementById('webBarcodeVideo');
+      if (titleEl) titleEl.textContent = p34.camModalTitle;
+      modal.setAttribute('dir', (state.evalData && state.evalData.dir) || 'ltr');
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+
+      const hasDetectorApi = typeof window !== 'undefined' && typeof window.BarcodeDetector === 'function';
+      const hasCamApi = typeof navigator !== 'undefined' && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function';
+      if (!hasCamApi) {
+        if (vid) vid.style.display = 'none';
+        if (msgEl) msgEl.textContent = p34.camUnsupported;
+        return;
+      }
+      let localStream = null;
+      try {
+        if (vid) vid.style.display = 'block';
+        if (msgEl) msgEl.textContent = hasDetectorApi ? '...' : (p34.camFallbackScan || '...');
+        localStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+        if (mySession !== _webCamSessionToken) {
+          try {
+            localStream.getTracks().forEach((t) => t.stop());
+          } catch (_) {}
+          return;
+        }
+        _webCamStream = localStream;
+        if (vid) {
+          vid.srcObject = localStream;
+          await vid.play();
+          if (mySession !== _webCamSessionToken) {
+            try {
+              localStream.getTracks().forEach((t) => t.stop());
+            } catch (_) {}
+            if (_webCamStream === localStream) _webCamStream = null;
+            return;
+          }
+        }
+
+        let detector = null;
+        if (hasDetectorApi) {
+          try {
+            detector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'] });
+          } catch (_) {
+            detector = null;
+          }
+        }
+        if (detector) {
+          const scanFrame = async () => {
+            if (mySession !== _webCamSessionToken || !_webCamStream || !vid) return;
+            if (vid.readyState < 2) {
+              _webCamRaf = requestAnimationFrame(scanFrame);
+              return;
+            }
+            try {
+              const codes = await detector.detect(vid);
+              if (mySession !== _webCamSessionToken) return;
+              if (Array.isArray(codes) && codes.length > 0 && codes[0].rawValue) {
+                const detectedCode = String(codes[0].rawValue).trim();
+                stopWebBarcodeCamera();
+                await lookupBarcodeFromUi(detectedCode);
+                return;
+              }
+            } catch (_) {}
+            if (mySession === _webCamSessionToken && _webCamStream) {
+              _webCamRaf = requestAnimationFrame(scanFrame);
+            }
+          };
+          _webCamRaf = requestAnimationFrame(scanFrame);
+          return;
+        }
+
+        // Safari / Firefox compatibility mode (also automatic fallback if native BarcodeDetector throws): pure-JS 1D decoder
+        if (msgEl) msgEl.textContent = p34.camFallbackScan || '...';
+        const decoderMod = await getBrowserBarcode1dDecoder();
+        if (mySession !== _webCamSessionToken) return;
+        const decodeFn = decoderMod && decoderMod.decode1dBarcodeFromRgba;
+        if (typeof decodeFn !== 'function') {
+          stopWebCamTracksOnly();
+          if (vid) vid.style.display = 'none';
+          if (msgEl) msgEl.textContent = p34.camUnsupported;
+          return;
+        }
+        const offscreen = document.createElement('canvas');
+        const ctx = offscreen.getContext('2d', { willReadFrequently: true });
+        let prevCandidate = '';
+        let consensusCount = 0;
+
+        const scanFallbackFrame = () => {
+          if (mySession !== _webCamSessionToken || !_webCamStream || !vid) return;
+          if (vid.readyState >= 2 && vid.videoWidth > 0 && vid.videoHeight > 0 && ctx) {
+            try {
+              const targetW = Math.min(640, vid.videoWidth);
+              const targetH = Math.max(67, Math.round((vid.videoHeight * targetW) / vid.videoWidth));
+              if (offscreen.width !== targetW || offscreen.height !== targetH) {
+                offscreen.width = targetW;
+                offscreen.height = targetH;
+              }
+              ctx.drawImage(vid, 0, 0, targetW, targetH);
+              // Wider vertical capture crop so both horizontal and 90-degree vertical barcodes remain unclipped
+              const bandY = Math.floor(targetH * 0.05);
+              const bandH = Math.max(67, Math.min(targetH - bandY, Math.floor(targetH * 0.9)));
+              const imgData = ctx.getImageData(0, bandY, targetW, bandH);
+              const hit = decodeFn(imgData.data, targetW, bandH);
+              if (hit && hit.code) {
+                if (hit.code === prevCandidate) {
+                  consensusCount += 1;
+                } else {
+                  prevCandidate = hit.code;
+                  consensusCount = 1;
+                }
+                if (consensusCount >= 2) {
+                  stopWebBarcodeCamera();
+                  lookupBarcodeFromUi(hit.code);
+                  return;
+                }
+              }
+            } catch (_) {}
+          }
+          if (mySession === _webCamSessionToken && _webCamStream) {
+            _webCamTimer = setTimeout(() => {
+              if (mySession === _webCamSessionToken && _webCamStream) {
+                _webCamRaf = requestAnimationFrame(scanFallbackFrame);
+              }
+            }, 140);
+          }
+        };
+        _webCamRaf = requestAnimationFrame(scanFallbackFrame);
+      } catch (_) {
+        if (mySession !== _webCamSessionToken) {
+          if (localStream) {
+            try {
+              localStream.getTracks().forEach((t) => t.stop());
+            } catch (_) {}
+            if (_webCamStream === localStream) _webCamStream = null;
+          }
+          return;
+        }
+        stopWebCamTracksOnly();
+        if (vid) vid.style.display = 'none';
+        if (msgEl) msgEl.textContent = p34.camUnsupported;
+      }
+    }
+
+    let _lastDossierTriggerEl = null;
+    async function openIngredientDossierModal(pos) {
+      const modal = document.getElementById('ingredientDossierModal');
+      if (!modal || !state.evalData) return;
+      _lastDossierTriggerEl = document.activeElement;
+      const obs = (state.evalData.observations || []).find((o) => Number(o.position) === Number(pos));
+      if (!obs) return;
+      const p34 = getP34Text(state.lang);
+      const ft = getFeatText(state.lang);
+      const loc = state.evalData.locale;
+      const auth = (document.getElementById('halalAuth') && document.getElementById('halalAuth').value) || 'GIMDES';
+      const activeProfiles = Object.entries(state.profiles).filter(([k, v]) => v && k !== 'vegan' && k !== 'halal').map(([k]) => k);
+      let dossier = null;
+      try {
+        const eng = await getBrowserRuleEngine();
+        if (eng && typeof eng.getIngredientDossier === 'function') {
+          dossier = eng.getIngredientDossier(obs, {
+            productType: state.evalData.productType,
+            applicationType: state.evalData.applicationType || (state.activeBarcodeMeta && state.activeBarcodeMeta.applicationType) || undefined,
+            customWatchlist: state.customWatchlist || [],
+            lang: state.lang,
+            jurisdiction: state.jurisdiction || 'EU',
+            halalAuthority: auth,
+            madhhab: state.madhhab || 'general',
+            userProfiles: activeProfiles,
+            claims: state.claims
+          });
+        }
+      } catch (_) {}
+      if (!dossier) return;
+      modal.setAttribute('dir', state.evalData.dir || 'ltr');
+      const titleEl = document.getElementById('ingredientDossierTitle');
+      const bodyEl = document.getElementById('ingredientDossierBody');
+      if (titleEl) titleEl.textContent = `🔬 ${dossier.localizedName || dossier.canonical}`;
+      if (bodyEl) {
+        const badgesHtml = (dossier.beneficialRoles || [])
+          .map((r) => `<span style="font-size:11px; font-weight:800; padding:3px 9px; border-radius:9999px; background:${r.key === 'Superstar' ? 'var(--ok-bg)' : 'var(--soft)'}; color:${r.key === 'Superstar' ? 'var(--ok)' : 'var(--accent)'}; border:1px solid var(--accent);">✨ ${escapeHtml(r.label)}</span>`)
+          .join('');
+        const funcsHtml = (dossier.cosingFunctions || []).length > 0
+          ? `<div style="font-size:12px;"><strong>${escapeHtml(p34.dossierFuncLbl)}:</strong> ${escapeHtml(dossier.cosingFunctions.join(' · '))}${dossier.cosingRef ? ` <span class="mono" dir="ltr">(Ref ${escapeHtml(dossier.cosingRef)})</span>` : ''}</div>`
+          : '';
+        const profsHtml = (dossier.profileMatrix || [])
+          .map((pm) => {
+            const pName =
+              pm.profile === 'ozel_kara_liste'
+                ? `🧬 ${ft.watchlistBadge}`
+                : (loc.profileScreen && loc.profileScreen.profiles && loc.profileScreen.profiles[pm.profile] && loc.profileScreen.profiles[pm.profile].name) || pm.profile;
+            const bad = pm.status === 'kirmizi';
+            const warn = pm.status === 'sari' || pm.status === 'sari_ilk5' || pm.status === 'veri_yok';
+            const unknown = pm.status === 'unknown' || pm.status === 'bilinmiyor';
+            const bg = bad ? 'var(--bad-bg)' : warn ? 'var(--warn-bg)' : unknown ? 'var(--surface2)' : 'var(--ok-bg)';
+            const col = bad ? 'var(--bad)' : warn ? 'var(--warn)' : unknown ? 'var(--muted)' : 'var(--ok)';
+            return `<span style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; background:${bg}; color:${col};">${escapeHtml(pName)}${unknown ? ` · ${escapeHtml(p34.statusUnknown || 'Unknown')}` : ''}</span>`;
+          })
+          .join('');
+        const localizeAuthStatus = (st) => {
+          if (st === 'yesil') return loc.badges.halalOk;
+          if (st === 'kirmizi') return loc.badges.halalRed;
+          if (st === 'conflict') return loc.badges.conflict || loc.badges.halalRed;
+          if (st === 'sari' || st === 'sari_yesil') return loc.badges.musbooh;
+          return p34.statusUnknown || 'Unknown';
+        };
+        const authMatrixHtml = ['GIMDES', 'JAKIM', 'MUI', 'IFANCA']
+          .map((ak) => {
+            const st = (dossier.authorityMatrix && dossier.authorityMatrix[ak]) || 'unknown';
+            const bg =
+              st === 'yesil'
+                ? 'var(--ok-bg)'
+                : st === 'kirmizi' || st === 'conflict'
+                ? 'var(--bad-bg)'
+                : st === 'unknown' || st === 'bilinmiyor'
+                ? 'var(--surface2)'
+                : 'var(--warn-bg)';
+            const col =
+              st === 'yesil'
+                ? 'var(--ok)'
+                : st === 'kirmizi' || st === 'conflict'
+                ? 'var(--bad)'
+                : st === 'unknown' || st === 'bilinmiyor'
+                ? 'var(--muted)'
+                : 'var(--warn)';
+            return `<span style="font-size:11px; font-weight:800; padding:4px 8px; border-radius:8px; background:${bg}; color:${col};">${ak}: ${escapeHtml(localizeAuthStatus(st))}</span>`;
+          })
+          .join('');
+        const srcsHtml = (dossier.sources || [])
+          .map((s) => {
+            const safeUrl = sanitizeHttpUrl(s.url);
+            return safeUrl
+              ? `<a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" dir="ltr" style="font-size:11px; color:var(--accent); text-decoration:underline;">${escapeHtml(s.id)}: ${escapeHtml(s.title)} ↗</a>`
+              : '';
+          })
+          .filter(Boolean)
+          .join('<br/>');
+        bodyEl.innerHTML = `
+          <div style="font-size:12px; color:var(--muted);"><span class="mono" dir="ltr">${escapeHtml(dossier.raw)} · #${formatDigits(dossier.position, state.lang)}</span></div>
+          ${badgesHtml ? `<div style="display:flex; flex-wrap:wrap; gap:6px;">${badgesHtml}</div>` : ''}
+          <div style="background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:9px 11px; font-size:12px;">
+            <div><strong>${escapeHtml(p34.dossierZoneLbl)}:</strong> ${escapeHtml(dossier.concentrationZone)}</div>
+            ${funcsHtml}
+          </div>
+          <div style="font-size:12.5px; line-height:1.45; color:var(--ink);">${escapeHtml(dossier.legalText)}</div>
+          <div>
+            <div style="font-size:11.5px; font-weight:800; color:var(--muted); margin-bottom:5px;">${escapeHtml(p34.dossierProfileLbl)}</div>
+            <div style="display:flex; flex-wrap:wrap; gap:5px;">${profsHtml}</div>
+          </div>
+          <div>
+            <div style="font-size:11.5px; font-weight:800; color:var(--muted); margin-bottom:5px;">${escapeHtml(p34.dossierHalalLbl)}</div>
+            <div style="display:flex; flex-wrap:wrap; gap:5px;">${authMatrixHtml}</div>
+          </div>
+          ${dossier.cleanerSwapTip ? `<div style="background:var(--ok-bg); color:var(--ok); border-radius:10px; padding:8px 10px; font-size:12px; font-weight:700;">💡 ${escapeHtml(dossier.cleanerSwapTip)}</div>` : ''}
+          ${srcsHtml ? `<div style="font-size:11.5px; line-height:1.45;"><strong>${escapeHtml(p34.dossierSourceLbl)}:</strong><br/>${srcsHtml}</div>` : ''}
+        `;
+      }
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+      const closeBtn = document.getElementById('ingredientDossierCloseBtn');
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeIngredientDossierModal() {
+      const modal = document.getElementById('ingredientDossierModal');
+      if (modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+      }
+      if (_lastDossierTriggerEl && typeof _lastDossierTriggerEl.focus === 'function') {
+        _lastDossierTriggerEl.focus();
+      }
     }
 
     function renderApiErrorBanner() {
@@ -4014,10 +5542,21 @@
         }
         return;
       }
-      const prevFocusedId =
+      const prevFocusedEl =
         document.activeElement && el.contains(document.activeElement) && document.activeElement.id
-          ? document.activeElement.id
+          ? document.activeElement
           : null;
+      const prevFocusedId = prevFocusedEl ? prevFocusedEl.id : null;
+      let prevSelStart = null;
+      let prevSelEnd = null;
+      if (prevFocusedEl) {
+        try {
+          if (typeof prevFocusedEl.selectionStart === 'number') {
+            prevSelStart = prevFocusedEl.selectionStart;
+            prevSelEnd = typeof prevFocusedEl.selectionEnd === 'number' ? prevFocusedEl.selectionEnd : prevSelStart;
+          }
+        } catch (_) {}
+      }
 
       let screenHtml = '';
       if (state.screen === 'main') {
@@ -4037,14 +5576,23 @@
         const shareModal = document.getElementById('shareCardModal');
         const methModal = document.getElementById('methodologyModal');
         const regModal = document.getElementById('regReportModal');
+        const dossierModal = document.getElementById('ingredientDossierModal');
+        const camModal = document.getElementById('webBarcodeCameraModal');
         const modalOpen =
           (shareModal && shareModal.style.display === 'flex') ||
           (methModal && methModal.style.display === 'flex') ||
-          (regModal && regModal.style.display === 'flex');
+          (regModal && regModal.style.display === 'flex') ||
+          (dossierModal && dossierModal.style.display === 'flex') ||
+          (camModal && camModal.style.display === 'flex');
         if (!modalOpen) {
           const nextFocusEl = document.getElementById(prevFocusedId);
           if (nextFocusEl && typeof nextFocusEl.focus === 'function') {
             nextFocusEl.focus({ preventScroll: true });
+            if (prevSelStart !== null && typeof nextFocusEl.setSelectionRange === 'function') {
+              try {
+                nextFocusEl.setSelectionRange(prevSelStart, prevSelEnd);
+              } catch (_) {}
+            }
           }
         }
       }
@@ -4061,11 +5609,14 @@
       const cards = [
         { k: 'hamilelik', title: pLoc.hamilelik.name, desc: pLoc.hamilelik.desc },
         { k: 'akne', title: pLoc.akne.name, desc: pLoc.akne.desc },
+        { k: 'fungal_acne', title: (pLoc.fungal_acne && pLoc.fungal_acne.name) || 'Fungal Acne', desc: (pLoc.fungal_acne && pLoc.fungal_acne.desc) || '' },
+        { k: 'egzama_rosacea', title: (pLoc.egzama_rosacea && pLoc.egzama_rosacea.name) || 'Eczema & Rosacea', desc: (pLoc.egzama_rosacea && pLoc.egzama_rosacea.desc) || '' },
         { k: 'hassas_cilt', title: pLoc.hassas_cilt.name, desc: pLoc.hassas_cilt.desc },
         { k: 'cocuk_metabolik', title: pLoc.cocuk_metabolik.name, desc: pLoc.cocuk_metabolik.desc },
         { k: 'astim_alerji', title: pLoc.astim_alerji.name, desc: pLoc.astim_alerji.desc },
         { k: 'vegan', title: u.veganTitle, desc: u.veganDesc }
       ];
+      const p34 = getP34Text(state.lang);
       const selectedCount = Object.values(state.profiles).filter(Boolean).length;
 
       return `
@@ -4089,7 +5640,7 @@
               const on = !!state.profiles[c.k];
               return `
               <button type="button" onclick="toggleProfile('${c.k}')" style="position:relative; text-align:start; display:flex; flex-direction:column; gap:6px; padding:14px; min-height:94px; border-radius:18px; border:1.5px solid ${on ? 'var(--accent)' : 'var(--line)'}; background:${on ? 'var(--soft)' : 'var(--surface)'}; color:var(--ink);">
-                <span style="font-size:14px; font-weight:700;">${c.title}</span>
+                <span style="font-size:14px; font-weight:700; padding-inline-end:26px;">${c.title}</span>
                 <span style="font-size:11.5px; line-height:1.35; color:var(--muted);">${c.desc}</span>
                 ${
                   on
@@ -4117,7 +5668,7 @@
         <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:9px;">
           <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
             <label for="customWatchInput" style="font-size:13.5px; font-weight:800; color:var(--ink);">${getFeatText(state.lang).watchlistTitle}</label>
-            <span class="mono" style="font-size:11px; font-weight:800; color:${(state.customWatchlist || []).length >= 50 ? 'var(--bad)' : 'var(--muted)'};">${formatDigits((state.customWatchlist || []).length, state.lang)}/50</span>
+            <span class="mono" style="font-size:11px; font-weight:800; color:${(state.customWatchlist || []).length >= 50 ? 'var(--bad)' : 'var(--muted)'};">${formatDigits((state.customWatchlist || []).length, state.lang)}/${formatDigits(50, state.lang)}</span>
           </div>
           <span style="font-size:11.5px; line-height:1.38; color:var(--muted); margin-top:-4px;">${getFeatText(state.lang).watchlistSub}</span>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -4155,6 +5706,31 @@
           </div>
         </div>
 
+        <!-- FAZ 4: Aile / Hane Çoklu Profili -->
+        <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:13.5px; font-weight:800; color:var(--ink);">${escapeHtml(p34.householdTitle)} (${formatDigits((state.householdMembers || []).length, state.lang)}/${formatDigits(4, state.lang)})</div>
+          <span style="font-size:11.5px; line-height:1.35; color:var(--muted);">${escapeHtml(p34.householdSub)}</span>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button type="button" onclick="addHouseholdPreset('preg')" ${(state.householdMembers || []).length >= 4 ? 'disabled' : ''} style="min-height:44px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:12px; padding:8px 10px; font-size:11.5px; font-weight:700;">${escapeHtml(p34.householdAddPartnerPreg)}</button>
+            <button type="button" onclick="addHouseholdPreset('baby')" ${(state.householdMembers || []).length >= 4 ? 'disabled' : ''} style="min-height:44px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:12px; padding:8px 10px; font-size:11.5px; font-weight:700;">${escapeHtml(p34.householdAddBaby)}</button>
+            <button type="button" onclick="addHouseholdPreset('fungal')" ${(state.householdMembers || []).length >= 4 ? 'disabled' : ''} style="min-height:44px; border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:12px; padding:8px 10px; font-size:11.5px; font-weight:700;">${escapeHtml(p34.householdAddFungal)}</button>
+          </div>
+          ${
+            (state.householdMembers || []).length > 0
+              ? `<div style="display:flex; flex-wrap:wrap; gap:6px;">
+                  ${state.householdMembers
+                    .map(
+                      (m, idx) => `<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:12px; background:var(--soft); border:1px solid var(--accent); font-size:11.5px; font-weight:700; color:var(--ink);">
+                        <span>👤 ${escapeHtml(m.name)}</span>
+                        <button type="button" onclick="removeHouseholdMember(${idx})" aria-label="Remove" style="min-width:44px; min-height:44px; border:none; background:transparent; color:var(--bad); font-weight:900;">✕</button>
+                      </span>`
+                    )
+                    .join('')}
+                </div>`
+              : ''
+          }
+        </div>
+
         <!-- AYARLAR: Bölge, Dil ve Ülke Yapısı Seçimi (Varsayılan: İndirilen Ülke / Cihaz Dili) -->
         <div style="background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:14px; display:flex; flex-direction:column; gap:10px;">
           <button type="button" aria-expanded="${state.settingsExpanded ? 'true' : 'false'}" onclick="state.settingsExpanded = !state.settingsExpanded; renderScreen();" style="width:100%; min-height:44px; border:none; background:transparent; padding:4px 0; text-align:start; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:8px;">
@@ -4170,7 +5746,7 @@
           <div style="display:flex; flex-direction:column; gap:8px; padding-top:8px; border-top:1px solid var(--line);">
             <div>
               <label for="countryStructureSelect" style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.countryStructureLbl}</label>
-              <select id="countryStructureSelect" onchange="switchLang(this.value)" style="width:100%; min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12.5px; font-weight:700;">
+              <select id="countryStructureSelect" onchange="switchLang(this.value)" style="width:100%; height:44px; min-height:44px; line-height:1.25; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 10px; font:inherit; font-size:12.5px; font-weight:700;">
                 <option value="auto" ${state.autoDetected ? 'selected' : ''}>${st.autoOptionLbl} (${MARKET_STRUCTURES[detectDeviceLang()].flag} ${MARKET_STRUCTURES[detectDeviceLang()].name})</option>
                 ${Object.entries(MARKET_STRUCTURES)
                   .map(
@@ -4184,7 +5760,7 @@
             <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px;">
               <div>
                 <label for="halalAuthSettingsSelect" style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.halalAuthSettingLbl}</label>
-                <select id="halalAuthSettingsSelect" onchange="changeAuthorityFromSettings(this.value)" style="width:100%; min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
+                <select id="halalAuthSettingsSelect" onchange="changeAuthorityFromSettings(this.value)" style="width:100%; height:44px; min-height:44px; line-height:1.25; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
                   <option value="GIMDES" ${currentAuth === 'GIMDES' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).GIMDES}</option>
                   <option value="MUI" ${currentAuth === 'MUI' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).MUI}</option>
                   <option value="JAKIM" ${currentAuth === 'JAKIM' ? 'selected' : ''}>${(AUTH_OPTIONS_I18N[state.lang] || AUTH_OPTIONS_I18N.en).JAKIM}</option>
@@ -4193,12 +5769,21 @@
               </div>
               <div>
                 <label for="regStructureSettingsSelect" style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${st.regStructureLbl}</label>
-                <select id="regStructureSettingsSelect" onchange="changeJurisdictionFromSettings(this.value)" style="width:100%; min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
+                <select id="regStructureSettingsSelect" onchange="changeJurisdictionFromSettings(this.value)" style="width:100%; height:44px; min-height:44px; line-height:1.25; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
                   <option value="TR" ${state.jurisdiction === 'TR' ? 'selected' : ''}>TR (TİTCK/TGK + AB)</option>
                   <option value="EU" ${state.jurisdiction === 'EU' ? 'selected' : ''}>EU (EC 1223/2009)</option>
                   <option value="US" ${state.jurisdiction === 'US' ? 'selected' : ''}>US (FDA 21 CFR)</option>
                 </select>
               </div>
+            </div>
+
+            <div>
+              <label for="madhhabSelect" style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">${escapeHtml(p34.madhhabLbl)}</label>
+              <select id="madhhabSelect" onchange="changeMadhhab(this.value)" style="width:100%; height:44px; min-height:44px; line-height:1.25; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:0 8px; font:inherit; font-size:12px; font-weight:700;">
+                ${['general', 'hanafi', 'shafii', 'maliki', 'hanbali']
+                  .map((mk) => `<option value="${mk}" ${state.madhhab === mk ? 'selected' : ''}>${escapeHtml((p34.madhhabs && p34.madhhabs[mk]) || mk)}</option>`)
+                  .join('')}
+              </select>
             </div>
 
             ${
@@ -4208,7 +5793,7 @@
             <div style="background:var(--soft); border:1px solid var(--accent); border-radius:12px; padding:10px 12px; display:flex; flex-direction:column; gap:5px; margin-top:2px;">
               <span style="font-size:12px; font-weight:800; color:var(--accent);">${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyTitle}</span>
               <span style="font-size:11.5px; line-height:1.42; color:var(--ink);">
-                ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyBody(struct.flag, struct.name, currentAuth, state.jurisdiction === 'US' ? 'US FDA 21 CFR' : struct.regLabel)}
+                ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyBody(escapeHtml(struct.flag), escapeHtml(struct.name), escapeHtml(currentAuth), escapeHtml(state.jurisdiction === 'US' ? 'US FDA 21 CFR' : struct.regLabel))}
               </span>
               <span style="font-size:10.5px; line-height:1.35; color:var(--muted);">
                 ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).legalNote}
@@ -4219,7 +5804,16 @@
           </div>
         </div>
 
-        <button type="button" onclick="switchScreen('result')" style="margin-top:auto; height:52px; border-radius:26px; border:none; background:var(--accent); color:var(--on-accent); font-size:15.5px; font-weight:700;">
+        <button type="button" onclick="eraseAllWebData()" style="min-height:44px; border-radius:14px; border:1px solid var(--bad); background:var(--bad-bg); color:var(--bad); font-size:12px; font-weight:800; padding:8px 12px;">
+          ${escapeHtml((PHASE1_WEB_I18N[state.lang] || PHASE1_WEB_I18N.en).eraseBtn)}
+        </button>
+        ${
+          state.eraseDataToast
+            ? `<div style="background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:700; text-align:center;">✓ ${escapeHtml((PHASE1_WEB_I18N[state.lang] || PHASE1_WEB_I18N.en).eraseDone)}</div>`
+            : ''
+        }
+
+        <button type="button" onclick="switchScreen('result')" style="margin-top:auto; height:52px; min-height:52px; flex-shrink:0; border-radius:26px; border:none; background:var(--accent); color:var(--on-accent); font-size:15.5px; font-weight:700;">
           ${u.seeResultBtn} · ${formatDigits(selectedCount, state.lang)} ${u.selectedWord}
         </button>
       `;
@@ -4230,40 +5824,46 @@
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
       const bUi = BARCODE_UI_I18N[state.lang] || BARCODE_UI_I18N.en;
+      const p34 = getP34Text(state.lang);
+      const st = STUDIO_I18N[state.lang] || STUDIO_I18N.en;
+      const ptTexts = PROD_TYPE_I18N[state.lang] || PROD_TYPE_I18N.en;
+      const currentRawText = (document.getElementById('liveInput') && document.getElementById('liveInput').value) || '';
+      const currentPt = state.evalData.productType === 'food' ? 'food' : 'cosmetic';
       const obs = state.evalData.observations || [];
       const confirmations = state.evalData.unresolvedConfirmations || [];
       const recCount = obs.filter((o) => o.status === 'recognized').length;
 
       return `
-        <div style="background:#111613; color:#F3F5F2; margin:0; border-radius:22px; min-height:100%; width:100%; max-width:100%; box-sizing:border-box; min-width:0; padding:18px 14px 20px; display:flex; flex-direction:column; justify-content:space-between; position:relative;">
+        <div style="background:#10241C; color:#F2F0EB; margin:0; border-radius:22px; min-height:100%; width:100%; max-width:100%; box-sizing:border-box; min-width:0; padding:18px 14px 20px; display:flex; flex-direction:column; justify-content:space-between; position:relative; border:1px solid #254739;">
           <div style="display:flex; align-items:center; justify-content:space-between;">
             <span style="font-weight:800; font-size:16px;">${u.cameraTitle}</span>
-            <span style="font-size:12px; padding:6px 12px; border-radius:16px; background:rgba(255,255,255,0.14); font-weight:700;">
+            <span style="font-size:12px; padding:6px 12px; border-radius:9999px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.14); font-weight:700;">
               ${state.evalData.productType === 'cosmetic' ? loc.scanScreen.productTypeCosmetic : loc.scanScreen.productTypeFood}
             </span>
           </div>
 
           <!-- Hibrit Barkod Okuyucu (EAN / Open Food & Beauty Facts) -->
-          <div style="margin-top:10px; padding:10px 12px; border-radius:14px; border:1px solid rgba(197,160,89,0.45); background:rgba(20,28,51,0.72); display:flex; flex-direction:column; gap:7px;">
-            <span style="font-size:11.5px; font-weight:800; color:#EAD39C;">${escapeHtml(bUi.title)}</span>
+          <div style="margin-top:10px; padding:11px 12px; border-radius:16px; border:1px solid rgba(217,185,114,0.4); background:rgba(22,46,35,0.88); display:flex; flex-direction:column; gap:7px;">
+            <span style="font-size:11.5px; font-weight:800; color:#D9B972;">${escapeHtml(bUi.title)}</span>
             <div style="display:flex; gap:6px; align-items:center;">
-              <input id="barcodeInput" type="text" inputmode="numeric" dir="ltr" value="${escapeHtml(state.barcodeInputVal || '')}" placeholder="${escapeHtml(bUi.placeholder)}" aria-label="${escapeHtml(bUi.placeholder)}" onkeydown="if(event.key==='Enter'){event.preventDefault();lookupBarcodeFromUi();}" oninput="state.barcodeInputVal=this.value" style="flex:1; min-width:0; min-height:44px; border-radius:10px; border:1px solid rgba(255,255,255,0.24); background:rgba(11,19,43,0.85); color:#FFFFFF; padding:0 10px; font-size:12.5px; font-family:ui-monospace,monospace;" />
-              <button id="barcodeLookupBtn" type="button" onclick="lookupBarcodeFromUi()" style="min-height:44px; padding:0 12px; border-radius:10px; border:none; background:#E6C98A; color:#0B132B; font-size:12px; font-weight:800; cursor:pointer; flex:none;">${escapeHtml(bUi.btn)}</button>
+              <input id="barcodeInput" type="text" inputmode="numeric" dir="ltr" value="${escapeHtml(state.barcodeInputVal || '')}" placeholder="${escapeHtml(bUi.placeholder)}" aria-label="${escapeHtml(bUi.placeholder)}" onkeydown="if(event.key==='Enter'){event.preventDefault();lookupBarcodeFromUi();}" oninput="state.barcodeInputVal=this.value" style="flex:1; min-width:0; min-height:44px; border-radius:12px; border:1px solid #34604E; background:rgba(9,20,16,0.86); color:#F3EFE6; padding:0 9px; font-size:11.5px; font-family:ui-monospace,monospace;" />
+              <button id="barcodeLookupBtn" type="button" onclick="lookupBarcodeFromUi()" style="min-height:44px; padding:0 11px; border-radius:9999px; border:none; background:#2FA877; color:#07120E; font-size:11.5px; font-weight:800; cursor:pointer; flex:none; white-space:nowrap;">${escapeHtml(bUi.btn)}</button>
             </div>
+            <button id="webCamBarcodeBtn" type="button" onclick="openWebBarcodeCameraModal()" style="min-height:44px; width:100%; border-radius:12px; border:1px solid #2FA877; background:rgba(47,168,119,0.16); color:#E4F3EC; font-size:11.5px; font-weight:800; cursor:pointer;">${escapeHtml(p34.camBarcodeBtn)}</button>
             <div style="display:flex; flex-wrap:wrap; gap:5px; align-items:center;">
-              <span style="font-size:10.5px; color:#CBD5E1; font-weight:700;">${escapeHtml(bUi.quickLbl)}</span>
+              <span style="font-size:10.5px; color:#A4B5AC; font-weight:700;">${escapeHtml(bUi.quickLbl)}</span>
               ${QUICK_BARCODES.map(
                 (q) =>
-                  `<button type="button" onclick="lookupBarcodeFromUi('${q.code}')" style="min-height:44px; min-width:44px; padding:8px 12px; border-radius:10px; border:1px solid rgba(230,201,138,0.45); background:rgba(255,255,255,0.08); color:#F3F5F2; font-size:11px; font-weight:700; cursor:pointer;">${escapeHtml(q.label)} · ${q.code.slice(-4)}</button>`
+                  `<button type="button" onclick="lookupBarcodeFromUi('${q.code}')" style="min-height:44px; min-width:44px; padding:8px 12px; border-radius:9999px; border:1px solid rgba(217,185,114,0.4); background:rgba(255,255,255,0.07); color:#F3EFE6; font-size:11px; font-weight:700; cursor:pointer;">${escapeHtml(q.label)} · ${q.code.slice(-4)}</button>`
               ).join('')}
             </div>
             ${
               state.barcodeStatusBanner
-                ? `<div id="barcodeStatusMsg" style="padding:7px 10px; border-radius:9px; background:${state.barcodeStatusBanner.tone === 'ok' ? 'rgba(16,185,129,0.22)' : 'rgba(245,158,11,0.24)'}; border:1px solid ${state.barcodeStatusBanner.tone === 'ok' ? '#34D399' : '#FBBF24'}; color:#FFFFFF; font-size:11.5px; font-weight:700; line-height:1.35; display:flex; flex-direction:column; gap:6px;">
+                ? `<div id="barcodeStatusMsg" style="padding:7px 10px; border-radius:10px; background:${state.barcodeStatusBanner.tone === 'ok' ? 'rgba(47,168,119,0.2)' : 'rgba(251,191,36,0.2)'}; border:1px solid ${state.barcodeStatusBanner.tone === 'ok' ? '#2FA877' : '#FBBF24'}; color:#F3EFE6; font-size:11.5px; font-weight:700; line-height:1.35; display:flex; flex-direction:column; gap:6px;">
                      <span>${state.barcodeStatusBanner.tone === 'ok' ? '🟢 ' : '⚠️ '}${escapeHtml(state.barcodeStatusBanner.message)}</span>
                      ${
                        state.barcodeStatusBanner.canSaveCustom
-                         ? `<button id="saveCustomBarcodeBtn" type="button" data-save-barcode="${escapeHtml(state.barcodeStatusBanner.barcode)}" style="min-height:44px; padding:6px 10px; border-radius:8px; border:1px solid #34D399; background:rgba(16,185,129,0.28); color:#ECFDF5; font-size:11px; font-weight:800; cursor:pointer; text-align:center;">${escapeHtml(bUi.saveCustomBtn(state.barcodeStatusBanner.barcode))}</button>`
+                         ? `<button id="saveCustomBarcodeBtn" type="button" data-save-barcode="${escapeHtml(state.barcodeStatusBanner.barcode)}" style="min-height:44px; padding:6px 12px; border-radius:9999px; border:1px solid #2FA877; background:rgba(47,168,119,0.25); color:#E4F3EC; font-size:11px; font-weight:800; cursor:pointer; text-align:center;">${escapeHtml(bUi.saveCustomBtn(state.barcodeStatusBanner.barcode))}</button>`
                          : ''
                      }
                    </div>`
@@ -4271,12 +5871,59 @@
             }
           </div>
 
-          <div style="margin-top:10px; padding:10px 14px; border-radius:14px; border:1px dashed rgba(197,160,89,0.55); background:rgba(15,41,30,0.65); display:flex; align-items:center; justify-content:space-between; gap:10px;">
-            <span style="font-size:12px; font-weight:700; color:#EAD39C;">📷 ${escapeHtml(state.productTitle)}</span>
-            <span class="mono" style="font-size:11.5px; color:#D8D2C5;">${u.recognizedCountFmt(recCount, obs.length)}</span>
+          <!-- Mobil Web / PWA Ekran 2 Doğrudan İçerik Girişi & Tür Seçici (<=640px & masaüstü senkron) -->
+          <div style="margin-top:10px; padding:11px 12px; border-radius:16px; border:1px solid rgba(217,185,114,0.32); background:rgba(22,46,35,0.88); display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; flex-wrap:wrap;">
+              <label for="scanLiveInput" style="font-size:11.5px; font-weight:800; color:#D9B972;">✏️ ${escapeHtml(st.liveEditHeader)}</label>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px;">
+              <button type="button" onclick="setProductTypeFromScan('cosmetic')" aria-pressed="${currentPt === 'cosmetic' ? 'true' : 'false'}" style="min-height:44px; padding:6px 10px; border-radius:9999px; border:1px solid ${currentPt === 'cosmetic' ? '#2FA877' : '#34604E'}; background:${currentPt === 'cosmetic' ? '#2FA877' : 'rgba(9,20,16,0.86)'}; color:${currentPt === 'cosmetic' ? '#07120E' : '#F3EFE6'}; font-size:11.5px; font-weight:800; cursor:pointer;">${escapeHtml(ptTexts.cosmetic)}</button>
+              <button type="button" onclick="setProductTypeFromScan('food')" aria-pressed="${currentPt === 'food' ? 'true' : 'false'}" style="min-height:44px; padding:6px 10px; border-radius:9999px; border:1px solid ${currentPt === 'food' ? '#2FA877' : '#34604E'}; background:${currentPt === 'food' ? '#2FA877' : 'rgba(9,20,16,0.86)'}; color:${currentPt === 'food' ? '#07120E' : '#F3EFE6'}; font-size:11.5px; font-weight:800; cursor:pointer;">${escapeHtml(ptTexts.food)}</button>
+            </div>
+            <textarea id="scanLiveInput" rows="3" oninput="onScanInputChanged(this.value)" placeholder="Ingredients: Aqua, Glycerin, Niacinamide..." style="width:100%; min-height:74px; box-sizing:border-box; border-radius:12px; border:1px solid #34604E; background:rgba(9,20,16,0.86); color:#F3EFE6; padding:9px 10px; font:inherit; font-size:12px; line-height:1.4; resize:vertical;">${escapeHtml(currentRawText)}</textarea>
+            ${
+              currentPt === 'food'
+                ? (() => {
+                    const nut = state.nutritionPer100g || {};
+                    const drafts = state.nutritionDraftStrings || {};
+                    const numAttr = (k) => {
+                      if (Object.hasOwn(drafts, k)) return String(drafts[k]);
+                      if (nut[k] !== undefined && nut[k] !== null) return String(nut[k]);
+                      if (k === 'energyKcal' && typeof nut.energyKj === 'number' && Number.isFinite(nut.energyKj)) {
+                        return String(Math.round(nut.energyKj / 4.184));
+                      }
+                      if (k === 'saltG' && typeof nut.sodiumMg === 'number' && Number.isFinite(nut.sodiumMg)) {
+                        return String(Number(((nut.sodiumMg * 2.5) / 1000).toFixed(2)));
+                      }
+                      return '';
+                    };
+                    return `<details id="foodNutritionDetails" ${state.nutritionPer100g || Object.keys(drafts).length > 0 ? 'open' : ''} style="border:1px solid #34604E; border-radius:12px; padding:8px 10px; background:rgba(9,20,16,0.62);">
+                      <summary style="font-size:11.5px; font-weight:800; color:#D9B972; cursor:pointer; min-height:32px; display:flex; align-items:center;">${escapeHtml(p34.nutriToggle)}</summary>
+                      <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; margin-top:8px;">
+                        <label style="display:flex; flex-direction:column; gap:2px; font-size:10px; color:#B8CEC5;">${escapeHtml(p34.nutriKcal)}<input id="nutriKcalInp" type="text" inputmode="decimal" dir="ltr" value="${escapeHtml(numAttr('energyKcal'))}" oninput="onWebNutritionChanged('energyKcal', this.value)" style="min-height:36px; border-radius:8px; border:1px solid #34604E; background:rgba(9,20,16,0.9); color:#F3EFE6; padding:0 7px; font-size:11.5px;" /></label>
+                        <label style="display:flex; flex-direction:column; gap:2px; font-size:10px; color:#B8CEC5;">${escapeHtml(p34.nutriSugars)}<input id="nutriSugarsInp" type="text" inputmode="decimal" dir="ltr" value="${escapeHtml(numAttr('sugarsG'))}" oninput="onWebNutritionChanged('sugarsG', this.value)" style="min-height:36px; border-radius:8px; border:1px solid #34604E; background:rgba(9,20,16,0.9); color:#F3EFE6; padding:0 7px; font-size:11.5px;" /></label>
+                        <label style="display:flex; flex-direction:column; gap:2px; font-size:10px; color:#B8CEC5;">${escapeHtml(p34.nutriSatFat)}<input id="nutriSatFatInp" type="text" inputmode="decimal" dir="ltr" value="${escapeHtml(numAttr('saturatedFatG'))}" oninput="onWebNutritionChanged('saturatedFatG', this.value)" style="min-height:36px; border-radius:8px; border:1px solid #34604E; background:rgba(9,20,16,0.9); color:#F3EFE6; padding:0 7px; font-size:11.5px;" /></label>
+                        <label style="display:flex; flex-direction:column; gap:2px; font-size:10px; color:#B8CEC5;">${escapeHtml(p34.nutriSalt)}<input id="nutriSaltInp" type="text" inputmode="decimal" dir="ltr" value="${escapeHtml(numAttr('saltG'))}" oninput="onWebNutritionChanged('saltG', this.value)" style="min-height:36px; border-radius:8px; border:1px solid #34604E; background:rgba(9,20,16,0.9); color:#F3EFE6; padding:0 7px; font-size:11.5px;" /></label>
+                        <label style="display:flex; flex-direction:column; gap:2px; font-size:10px; color:#B8CEC5;">${escapeHtml(p34.nutriFiber)}<input id="nutriFiberInp" type="text" inputmode="decimal" dir="ltr" value="${escapeHtml(numAttr('fiberG'))}" oninput="onWebNutritionChanged('fiberG', this.value)" style="min-height:36px; border-radius:8px; border:1px solid #34604E; background:rgba(9,20,16,0.9); color:#F3EFE6; padding:0 7px; font-size:11.5px;" /></label>
+                        <label style="display:flex; flex-direction:column; gap:2px; font-size:10px; color:#B8CEC5;">${escapeHtml(p34.nutriProtein)}<input id="nutriProteinInp" type="text" inputmode="decimal" dir="ltr" value="${escapeHtml(numAttr('proteinG'))}" oninput="onWebNutritionChanged('proteinG', this.value)" style="min-height:36px; border-radius:8px; border:1px solid #34604E; background:rgba(9,20,16,0.9); color:#F3EFE6; padding:0 7px; font-size:11.5px;" /></label>
+                      </div>
+                      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:7px; flex-wrap:wrap;">
+                        <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#E4F3EC; cursor:pointer;"><input type="checkbox" ${nut.isBeverage ? 'checked' : ''} onchange="onWebNutritionChanged('isBeverage', this.checked)" /> ${escapeHtml(p34.nutriBev)}</label>
+                        <button type="button" onclick="clearWebNutritionInputs()" style="min-height:32px; padding:3px 10px; border-radius:8px; border:1px solid #34604E; background:transparent; color:#D9B972; font-size:11px; font-weight:700; cursor:pointer;">${escapeHtml(p34.nutriClear)}</button>
+                      </div>
+                    </details>`;
+                  })()
+                : ''
+            }
+            <button id="scanAnalyzeBtn" type="button" onclick="onScanAnalyzeNow()" style="min-height:44px; width:100%; border-radius:9999px; border:none; background:#2FA877; color:#07120E; font-size:12.5px; font-weight:800; cursor:pointer;">${escapeHtml(loc.scanScreen.analyzeBtn)}</button>
           </div>
 
-          <div style="position:relative; margin:14px auto; width:100%; background:#EEEBE2; border-radius:14px; padding:16px; color:#2A2A26; font-size:13px; line-height:1.75; box-shadow:0 12px 30px rgba(0,0,0,0.35); border:1.5px solid rgba(197,160,89,0.4);">
+          <div style="margin-top:10px; padding:10px 14px; border-radius:14px; border:1px dashed rgba(217,185,114,0.5); background:rgba(13,53,38,0.65); display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <span style="font-size:12px; font-weight:700; color:#D9B972;">📷 ${escapeHtml(state.productTitle)}</span>
+            <span class="mono" style="font-size:11.5px; color:#F2F0EB;">${u.recognizedCountFmt(recCount, obs.length)}</span>
+          </div>
+
+          <div style="position:relative; margin:14px auto; width:100%; background:#F2F0EB; border-radius:14px; padding:16px; color:#14261D; font-size:13px; line-height:1.75; box-shadow:0 12px 30px rgba(0,0,0,0.32); border:1px solid rgba(217,185,114,0.45);">
             <span style="font-weight:800; letter-spacing:0.04em;">${u.ingredientsHeader.toUpperCase()}: </span>
             ${obs
               .map((o) => {
@@ -4286,7 +5933,7 @@
                 }
                 return `<span style="outline:2px dashed #D9901A; background:rgba(242,177,52,0.32); border-radius:4px; padding:1px 4px; font-weight:700;">${disp}</span>`;
               })
-              .join(', ')}
+              .join(state.lang === 'ar' || state.lang === 'ur' ? '، ' : ', ')}
           </div>
 
           <div style="background:var(--surface); color:var(--ink); border-radius:26px; padding:18px; display:flex; flex-direction:column; gap:10px;">
@@ -4338,9 +5985,12 @@
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
       const ft = getFeatText(state.lang);
+      const p34 = getP34Text(state.lang);
       const reg = state.evalData.cards.regulatoryCard;
       const prof = state.evalData.cards.profileCard;
       const halal = state.evalData.cards.halalCard;
+      const nova = state.evalData.cards.novaCard;
+      const nutriScore = state.evalData.cards.nutriScoreCard;
       const swapGuide = state.evalData.cards.swapGuideCard;
       const routineConflict = state.evalData.cards.routineConflictCard;
       const regReport = state.evalData.cards.regulatoryReportCard;
@@ -4350,6 +6000,8 @@
       const score = reg.score;
       const circumference = 238.8;
       const dash = score !== null ? ((score / 100) * circumference).toFixed(1) : '0';
+      const covPct = Math.max(0, Math.min(100, Math.round(Number(reg.coveragePercent) || 0)));
+      const curatedCovPct = Math.max(0, Math.min(100, Math.round(Number(reg.curatedCoveragePercent) || 0)));
 
       const penaltyItems = reg.findings.filter((f) => f.severity !== 'bilgi');
       const ethanolFound = halal.findings.some((f) => f.category === 'B_alkol');
@@ -4363,7 +6015,7 @@
         let kind = 'ok';
         let levelText = u.noProblemBadge;
         let whyText = o.substance
-          ? localizeItemExplanation('ok', 'izinli', o.substance.eu_detail, state.lang)
+          ? localizeItemExplanation('ok', 'izinli', o.substance.eu_detail, state.lang, o)
           : u.stdIngredientDesc;
         let sources = o.substance ? o.substance.sources || [] : [];
 
@@ -4374,7 +6026,7 @@
         } else if (regFind && (regFind.severity === 'yuksek' || regFind.severity === 'orta' || regFind.severity === 'dusuk')) {
           kind = regFind.euStatus === 'yasak' ? 'bad' : 'warn';
           levelText = regFind.euStatus === 'yasak' ? loc.badges.banned : loc.badges.restricted;
-          whyText = regFind.legalText || localizeItemExplanation('warn', regFind.euStatus, '', state.lang);
+          whyText = regFind.legalText || localizeItemExplanation('warn', regFind.euStatus, '', state.lang, o);
         } else if (profAlert) {
           kind =
             profAlert.profile === 'ozel_kara_liste' || profAlert.level === 'kirmizi'
@@ -4448,15 +6100,17 @@
       const flaggedRows = allRows.filter((r) => r.kind !== 'ok');
       const visibleRows = state.showAllIngredients ? allRows : flaggedRows;
 
-      // 1-Line First-3-Seconds Verdict Hero (Definite Red ALWAYS takes priority over Pending OCR / Low Coverage)
+      // 1-Line First-3-Seconds Verdict Hero (Definite Red ALWAYS takes priority over Pending OCR / Low Coverage; respects halal emphasis toggle)
+      const p1 = PHASE1_WEB_I18N[state.lang] || PHASE1_WEB_I18N.en;
+      const halalActive = state.profiles.halal !== false;
       let verdictHeroBg = 'var(--ok-bg)';
       let verdictHeroCol = 'var(--ok)';
-      let verdictHeroText = `🟢 ${u.goodNoBanned} · ${loc.badges.halalOk}`;
-      if (reg.capApplied === 10 || unified.halalTone === 'bad' || unified.profTone === 'bad') {
+      let verdictHeroText = `🟢 ${u.goodNoBanned}${halalActive ? ' · ' + loc.badges.halalOk : ''}`;
+      if (reg.capApplied === 10 || (halalActive && unified.halalTone === 'bad') || unified.profTone === 'bad') {
         verdictHeroBg = 'var(--bad-bg)';
         verdictHeroCol = 'var(--bad)';
         const reason =
-          unified.halalTone === 'bad'
+          halalActive && unified.halalTone === 'bad'
             ? `${halal.selectedAuthority}: ${unified.halalTitle}`
             : reg.capApplied === 10
             ? u.euNonCompliant
@@ -4470,14 +6124,14 @@
         verdictHeroBg = 'var(--warn-bg)';
         verdictHeroCol = 'var(--warn)';
         verdictHeroText = `⚪ ${loc.badges.lowCoverage || ft.statusLowCoverage} — ${ft.lowCovTileSub}`;
-      } else if (unified.halalTone === 'warn' || unified.profTone === 'warn' || penaltyItems.length > 0) {
+      } else if ((halalActive && unified.halalTone === 'warn') || unified.profTone === 'warn' || penaltyItems.length > 0) {
         verdictHeroBg = 'var(--warn-bg)';
         verdictHeroCol = 'var(--warn)';
-        if (unified.halalTone === 'warn' && unified.profTone === 'ok' && penaltyItems.length === 0) {
+        if (halalActive && unified.halalTone === 'warn' && unified.profTone === 'ok' && penaltyItems.length === 0) {
           verdictHeroText = `🟢 ${u.fitsPrefs} · 🟡 ${halal.selectedAuthority}: ${unified.halalTitle}`;
         } else {
           const reason =
-            unified.halalTone === 'warn'
+            halalActive && unified.halalTone === 'warn'
               ? `${halal.selectedAuthority}: ${unified.halalTitle}`
               : unified.profTone === 'warn'
               ? `${u.forYouCaps}: ${unified.profileTitle}`
@@ -4489,7 +6143,7 @@
       return `
         <div style="display:flex; align-items:center; justify-content:space-between;">
           <div style="display:flex; align-items:center; gap:8px;">
-            <img src="./assets/incifact-app-icon.png" width="28" height="28" style="border-radius:7px; display:block; flex:none; box-shadow: 0 1px 4px rgba(11, 19, 43, 0.2);" alt="InciFact Logo" />
+            <img src="./assets/incifact-app-icon-192.png" width="28" height="28" style="border-radius:7px; display:block; flex:none; box-shadow: 0 1px 4px rgba(11, 19, 43, 0.2);" alt="InciFact Logo" />
             <span style="font-weight:800; font-size:16px;">InciFact</span>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -4501,7 +6155,7 @@
         <div>
           <h1 style="margin:0; font-size:19.5px; font-weight:800; letter-spacing:-0.01em;">${escapeHtml(state.productTitle)}</h1>
           <span style="font-size:12.5px; color:var(--muted);">
-            ${state.evalData.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${formatDigits(reg.totalCount, state.lang)} ${u.ingredientWord} · ${formatPercent(reg.coveragePercent, state.lang)} ${u.recognizedWord}
+            ${state.evalData.productType === 'cosmetic' ? u.cosmeticShort : u.foodShort} · ${formatDigits(reg.totalCount, state.lang)} ${u.ingredientWord} · ${formatPercent(reg.coveragePercent, state.lang)} ${u.recognizedWord} · ${escapeHtml(p34.curatedCovLbl)}: ${formatPercent(curatedCovPct, state.lang)}
           </span>
           ${
             state.activeBarcodeMeta && state.activeBarcodeMeta.barcode
@@ -4521,14 +6175,14 @@
         <button type="button" aria-expanded="${state.regionNoticeHighlight ? 'true' : 'false'}" onclick="state.regionNoticeHighlight = !state.regionNoticeHighlight; renderScreen();" style="width:100%; min-height:44px; text-align:start; color:var(--ink); cursor:pointer; background:${state.regionNoticeHighlight ? 'var(--soft)' : 'var(--surface)'}; border:1px solid ${state.regionNoticeHighlight ? 'var(--accent)' : 'var(--line)'}; border-radius:12px; padding:7px 11px; display:flex; flex-direction:column; justify-content:center; gap:5px;">
           <span style="display:flex; align-items:center; justify-content:space-between; gap:6px; width:100%;">
             <span style="font-size:11.5px; font-weight:700; color:var(--ink);">
-              ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).activeBar((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).flag, (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).name.split('·')[0].trim(), halal.selectedAuthority, state.jurisdiction === 'US' ? 'US FDA' : state.jurisdiction)}
+              ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).activeBar(escapeHtml((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).flag), escapeHtml((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).name.split('·')[0].trim()), escapeHtml(halal.selectedAuthority), escapeHtml(state.jurisdiction === 'US' ? 'US FDA' : state.jurisdiction))}
             </span>
             <span style="font-size:11px; font-weight:800; color:var(--accent); flex:none;">ⓘ</span>
           </span>
           ${
             state.regionNoticeHighlight
               ? `<span style="font-size:11px; line-height:1.4; color:var(--ink); border-top:1px solid var(--line); padding-top:5px; width:100%;">
-                   ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyBody((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).flag, (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).name, halal.selectedAuthority, state.jurisdiction === 'US' ? 'US FDA 21 CFR' : (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).regLabel)}
+                   ${(REGIONAL_NOTICE_I18N[state.lang] || REGIONAL_NOTICE_I18N.en).whyBody(escapeHtml((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).flag), escapeHtml((MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).name), escapeHtml(halal.selectedAuthority), escapeHtml(state.jurisdiction === 'US' ? 'US FDA 21 CFR' : (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).regLabel))}
                  </span>`
               : ''
           }
@@ -4539,16 +6193,16 @@
           <div style="position:relative; width:86px; height:86px; flex:none;">
             <svg width="86" height="86" viewBox="0 0 88 88">
               <circle cx="44" cy="44" r="38" fill="none" stroke="var(--line)" stroke-width="8"></circle>
-              <circle cx="44" cy="44" r="38" fill="none" stroke="${score !== null && score >= 75 ? 'var(--ok)' : 'var(--warn)'}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${dash} 238.8" transform="rotate(-90 44 44)"></circle>
+              <circle cx="44" cy="44" r="38" fill="none" stroke="${reg.capApplied === 10 || (score !== null && score < 50) ? 'var(--bad)' : (score !== null && score >= 75 ? 'var(--ok)' : 'var(--warn)')}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${dash} 238.8" transform="rotate(-90 44 44)"></circle>
             </svg>
             <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-              <span style="font-size:28px; font-weight:800; line-height:1;">${score !== null ? formatDigits(score, state.lang) : '—'}</span>
-              <span style="font-size:11px; color:var(--muted);" dir="ltr">${score !== null ? '/ ' + formatDigits(100, state.lang) : u.uncertainWord}</span>
+              <span style="font-size:28px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums;">${score !== null ? formatDigits(score, state.lang) : '—'}</span>
+              <span style="font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums;" ${score !== null ? 'dir="ltr"' : ''}>${score !== null ? '/ ' + formatDigits(100, state.lang) : u.uncertainWord}</span>
             </div>
           </div>
 
           <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:0;">
-            <span style="font-size:15px; font-weight:800; color:${reg.capApplied === 10 ? 'var(--bad)' : (score !== null && score >= 75 ? 'var(--ok)' : 'var(--warn)')};">
+            <span style="font-size:15px; font-weight:800; color:${reg.capApplied === 10 || (score !== null && score < 50) ? 'var(--bad)' : (score !== null && score >= 75 ? 'var(--ok)' : 'var(--warn)')};">
               ${
                 reg.capApplied === 10
                   ? u.euNonCompliant
@@ -4560,6 +6214,9 @@
               }
             </span>
             <span style="font-size:11px; color:var(--muted); font-weight:600;">${escapeHtml(ft.regIndexNote || '')}</span>
+            <div style="width:100%; height:5px; border-radius:9999px; background:var(--surface2); overflow:hidden; margin:2px 0;">
+              <div style="width:${covPct}%; height:5px; border-radius:9999px; background:${covPct >= 80 ? 'var(--accent)' : 'var(--warn)'};"></div>
+            </div>
             ${
               penaltyItems.length > 0
                 ? `<span style="font-size:12px; color:var(--muted); font-weight:600;">${u.scoreReducers}</span>` +
@@ -4585,10 +6242,10 @@
             </span>
           </button>
 
-          <button type="button" onclick="switchScreen('${unified.hasPendingOcr ? 'scan' : 'halal'}')" style="border:none; text-align:start; cursor:pointer; background:${unified.halalBg}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px; min-width:0;">
-            <span style="font-size:11.5px; font-weight:800; color:${unified.halalFg};">${u.halalCaps} · ${escapeHtml(halal.selectedAuthority)}</span>
+          <button type="button" onclick="switchScreen('${unified.hasPendingOcr ? 'scan' : 'halal'}')" style="border:${halalActive ? 'none' : '1px dashed var(--line)'}; opacity:${halalActive ? '1' : '0.72'}; text-align:start; cursor:pointer; background:${halalActive ? unified.halalBg : 'var(--surface)'}; border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:3px; min-width:0;">
+            <span style="font-size:11.5px; font-weight:800; color:${halalActive ? unified.halalFg : 'var(--muted)'};">${u.halalCaps} · ${escapeHtml(halal.selectedAuthority)}</span>
             <span style="font-size:13.5px; font-weight:800; color:var(--ink);">${escapeHtml(unified.halalTitle)}</span>
-            <span style="font-size:12px; color:var(--ink);">${u.tapForDetail}</span>
+            <span style="font-size:12px; color:${halalActive ? 'var(--ink)' : 'var(--muted)'};">${escapeHtml(halalActive ? u.tapForDetail : p1.halalMutedNote)}</span>
           </button>
         </div>
 
@@ -4628,7 +6285,99 @@
               ? `<div style="background:var(--soft); color:var(--accent); border:1px solid var(--accent); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:800; text-align:center;">${escapeHtml(state.compareSlotToast)}</div>`
               : ''
           }
+          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+            <span style="font-size:11px; font-weight:800; color:var(--muted);">${escapeHtml(p34.shelfSaveTitle)}:</span>
+            ${
+              state.evalData.productType === 'cosmetic'
+                ? `<button type="button" onclick="saveCurrentProductToShelf('AM')" style="min-height:44px; padding:6px 10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11px; font-weight:700;">${escapeHtml(p34.shelfAmBtn)}</button>
+                   <button type="button" onclick="saveCurrentProductToShelf('PM')" style="min-height:44px; padding:6px 10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11px; font-weight:700;">${escapeHtml(p34.shelfPmBtn)}</button>`
+                : `<button type="button" onclick="saveCurrentProductToShelf('Pantry')" style="min-height:44px; padding:6px 10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:11px; font-weight:700;">${escapeHtml(p34.shelfPantryBtn)}</button>`
+            }
+          </div>
+          ${
+            state.shelfToast
+              ? `<div style="background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:800; text-align:center;">✓ ${escapeHtml(state.shelfToast)}</div>`
+              : ''
+          }
         </div>
+
+        <!-- FAZ 4: Aile / Hane Çoklu Profil Özet Şeridi -->
+        ${
+          state.householdEval && state.householdEval.memberCount > 0
+            ? `<div id="householdVerdictCard" style="background:var(--surface); border:1.5px solid var(--accent); border-radius:18px; padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
+                <span style="font-size:13px; font-weight:800; color:var(--ink);">${escapeHtml(p34.householdVerdictTitle)}</span>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  ${state.householdEval.members
+                    .map((m) => {
+                      const col = m.overallColor === 'kirmizi' ? 'var(--bad)' : m.overallColor === 'sari' ? 'var(--warn)' : m.overallColor === 'unknown' ? 'var(--muted)' : 'var(--ok)';
+                      const bg = m.overallColor === 'kirmizi' ? 'var(--bad-bg)' : m.overallColor === 'sari' ? 'var(--warn-bg)' : m.overallColor === 'unknown' ? 'var(--surface2)' : 'var(--ok-bg)';
+                      return `<div style="background:${bg}; border:1px solid ${col}; border-radius:12px; padding:8px 10px; display:flex; flex-direction:column; gap:2px;">
+                        <span style="font-size:12px; font-weight:800; color:${col};">👤 ${escapeHtml(m.name)}</span>
+                        <span style="font-size:11.5px; color:var(--ink);">${escapeHtml(m.topReason)}</span>
+                      </div>`;
+                    })
+                    .join('')}
+                </div>
+              </div>`
+            : ''
+        }
+
+        <!-- FAZ 3: FAO/WHO NOVA 1–4 Gıda İşlenmişlik Kartı -->
+        ${
+          nova && nova.applicable
+            ? `<div id="novaCard" style="background:var(--surface); border:1.5px solid ${nova.badgeColor === 'kirmizi' ? 'var(--bad)' : nova.badgeColor === 'sari' ? 'var(--warn)' : 'var(--ok)'}; border-radius:18px; padding:12px 14px; display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                  <span style="font-size:13px; font-weight:800; color:var(--ink);">${escapeHtml(nova.cardTitle)}</span>
+                  <span style="font-size:11px; font-weight:800; padding:2px 8px; border-radius:10px; background:${nova.badgeColor === 'kirmizi' ? 'var(--bad-bg)' : nova.badgeColor === 'sari' ? 'var(--warn-bg)' : 'var(--ok-bg)'}; color:${nova.badgeColor === 'kirmizi' ? 'var(--bad)' : nova.badgeColor === 'sari' ? 'var(--warn)' : 'var(--ok)'};">NOVA ${formatDigits(nova.group, state.lang)}</span>
+                </div>
+                <div style="font-size:12.5px; font-weight:800; color:var(--ink);">${escapeHtml(nova.label)}</div>
+                <div style="font-size:11.5px; line-height:1.4; color:var(--muted);">${escapeHtml(nova.summary)}</div>
+                ${(nova.markers || []).length > 0 ? `<div style="font-size:11px; color:var(--bad); font-weight:700;">• ${escapeHtml(nova.markers.join(', '))}</div>` : ''}
+              </div>`
+            : ''
+        }
+
+        <!-- FAZ 5: Resmi Nutri-Score 2023 (A–E) & 100g Trafik Işıkları Kartı -->
+        ${
+          nutriScore && state.evalData.productType === 'food'
+            ? (() => {
+                const grades = [
+                  { g: 'A', bg: '#038141', fg: '#FFFFFF' },
+                  { g: 'B', bg: '#85BB2F', fg: '#091410' },
+                  { g: 'C', bg: '#FECB02', fg: '#091410' },
+                  { g: 'D', bg: '#EE8100', fg: '#FFFFFF' },
+                  { g: 'E', bg: '#E63E11', fg: '#FFFFFF' }
+                ];
+                const gradeBar = grades
+                  .map((it) => {
+                    const active = nutriScore.available && nutriScore.grade === it.g;
+                    return `<span style="display:inline-flex; align-items:center; justify-content:center; width:${active ? '34px' : '24px'}; height:${active ? '34px' : '24px'}; border-radius:8px; background:${it.bg}; color:${it.fg}; font-weight:900; font-size:${active ? '16px' : '12px'}; opacity:${nutriScore.available ? (active ? '1' : '0.36') : '0.32'}; border:${active ? '2px solid var(--ink)' : 'none'};">${it.g}</span>`;
+                  })
+                  .join('');
+                const tlHtml =
+                  nutriScore.available && nutriScore.trafficLights
+                    ? `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;">
+                        ${Object.values(nutriScore.trafficLights)
+                          .map((tl) => {
+                            const col = tl.color === 'kirmizi' ? 'var(--bad)' : tl.color === 'sari' ? 'var(--warn)' : 'var(--ok)';
+                            const bg = tl.color === 'kirmizi' ? 'var(--bad-bg)' : tl.color === 'sari' ? 'var(--warn-bg)' : 'var(--ok-bg)';
+                            return `<span style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:999px; background:${bg}; color:${col}; border:1px solid ${col};">${escapeHtml(tl.title)}: ${formatDigits(tl.value, state.lang)} ${escapeHtml(tl.unit)} (${escapeHtml(tl.label)})</span>`;
+                          })
+                          .join('')}
+                      </div>`
+                    : '';
+                return `<div id="nutriScoreCard" style="background:var(--surface); border:1.5px solid ${nutriScore.available ? escapeHtml(nutriScore.gradeColor) : 'var(--line)'}; border-radius:18px; padding:12px 14px; display:flex; flex-direction:column; gap:7px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+                    <span style="font-size:13px; font-weight:800; color:var(--ink);">${escapeHtml(nutriScore.cardTitle)}</span>
+                    ${nutriScore.available ? `<span class="mono" style="font-size:11px; font-weight:800; color:var(--muted);">N:${formatDigits(nutriScore.negativePoints, state.lang)} · P:${formatDigits(nutriScore.positivePoints, state.lang)}</span>` : ''}
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;" aria-label="${escapeHtml(nutriScore.available ? nutriScore.gradeLabel : nutriScore.cardTitle)}">${gradeBar}</div>
+                  ${tlHtml}
+                  ${(nutriScore.notes || []).length > 0 ? `<div style="font-size:11px; line-height:1.4; color:var(--muted);">${nutriScore.notes.map((n) => escapeHtml(n)).join(' ')}</div>` : ''}
+                </div>`;
+              })()
+            : ''
+        }
 
         <!-- ÖZELLİK 6: Kozmetik "Birlikte Kullanım / Cilt Rutini Çakışma Uyarısı" (Retinol + AHA/BHA, Saf C Vit + Asit, Bakır Peptit, Alkol Denat) -->
         ${
@@ -4787,7 +6536,7 @@
                         ? 'var(--muted)'
                         : 'var(--ok)';
                     return `
-              <div data-row-kind="${escapeHtml(it.kind)}" data-alert-level="${escapeHtml(it.alertLevel || '')}" style="background:var(--surface); border-radius:18px; padding:12px 14px; display:flex; gap:10px;">
+              <div role="button" tabindex="0" onclick="openIngredientDossierModal(${Number(it.pos)})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openIngredientDossierModal(${Number(it.pos)});}" data-row-kind="${escapeHtml(it.kind)}" data-alert-level="${escapeHtml(it.alertLevel || '')}" style="background:var(--surface); border-radius:18px; padding:12px 14px; min-height:44px; display:flex; gap:10px; cursor:pointer; border:1px solid var(--line);">
                 <span style="width:26px; height:26px; border-radius:13px; background:${badgeBg}; color:${fg}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex:none;">
                   ${it.kind === 'bad' || it.kind === 'warn' ? '!' : it.kind === 'info' ? 'i' : it.kind === 'unknown' ? '?' : '✓'}
                 </span>
@@ -4800,15 +6549,18 @@
                     <span style="font-size:11.5px; font-weight:700; color:${fg}; flex:none;">${escapeHtml(it.levelText)}</span>
                   </div>
                   <span style="font-size:12.5px; line-height:1.38; color:var(--muted);">${escapeHtml(it.whyText)}</span>
-                  <div style="display:flex; flex-wrap:wrap; gap:5px;">
-                    ${it.sources
-                      .map((s) => {
-                        const sText = typeof s === 'string' ? s : (s && (s.id || s.short_label || s.title)) || '';
-                        return sText
-                          ? `<span class="mono" dir="ltr" style="font-size:10.5px; padding:2px 8px; border-radius:10px; border:1px solid var(--line); color:var(--ink);">${escapeHtml(sText)} ↗</span>`
-                          : '';
-                      })
-                      .join('')}
+                  <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:5px;">
+                    <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                      ${it.sources
+                        .map((s) => {
+                          const sText = typeof s === 'string' ? s : (s && (s.id || s.short_label || s.title)) || '';
+                          return sText
+                            ? `<span class="mono" dir="ltr" style="font-size:10.5px; padding:2px 8px; border-radius:10px; border:1px solid var(--line); color:var(--ink);">${escapeHtml(sText)} ↗</span>`
+                            : '';
+                        })
+                        .join('')}
+                    </div>
+                    <span style="font-size:10.5px; font-weight:700; color:var(--accent);">${escapeHtml(p34.tapRowHint)}</span>
                   </div>
                 </div>
               </div>`;
@@ -4816,6 +6568,79 @@
                   .join('')
           }
         </div>
+
+        ${
+          (state.evalData.productType === 'food' || state.profiles.vegan) && state.evalData.cards.veganSugarCard
+            ? (() => {
+                const vs = state.evalData.cards.veganSugarCard;
+                const freeList = (vs.detectedFreeSugars || []).map((s) => s.localizedName || s.canonical || s.rawToken).filter(Boolean);
+                const rapidList = (vs.detectedRapidCarbs || []).map((c) => c.localizedName || c.canonical || c.rawToken).filter(Boolean);
+                const veganConcerns = [...(vs.nonVeganItems || []), ...(vs.uncertainVeganItems || [])]
+                  .map((v) => v.localizedName || v.canonical || v.rawToken)
+                  .filter(Boolean);
+                const hasSugarFlag = freeList.length > 0 || rapidList.length > 0;
+                return `<div id="veganSugarCard" style="background:var(--surface); border:1.5px solid ${veganConcerns.length > 0 ? 'var(--bad)' : hasSugarFlag ? 'var(--warn)' : 'var(--line)'}; border-radius:18px; padding:13px 14px; display:flex; flex-direction:column; gap:7px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <span style="font-size:13.5px; font-weight:800; color:var(--ink);">🍬 ${escapeHtml(vs.cardTitle)}</span>
+                    ${
+                      state.evalData.productType === 'food'
+                        ? `<span class="mono" style="font-size:11px; font-weight:800; padding:2px 8px; border-radius:10px; background:${hasSugarFlag ? 'var(--warn-bg)' : 'var(--ok-bg)'}; color:${hasSugarFlag ? 'var(--warn)' : 'var(--ok)'}; flex:none;">${escapeHtml(p1.sugarTotalLbl)}: ${formatDigits(vs.freeSugarCount || 0, state.lang)}</span>`
+                        : ''
+                    }
+                  </div>
+                  ${freeList.length > 0 ? `<div style="font-size:12px; color:var(--warn); line-height:1.4;"><strong>${escapeHtml(p1.freeSugarsLbl)}:</strong> ${escapeHtml(freeList.join(', '))}</div>` : ''}
+                  ${rapidList.length > 0 ? `<div style="font-size:12px; color:var(--muted); line-height:1.4;"><strong>${escapeHtml(p1.rapidCarbsLbl)}:</strong> ${escapeHtml(rapidList.join(', '))}</div>` : ''}
+                  ${
+                    veganConcerns.length > 0
+                      ? `<div style="font-size:12px; font-weight:700; color:var(--bad); line-height:1.4;"><strong>${escapeHtml(p1.veganConcernLbl)}:</strong> ${escapeHtml(veganConcerns.join(', '))}</div>`
+                      : state.profiles.vegan
+                      ? `<div style="font-size:12px; font-weight:700; color:var(--ok);">✓ ${escapeHtml(p1.veganOkNote)}</div>`
+                      : ''
+                  }
+                </div>`;
+              })()
+            : ''
+        }
+
+        <!-- FAZ 4: Katalogdan Daha Temiz & Helal Alternatifler ve INCI Muadilleri -->
+        ${
+          state.alternativesData &&
+          ((state.alternativesData.cleanerAlternatives || []).length > 0 || (state.alternativesData.dupes || []).length > 0)
+            ? `<div id="cleanerAlternativesCard" style="background:var(--surface); border:1.5px solid var(--accent); border-radius:18px; padding:13px 14px; display:flex; flex-direction:column; gap:8px;">
+                <span style="font-size:13.5px; font-weight:800; color:var(--accent);">${escapeHtml(p34.altTitle)}</span>
+                ${
+                  (state.alternativesData.cleanerAlternatives || []).length > 0
+                    ? `<span style="font-size:11px; font-weight:700; color:var(--muted);">${escapeHtml(p34.altCleanSub)}</span>
+                       <div style="display:flex; flex-direction:column; gap:6px;">
+                         ${state.alternativesData.cleanerAlternatives
+                           .map(
+                             (alt, altIdx) => `<button type="button" data-alt-kind="cleaner" data-alt-idx="${altIdx}" onclick="loadAlternativeProductFromList(this.getAttribute('data-alt-kind'), this.getAttribute('data-alt-idx'))" style="min-height:44px; text-align:start; border-radius:12px; border:1px solid var(--ok); background:var(--ok-bg); color:var(--ink); padding:8px 10px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                               <div style="min-width:0;">
+                                 <div style="font-size:12.5px; font-weight:800;">${escapeHtml(alt.name)}</div>
+                                 <div style="font-size:11px; color:var(--muted);">${escapeHtml(p34.inciSimLbl)}: ${formatPercent(alt.similarityPercent, state.lang)}${alt.nutriScoreGrade ? ` · Nutri-Score ${escapeHtml(alt.nutriScoreGrade)}` : ''}</div>
+                               </div>
+                               <span class="mono" style="font-size:12px; font-weight:800; color:var(--ok); flex:none;">${formatDigits(alt.score, state.lang)}/100</span>
+                             </button>`
+                           )
+                           .join('')}
+                       </div>`
+                    : ''
+                }
+                ${
+                  (state.alternativesData.dupes || []).length > 0
+                    ? `<span style="font-size:11px; font-weight:700; color:var(--muted);">${escapeHtml(p34.altDupeSub)}</span>
+                       <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                         ${state.alternativesData.dupes
+                           .map(
+                             (dp, dpIdx) => `<button type="button" data-alt-kind="dupe" data-alt-idx="${dpIdx}" onclick="loadAlternativeProductFromList(this.getAttribute('data-alt-kind'), this.getAttribute('data-alt-idx'))" style="min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:6px 10px; font-size:11px; font-weight:700;">🧪 ${escapeHtml(dp.name)} · ${formatPercent(dp.similarityPercent, state.lang)}</button>`
+                           )
+                           .join('')}
+                       </div>`
+                    : ''
+                }
+              </div>`
+            : ''
+        }
 
         <p style="margin:4px 0 0; font-size:11.5px; line-height:1.4; color:var(--muted);">
           ${u.disclaimer}
@@ -4886,6 +6711,11 @@
         </div>
 
         <!-- Hukuki Mikro-Feragatname (P0 Legal) -->
+        ${
+          halal.madhhab && halal.madhhab !== 'general' && halal.madhhabNote
+            ? `<div style="background:var(--soft); border:1.5px solid var(--accent); border-radius:14px; padding:9px 12px; font-size:12px; font-weight:700; color:var(--ink); line-height:1.4;">🕌 ${escapeHtml(halal.madhhabNote)}</div>`
+            : ''
+        }
         <div style="background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
           <div style="display:flex; align-items:flex-start; gap:8px;">
             <span style="font-size:13px; line-height:1.2;">⚖️</span>
@@ -5021,6 +6851,7 @@
       const loc = state.evalData.locale;
       const u = getUiText(state.lang);
       const ft = getFeatText(state.lang);
+      const p34 = getP34Text(state.lang);
       const a = comp.productA;
       const b = comp.productB;
       const diff = comp.decidingDifference;
@@ -5099,11 +6930,11 @@
         <div style="background:var(--surface); border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:10px; border:1px solid var(--line);">
           <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px;">
             <div style="min-width:0; display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${aBg}; border:1.5px solid ${aBetter ? 'var(--ok)' : a.hasBanned ? 'var(--bad)' : 'transparent'};">
-              <span style="font-size:30px; font-weight:800; line-height:1; color:${aColor};">${a.score !== null ? escapeHtml(formatDigits(a.score, state.lang)) : '—'}</span>
+              <span style="font-size:30px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; color:${aColor};">${a.score !== null ? escapeHtml(formatDigits(a.score, state.lang)) : '—'}</span>
               <span style="font-size:13px; font-weight:700; text-align:center; overflow-wrap:anywhere;">${escapeHtml(a.name)}</span>
             </div>
             <div style="min-width:0; display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 8px; border-radius:16px; background:${bBg}; border:1.5px solid ${bBetter ? 'var(--ok)' : b.hasBanned ? 'var(--bad)' : 'transparent'};">
-              <span style="font-size:30px; font-weight:800; line-height:1; color:${bColor};">${b.score !== null ? escapeHtml(formatDigits(b.score, state.lang)) : '—'}</span>
+              <span style="font-size:30px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; color:${bColor};">${b.score !== null ? escapeHtml(formatDigits(b.score, state.lang)) : '—'}</span>
               <span style="font-size:13px; font-weight:700; text-align:center; overflow-wrap:anywhere;">${escapeHtml(b.name)}</span>
             </div>
           </div>
@@ -5129,6 +6960,15 @@
               <span style="text-align:center; font-weight:700; color:${aHalalColor}; min-width:0; overflow-wrap:anywhere;">${escapeHtml(mapHalalLabel(a))}</span>
               <span style="text-align:center; font-weight:700; color:${bHalalColor}; min-width:0; overflow-wrap:anywhere;">${escapeHtml(mapHalalLabel(b))}</span>
             </div>
+            ${
+              a.nutriScoreGrade || b.nutriScoreGrade || a.novaGroup || b.novaGroup
+                ? `<div style="display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(68px, 0.9fr) minmax(68px, 0.9fr); gap:6px; align-items:center; padding:8px 2px; border-top:1px solid var(--line); font-size:12px; min-width:0;">
+                    <span style="color:var(--muted); min-width:0; overflow-wrap:anywhere;">Nutri-Score / NOVA</span>
+                    <span style="text-align:center; font-weight:800; color:var(--ink); min-width:0; overflow-wrap:anywhere;">${escapeHtml([a.nutriScoreGrade ? 'NS ' + a.nutriScoreGrade : '', a.novaGroup ? 'NOVA ' + formatDigits(a.novaGroup, state.lang) : ''].filter(Boolean).join(' · ') || '—')}</span>
+                    <span style="text-align:center; font-weight:800; color:var(--ink); min-width:0; overflow-wrap:anywhere;">${escapeHtml([b.nutriScoreGrade ? 'NS ' + b.nutriScoreGrade : '', b.novaGroup ? 'NOVA ' + formatDigits(b.novaGroup, state.lang) : ''].filter(Boolean).join(' · ') || '—')}</span>
+                  </div>`
+                : ''
+            }
           </div>
 
           ${
@@ -5173,6 +7013,60 @@
               }
             </div>`
               : ''
+          }
+          ${
+            comp.dupeAnalysis
+              ? `<div id="compareDupeBox" style="border-radius:12px; background:var(--soft); border:1px solid var(--accent); padding:9px 11px; display:flex; flex-direction:column; gap:4px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:800; color:var(--accent);">
+                    <span>🧪 ${escapeHtml(p34.inciSimLbl)}</span>
+                    <span class="mono">${formatPercent(comp.dupeAnalysis.similarityPercent, state.lang)}</span>
+                  </div>
+                  ${(comp.dupeAnalysis.sharedActives || []).length > 0 ? `<div style="font-size:11px; color:var(--ink);"><strong>${escapeHtml(p34.sharedActivesLbl)}:</strong> ${escapeHtml(comp.dupeAnalysis.sharedActives.join(', '))}</div>` : ''}
+                </div>`
+              : ''
+          }
+        </div>
+
+        <!-- FAZ 4: AM / PM Rutin & Kiler Çakışma Rafı -->
+        <div id="routineShelfCard" style="background:var(--surface); border:1.5px solid var(--line); border-radius:20px; padding:13px 14px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <span style="font-size:14px; font-weight:800; color:var(--ink);">${escapeHtml(p34.shelfPanelTitle)}</span>
+            <span class="mono" style="font-size:11px; font-weight:800; padding:2px 8px; border-radius:10px; background:var(--surface2); color:var(--ink);">${formatDigits((state.routineShelf || []).length, state.lang)}</span>
+          </div>
+          ${
+            !state.routineShelf || state.routineShelf.length === 0
+              ? `<span style="font-size:12px; color:var(--muted);">${escapeHtml(p34.shelfEmpty)}</span>`
+              : `
+                ${
+                  state.shelfEval
+                    ? `<div style="border-radius:12px; padding:8px 10px; font-size:12px; font-weight:700; background:${state.shelfEval.summaryColor === 'kirmizi' ? 'var(--bad-bg)' : state.shelfEval.summaryColor === 'sari' ? 'var(--warn-bg)' : 'var(--ok-bg)'}; color:${state.shelfEval.summaryColor === 'kirmizi' ? 'var(--bad)' : state.shelfEval.summaryColor === 'sari' ? 'var(--warn)' : 'var(--ok)'};">
+                         ${escapeHtml(state.shelfEval.summaryText)}
+                       </div>`
+                    : ''
+                }
+                ${
+                  state.shelfEval && [...(state.shelfEval.amConflicts || []), ...(state.shelfEval.pmConflicts || [])].length > 0
+                    ? [...state.shelfEval.amConflicts, ...state.shelfEval.pmConflicts]
+                        .slice(0, 6)
+                        .map((c) => `<div style="background:var(--warn-bg); border:1px solid var(--warn); border-radius:10px; padding:7px 9px; font-size:11.5px;"><strong>[${escapeHtml(c.slot)}] ${escapeHtml(c.productA)} + ${escapeHtml(c.productB)}:</strong> ${escapeHtml(c.title)}</div>`)
+                        .join('')
+                    : ''
+                }
+                ${
+                  state.shelfEval && (state.shelfEval.omnibusAlerts || []).length > 0
+                    ? `<div style="font-size:11.5px; font-weight:800; color:var(--bad);">⏳ ${escapeHtml(p34.omnibusAlertsLbl)}: ${escapeHtml(state.shelfEval.omnibusAlerts.map((o) => `${o.productName} (${o.substance})`).join(', '))}</div>`
+                    : ''
+                }
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                  ${state.routineShelf
+                    .map(
+                      (sh) => `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 9px; border-radius:10px; background:var(--bg); border:1px solid var(--line);">
+                        <span style="font-size:12px; font-weight:700; min-width:0; overflow:hidden; text-overflow:ellipsis;">[${escapeHtml(sh.slot)}] ${escapeHtml(sh.name)}</span>
+                        <button type="button" data-shelf-id="${escapeHtml(sh.id)}" onclick="removeShelfItem(this.getAttribute('data-shelf-id'))" aria-label="Remove" style="min-width:44px; min-height:44px; border:none; background:transparent; color:var(--bad); font-weight:800;">✕</button>
+                      </div>`
+                    )
+                    .join('')}
+                </div>`
           }
         </div>
 
@@ -5239,7 +7133,6 @@
         if (closeBtn) closeBtn.textContent = u.methodologyClose;
         if (xBtn) xBtn.setAttribute('aria-label', u.methodologyClose);
         if (bodyEl && Array.isArray(u.methodologyItems)) {
-          const privLabel = PRIVACY_LINK_I18N[state.lang] || PRIVACY_LINK_I18N.en;
           bodyEl.innerHTML = `
             <div style="display:flex; align-items:center; gap:12px; background:var(--soft); border-radius:12px; padding:10px 12px; font-size:11.5px; color:var(--muted);">
               <img src="./assets/incifact-corporate-seal.jpg" alt="InciFact Corporate Seal" width="54" height="54" style="border-radius:10px; flex:none; border:1px solid rgba(197,160,89,0.4);" />
@@ -5254,9 +7147,6 @@
               </div>`
               )
               .join('')}
-            <div style="padding-top:6px; border-top:1px solid var(--divider); display:flex; align-items:center;">
-              <a href="./privacy.html" target="_blank" rel="noopener noreferrer" style="min-height:44px; display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:12.5px; font-weight:700; text-decoration:underline;">🔒 ${escapeHtml(privLabel)}</a>
-            </div>
           `;
         }
         const privFooterLink = document.getElementById('methodologyPrivacyLink');
@@ -5461,6 +7351,8 @@
       const shareModal = document.getElementById('shareCardModal');
       const methModal = document.getElementById('methodologyModal');
       const regModal = document.getElementById('regReportModal');
+      const dosModal = document.getElementById('ingredientDossierModal');
+      const camModal = document.getElementById('webBarcodeCameraModal');
       const activeModal =
         shareModal && shareModal.style.display === 'flex'
           ? shareModal
@@ -5468,11 +7360,17 @@
           ? methModal
           : regModal && regModal.style.display === 'flex'
           ? regModal
+          : dosModal && dosModal.style.display === 'flex'
+          ? dosModal
+          : camModal && camModal.style.display === 'flex'
+          ? camModal
           : null;
       if (e.key === 'Escape' && activeModal) {
         if (activeModal === shareModal) closeShareCardModal();
         if (activeModal === methModal) closeMethodologyModal();
         if (activeModal === regModal) closeRegulatoryReportModal();
+        if (activeModal === dosModal) closeIngredientDossierModal();
+        if (activeModal === camModal) stopWebBarcodeCamera();
         return;
       }
       if (e.key === 'Tab' && activeModal) {
@@ -5493,6 +7391,14 @@
       }
     });
 
+    const initAuthEl = document.getElementById('halalAuth');
+    if (initAuthEl) {
+      initAuthEl.value =
+        _loadedWebPrefs && _loadedWebPrefs.halalAuthority
+          ? _loadedWebPrefs.halalAuthority
+          : (MARKET_STRUCTURES[state.lang] || MARKET_STRUCTURES.tr).auth;
+    }
+    document.body.classList.toggle('dark', Boolean(state.dark));
     const initLive = document.getElementById('liveInput');
     if (initLive) {
       initLive.value = getSampleText(state.activeSampleIdx, state.lang);
@@ -5517,7 +7423,7 @@
       <div style="padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; gap:12px;">
         <canvas id="shareCardCanvas" width="1080" height="1350" style="width:100%; max-width:320px; height:auto; border-radius:16px; box-shadow:0 12px 28px rgba(11,19,43,0.45); border:1px solid rgba(197,160,89,0.45);"></canvas>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%;">
-          <button id="shareModalDownloadBtn" type="button" onclick="downloadShareCardPng()" style="min-height:44px; border-radius:12px; border:none; background:var(--accent); color:var(--on-accent); font-size:12.5px; font-weight:800; cursor:pointer;">📥 PNG İndir</button>
+          <button id="shareModalDownloadBtn" type="button" onclick="downloadShareCardPng(true)" style="min-height:44px; border-radius:12px; border:none; background:var(--accent); color:var(--on-accent); font-size:12.5px; font-weight:800; cursor:pointer;">📤 Paylaş / PNG İndir</button>
           <button id="shareModalWaBtn" type="button" onclick="shareViaWhatsApp()" style="min-height:44px; border-radius:12px; border:none; background:#145A32; color:#FFFFFF; font-size:12.5px; font-weight:800; cursor:pointer;">📲 WhatsApp</button>
         </div>
         <button id="shareModalCopyBtn" type="button" onclick="copyShareSummaryText(); closeShareCardModal();" style="min-height:44px; width:100%; border-radius:12px; border:1px solid var(--line); background:var(--surface2); color:var(--ink); font-size:12px; font-weight:700; cursor:pointer;">📋 Özet Metni Panoya Kopyala</button>
@@ -5572,6 +7478,31 @@
       <div class="reg-report-modal-actions" style="padding:12px 18px; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:8px;">
         <button id="regReportPrintBtn" type="button" onclick="window.print()" style="background:var(--accent); color:var(--on-accent); border:none; border-radius:12px; min-height:44px; font-weight:800; font-size:12.5px; cursor:pointer;">🖨️ Yazdır / PDF</button>
         <button id="regReportCopyModalBtn" type="button" onclick="copyRegulatoryReportText(); closeRegulatoryReportModal();" style="background:var(--surface2); color:var(--ink); border:1px solid var(--line); border-radius:12px; min-height:44px; font-weight:700; font-size:12px; cursor:pointer;">📋 Raporu Kopyala</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAZ 4: Tıklanabilir Bileşen Dosyası Modalı (INCIDecoder-stili Bilimsel Kart) -->
+  <div id="ingredientDossierModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="ingredientDossierTitle" onclick="if(event.target===this)closeIngredientDossierModal();" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.68); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--surface); border:1.5px solid var(--accent); border-radius:24px; max-width:440px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.45);">
+      <div style="padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
+        <span id="ingredientDossierTitle" style="font-weight:800; font-size:14.5px; color:var(--ink);">🔬 Bileşen Detayı</span>
+        <button id="ingredientDossierCloseBtn" type="button" aria-label="Close" onclick="closeIngredientDossierModal()" style="border:none; background:var(--surface2); min-width:44px; min-height:44px; width:44px; height:44px; border-radius:22px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+      </div>
+      <div id="ingredientDossierBody" style="padding:14px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; color:var(--ink);"></div>
+    </div>
+  </div>
+
+  <!-- FAZ 4: Web/PWA Canlı Kamera Barkod Okuyucu Modalı (BarcodeDetector + getUserMedia) -->
+  <div id="webBarcodeCameraModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="webBarcodeModalTitle" onclick="if(event.target===this)stopWebBarcodeCamera();" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.78); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--surface); border:1.5px solid var(--accent); border-radius:24px; max-width:420px; width:100%; overflow:hidden; display:flex; flex-direction:column;">
+      <div style="padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;">
+        <span id="webBarcodeModalTitle" style="font-weight:800; font-size:14.5px; color:var(--ink);">📷 Canlı Barkod Tarayıcı</span>
+        <button id="webBarcodeCloseBtn" type="button" aria-label="Close" onclick="stopWebBarcodeCamera()" style="border:none; background:var(--surface2); min-width:44px; min-height:44px; width:44px; height:44px; border-radius:22px; font-weight:800; cursor:pointer; color:var(--ink);">✕</button>
+      </div>
+      <div style="padding:14px 18px; display:flex; flex-direction:column; gap:10px; align-items:center;">
+        <video id="webBarcodeVideo" playsinline muted style="width:100%; border-radius:14px; background:#091410; max-height:260px; object-fit:cover;"></video>
+        <div id="webBarcodeCamStatus" style="font-size:12px; color:var(--muted); text-align:center; line-height:1.45;"></div>
       </div>
     </div>
   </div>

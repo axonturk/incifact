@@ -6,10 +6,10 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#F7F4EF",
-  "theme_color": "#0F291E",
+  "background_color": "#F2F0EB",
+  "theme_color": "#006241",
   "lang": "tr",
-  "categories": ["health", "medical", "lifestyle", "shopping"],
+  "categories": ["health", "lifestyle", "shopping"],
   "icons": [
     {
       "src": "./assets/incifact-app-icon-192.png",

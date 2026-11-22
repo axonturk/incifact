@@ -1,5 +1,5 @@
-// Lists unrecognized tokens in every localized ready-made sample of the web simulator (8 products x 10 languages).
-// Run: node tests/localized_samples_coverage.mjs [--strict]   (--strict exits 1 if any sample < 100 % recognised)
+// Lists unrecognized tokens in every localized ready-made sample of the web simulator (8 products x 10 languages = 80 samples).
+// Run: node tests/localized_samples_coverage.mjs [--strict]   (--strict exits 1 if any sample < 100 % recognised or unconfirmed)
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { evaluateProduct } from '../src/engine/ruleEngine.mjs';
@@ -16,20 +16,35 @@ for (; end < html.length; end++) {
 }
 const SAMPLES = vm.runInNewContext('(' + html.slice(i, end + 1) + ')');
 
-let below100 = 0, total = 0;
+let below100Raw = 0, below100Confirmed = 0, total = 0;
 const rows = [];
 SAMPLES.forEach((s, idx) => {
   const texts = s.texts || s.text || s.rawText || s.labels || {};
   for (const [lang, rawText] of Object.entries(texts)) {
     if (typeof rawText !== 'string') continue;
     total++;
-    const r = evaluateProduct({ rawText, lang, productType: s.productType || s.type || 'cosmetic' });
-    const cov = r.cards.regulatoryCard.coveragePercent;
+    const productType = s.productType || s.type || 'cosmetic';
+    const r = evaluateProduct({ rawText, lang, productType });
+    const covRaw = r.cards.regulatoryCard.coveragePercent;
     const unknown = r.observations.filter((o) => o.status === 'unrecognized').map((o) => o.raw);
-    if (cov < 100) below100++;
-    if (unknown.length) rows.push(`#${idx} ${lang} ${cov}% -> ${unknown.join(' | ')}`);
+    if (covRaw < 100) below100Raw++;
+
+    const rConfirmed = evaluateProduct({
+      rawText,
+      lang,
+      productType,
+      userConfirmations: { 'Sodium Laur?l Sulfate': 'sles' }
+    });
+    const covConfirmed = rConfirmed.cards.regulatoryCard.coveragePercent;
+    const unresolvedAfter = rConfirmed.observations
+      .filter((o) => o.status !== 'recognized')
+      .map((o) => `${o.raw}(${o.status})`);
+    if (covConfirmed < 100 || !rConfirmed.cards.regulatoryCard.canShowScore) below100Confirmed++;
+    if (unknown.length || unresolvedAfter.length) {
+      rows.push(`#${idx} ${lang} raw=${covRaw}% confirmed=${covConfirmed}% -> ${[...unknown, ...unresolvedAfter].join(' | ')}`);
+    }
   }
 });
 rows.forEach((r) => console.log(r));
-console.log(`\n${total - below100}/${total} samples at 100 % coverage`);
-if (process.argv.includes('--strict') && rows.length) process.exit(1);
+console.log(`\n${total - below100Raw}/${total} samples at 100 % raw (${total - below100Confirmed}/${total} at 100 % post-OCR-confirm)`);
+if (process.argv.includes('--strict') && (rows.length || below100Confirmed > 0)) process.exit(1);

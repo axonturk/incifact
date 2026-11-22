@@ -3,6 +3,7 @@ import {
   evaluateProduct,
   compareProducts,
   parseIngredientList,
+  extractSmartLabelContext,
   normalizeBarcodeInput,
   lookupBarcodeProduct,
   createCustomBarcodeEntry,
@@ -12,7 +13,7 @@ import {
 import cosingIngredients from '../src/data/generated/cosing_ingredients.mjs';
 
 console.log('======================================================================');
-console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (60 KABUL KRİTERİ)');
+console.log('🧪 ÇAPRAZ-AI DOĞRULAMA KURAL MOTORU TEST PAKETİ (64 KABUL KRİTERİ)');
 console.log('======================================================================\n');
 
 let passed = 0;
@@ -1295,8 +1296,8 @@ runTest('54. Hibrit Barkod Okuyucu: EAN-13 (Arapça/Urduca rakamlar dahil), 10 d
   assert.equal(cerAP.localizedName, 'Seramid AP');
   assert.equal(cerEOP.localizedName, 'Seramid EOP');
 
-  // 3) <%80 kapsamlı gönüllü kaydı (0000000000017) requiresOcrFallback = true dönmeli
-  const lowCov = lookupBarcodeProduct({ barcode: '0000000000017', lang: 'en' });
+  // 3) <%80 kapsamlı gönüllü kaydı (2000000000046) requiresOcrFallback = true dönmeli
+  const lowCov = lookupBarcodeProduct({ barcode: '2000000000046', lang: 'en' });
   assert.equal(lowCov.found, true);
   assert.ok(lowCov.coveragePercent < 80);
   assert.equal(lowCov.requiresOcrFallback, true);
@@ -1482,7 +1483,7 @@ runTest('57. Genişletilmiş Barkod Kataloğu (21 tam kapsamlı ürün + 1 <%80 
       assert.equal(res.valid, true, `Barkod=${code} Dil=${lang} valid=true olmalı`);
       assert.equal(res.found, true, `Barkod=${code} Dil=${lang} found=true olmalı`);
       assert.ok(res.productName && res.productName.length > 2, `Barkod=${code} Dil=${lang} yerelleştirilmiş ad dönmeli`);
-      if (code === '0000000000017') {
+      if (code === '2000000000046') {
         assert.ok(res.coveragePercent < 80);
         assert.equal(res.requiresOcrFallback, true);
       } else {
@@ -1757,6 +1758,347 @@ runTest('60. [P0-2] Triclosan, Triclocarban, Genistein, Daidzein limit/takvim ku
   const annex3 = evaluateProduct({ rawText: 'Aqua, Almondamide DEA', productType: 'cosmetic', lang: 'tr' });
   const f3 = annex3.cards.regulatoryCard.findings.find((f) => f.substanceId === 'cosing_31426');
   assert.ok(f3 && f3.euStatus === 'kisitli' && f3.severity === 'orta' && /Ek III/.test(f3.legalText));
+});
+
+// ============================================================================
+// TEST 61: Gerçek Şişe Fotoğraflarından Tam Etiket OCR Çıkarımı & Analizi
+// ============================================================================
+runTest('61. Gerçek ürün etiketlerinden (Ananas Sirkesi, Crown Cola, Peros Sıvı Sabun) tam şişe OCR ayıklama ve %100 kapsama', () => {
+  // 1) Tahta Kapı Ananas Sirkesi
+  const ananasRaw = [
+    'tahta kapı',
+    'ANANAS SİRKESİ',
+    'Enerji ve Besin Öğeleri',
+    '100g İçin',
+    'Enerji (kJ/kcal) 63 / 15',
+    'Geleneksel fermantasyon yolu ile üretilmiştir. Bu sebeple özellikle kapak açıldıktan sonra tortu oluşabilir.',
+    'İçindekiler:',
+    'Pineapple Fruit (Ananas Meyvesi)',
+    'Triticum, (Bulgur)',
+    'Cicer,(Nohut),',
+    'Turmeric (Zerdeçal),',
+    'Sugar, Aqua.',
+    'İşletme Kayıt No : TR-42-K-028527 ve 04/09/2019',
+    'GÜZELDOST DOĞAL ÜRÜNLER KOZ. LTD. ŞTİ.',
+    '8 683310 222427',
+    'YERLİ ÜRETİM MADE IN TÜRKİYE Vegan'
+  ];
+  const smart1 = extractSmartLabelContext(ananasRaw);
+  assert.equal(smart1.detectedProductType, 'food');
+  assert.equal(smart1.detectedBarcode, '8683310222427');
+  assert.equal(smart1.detectedVeganClaim, 'declared');
+  const eval1 = evaluateProduct({
+    rawText: smart1.ingredientText,
+    productType: smart1.detectedProductType,
+    claims: { veganStatus: smart1.detectedVeganClaim || 'none' },
+    lang: 'tr'
+  });
+  assert.equal(eval1.coveragePercent, 100);
+  assert.equal(eval1.recognizedCount, 6);
+  assert.equal(eval1.totalCount, 6);
+  assert.equal(eval1.cards.regulatoryCard.canShowScore, true);
+  assert.equal(eval1.cards.regulatoryCard.score, 100);
+  assert.ok(eval1.cards.regulatoryReportCard.detectedAllergens.some((a) => a.allergenId === 'gluten'));
+
+  // 2) Crown Cola 2,5 L
+  const colaRaw = [
+    'CROWN COLA. KOLA',
+    'Kafein İçerir.',
+    '2,5 L e',
+    'İçindekiler: Su, Şeker (*S) veya',
+    'Fruktoz-Glukoz Şurubu (*F),',
+    'Karbondioksit, Renklendirici (Amonyum',
+    'Sülfit Karamel), Asitlik Düzenleyici',
+    '(Fosforik Asit), Koruyucu (Sodyum',
+    'Benzoat), Kafein (maks. 150 mg/L),',
+    'Aroma Verici.',
+    '* Kullanılan Şeker veya Fruktoz-Glukoz',
+    'Şurubu ambalaj üzerine kodlanmıştır.',
+    "Alkolsüz İçecekler Tebliği'ne uygundur.",
+    'Gıda İşletmecisi:',
+    'ŞOK Marketler Ticaret A.Ş.',
+    'Della Gıda San. ve Tic. A.Ş. tarafından üretilmiştir.',
+    'Net Miktar: 2,5 L e'
+  ];
+  const smart2 = extractSmartLabelContext(colaRaw);
+  assert.equal(smart2.detectedProductType, 'food');
+  const eval2 = evaluateProduct({
+    rawText: smart2.ingredientText,
+    productType: smart2.detectedProductType,
+    lang: 'tr'
+  });
+  assert.equal(eval2.coveragePercent, 100);
+  assert.equal(eval2.recognizedCount, 9);
+  assert.equal(eval2.totalCount, 9);
+  assert.equal(eval2.cards.regulatoryCard.canShowScore, true);
+  assert.equal(eval2.cards.veganSugarCard.freeSugarCount, 2);
+
+  // 3) Peros Bal & Pamuk Çiçeği Besleyici Sıvı Sabun 3 Kg (multi-language bottle)
+  const perosRaw = [
+    'Peros',
+    'PD 03/06/2025 LOT : 254103000783',
+    'EXD:03/06/2028 23:03',
+    'Bal & Pamuk Çiçeği Besleyici Sıvı Sabun / Honey & Cotton Flower Nourishing Liquid Soap / Savon liquide nourrissant',
+    'TR Kullanma Talimatı: Ellerinizi ıslatıp, uygun miktarda sıvı sabunla köpürtün ve iyice durulayın.',
+    'GB Directions for Use: Wet your hands, lather with an appropriate amount of liquid soap and rinse thoroughly.',
+    'TR Uyarılar: Göz ile temasından kaçının. Göz ile teması halinde, bol su ile durulayın.',
+    'TR İÇİNDEKİLER: Aqua*, Sodium Laureth Sulfate*, Cocoamidopropyl Betaine*, Sodium Chloride*, Cocoyl Methyl Glucamide*, Glycerin*, Parfum, Linalool, Limonene, Hexyl Cinnamal, Amyl Cinnamal, Benzyl Salicylate, Citric Acid*, Methylchloroisothiazolinone, Methylisothiazolinone, Benzophenone-4, Tetrasodium EDTA, Magnesium Nitrate, Magnesium Chloride, CI 14720, CI 19140.',
+    'GB INGREDIENTS: Aqua*, Sodium Laureth Sulfate*, Cocoamidopropyl Betaine*, Sodium Chloride*, Cocoyl Methyl Glucamide*, Glycerin*, Parfum, Linalool, Limonene, Hexyl Cinnamal, Amyl Cinnamal, Benzyl Salicylate, Citric Acid*, Methylchloroisothiazolinone, Methylisothiazolinone, Benzophenone-4, Tetrasodium EDTA, Magnesium Nitrate, Magnesium Chloride, CI 14720, CI 19140.',
+    'DE ZUSAMMENSETZUNG: Wasser, Natriumlaurethsulfat, Cocoamidopropylbetain, Natriumchlorid, Cocoylmethylglucamid, Glycerin',
+    '*Doğal Kaynaklı İçerikten elde edilmiştir. *Naturally derived ingredients.',
+    'Beyaz Kağıt ve Hijyenik Ürünler Tem. İnş. San. Tic. A.Ş.',
+    '8 697713 838901',
+    '3 Kg / 2,94 L e'
+  ];
+  const smart3 = extractSmartLabelContext(perosRaw);
+  assert.equal(smart3.detectedProductType, 'cosmetic');
+  assert.equal(smart3.detectedApplicationType, 'rinse_off');
+  assert.equal(smart3.detectedBarcode, '8697713838901');
+  assert.ok(/^TR\s+İÇİNDEKİLER:/i.test(smart3.ingredientText));
+  const eval3 = evaluateProduct({
+    rawText: smart3.ingredientText,
+    productType: smart3.detectedProductType,
+    applicationType: smart3.detectedApplicationType || undefined,
+    lang: 'tr'
+  });
+  assert.equal(eval3.coveragePercent, 100);
+  assert.equal(eval3.recognizedCount, 21);
+  assert.equal(eval3.totalCount, 21);
+  assert.equal(eval3.cards.regulatoryCard.canShowScore, true);
+  assert.equal(eval3.cards.regulatoryCard.score, 48);
+});
+
+// ============================================================================
+// TEST 62: Yeni Türkiye Ürün Barkodları (8683310222427 & 8697713838901) 10 Dilde
+// ============================================================================
+runTest('62. Yeni ürün barkodları (Ananas Sirkesi & Peros Sıvı Sabun) 10 dilde katalogda eksiksiz dönmeli', () => {
+  const langs = ['tr', 'en', 'ar', 'de', 'fr', 'id', 'ms', 'es', 'ru', 'ur'];
+  for (const lang of langs) {
+    const ananas = lookupBarcodeProduct({ barcode: '8683310222427', lang });
+    assert.equal(ananas.found, true, `8683310222427 found failed for ${lang}`);
+    assert.equal(ananas.requiresOcrFallback, false, `8683310222427 fallback failed for ${lang}`);
+    assert.equal(ananas.coveragePercent, 100, `8683310222427 coverage failed for ${lang}`);
+    assert.equal(ananas.productType, 'food');
+    assert.ok(ananas.evaluation.cards.regulatoryReportCard.detectedAllergens.some((a) => a.allergenId === 'gluten'));
+
+    const peros = lookupBarcodeProduct({ barcode: '8697713838901', lang });
+    assert.equal(peros.found, true, `8697713838901 found failed for ${lang}`);
+    assert.equal(peros.requiresOcrFallback, false, `8697713838901 fallback failed for ${lang}`);
+    assert.equal(peros.coveragePercent, 100, `8697713838901 coverage failed for ${lang}`);
+    assert.equal(peros.productType, 'cosmetic');
+    assert.equal(peros.applicationType, 'rinse_off');
+    assert.equal(peros.evaluation.cards.regulatoryCard.score, 48);
+  }
+});
+
+// ============================================================================
+// TEST 63: 10 Dilde Gerçek Etiket Regresyonları (AS/Piñas, Satır İçi Footer,
+//          Fransız Tire, Almanca Bileşik Alerjen, Arapça SIN/ة, Rusça E-posta, Endonezya BPOM)
+// ============================================================================
+runTest('63. 10 dilde gerçek ambalaj regresyonları (parser, kapsam, helal ve alerjen korumaları)', () => {
+  // 1) ES & EN: 'piñas' / 'pasas' / 'as' SMART_FOOTER_STOP_RE sınırı kesilmemeli, [...] açılmalı, mejillones Hanafi sarı/JAKIM yeşil
+  const esLabel = 'Ingredientes: Cereales (59%) [copos de avena (41%), piñas azucaradas (piñas, azúcar), aceite de girasol], mejillones, Amorphous Silicon Dioxide as anticaking agent.';
+  const esSmart = extractSmartLabelContext(esLabel);
+  assert.ok(esSmart.ingredientText.includes('piñas') && esSmart.ingredientText.includes('anticaking'), `Spanish/as truncation regressed: ${esSmart.ingredientText}`);
+  assert.equal(esSmart.detectedProductType, 'food');
+  const esEvalGimdes = evaluateProduct({ rawText: esSmart.ingredientText, productType: 'food', halalAuthority: 'GIMDES', lang: 'es' });
+  const esEvalJakim = evaluateProduct({ rawText: esSmart.ingredientText, productType: 'food', halalAuthority: 'JAKIM', lang: 'es' });
+  assert.ok(esEvalGimdes.recognizedCount >= 4);
+  assert.equal(esEvalGimdes.cards.halalCard.overallStatus, 'kaynak_belirsiz_musbooh');
+  assert.ok(esEvalGimdes.cards.halalCard.findings.some((f) => f.ruleId === 'shellfish_molluscs_fiqh' && f.status === 'sari'));
+  assert.equal(esEvalJakim.cards.halalCard.overallStatus, 'uygun_gorunuyor');
+  assert.ok(esEvalJakim.cards.halalCard.findings.some((f) => f.ruleId === 'shellfish_molluscs_fiqh' && f.status === 'yesil'));
+
+  // 2) TR: Tek satır inline footer kesimi ve kesilmiş domuz negasyonu yanlış alarm vermemeli
+  const trInline = "İçindekiler: Su, Şeker (*S) veya Fruktoz-Glukoz Şurubu (*F), Karbondioksit, Fosforik Asit. * Kullanılan Şeker ambalaj üzerine kodlanmıştır. Türk Gıda Kodeksi'ne uygundur. Ürünlerimizde DOMUZ YAĞI ve KATKILARI";
+  const trSmart = extractSmartLabelContext(trInline);
+  assert.ok(trSmart.ingredientText.includes('Fosforik Asit') && !trSmart.ingredientText.includes('Türk Gıda Kodeksi'));
+  const trEval = evaluateProduct({ rawText: trSmart.ingredientText, productType: 'food', lang: 'tr' });
+  assert.equal(trEval.recognizedCount, 5);
+  const trPorkNeg = evaluateProduct({ rawText: 'Su, Tuz, Ürünlerimizde DOMUZ YAĞI ve KATKILARI', productType: 'food', lang: 'tr' });
+  assert.notEqual(trPorkNeg.cards.halalCard.overallStatus, 'uygunsuz_bulgu');
+
+  // 3) DE: Amaranth tahılı sahte E123 vermemeli, çok kelimeli tire birleşimi, bileşik alerjenler ve tierisches Lab
+  const deRes = evaluateProduct({
+    rawText: 'Amaranth 6%, Hühnereieigelb, Magermilchpulver, tierisches Lab',
+    productType: 'food',
+    halalAuthority: 'GIMDES',
+    lang: 'de'
+  });
+  assert.ok(!deRes.observations.some((i) => i.substance?.id === 'other_synthetic_food_colors_e123_e155'));
+  assert.ok(deRes.cards.regulatoryReportCard.detectedAllergens.some((a) => a.allergenId === 'egg'));
+  assert.ok(deRes.cards.regulatoryReportCard.detectedAllergens.some((a) => a.allergenId === 'milk'));
+  assert.ok(deRes.cards.halalCard.findings.some((f) => f.ruleId === 'whey_rennet' && f.status === 'sari'));
+  const deCos = evaluateProduct({ rawText: 'Aqua, PEN-\nTYLENE GLYCOL, Glycerin', productType: 'cosmetic', lang: 'de' });
+  assert.equal(deCos.coveragePercent, 100);
+
+  // 4) FR: ' - ' ayracı, parantez içi iki nokta, _œufs_, présure, calvados, lardons
+  const frSmart = extractSmartLabelContext('COMPOSITION\nOignons rissolés (oignons, huile d\'olive, acidifiant : acide citrique) - _œufs_ - présure - calvados - lardons\nA consommer de préférence avant');
+  const frRes = evaluateProduct({ rawText: frSmart.ingredientText, productType: 'food', lang: 'fr' });
+  assert.ok(frRes.cards.regulatoryReportCard.detectedAllergens.some((a) => a.allergenId === 'egg'));
+  assert.equal(frRes.cards.halalCard.overallStatus, 'uygunsuz_bulgu');
+  assert.ok(frRes.cards.halalCard.findings.some((f) => f.status === 'kirmizi'));
+
+  // 5) AR: التركيب başlığı, Ta Marbuta (قشطه / نكهه), SIN(407, 412, 471), أحمر كارمين
+  const arSmart = extractSmartLabelContext('التركيب: حليب كامل الدسم، قشطه، نكهه، أحمر كارمين، SIN(407, 412, 471)\nالقيمة الغذائية');
+  const arRes = evaluateProduct({ rawText: arSmart.ingredientText, productType: 'food', halalAuthority: 'GIMDES', lang: 'ar' });
+  assert.equal(arRes.coveragePercent, 100);
+  assert.ok(arRes.observations.some((i) => i.substance?.id === 'carrageenan_e407'));
+  assert.ok(arRes.cards.halalCard.findings.some((f) => f.ruleId === 'carmine_e120' && f.status === 'kirmizi'));
+
+  // 6) ID: KOMPOSISI MI + (mengandung ...) + BPOM/HALAL footer durdurma
+  const idSmart = extractSmartLabelContext('KOMPOSISI MI: Tepung terigu, saus cabai (mengandung penguat rasa mononatrium glutamat), Pemanis buatan sukralosa, Natrium Benzoat.\nINFORMASI NILAI GIZI\nBPOM RI MD 231509339002\nHALAL INDONESIA ID3131');
+  assert.equal(idSmart.detectedProductType, 'food');
+  assert.ok(!idSmart.ingredientText.includes('BPOM'));
+  const idRes = evaluateProduct({ rawText: idSmart.ingredientText, productType: 'food', lang: 'id' });
+  assert.ok(idRes.recognizedCount >= 4);
+
+  // 7) MS & RU: E452i/C.I. 45100 yanlış OCR uyarısı vermemeli; RU e-posta sonrası Состав продукта + iç içe parantez + şeker
+  const msRes = evaluateProduct({ rawText: 'Ingredient: Aqua, Aluminium Chlo-\nrohydrate, E452i, C.I. 45100', productType: 'cosmetic', lang: 'ms' });
+  assert.equal(msRes.cards.regulatoryCard.canShowScore, true);
+  assert.equal(msRes.coveragePercent, 100);
+  const ruSmart = extractSmartLabelContext('e-mail: sales@altzakroma.ru\nСостав продукта: вода питьевая, сахар белый, соус (регуляторы кислотности (Е260, Е270), Е471), мальтодекстрин из риса\nПищевая ценность:');
+  const ruRes = evaluateProduct({ rawText: ruSmart.ingredientText, productType: 'food', lang: 'ru' });
+  assert.ok(ruRes.recognizedCount >= 5);
+  assert.equal(ruRes.cards.veganSugarCard.freeSugarCount >= 1, true);
+  assert.ok(ruRes.cards.halalCard.findings.some((f) => f.ruleId === 'e471' && f.status === 'sari'));
+});
+
+// 64. Kullanıcı 3 TR Gerçek Şişe/Etiket, 10-Dil Parser Sertleştirmesi & Çoklu Otorite Helal Doğrulaması
+runTest('64. Kullanıcı 3 TR Etiketi, İ\u0307ÇİNDEKİLER, RTL Arapça/Rusça/Alman Parser & Helal Otorite Senkronu', () => {
+  const unrecOf = (r) => (r.observations || []).filter((o) => o.status !== 'recognized').map((o) => o.raw);
+
+  // 1) Kullanıcı TR Fotoğraf 1: Tahta Kapı Ananas Sirkesi (çok satırlı + tek satırlı)
+  const sirkeMulti = `İçindekiler:
+Pineapple Fruit (Ananas Meyvesi)
+Triticum, (Bulgur)
+Cicer,(Nohut),
+Turmeric (Zerdeçal),
+Sugar, Aqua.
+İşletme Kayıt No :
+TR-42-K-028527 ve 04/09/2019
+GÜZELDOST DOĞAL ÜRÜNLER KOZ. LTD. ŞTİ.
+8 683310 222427
+Vegan`;
+  const sirkeInline = 'İçindekiler: Pineapple Fruit (Ananas Meyvesi), Triticum, (Bulgur), Cicer,(Nohut), Turmeric (Zerdeçal), Sugar, Aqua. Vegan 8683310222427';
+  for (const [labelName, txt] of [['multiline', sirkeMulti], ['inline', sirkeInline]]) {
+    const sm = extractSmartLabelContext(txt);
+    assert.equal(sm.detectedProductType, 'food', labelName);
+    assert.equal(sm.detectedBarcode, '8683310222427', labelName);
+    assert.equal(sm.detectedVeganClaim, 'declared', labelName);
+    const ev = evaluateProduct({ rawText: sm.ingredientText, productType: sm.detectedProductType, lang: 'tr', claims: { veganStatus: sm.detectedVeganClaim } });
+    assert.equal(ev.coveragePercent, 100, `${labelName}: ${JSON.stringify(unrecOf(ev))}`);
+    assert.deepEqual(unrecOf(ev), []);
+  }
+
+  // 2) Kullanıcı TR Fotoğraf 2: Crown Cola 2,5 L (çok satırlı + tek satırlı)
+  const colaMulti = `CROWN COLA. KOLA
+Kafein İçerir.
+İçindekiler: Su, Şeker (*S) veya Fruktoz-Glukoz Şurubu (*F), Karbondioksit, Renklendirici (Amonyum Sülfit Karamel), Asitlik Düzenleyici (Fosforik Asit), Koruyucu (Sodyum Benzoat), Kafein (maks. 150 mg/L), Aroma Verici.
+* Kullanılan Şeker veya Fruktoz-Glukoz Şurubu ambalaj üzerine kodlanmıştır.
+Alkolsüz İçecekler Tebliği'ne uygundur.`;
+  const colaInline = 'İçindekiler: Su, Şeker (*S) veya Fruktoz-Glukoz Şurubu (*F), Karbondioksit, Renklendirici (Amonyum Sülfit Karamel), Asitlik Düzenleyici (Fosforik Asit), Koruyucu (Sodyum Benzoat), Kafein (maks. 150 mg/L), Aroma Verici.';
+  for (const txt of [colaMulti, colaInline]) {
+    const sm = extractSmartLabelContext(txt);
+    assert.equal(sm.detectedProductType, 'food');
+    const ev = evaluateProduct({ rawText: sm.ingredientText, productType: 'food', lang: 'tr' });
+    assert.equal(ev.coveragePercent, 100, JSON.stringify(unrecOf(ev)));
+    assert.deepEqual(unrecOf(ev), []);
+  }
+
+  // 3) Kullanıcı TR Fotoğraf 3: Peros Sıvı Sabun 3 Kg (çok satırlı + tek satırlı)
+  const perosMulti = `Bal & Pamuk Çiçeği Besleyici Sıvı Sabun
+Kullanma Talimatı: Ellerinizi ıslatıp köpürtün ve iyice durulayın.
+TR İÇİNDEKİLER: Aqua*, Sodium Laureth Sulfate*, Cocoamidopropyl Betaine*, Sodium Chloride*, Cocoyl Methyl Glucamide*, Glycerin*, Parfum, Linalool, Limonene, Hexyl Cinnamal, Amyl Cinnamal, Benzyl Salicylate, Citric Acid*, Methylchloroisothiazolinone, Methylisothiazolinone, Benzophenone-4, Tetrasodium EDTA, Magnesium Nitrate, Magnesium Chloride, CI 14720, CI 19140.
+*Doğal kaynaklı içerikten elde edilmiştir.
+8 697713 838901`;
+  const perosInline = 'Sıvı Sabun. TR İÇİNDEKİLER: Aqua*, Sodium Laureth Sulfate*, Cocoamidopropyl Betaine*, Sodium Chloride*, Cocoyl Methyl Glucamide*, Glycerin*, Parfum, Linalool, Limonene, Hexyl Cinnamal, Amyl Cinnamal, Benzyl Salicylate, Citric Acid*, Methylchloroisothiazolinone, Methylisothiazolinone, Benzophenone-4, Tetrasodium EDTA, Magnesium Nitrate, Magnesium Chloride, CI 14720, CI 19140. Lather and rinse thoroughly.';
+  for (const [isMulti, txt] of [[true, perosMulti], [false, perosInline]]) {
+    const sm = extractSmartLabelContext(txt);
+    assert.equal(sm.detectedProductType, 'cosmetic');
+    assert.equal(sm.detectedApplicationType, 'rinse_off');
+    if (isMulti) assert.equal(sm.detectedBarcode, '8697713838901');
+    const ev = evaluateProduct({ rawText: sm.ingredientText, productType: 'cosmetic', applicationType: sm.detectedApplicationType, lang: 'tr' });
+    assert.equal(ev.coveragePercent, 100, JSON.stringify(unrecOf(ev)));
+    assert.deepEqual(unrecOf(ev), []);
+  }
+
+  // 4) Decomposed İ\u0307ÇİNDEKİLER ve çapraz bulaş / işleme cümlelerinin depth-0 temizliği
+  const decompEv = evaluateProduct({
+    rawText: 'I\u0307C\u0327I\u0307NDEKI\u0307LER: Su, Şeker, Süt. Eser miktarda fındık içerebilir. Laktoz içerir.',
+    productType: 'food',
+    lang: 'tr'
+  });
+  assert.equal(decompEv.coveragePercent, 100, JSON.stringify(unrecOf(decompEv)));
+  assert.equal(decompEv.recognizedCount, 3);
+
+  const frHppEv = evaluateProduct({
+    rawText: "INGREDIENT : jus d'orange 100%. Pur jus stabilisé à froid par haute pression. Peut contenir des traces de lait.",
+    productType: 'food',
+    lang: 'fr'
+  });
+  assert.equal(frHppEv.coveragePercent, 100, JSON.stringify(unrecOf(frHppEv)));
+  assert.equal(frHppEv.recognizedCount, 1);
+
+  const deCrossEv = evaluateProduct({
+    rawText: 'Zutaten: Wasser, Zucker. Kann Spuren von Schalenfrüchten enthalten.',
+    productType: 'food',
+    lang: 'de'
+  });
+  assert.equal(deCrossEv.coveragePercent, 100, JSON.stringify(unrecOf(deCrossEv)));
+  assert.equal(deCrossEv.recognizedCount, 2);
+
+  // 5) Arapça RTL ters parantezler, (407,412)SIN, 290 SIN, (ط ح ص), م ت (ج) ve فيتامينات A، D، E
+  const arComplex = evaluateProduct({
+    rawText: 'محتويات: زيت النخيل )أولين(، أملاح مستحلبة )407، 412(SIN، 290 SIN (ط ح ص)، كاراجينان م ت (ج)، محافظ (حمض الاسيتيك م ت ج، اسيتات الصوديوم م ت ج)، فيتامينات A، D، E.',
+    productType: 'food',
+    lang: 'ar'
+  });
+  assert.equal(arComplex.coveragePercent, 100, JSON.stringify(unrecOf(arComplex)));
+  assert.ok(arComplex.recognizedCount >= 8);
+
+  // 6) mikrobielles Lab (4 otorite yeşil) + vinagre de alcohol (istihale sirke yeşil)
+  for (const auth of ['GIMDES', 'JAKIM', 'MUI', 'IFANCA']) {
+    const rennetEv = evaluateProduct({ rawText: 'Zutaten: Milch, Salz, mikrobielles Lab', productType: 'food', halalAuthority: auth, lang: 'de' });
+    assert.equal(rennetEv.coveragePercent, 100);
+    assert.equal(rennetEv.cards.halalCard.overallStatus, 'uygun_gorunuyor', `mikrobielles Lab ${auth}`);
+  }
+  const vinegEv = evaluateProduct({ rawText: 'Ingredientes: agua, vinagre de alcohol, sal', productType: 'food', halalAuthority: 'GIMDES', lang: 'es' });
+  assert.equal(vinegEv.coveragePercent, 100);
+  assert.equal(vinegEv.cards.halalCard.overallStatus, 'uygun_gorunuyor');
+
+  // 7) Almanca inline Enthält + OTNE + Benzisothiazolinone + askılı tire Soja-, Sonnenblumenlecithin
+  const deOtne = evaluateProduct({
+    rawText: 'Formulierung enthält: Citronellol, Tetramethyl acetyloctahydronaphthalenes\nEnthält Benzisothiazolinone.',
+    productType: 'cosmetic',
+    lang: 'de'
+  });
+  assert.equal(deOtne.coveragePercent, 100, JSON.stringify(unrecOf(deOtne)));
+  assert.ok(deOtne.observations.some((o) => o.substance?.id === 'fragrance_allergen_otne' && o.substance?.eu_status === 'kisitli'));
+  assert.ok(deOtne.observations.some((o) => o.substance?.id === 'benzisothiazolinone' && o.substance?.eu_status === 'kisitli'));
+
+  const deLec = evaluateProduct({ rawText: 'Zutaten: Soja-, Sonnenblumenlecithin', productType: 'food', lang: 'de' });
+  assert.equal(deLec.coveragePercent, 100);
+  assert.equal(deLec.recognizedCount, 2);
+
+  // 8) Noktalı C.I. 45100, CI. No. 15985, INS 331 (iii), Rusça fonksiyonel tire, kahve (5%), (and) & açık '(' kurtarma
+  const mixedEv = evaluateProduct({
+    rawText: 'INGREDIENTS: Aqua (and) Sodium Laureth Sulfate, C.I. 45100, CI. No. 15985',
+    productType: 'cosmetic',
+    lang: 'en'
+  });
+  assert.equal(mixedEv.coveragePercent, 100, JSON.stringify(unrecOf(mixedEv)));
+  assert.equal(mixedEv.recognizedCount, 4);
+
+  const insEv = evaluateProduct({ rawText: 'Ingredients: soluble coffee, roast and ground coffee (5%). INS 331 (iii', productType: 'food', lang: 'en' });
+  assert.equal(insEv.coveragePercent, 100, JSON.stringify(unrecOf(insEv)));
+
+  const ruEv = evaluateProduct({ rawText: 'Состав: вода, регулятор кислотности – лимонная кислота.', productType: 'food', lang: 'ru' });
+  assert.equal(ruEv.coveragePercent, 100, JSON.stringify(unrecOf(ruEv)));
+  assert.equal(ruEv.recognizedCount, 2);
+
+  const unclosedParenEv = evaluateProduct({ rawText: 'Aqua, Parfum (Linalool, Limonene', productType: 'cosmetic', lang: 'en' });
+  assert.equal(unclosedParenEv.coveragePercent, 100, JSON.stringify(unrecOf(unclosedParenEv)));
 });
 
 console.log(`\n🎉 TÜM TESTLER TAMAMLANDI: ${passed}/${total} KABUL KRİTERİ %100 BAŞARIYLA GEÇTİ!`);

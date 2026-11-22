@@ -168,7 +168,11 @@
         "виски",
         "водка",
         "ром",
-        "ликёр"
+        "ликёр",
+        "calvados",
+        "calvados busnel",
+        "vino dulce aromatizado",
+        "vino dulce"
       ],
       "codes": [],
       "category": "A_haram",
@@ -250,8 +254,12 @@
         "sığır jelatini",
         "gelatin sapi",
         "gelatin lembu",
-        "fish gelatin",
-        "balık jelatini"
+        "speisegelatine",
+        "speisegelatine (rind)",
+        "rindergelatine",
+        "gelatine (rind)",
+        "gélatine bovine",
+        "gélatine de boeuf"
       ],
       "codes": [],
       "category": "C_musbooh",
@@ -269,6 +277,37 @@
       "source_id": "OIC_SMIIC_1",
       "verification": "model_bilgisi",
       "template_tr": "Jelatin sığır, balık veya domuz kaynaklı olabilir; etikette kaynak türü belirtilmemiş. Değerlendirme için helal sertifikası veya üretici beyanı gerekir. (Not: AB 1333/2008'de jelatin katkı maddesi değildir, E441 resmi bir E-kodu değildir)."
+    },
+    {
+      "id": "fish_gelatin_halal",
+      "canonical": "Fish Gelatin (Helal — Marine Source)",
+      "aliases": [
+        "fish gelatin",
+        "balık jelatini",
+        "fischgelatine",
+        "gélatine de poisson",
+        "gelatina de pescado",
+        "gelatin ikan",
+        "рыбный желатин",
+        "جيلاتين سمكي",
+        "مچھلی کا جیلیٹن"
+      ],
+      "codes": [],
+      "category": "H_helal",
+      "vegan_compatible": false,
+      "vegetarian_compatible": false,
+      "vegan_claim_resolves": false,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "yesil",
+        "GIMDES": "yesil",
+        "JAKIM": "yesil",
+        "MUI": "yesil",
+        "IFANCA": "yesil"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "ikincil_kontrol",
+      "template_tr": "Balık jelatini deniz ürünü kaynaklı olup dört mezhep ve helal otoritelerinin tamamında helaldir (ancak balık türevli olduğu için Vegan/Vejetaryen değildir)."
     },
     {
       "id": "e471",
@@ -315,7 +354,8 @@
         "e472f",
         "datem",
         "polyglycerol polyricinoleate",
-        "pgpr"
+        "pgpr",
+        "milchsäureester von mono- und diglyceriden von speisefettsäuren"
       ],
       "codes": [
         "E472A",
@@ -423,10 +463,16 @@
         "l-cisteína",
         "l-sisteina",
         "л-цистеин",
-        "إل-سيستين"
+        "إل-سيستين",
+        "l-cystine",
+        "l-sistina",
+        "л-цистин",
+        "e921",
+        "e 921"
       ],
       "codes": [
-        "E920"
+        "E920",
+        "E921"
       ],
       "category": "C_musbooh",
       "vegan_compatible": true,
@@ -500,7 +546,22 @@
         "молочная сыворотка",
         "сычужный фермент",
         "مصل اللبن",
-        "منفحة"
+        "منفحة",
+        "مصل الحليب",
+        "مسحوق مصل اللبن",
+        "tierisches lab",
+        "présure",
+        "suero de leche en polvo",
+        "сыворотка молочная",
+        "بودرة شرش الحليب الحلو",
+        "sweet whey powder",
+        "شرش الحليب",
+        "süßmolkenpulver",
+        "süssmolkenpulver",
+        "molkenpulver",
+        "lactosérum en poudre",
+        "lactosuero en polvo",
+        "lactosuero"
       ],
       "codes": [],
       "category": "C_musbooh",
@@ -560,7 +621,10 @@
         "кармин",
         "كارمين",
         "قرمز",
-        "کارمائن"
+        "کارمائن",
+        "أحمر كارمين",
+        "carmine red",
+        "rouge carmin"
       ],
       "codes": [
         "E120",
@@ -580,7 +644,10 @@
       },
       "source_id": "JAKIM_MKI_2012",
       "verification": "ikincil_kontrol",
-      "template_tr": "Karmin (E120 / CI 75470), Dactylopius coccus böceğinden elde edilen karminik asit boyasıdır (böcek kanı değildir). Helal hükmü kurumlara göre değişir: GİMDES ve IFANCA uygunsuz (Kırmızı) sayarken, Endonezya MUI (33/2011) ve Malezya JAKIM/MKI (2012) helal kabul eder. Vegan değildir."
+      "template_tr": "Karmin (E120 / CI 75470), Dactylopius coccus böceğinden elde edilen karminik asit boyasıdır (böcek kanı değildir). Helal hükmü kurumlara göre değişir: GİMDES ve IFANCA uygunsuz (Kırmızı) sayarken, Endonezya MUI (33/2011) ve Malezya JAKIM/MKI (2012) helal kabul eder. Vegan değildir.",
+      "secondary_source_ids": [
+        "MUI_33_2011"
+      ]
     },
     {
       "id": "shellac_e904",
@@ -647,7 +714,13 @@
         "lecitina (soja)",
         "лецитин (соевый)",
         "لیسیتھین",
-        "لیسیتھین (سویا)"
+        "لیسیتھین (سویا)",
+        "ليسيتين الصويا",
+        "ليسيثين الصوجا",
+        "ليسيتين الصوجا",
+        "rapslecithin",
+        "sonnenblumenlecithine",
+        "sunflower lecithins"
       ],
       "codes": [
         "E322"
@@ -701,7 +774,10 @@
         "mel",
         "royal jelly",
         "arı sütü",
-        "cera flava"
+        "cera flava",
+        "عسل نحل طبيعي",
+        "natural bee honey",
+        "acacia honey"
       ],
       "codes": [
         "E901"
@@ -863,7 +939,12 @@
         "سیٹائل الکوحل",
         "سٹیریل الکوحل",
         "فینوکسی ایتھنول",
-        "بینزائل الکوحل"
+        "بینزائل الکوحل",
+        "sorbit",
+        "acetato de tocoferol",
+        "alfatokoferol",
+        "alfa tokoferol",
+        "d-alfa tokoferol"
       ],
       "codes": [
         "E420",
@@ -903,7 +984,12 @@
         "disodyum 5-ribonükleotidler",
         "ribonükleotidler",
         "инозинат натрия",
-        "إينوزينات ثنائي الصوديوم"
+        "إينوزينات ثنائي الصوديوم",
+        "dinatrium inosinat-guanilat",
+        "dinatrium 5'-guanilat",
+        "dinatrium 5'-inosinat",
+        "dinatrium guanilat",
+        "dinatrium inosinat"
       ],
       "codes": [
         "E627",
@@ -947,7 +1033,9 @@
         "sorbitan monolaurate",
         "sorbitan palmitate",
         "полисорбат 80",
-        "بوليسوربات 80"
+        "بوليسوربات 80",
+        "sorbitan monostearate",
+        "e491"
       ],
       "codes": [
         "E432",
@@ -1032,7 +1120,55 @@
         "ароматизатор",
         "نكهة",
         "نكهات",
-        "نكهة طبيعية"
+        "نكهة طبيعية",
+        "perisa sintetik",
+        "aromatizantes",
+        "saborizantes",
+        "aromes naturels",
+        "منكهات",
+        "معطر",
+        "عطر اصطناعي",
+        "نكهة مطابقة للطبيعي",
+        "نكهات مماثلة للنكهات الطبيعية",
+        "عطر مماثل للطبيعي",
+        "نكهة صناعية",
+        "مكسب طعم الجبنة",
+        "نكهة الشواء",
+        "cheese flavor",
+        "barbecue flavor",
+        "honey bbq sauce flavor",
+        "nature-identical flavors",
+        "artificial flavours",
+        "arôme",
+        "arôme barbecue",
+        "aroma vanillin",
+        "arôme naturel de cerise",
+        "arôme naturel de fraise",
+        "arôme naturel de cassis",
+        "arôme naturel de cerise avec d'autres arômes naturels",
+        "arôme naturel de fraise avec d'autres arômes naturels",
+        "arôme naturel de cassis avec d'autres arômes naturels",
+        "aroma natural",
+        "aroma natural de ajo",
+        "aromas",
+        "perisa identik alami",
+        "perisa artifisial",
+        "perisa identik alami cokelat",
+        "perisa artifisial vanilla",
+        "perisa sintetik apel",
+        "perisa sintetik vanilla",
+        "perisa sintetik vanila",
+        "perisa artifisial ayam",
+        "perisa alami bawang putih",
+        "lychee flavor",
+        "perisa laici",
+        "fruit flavour",
+        "fruit flavor",
+        "artificial cheese flavor powder",
+        "artificial chicken flavor powder",
+        "green tea flavor oil",
+        "пищевой ароматизатор",
+        "пищевой ароматизатор «клубника»"
       ],
       "codes": [],
       "category": "C_musbooh",
@@ -1114,21 +1250,43 @@
       "canonical": "Digestive & Cheese Enzymes (Pepsin / Lipase / Pancreatin / Trypsin)",
       "aliases": [
         "pepsin",
-        "lipase",
-        "lipaz",
         "pancreatin",
         "pankreatin",
         "trypsin",
         "tripsin",
         "animal enzyme",
         "пепсин",
-        "липаза",
-        "بيبسين",
-        "ليباز"
+        "بيبسين"
       ],
       "codes": [],
       "category": "C_musbooh",
       "vegan_compatible": false,
+      "vegetarian_compatible": true,
+      "vegan_claim_resolves": false,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "sari",
+        "GIMDES": "sari",
+        "JAKIM": "sari",
+        "MUI": "sari",
+        "IFANCA": "sari"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "ikincil_kontrol",
+      "template_tr": "Pepsin ve lipaz gibi enzimler mikrobiyal kaynaklı olabileceği gibi domuz veya sığır midesinden/pankreasından da elde edilebilir. Helal veya Vegan sertifikası aranmalıdır."
+    },
+    {
+      "id": "microbial_or_animal_lipase",
+      "canonical": "Lipase Enzyme (Microbial or Animal Origin)",
+      "aliases": [
+        "lipase",
+        "lipaz",
+        "липаза",
+        "ليباز"
+      ],
+      "codes": [],
+      "category": "C_musbooh",
+      "vegan_compatible": true,
       "vegetarian_compatible": true,
       "vegan_claim_resolves": true,
       "halal_claim_conflict": false,
@@ -1141,7 +1299,7 @@
       },
       "source_id": "OIC_SMIIC_1",
       "verification": "ikincil_kontrol",
-      "template_tr": "Pepsin ve lipaz gibi enzimler mikrobiyal kaynaklı olabileceği gibi domuz veya sığır midesinden/pankreasından da elde edilebilir. Helal veya Vegan sertifikası aranmalıdır."
+      "template_tr": "Lipaz enzimi mikrobiyel/bitkisel veya hayvansal (domuz/sığır pankreası) kaynaklı olabilir; doğrulanmış Vegan veya Helal sertifikası ile kaynak netleştirilmelidir."
     },
     {
       "id": "edible_bone_phosphate_e542",
@@ -1183,7 +1341,10 @@
         "potassium lardate",
         "vetчина",
         "бекон",
-        "لحم خنزير مقدد"
+        "لحم خنزير مقدد",
+        "lardons",
+        "lardons cuits fumés",
+        "lardons fumés"
       ],
       "codes": [],
       "category": "A_haram",
@@ -1246,7 +1407,21 @@
         "dana yağı",
         "tavuk yağı",
         "tavuk eti tozu",
-        "gelatin crosspolymer"
+        "gelatin crosspolymer",
+        "yenilebilir sığır jelatini",
+        "мясо говядины сушеное",
+        "мясо курицы сушеное",
+        "животных жиров",
+        "hydrolyzed bovine collagen",
+        "bovine collagen peptides",
+        "hidrolize sığır kolajeni",
+        "لحم الدجاج",
+        "لحم الدواجن",
+        "viande de volaille",
+        "chicken breast",
+        "chicken breast meat",
+        "chicken boneless thigh with skin",
+        "hähnchenfleisch"
       ],
       "codes": [],
       "category": "C_musbooh",
@@ -1300,9 +1475,6 @@
         "krema",
         "yogurt",
         "yoğurt",
-        "cheese powder",
-        "peynir tozu",
-        "peynir",
         "casein",
         "sodium caseinate",
         "kazein",
@@ -1316,7 +1488,68 @@
         "albumin",
         "egg albumen",
         "lysozyme",
-        "lizozim"
+        "lizozim",
+        "padatan susu",
+        "skim milk powder",
+        "susu tepung skim",
+        "pepejal susu",
+        "protein susu",
+        "яичный порошок",
+        "сухое цельное молоко",
+        "butter milk powder",
+        "low fat cow's milk",
+        "natrium kaseinat",
+        "قشدة",
+        "مسحوق اللبن",
+        "مادة دهنية حليبية",
+        "بروتينات الحليب",
+        "حليب كامل مجفف",
+        "حليب خالي من الدسم مشكل",
+        "حليب كامل طازج مقوى",
+        "حليب جاف",
+        "خمائر لبنية لليوغرت",
+        "milk solids non-fat",
+        "vollmilchpulver",
+        "vollmilch",
+        "magermilch",
+        "kuhmilch",
+        "milch",
+        "milchzucker",
+        "laktose",
+        "milchproteine",
+        "butterreinfett",
+        "sahne",
+        "vollei",
+        "eigelb",
+        "lait",
+        "lait entier",
+        "lait de vache",
+        "lait bio de vache",
+        "crème",
+        "protéines de lait",
+        "leche",
+        "huevo",
+        "huevos",
+        "yema de huevo",
+        "clara de huevo",
+        "ovo pasteurizado",
+        "proteína de leche",
+        "telur",
+        "telur kering",
+        "susu skim bubuk",
+        "milk derivatives",
+        "milk solids non fat",
+        "pepejal susu tanpa lemak",
+        "lemak susu",
+        "cream extract",
+        "ekstrak krim",
+        "яичный белок",
+        "нормализованное молоко",
+        "цельное молоко",
+        "обезжиренное молоко",
+        "tam yağlı süttozu",
+        "yarım yağlı inek sütü",
+        "dried egg yolk"
       ],
       "codes": [
         "E1105"
@@ -1338,6 +1571,44 @@
       "template_tr": "Süt ürünleri (süt tozu, laktoz, tereyağı, kazein) ve yumurta İslami açıdan helaldir (peynir altı suyu/enzim hariç); ancak hayvansal kaynaklı olduğu için Vegan değildir."
     },
     {
+      "id": "cheese_rennet_unspecified",
+      "canonical": "Cheese / Cheese Powder (Rennet Source Unspecified)",
+      "aliases": [
+        "cheese powder",
+        "peynir tozu",
+        "peynir",
+        "cheese",
+        "cheddar cheese",
+        "frischkäse",
+        "serbuk keju",
+        "mozzarella cheese powder",
+        "جبن",
+        "أجبان",
+        "جبن شيدار",
+        "queso",
+        "fromage",
+        "käse",
+        "сыр",
+        "keju"
+      ],
+      "codes": [],
+      "category": "C_musbooh",
+      "vegan_compatible": false,
+      "vegetarian_compatible": true,
+      "vegan_claim_resolves": false,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "sari",
+        "GIMDES": "sari",
+        "JAKIM": "sari",
+        "MUI": "sari",
+        "IFANCA": "sari"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "ikincil_kontrol",
+      "template_tr": "Peynir ve peynir tozu üretiminde hayvansal şirden (rennet) veya mikrobiyel peynir mayası kullanılabilir; etikette maya kaynağı belirtilmediği için şüpheli (meşbuh) değerlendirilir, helal sertifikası veya mikrobiyel maya beyanı aranmalıdır."
+    },
+    {
       "id": "cholesterol_lipid",
       "canonical": "Cholesterol (Animal Lipid)",
       "aliases": [
@@ -1351,7 +1622,7 @@
       "category": "C_musbooh",
       "vegan_compatible": false,
       "vegetarian_compatible": true,
-      "vegan_claim_resolves": true,
+      "vegan_claim_resolves": false,
       "halal_claim_conflict": false,
       "authority_rulings": {
         "general_cautious": "sari",
@@ -1363,6 +1634,282 @@
       "source_id": "OIC_SMIIC_1",
       "verification": "model_bilgisi",
       "template_tr": "Kolesterol hayvansal lipidlerden veya lanolinden elde edilir. Hayvansal kökenli olduğu için Vegan değildir; helallik durumu kaynağın İslami usule uygunluğuna bağlıdır."
+    },
+    {
+      "id": "shellfish_molluscs_fiqh",
+      "canonical": "Shellfish, Crustaceans & Molluscs (Shrimp, Crab, Lobster, Mussels, Squid, Chitosan)",
+      "aliases": [
+        "mussels",
+        "mussel",
+        "mejillones",
+        "moules",
+        "midye",
+        "oysters",
+        "istiridye",
+        "clams",
+        "scallops",
+        "kalamar",
+        "squid",
+        "shrimp",
+        "prawn",
+        "prawns",
+        "crab",
+        "lobster",
+        "crayfish",
+        "krill",
+        "karides",
+        "yengeç",
+        "ıstakoz",
+        "crevette",
+        "garnele",
+        "gamba",
+        "gambas",
+        "креветки",
+        "جمبري",
+        "روبيان",
+        "udang",
+        "ketam",
+        "chitosan",
+        "kitosan",
+        "хитозан"
+      ],
+      "codes": [],
+      "category": "D_tartismali",
+      "vegan_compatible": false,
+      "vegetarian_compatible": false,
+      "vegan_claim_resolves": false,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "sari",
+        "GIMDES": "sari",
+        "JAKIM": "yesil",
+        "MUI": "yesil",
+        "IFANCA": "yesil"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "ikincil_kontrol",
+      "template_tr": "Kabuklu deniz ürünleri / yumuşakçalar (midye, istiridye, kalamar vb.) Şafii/Maliki/Hanbeli mezheplerinde helal, Hanefi mezhebinde ise balık dışındaki su ürünleri mekruh/caiz görülmediğinden ihtilaflıdır."
+    },
+    {
+      "id": "microbial_rennet",
+      "canonical": "Microbial Rennet (Fermentation / Non-Animal)",
+      "aliases": [
+        "mikrobielles lab",
+        "mikrobiellen lab",
+        "microbial rennet",
+        "mikrobiyel maya",
+        "mikrobiyel peynir mayası",
+        "présure microbienne",
+        "cuajo microbiano"
+      ],
+      "codes": [],
+      "category": "H_helal",
+      "vegan_compatible": true,
+      "vegetarian_compatible": true,
+      "vegan_claim_resolves": true,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "yesil",
+        "GIMDES": "yesil",
+        "JAKIM": "yesil",
+        "MUI": "yesil",
+        "IFANCA": "yesil"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "ikincil_kontrol",
+      "template_tr": "Mikrobiyel / fermantasyon kaynaklı peynir mayası hayvansal şirden içermez; tüm otoritelerde uygundur."
+    },
+    {
+      "id": "wine_balsamic_vinegar_takhallul",
+      "canonical": "Wine Vinegar & Balsamic Vinegar (Takhallul Jurisprudence)",
+      "aliases": [
+        "wine vinegar",
+        "red wine vinegar",
+        "white wine vinegar",
+        "balsamic vinegar",
+        "sherry vinegar",
+        "champagne vinegar",
+        "şarap sirkesi",
+        "kırmızı şarap sirkesi",
+        "beyaz şarap sirkesi",
+        "balzamik sirke",
+        "weinessig",
+        "vinaigre de vin",
+        "خل النبيذ",
+        "خل العنب"
+      ],
+      "codes": [],
+      "category": "D_tartismali",
+      "vegan_compatible": true,
+      "vegetarian_compatible": true,
+      "vegan_claim_resolves": false,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "sari",
+        "GIMDES": "kirmizi",
+        "JAKIM": "sari",
+        "MUI": "sari",
+        "IFANCA": "yesil"
+      },
+      "source_id": "GIMDES_STD",
+      "verification": "birincil_kaynak",
+      "template_tr": "Şarap/balzamik sirkesi tahallül (alkolün asetik aside dönüşümü) tartışmalı bir başlığıdır: GİMDES şarap kökenli ve kalıntı alkol riski nedeniyle uygunsuz (Kırmızı), Şafii/Hanbeli fıkhı insan müdahaleli tahallülü mahzurlu, Hanefi/Maliki ve IFANCA tam sirkeleşme şartıyla izinli veya koşullu görür."
+    },
+    {
+      "id": "blood_plasma_haram",
+      "canonical": "Animal Blood Plasma / Hemoglobin (E-Free / Binding)",
+      "aliases": [
+        "blood plasma",
+        "plasma protein",
+        "dried blood",
+        "hemoglobin",
+        "haemoglobin",
+        "fibrinogen",
+        "thrombin",
+        "kan plazması",
+        "blutplasma",
+        "plasma sanguin"
+      ],
+      "codes": [],
+      "category": "A_haram",
+      "vegan_compatible": false,
+      "vegetarian_compatible": false,
+      "vegan_claim_resolves": false,
+      "halal_claim_conflict": true,
+      "authority_rulings": {
+        "general_cautious": "kirmizi",
+        "GIMDES": "kirmizi",
+        "JAKIM": "kirmizi",
+        "MUI": "kirmizi",
+        "IFANCA": "kirmizi"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "birincil_kaynak",
+      "template_tr": "Hayvansal akıcı kan / kan plazması (Hemoglobin/Fibrinojen) tüm İslam fıkıh mezhepleri ve helal kurumlarınca KESİN HARAM (Kırmızı) ve Vegan/Vejetaryen dışıdır."
+    },
+    {
+      "id": "insect_novel_food_flours",
+      "canonical": "Edible Insect Proteins & Novel Food Flours (Acheta / Tenebrio)",
+      "aliases": [
+        "acheta domesticus",
+        "tenebrio molitor",
+        "locusta migratoria",
+        "alphitobius diaperinus",
+        "cricket flour",
+        "cricket powder",
+        "house cricket",
+        "yellow mealworm",
+        "migratory locust",
+        "çekirge unu",
+        "cırcır böceği unu",
+        "insektenmehl",
+        "farine de grillon"
+      ],
+      "codes": [],
+      "category": "D_tartismali",
+      "vegan_compatible": false,
+      "vegetarian_compatible": false,
+      "vegan_claim_resolves": false,
+      "halal_claim_conflict": true,
+      "authority_rulings": {
+        "general_cautious": "kirmizi",
+        "GIMDES": "kirmizi",
+        "JAKIM": "kirmizi",
+        "MUI": "kirmizi",
+        "IFANCA": "sari"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "birincil_kaynak",
+      "template_tr": "Yenilebilir böcek unu / proteini (Acheta domesticus, Tenebrio molitor): Çekirge (Locusta migratoria) hariç böcekler Hanefi, Şafii ve Hanbeli mezheplerince haram/habis sayılır; GİMDES, JAKIM ve MUI böcek türevlerini Kırmızı değerlendirir."
+    },
+    {
+      "id": "vitamin_d3_cholecalciferol",
+      "canonical": "Vitamin D3 (Cholecalciferol — Sheep Wool Lanolin vs Lichen)",
+      "aliases": [
+        "cholecalciferol",
+        "vitamin d3",
+        "vitamina d3",
+        "vitamine d3",
+        "d3 vitamini",
+        "kolekalsiferol"
+      ],
+      "codes": [],
+      "category": "C_musbooh",
+      "vegan_compatible": true,
+      "vegetarian_compatible": true,
+      "vegan_claim_resolves": true,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "sari",
+        "GIMDES": "sari",
+        "JAKIM": "sari",
+        "MUI": "sari",
+        "IFANCA": "sari"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "ikincil_kontrol",
+      "template_tr": "D3 Vitamini (Kolekalsiferol) çoğunlukla koyun yünü lanolininden (veya balık yağından), daha nadiren bitkisel likenden (lichen) üretilir. Vegan sertifikası yoksa kaynak doğrulaması gerekir."
+    },
+    {
+      "id": "e1518_e640_musbooh",
+      "canonical": "Triacetin (E1518) / Glycine (E640) — Animal vs Synthetic/Plant Check",
+      "aliases": [
+        "e1518",
+        "e 1518",
+        "triacetin",
+        "glyceryl triacetate",
+        "e640",
+        "e 640",
+        "glycine",
+        "glisin"
+      ],
+      "codes": [
+        "E1518",
+        "E640"
+      ],
+      "category": "C_musbooh",
+      "vegan_compatible": true,
+      "vegetarian_compatible": true,
+      "vegan_claim_resolves": true,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "sari",
+        "GIMDES": "sari",
+        "JAKIM": "sari",
+        "MUI": "sari",
+        "IFANCA": "sari"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "ikincil_kontrol",
+      "template_tr": "Triasetin (E1518) gliserin türevidir; Glisin (E640) sentetik veya hayvansal jelatin hidrolizatı olabilir. Bitkisel/Vegan ibaresi veya Helal sertifikası doğrulanmalıdır."
+    },
+    {
+      "id": "hydrolyzed_silk_allantoin",
+      "canonical": "Hydrolyzed Silk / Sericin & Allantoin Source Check",
+      "aliases": [
+        "hydrolyzed silk",
+        "sericin",
+        "silk amino acids",
+        "silk powder",
+        "allantoin",
+        "alantoin"
+      ],
+      "codes": [],
+      "category": "C_musbooh",
+      "vegan_compatible": true,
+      "vegetarian_compatible": true,
+      "vegan_claim_resolves": true,
+      "halal_claim_conflict": false,
+      "authority_rulings": {
+        "general_cautious": "sari",
+        "GIMDES": "sari",
+        "JAKIM": "sari",
+        "MUI": "sari",
+        "IFANCA": "sari"
+      },
+      "source_id": "OIC_SMIIC_1",
+      "verification": "ikincil_kontrol",
+      "template_tr": "Hidrolize ipek / Serisin ipek böceğinden; Allantoin günümüzde ağırlıklı sentetik üre/glikoksilik asitten üretilse de hayvansal üre/karakafes kökeni açısından Vegan/Helal beyanı teyit edilmelidir."
     }
   ]
 }

@@ -40,7 +40,7 @@ export const SUPPORTED_LANGUAGES = [
     nativeName: 'العربية',
     flag: '🇸🇦',
     dir: 'rtl',
-    defaultAuthority: 'general_cautious',
+    defaultAuthority: 'IFANCA',
     primaryMarkets: ['Saudi Arabia (KSA)', 'UAE', 'Qatar', 'Kuwait', 'Egypt'],
     marketRationale: 'Kişi başı en yüksek helal kozmetik ve gıda harcaması; Körfez (GCC) iOS payı >%65 ve en yüksek ödeme istekliliği.'
   },
@@ -60,7 +60,7 @@ export const SUPPORTED_LANGUAGES = [
     nativeName: 'Français',
     flag: '🇫🇷',
     dir: 'ltr',
-    defaultAuthority: 'general_cautious',
+    defaultAuthority: 'IFANCA',
     primaryMarkets: ['France', 'Belgique', 'Canada (Québec)', 'Maghreb'],
     marketRationale: 'Dünyada içerik tarama alışkanlığının merkezi (her 3 Fransızdan 1\'i tarayıcı kullanıyor) + Avrupa\'nın en büyük Müslüman nüfusu.'
   },
@@ -100,7 +100,7 @@ export const SUPPORTED_LANGUAGES = [
     nativeName: 'Русский',
     flag: '🇰🇿',
     dir: 'ltr',
-    defaultAuthority: 'general_cautious',
+    defaultAuthority: 'IFANCA',
     primaryMarkets: ['Kazakhstan', 'Uzbekistan', 'Azerbaijan', 'CIS'],
     marketRationale: 'Orta Asya (Kazakistan, Özbekistan, Azerbaycan) ve BDT genelinde 60M+ Müslüman tüketicinin ortak etiket ve INCI analiz dili.'
   },
@@ -128,13 +128,15 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Kimin için tarıyorsun?',
-      subtitle: 'Mobil uygulamada seçimin yalnızca bu cihazda işlenir. Web önizlemesinde yalnızca bu bilgisayardaki yerel sunucuya analiz için gönderilir; kaydedilmez, üçüncü taraflarla paylaşılmaz. Aynı ürün herkese aynı sonucu vermez.',
+      subtitle: 'Tercihlerin cihazında işlenir; bulut hesabı ve reklam takibi yoktur. Aynı ürün farklı kişilere aynı sonucu vermez.',
       profiles: {
         hamilelik: { name: 'Hamilelik & Emzirme', desc: 'Retinoidler, yüksek konsantrasyon salisilik asit ve şüpheli UV filtrelerini işaretler.' },
         cocuk_metabolik: { name: 'Bebek & Çocuk', desc: 'Southampton 6 sentetik boyaları, nitritleri, boratları ve sert koruyucuları öne çıkarır.' },
         hassas_cilt: { name: 'Hassas / Atopik Cilt', desc: '80+ (AB 2023/1545) parfüm alerjeni, MI/MCI, SLS ve ilk 5 sıradaki kurutucu alkolü yakalar.' },
         astim_alerji: { name: 'Alerji & Astım', desc: 'Sülfitler (E220-E228), formaldehit salıcılar ve saç boyası duyarlılaştırıcılarını bildirir.' },
-        akne: { name: 'Akneye Meyilli Cilt', desc: 'Genel puanı düşürmeden yalnız komedojenik ester ve ağır yağları uyarır.' }
+        akne: { name: 'Akneye Meyilli Cilt', desc: 'Genel puanı düşürmeden yalnız komedojenik ester ve ağır yağları uyarır.' },
+        fungal_acne: { name: 'Fungal Akne (Malassezia)', desc: 'Polisorbatlar, yağ asitleri ve Malassezia mayasını besleyen esterleri işaretler.' },
+        egzama_rosacea: { name: 'Egzama & Rozasea', desc: 'Bariyer zayıflatan kurutucu alkol, esansiyel yağ, mentol, BIT ve asitleri bildirir.' }
       },
       halalSectionTitle: 'Helal & Yaşam Tarzı Filtresi',
       authorityLabel: 'Helal Fetva / Standart Otoritesi',
@@ -152,6 +154,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'Bileşenleri Analiz Et →'
     },
     resultScreen: {
+      title: 'Ürün Analiz Özeti',
+      shareBtn: 'Özet Kartını Paylaş',
       scoreLabel: 'GENEL REGÜLASYON ENDEKSİ',
       coverageLabel: 'Tanınan Kapsam',
       recognizedLabel: 'Tanınan Madde',
@@ -211,13 +215,15 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Who are you scanning for?',
-      subtitle: 'In the mobile app your choices are processed only on this device. In the web preview they are sent only to the local server on this computer for analysis, never stored or shared with third parties. The same product affects different people differently.',
+      subtitle: 'Your choices are processed on your device with no cloud accounts or ad tracking. The same product affects different people differently.',
       profiles: {
         hamilelik: { name: 'Pregnancy & Nursing', desc: 'Flags retinoids, high-concentration salicylic acid, and suspected endocrine UV filters.' },
         cocuk_metabolik: { name: 'Baby & Child', desc: 'Highlights Southampton 6 synthetic dyes, nitrites, borates, and harsh preservatives.' },
         hassas_cilt: { name: 'Sensitive / Eczema Skin', desc: 'Catches 80+ (EU 2023/1545) fragrance allergens, MI/MCI, SLS, and top-5 drying denatured alcohol.' },
         astim_alerji: { name: 'Allergy & Asthma', desc: 'Flags sulfites (E220–E228), formaldehyde releasers, and hair-dye sensitizers.' },
-        akne: { name: 'Acne-Prone Skin', desc: 'Warns about comedogenic esters and heavy oils without distorting the general safety score.' }
+        akne: { name: 'Acne-Prone Skin', desc: 'Warns about comedogenic esters and heavy oils without distorting the general safety score.' },
+        fungal_acne: { name: 'Fungal Acne (Malassezia)', desc: 'Flags polysorbates, fatty acids, and esters that feed Malassezia folliculitis without affecting base score.' },
+        egzama_rosacea: { name: 'Eczema & Rosacea', desc: 'Flags flushing triggers, menthol, essential oils, drying alcohols, BIT, and barrier-stripping acids.' }
       },
       halalSectionTitle: 'Halal & Lifestyle Filter',
       authorityLabel: 'Halal Standard Authority',
@@ -235,6 +241,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'Analyze Ingredients →'
     },
     resultScreen: {
+      title: 'Product Analysis Summary',
+      shareBtn: 'Share Analysis Card',
       scoreLabel: 'REGULATORY TRANSPARENCY INDEX',
       coverageLabel: 'Recognized Coverage',
       recognizedLabel: 'Recognized Items',
@@ -294,19 +302,21 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'لمن تقوم بفحص المنتج؟',
-      subtitle: 'في تطبيق الهاتف تُعالَج اختياراتك على هذا الجهاز فقط. في معاينة الويب تُرسَل فقط إلى الخادم المحلي على هذا الحاسوب للتحليل، ولا تُخزَّن ولا تُشارَك مع أي طرف ثالث. المنتج نفسه لا يؤثر على الجميع بالطريقة نفسها.',
+      subtitle: 'تُعالَج اختياراتك على جهازك دون حسابات سحابية أو تتبع إعلاني. المنتج نفسه لا يؤثر على الجميع بالطريقة نفسها.',
       profiles: {
         hamilelik: { name: 'الحمل والرضاعة', desc: 'ينبهك من الريتينويدات وحمض الساليسيليك بتركيز عالٍ وفلاتر الشمس المشتبه بها.' },
         cocuk_metabolik: { name: 'الأطفال والرضع', desc: 'يكشف ألوان ساوثهامبتون الستة والنيتريت والبورات والمواد الحافظة القوية.' },
         hassas_cilt: { name: 'البشرة الحساسة والأكزيما', desc: 'يرصد 80+ (EU 2023/1545) مادة عطرية مسببة للحساسية و MI/MCI و SLS والكحول المجفف في أول ٥ مكونات.' },
         astim_alerji: { name: 'الحساسية والربو', desc: 'ينبهك من الكبريتيت (E220-E228) ومحررات الفورمالديهايد ومسببات حساسية صبغات الشعر.' },
-        akne: { name: 'البشرة المعرضة لحب الشباب', desc: 'يحذر من الإسترات والزيوت السادة للمسام دون خفض المؤشر التنظيمي العام.' }
+        akne: { name: 'البشرة المعرضة لحب الشباب', desc: 'يحذر من الإسترات والزيوت السادة للمسام دون خفض المؤشر التنظيمي العام.' },
+        fungal_acne: { name: 'حب الشباب الفطري (Malassezia)', desc: 'يرصد البوليسوربات والأحماض الدهنية والإسترات المغذية لفطر المالاسيزيا دون خفض الدرجة العامة.' },
+        egzama_rosacea: { name: 'الإكزيما والوردية', desc: 'ينبه من مهيجات الاحمرار والمنثول والزيوت العطرية والكحول المجفف والأحماض القوية.' }
       },
       halalSectionTitle: 'فلتر الحلال ونمط الحياة',
       authorityLabel: 'هيئة معايير الحلال المعتمدة',
       claimsLabel: 'شهادات المنتج على العبوة',
       continueBtn: 'متابعة — انتقل إلى الماسح ←',
-      privacyNote: 'الخصوصية: تفضيلات الصحة والعقيدة بيانات حساسة وفق المادة 9 من GDPR. لا حساب، ولا تخزين، ولا إرسال إلى السحابة أو أي طرف ثالث.'
+      privacyNote: 'الخصوصية: تفضيلات الصحة والعقيدة بيانات حساسة وفق المادة 9 من GDPR. لا ننشئ حساباً ولا نرسلها للسحابة أو جهات إعلانية؛ تُحفظ اختياراتك وقائمتك السوداء وسجل الفحص محلياً على جهازك فقط ويمكنك مسحها في أي وقت.'
     },
     scanScreen: {
       title: 'وجّه الكاميرا نحو قائمة المكونات',
@@ -318,6 +328,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'تحليل المكونات ←'
     },
     resultScreen: {
+      title: 'ملخص تحليل المنتج',
+      shareBtn: 'مشاركة بطاقة النتيجة',
       scoreLabel: 'مؤشر الشفافية والامتثال التنظيمي',
       coverageLabel: 'نسبة التغطية',
       recognizedLabel: 'مكونات معروفة',
@@ -377,19 +389,21 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Für wen scannst du?',
-      subtitle: 'In der mobilen App werden deine Angaben nur auf diesem Gerät verarbeitet. In der Web-Vorschau gehen sie nur zur Analyse an den lokalen Server auf diesem Computer, ohne Speicherung und ohne Weitergabe an Dritte.',
+      subtitle: 'Deine Angaben werden auf deinem Gerät verarbeitet – ohne Cloud-Konto oder Werbe-Tracking.',
       profiles: {
         hamilelik: { name: 'Schwangerschaft & Stillzeit', desc: 'Markiert Retinoide, hochdosierte Salicylsäure und bedenkliche UV-Filter.' },
         cocuk_metabolik: { name: 'Baby & Kinder', desc: 'Warnt vor Southampton-Azofarbstoffen, Nitriten, Boraten und starken Konservierern.' },
         hassas_cilt: { name: 'Empfindliche Haut / Neurodermitis', desc: 'Erkennt 80+ (EU 2023/1545) Duftstoffallergene, MI/MCI, SLS und Alcohol Denat. in den Top 5.' },
         astim_alerji: { name: 'Allergie & Asthma', desc: 'Meldet Sulfite (E220–E228), Formaldehydabspalter und Haarfärbe-Sensibilisierer.' },
-        akne: { name: 'Zu Akne neigende Haut', desc: 'Warnt vor komedogenen Estern und Ölen ohne den allgemeinen Regulierungs-Score zu verzerren.' }
+        akne: { name: 'Zu Akne neigende Haut', desc: 'Warnt vor komedogenen Estern und Ölen ohne den allgemeinen Regulierungs-Score zu verzerren.' },
+        fungal_acne: { name: 'Fungal Akne (Malassezia)', desc: 'Markiert Polysorbate, Fettsäuren und Ester, die Malassezia-Hefen fördern, ohne den Basis-Score zu verzerren.' },
+        egzama_rosacea: { name: 'Ekzem & Rosazea', desc: 'Meldet Flush-Auslöser, Menthol, ätherische Öle, austrocknende Alkohole, BIT und starke Säuren.' }
       },
       halalSectionTitle: 'Halal- & Lifestyle-Filter',
       authorityLabel: 'Halal-Zertifizierungsstandard',
       claimsLabel: 'Etikettenangaben (Halal / Vegan)',
       continueBtn: 'Weiter — Zum Scanner →',
-      privacyNote: 'Datenschutz: Gesundheits- und Glaubensangaben sind besondere Daten nach DSGVO Art. 9. Kein Konto, keine Speicherung, keine Übermittlung an Cloud oder Dritte.'
+      privacyNote: 'Datenschutz: Gesundheits- und Glaubensangaben sind besondere Daten nach DSGVO Art. 9. Kein Konto, keine Cloud-Speicherung, kein Werbe-Tracking (Einstellungen, Sperrliste und Verlauf bleiben nur lokal auf diesem Gerät und sind jederzeit löschbar).'
     },
     scanScreen: {
       title: 'Inhaltsstoffliste ausrichten',
@@ -401,6 +415,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'Inhaltsstoffe analysieren →'
     },
     resultScreen: {
+      title: 'Produktanalyse-Übersicht',
+      shareBtn: 'Analyse-Karte teilen',
       scoreLabel: 'REGULIERUNGS- & TRANSPARENZ-INDEX',
       coverageLabel: 'Erkannte Abdeckung',
       recognizedLabel: 'Erkannte Stoffe',
@@ -460,19 +476,21 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Pour qui scannez-vous ?',
-      subtitle: 'Dans l\'application mobile, vos choix sont traités uniquement sur cet appareil. Dans l\'aperçu web, ils sont envoyés uniquement au serveur local de cet ordinateur pour l\'analyse, sans stockage ni partage avec des tiers.',
+      subtitle: 'Vos choix sont traités sur votre appareil, sans compte cloud ni suivi publicitaire.',
       profiles: {
         hamilelik: { name: 'Grossesse & Allaitement', desc: 'Signale les rétinoïdes, l\'acide salicylique concentré et les filtres UV préoccupants.' },
         cocuk_metabolik: { name: 'Bébé & Enfant', desc: 'Met en évidence les 6 colorants de Southampton, nitrites, borates et conservateurs irritants.' },
         hassas_cilt: { name: 'Peau Sensible / Atopique', desc: 'Détecte les 80+ (UE 2023/1545) allergènes parfumés, MI/MCI, SLS et l\'alcool dénaturé dans le top 5.' },
         astim_alerji: { name: 'Allergies & Asthme', desc: 'Signale les sulfites (E220–E228), libérateurs de formaldéhyde et colorants capillaires.' },
-        akne: { name: 'Peau à Tendance Acnéique', desc: 'Avertit des esters et huiles comédogènes sans fausser le score réglementaire général.' }
+        akne: { name: 'Peau à Tendance Acnéique', desc: 'Avertit des esters et huiles comédogènes sans fausser le score réglementaire général.' },
+        fungal_acne: { name: 'Acné Fongique (Malassezia)', desc: 'Signale polysorbates, acides gras et esters nourrissant Malassezia sans altérer le score de base.' },
+        egzama_rosacea: { name: 'Eczéma & Rosacée', desc: 'Détecte menthol, huiles essentielles, alcool asséchant, BIT et acides affaiblissant la barrière.' }
       },
       halalSectionTitle: 'Filtre Halal & Mode de Vie',
       authorityLabel: 'Autorité de Référence Halal',
       claimsLabel: 'Mentions sur l\'Étiquette',
       continueBtn: 'Continuer — Ouvrir le Scanner →',
-      privacyNote: 'Confidentialité : vos données de santé et de convictions sont des données sensibles (RGPD art. 9). Aucun compte, aucun stockage, aucun envoi vers le cloud ou des tiers.'
+      privacyNote: 'Confidentialité : vos données de santé et de convictions sont des données sensibles (RGPD art. 9). Aucun compte ni stockage cloud ; vos préférences, liste noire et historique restent uniquement sur cet appareil et peuvent être effacés à tout moment.'
     },
     scanScreen: {
       title: 'Alignez la Liste des Ingrédients',
@@ -484,6 +502,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'Analyser les Ingrédients →'
     },
     resultScreen: {
+      title: 'Résumé d\'Analyse Produit',
+      shareBtn: 'Partager la Carte',
       scoreLabel: 'INDICE DE TRANSPARENCE RÉGLEMENTAIRE',
       coverageLabel: 'Couverture Reconnue',
       recognizedLabel: 'Ingrédients Reconnus',
@@ -543,19 +563,21 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Untuk siapa Anda memindai?',
-      subtitle: 'Di aplikasi seluler, pilihan Anda hanya diproses di perangkat ini. Di pratinjau web, pilihan hanya dikirim ke server lokal di komputer ini untuk analisis, tidak disimpan dan tidak dibagikan kepada pihak ketiga.',
+      subtitle: 'Pilihan Anda diproses di perangkat ini tanpa akun cloud atau pelacak iklan.',
       profiles: {
         hamilelik: { name: 'Ibu Hamil & Menyusui', desc: 'Menandai retinoid, asam salisilat dosis tinggi, dan filter UV yang dicurigai.' },
         cocuk_metabolik: { name: 'Bayi & Anak-Anak', desc: 'Menyoroti 6 pewarna sintetis Southampton, nitrit, borat, dan pengawet keras.' },
         hassas_cilt: { name: 'Kulit Sensitif / Eksim', desc: 'Mendeteksi 80+ (UE 2023/1545) alergen wewangian, MI/MCI, SLS, dan alkohol denat di 5 urutan teratas.' },
         astim_alerji: { name: 'Alergi & Asma', desc: 'Menandai sulfit (E220–E228), pelepas formaldehida, dan pemicu alergi cat rambut.' },
-        akne: { name: 'Kulit Rentan Berjerawat', desc: 'Memperingatkan ester dan minyak komedogenik tanpa menurunkan skor regulasi umum.' }
+        akne: { name: 'Kulit Rentan Berjerawat', desc: 'Memperingatkan ester dan minyak komedogenik tanpa menurunkan skor regulasi umum.' },
+        fungal_acne: { name: 'Jerawat Jamur (Malassezia)', desc: 'Menandai polisorbat, asam lemak, dan ester pemicu Malassezia tanpa memengaruhi skor dasar.' },
+        egzama_rosacea: { name: 'Eksim & Rosacea', desc: 'Mendeteksi pemicu kemerahan, mentol, minyak atsiri, alkohol kering, BIT, dan asam keras.' }
       },
       halalSectionTitle: 'Filter Halal & Gaya Hidup',
       authorityLabel: 'Otoritas Standar Halal (MUI / JAKIM / GİMDES)',
       claimsLabel: 'Klaim / Sertifikat pada Kemasan',
       continueBtn: 'Lanjutkan — Buka Pemindai →',
-      privacyNote: 'Privasi: Data kesehatan dan keyakinan adalah data sensitif (GDPR Pasal 9). Tanpa akun, tanpa penyimpanan, tidak dikirim ke cloud atau pihak ketiga.'
+      privacyNote: 'Privasi: Data kesehatan dan keyakinan adalah data sensitif (GDPR Pasal 9). Tanpa akun dan tanpa penyimpanan cloud; preferensi, daftar hitam, dan riwayat hanya disimpan secara lokal di perangkat ini dan dapat dihapus kapan saja.'
     },
     scanScreen: {
       title: 'Arahkan ke Daftar Komposisi',
@@ -567,6 +589,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'Analisis Komposisi →'
     },
     resultScreen: {
+      title: 'Ringkasan Analisis Produk',
+      shareBtn: 'Bagikan Kartu Hasil',
       scoreLabel: 'INDEKS TRANSPARANSI REGULASI',
       coverageLabel: 'Cakupan Dikenali',
       recognizedLabel: 'Bahan Dikenali',
@@ -626,19 +650,21 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Untuk siapa anda mengimbas?',
-      subtitle: 'Dalam aplikasi mudah alih, pilihan anda hanya diproses di peranti ini. Dalam pratonton web, ia hanya dihantar ke pelayan tempatan di komputer ini untuk analisis, tidak disimpan dan tidak dikongsi dengan pihak ketiga.',
+      subtitle: 'Pilihan anda diproses pada peranti anda tanpa akaun awan atau penjejak iklan.',
       profiles: {
         hamilelik: { name: 'Kehamilan & Penyusuan', desc: 'Menandakan retinoid, asid salisilik kepekatan tinggi dan penapis UV yang dicurigai.' },
         cocuk_metabolik: { name: 'Bayi & Kanak-kanak', desc: 'Menyerlahkan 6 pewarna tiruan Southampton, nitrit, borat dan pengawet keras.' },
         hassas_cilt: { name: 'Kulit Sensitif / Ekzema', desc: 'Mengesan 80+ (EU 2023/1545) alergen wangian, MI/MCI, SLS dan alkohol denat dalam 5 ramuan teratas.' },
         astim_alerji: { name: 'Alahan & Asma', desc: 'Menandakan sulfit (E220–E228), pelepas formaldehid dan pemeka pewarna rambut.' },
-        akne: { name: 'Kulit Mudah Berjerawat', desc: 'Memberi amaran tentang ester dan minyak komedogenik tanpa menjejaskan skor regulasi umum.' }
+        akne: { name: 'Kulit Mudah Berjerawat', desc: 'Memberi amaran tentang ester dan minyak komedogenik tanpa menjejaskan skor regulasi umum.' },
+        fungal_acne: { name: 'Jerawat Kulat (Malassezia)', desc: 'Menanda polisorbat, asid lemak dan ester pencetus Malassezia tanpa mengubah skor asas.' },
+        egzama_rosacea: { name: 'Ekzema & Rosacea', desc: 'Mengesan pencetus kemerahan, mentol, minyak pati, alkohol pengering, BIT dan asid kuat.' }
       },
       halalSectionTitle: 'Penapis Halal & Gaya Hidup',
       authorityLabel: 'Pihak Berkuasa Standard Halal (JAKIM / MUI / GİMDES)',
       claimsLabel: 'Akuan / Sijil pada Bungkusan',
       continueBtn: 'Teruskan — Ke Pengimbas →',
-      privacyNote: 'Privasi: Data kesihatan dan kepercayaan ialah data sensitif (GDPR Perkara 9). Tiada akaun, tiada storan, tidak dihantar ke awan atau pihak ketiga.'
+      privacyNote: 'Privasi: Data kesihatan dan kepercayaan ialah data sensitif (GDPR Perkara 9). Tiada akaun dan tiada storan awan; pilihan, senarai hitam dan sejarah hanya disimpan secara tempatan pada peranti ini dan boleh dipadam bila-bila masa.'
     },
     scanScreen: {
       title: 'Jajarkan Senarai Ramuan',
@@ -650,6 +676,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'Analisis Ramuan →'
     },
     resultScreen: {
+      title: 'Ringkasan Analisis Produk',
+      shareBtn: 'Kongsi Kad Keputusan',
       scoreLabel: 'INDEKS KETELUSAN REGULASI',
       coverageLabel: 'Liputan Dikenali',
       recognizedLabel: 'Ramuan Dikenali',
@@ -709,19 +737,21 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: '¿Para quién escaneas?',
-      subtitle: 'En la app móvil tus preferencias se procesan solo en este dispositivo. En la vista previa web se envían solo al servidor local de este ordenador para el análisis, sin guardarse ni compartirse con terceros.',
+      subtitle: 'Tus preferencias se procesan en tu dispositivo sin cuentas en la nube ni rastreadores publicitarios.',
       profiles: {
         hamilelik: { name: 'Embarazo y Lactancia', desc: 'Señala retinoides, ácido salicílico concentrado y filtros UV sospechosos.' },
         cocuk_metabolik: { name: 'Bebés y Niños', desc: 'Destaca los 6 colorantes de Southampton, nitritos, boratos y conservantes fuertes.' },
         hassas_cilt: { name: 'Piel Sensible / Atópica', desc: 'Detecta 80+ (UE 2023/1545) alérgenos de fragancia, MI/MCI, SLS y alcohol desnaturalizado en el top 5.' },
         astim_alerji: { name: 'Alergias y Asma', desc: 'Advierte sobre sulfitos (E220–E228), liberadores de formaldehído y tintes capilares.' },
-        akne: { name: 'Piel Propensa al Acné', desc: 'Advierte sobre ésteres y aceites comedogénicos sin distorsionar la puntuación general.' }
+        akne: { name: 'Piel Propensa al Acné', desc: 'Advierte sobre ésteres y aceites comedogénicos sin distorsionar la puntuación general.' },
+        fungal_acne: { name: 'Acné Fúngico (Malassezia)', desc: 'Señala polisorbatos, ácidos grasos y ésteres que alimentan Malassezia sin alterar la puntuación base.' },
+        egzama_rosacea: { name: 'Eccema y Rosácea', desc: 'Alerta sobre mentol, aceites esenciales, alcohol secante, BIT y ácidos que dañan la barrera.' }
       },
       halalSectionTitle: 'Filtro Halal y Estilo de Vida',
       authorityLabel: 'Autoridad de Estándar Halal',
       claimsLabel: 'Certificados en el Envase',
       continueBtn: 'Continuar — Ir al Escáner →',
-      privacyNote: 'Privacidad: tus datos de salud y creencias son datos sensibles (RGPD art. 9). Sin cuenta, sin almacenamiento y sin envío a la nube ni a terceros.'
+      privacyNote: 'Privacidad: tus datos de salud y creencias son datos sensibles (RGPD art. 9). Sin cuenta ni almacenamiento en la nube; tus preferencias, lista negra e historial se guardan solo localmente en este dispositivo y pueden borrarse cuando quieras.'
     },
     scanScreen: {
       title: 'Alinea la Lista de Ingredientes',
@@ -733,6 +763,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'Analizar Ingredientes →'
     },
     resultScreen: {
+      title: 'Resumen del Análisis',
+      shareBtn: 'Compartir Tarjeta',
       scoreLabel: 'ÍNDICE DE TRANSPARENCIA REGULATORIA',
       coverageLabel: 'Cobertura Reconocida',
       recognizedLabel: 'Ingredientes Reconocidos',
@@ -792,19 +824,21 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'Для кого вы проверяете состав?',
-      subtitle: 'В мобильном приложении ваш выбор обрабатывается только на этом устройстве. В веб-версии он передаётся только на локальный сервер этого компьютера для анализа, не сохраняется и не передаётся третьим лицам.',
+      subtitle: 'Ваши настройки обрабатываются на вашем устройстве без облачных аккаунтов и рекламных трекеров.',
       profiles: {
         hamilelik: { name: 'Беременность и ГВ', desc: 'Отмечает ретиноиды, высокую концентрацию салициловой кислоты и спорные УФ-фильтры.' },
         cocuk_metabolik: { name: 'Дети и малыши', desc: 'Выявляет 6 красителей Саутгемптона, нитриты, бораты и жесткие консерванты.' },
         hassas_cilt: { name: 'Чувствительная кожа / Атопия', desc: 'Находит 80+ (ЕС 2023/1545) отдушек-аллергенов, MI/MCI, SLS и денатурированный спирт в топ-5.' },
         astim_alerji: { name: 'Аллергия и астма', desc: 'Предупреждает о сульфитах (E220–E228), релизерах формальдегида и красителях для волос.' },
-        akne: { name: 'Склонная к акне кожа', desc: 'Предупреждает о комедогенных эфирах и маслах без занижения общего рейтинга.' }
+        akne: { name: 'Склонная к акне кожа', desc: 'Предупреждает о комедогенных эфирах и маслах без занижения общего рейтинга.' },
+        fungal_acne: { name: 'Грибковое акне (Malassezia)', desc: 'Отмечает полисорбаты, жирные кислоты и эфиры, питающие Malassezia, не меняя базовый балл.' },
+        egzama_rosacea: { name: 'Экзема и розацеа', desc: 'Фиксирует триггеры покраснения, ментол, эфирные масла, сушащий спирт, BIT и жёсткие кислоты.' }
       },
       halalSectionTitle: 'Фильтр Халяль и образа жизни',
       authorityLabel: 'Стандарт Халяль (GİMDES / JAKIM / MUI)',
       claimsLabel: 'Маркировка на упаковке',
       continueBtn: 'Далее — Перейти к сканеру →',
-      privacyNote: 'Конфиденциальность: данные о здоровье и убеждениях относятся к особой категории (GDPR, ст. 9). Без аккаунта, без хранения, без передачи в облако или третьим лицам.'
+      privacyNote: 'Конфиденциальность: данные о здоровье и убеждениях относятся к особой категории (GDPR, ст. 9). Без аккаунта и облака; настройки, чёрный список и история хранятся только локально на этом устройстве и удаляются в любой момент.'
     },
     scanScreen: {
       title: 'Наведите на список ингредиентов',
@@ -816,6 +850,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'Анализировать состав →'
     },
     resultScreen: {
+      title: 'Сводка анализа продукта',
+      shareBtn: 'Поделиться карточкой',
       scoreLabel: 'ИНДЕКС РЕГУЛЯТОРНОЙ ПРОЗРАЧНОСТИ',
       coverageLabel: 'Распознано состава',
       recognizedLabel: 'Известных веществ',
@@ -875,19 +911,21 @@ export const UI_STRINGS = {
     },
     profileScreen: {
       title: 'آپ کس کے لیے اسکین کر رہے ہیں؟',
-      subtitle: 'موبائل ایپ میں آپ کا انتخاب صرف اسی ڈیوائس پر پراسیس ہوتا ہے۔ ویب پیش نظارہ میں یہ صرف تجزیے کے لیے اسی کمپیوٹر کے مقامی سرور کو بھیجا جاتا ہے، محفوظ نہیں کیا جاتا اور کسی تیسرے فریق کے ساتھ شیئر نہیں ہوتا۔',
+      subtitle: 'آپ کے انتخابات آپ کی ڈیوائس پر پراسیس ہوتے ہیں، بغیر کلاؤڈ اکاؤنٹ یا اشتہاری ٹریکنگ کے۔',
       profiles: {
         hamilelik: { name: 'حمل اور دودھ پلانے والی مائیں', desc: 'ریٹینوئڈز، تیز سیلیسیلک ایسڈ اور مشتبہ یو وی فلٹرز کی نشاندہی کرتا ہے۔' },
         cocuk_metabolik: { name: 'بچے اور شیر خوار', desc: 'ساؤتھمپٹن کے 6 مصنوعی رنگوں، نائٹرائٹس، بوریٹس اور تیز پریزرویٹوز سے آگاہ کرتا ہے۔' },
         hassas_cilt: { name: 'حساس جلد / ایکزیما', desc: '80+ (EU 2023/1545) خوشبو کے الرجن، MI/MCI، SLS اور ابتدائی 5 اجزاء میں خشک کرنے والے الکحل کو پکڑتا ہے۔' },
         astim_alerji: { name: 'الرجی اور دمہ', desc: 'سلفائٹس (E220-E228)، فارملڈیہائیڈ اور ہیئر ڈائی الرجن کی نشاندہی کرتا ہے۔' },
-        akne: { name: 'مہاسوں (Acne) والی جلد', desc: 'عمومی اسکور کو کم کیے بغیر مسام بند کرنے والے تیل اور ایسٹرز سے خبردار کرتا ہے۔' }
+        akne: { name: 'مہاسوں (Acne) والی جلد', desc: 'عمومی اسکور کو کم کیے بغیر مسام بند کرنے والے تیل اور ایسٹرز سے خبردار کرتا ہے۔' },
+        fungal_acne: { name: 'فنگل ایکنی (Malassezia)', desc: 'بنیادی اسکور کو متاثر کیے بغیر پولی سوربیٹس، فیٹی ایسڈز اور ایسٹرز کی نشاندہی کرتا ہے۔' },
+        egzama_rosacea: { name: 'ایگزیما اور روزیسیا', desc: 'سرخی بڑھانے والے اجزاء، مینتھول، ایسینشل آئلز، خشک الکوحل اور سخت ایسڈز سے خبردار کرتا ہے۔' }
       },
       halalSectionTitle: 'حلال اور طرزِ زندگی فلٹر',
       authorityLabel: 'حلال اسٹینڈرڈ اتھارٹی',
       claimsLabel: 'پیکنگ پر موجود سرٹیفکیٹ',
       continueBtn: 'جاری رکھیں — اسکینر پر جائیں ←',
-      privacyNote: 'رازداری: صحت اور عقیدے سے متعلق انتخاب GDPR آرٹیکل 9 کے تحت حساس ڈیٹا ہیں۔ نہ اکاؤنٹ، نہ محفوظ کرنا، نہ کلاؤڈ یا کسی تیسرے فریق کو بھیجنا۔'
+      privacyNote: 'رازداری: صحت اور عقیدے سے متعلق انتخاب GDPR آرٹیکل 9 کے تحت حساس ڈیٹا ہیں۔ نہ کلاؤڈ اکاؤنٹ اور نہ تیسرے فریق کو منتقلی؛ آپ کی ترجیحات، ذاتی فہرست اور تاریخ صرف اسی ڈیوائس پر محفوظ رہتی ہے اور کسی بھی وقت حذف کی جا سکتی ہے۔'
     },
     scanScreen: {
       title: 'اجزاء کی فہرست کو سیدھ میں رکھیں',
@@ -899,6 +937,8 @@ export const UI_STRINGS = {
       analyzeBtn: 'اجزاء کا تجزیہ کریں ←'
     },
     resultScreen: {
+      title: 'مصنوعہ تجزیہ خلاصہ',
+      shareBtn: 'تجزیہ کارڈ شیئر کریں',
       scoreLabel: 'ریگولیٹری شفافیت انڈیکس',
       coverageLabel: 'شناخت شدہ کوریج',
       recognizedLabel: 'شناخت شدہ اجزاء',
@@ -965,12 +1005,13 @@ export const LEGAL_DISCLAIMERS = {
  * Translates dynamic engine status labels and disclaimers into the requested language
  */
 export function getLocaleStrings(lang = 'tr') {
-  const base = UI_STRINGS[lang] || UI_STRINGS.en;
+  const safeLang = typeof lang === 'string' && Object.hasOwn(UI_STRINGS, lang) ? lang : 'en';
+  const base = UI_STRINGS[safeLang];
   return {
     ...base,
     halalScreen: {
       ...base.halalScreen,
-      legalDisclaimerMicro: LEGAL_DISCLAIMERS[lang] || LEGAL_DISCLAIMERS.en
+      legalDisclaimerMicro: Object.hasOwn(LEGAL_DISCLAIMERS, safeLang) ? LEGAL_DISCLAIMERS[safeLang] : LEGAL_DISCLAIMERS.en
     }
   };
 }

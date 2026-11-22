@@ -1,0 +1,38 @@
+name: InciFact CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies for TypeScript typechecking
+        run: if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+
+      - name: Verify TypeScript strict mode (tsc --noEmit)
+        run: npm run typecheck
+
+      - name: Rebuild generated ES data modules
+        run: npm run build:data
+
+      - name: Verify generated modules match committed files
+        run: git diff --exit-code src/data/generated/
+
+      - name: Run full test & audit suite (12 suites + Phase 6 Boost Hardening)
+        run: npm test
+
+      - name: Build static web/PWA bundle & enforce size cap
+        run: npm run build:pages

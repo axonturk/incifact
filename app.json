@@ -2,15 +2,19 @@
   "expo": {
     "name": "InciFact",
     "slug": "incifact",
-    "version": "1.0.0",
+    "version": "1.2.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "assets/icon.png",
+      "assets/adaptive-icon.png"
+    ],
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0B132B"
+      "backgroundColor": "#091410"
     },
     "ios": {
       "supportsTablet": true,
@@ -18,27 +22,63 @@
       "infoPlist": {
         "NSCameraUsageDescription": "InciFact uses your camera to scan cosmetic (INCI) and food ingredient labels directly on your device.",
         "NSPhotoLibraryUsageDescription": "InciFact lets you select photos of product ingredient labels from your library to analyze them."
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          }
+        ]
       }
     },
     "android": {
       "package": "com.incifact.app",
+      "versionCode": 4,
       "usesCleartextTraffic": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0B132B"
+        "backgroundColor": "#091410"
       },
       "permissions": [
         "android.permission.CAMERA"
+      ],
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
       ]
     },
     "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "InciFact uses your camera to scan product barcodes and ingredient labels on your device.",
+          "recordAudioAndroid": false
+        }
+      ],
       [
         "expo-image-picker",
         {
           "photosPermission": "Allow InciFact to read ingredient label photos from your gallery."
         }
       ],
-      "expo-localization"
+      "expo-secure-store",
+      "./plugins/withAndroidHardening.cjs",
+      "./plugins/withAndroidMlkitOcr.cjs",
+      "./plugins/withIosVisionOcr.cjs"
     ]
   }
 }
