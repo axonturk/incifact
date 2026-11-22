@@ -1,0 +1,74 @@
+name: Build InciFact Android Preview APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  android-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Build generated data and run typecheck
+        run: |
+          npm run build:data
+          npm run typecheck
+
+      - name: Expo Android Prebuild
+        run: npx expo prebuild --platform android --non-interactive --clean
+
+      - name: Verify prebuild native plugins and hardening files
+        run: |
+          test -n "$(find android/app/src -name 'MlkitOcrModule.kt' -print -quit)"
+          test -f android/app/src/main/res/xml/data_extraction_rules.xml
+          test -f android/app/proguard-rules.pro
+
+      - name: Assemble Release APK
+        env:
+          ORG_GRADLE_PROJECT_reactNativeArchitectures: armeabi-v7a,arm64-v8a
+          GRADLE_OPTS: -Xmx4096m -XX:MaxMetaspaceSize=1024m
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Stage APK and compute SHA-256
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/app-release.apk dist/InciFact-v1.2.1-preview.apk
+          ls -lh dist/InciFact-v1.2.1-preview.apk
+          sha256sum dist/InciFact-v1.2.1-preview.apk
+
+      - name: Upload Android Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: incifact-android-apk
+          path: dist/InciFact-v1.2.1-preview.apk
+          if-no-files-found: error
+          retention-days: 14

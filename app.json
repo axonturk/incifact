@@ -78,7 +78,8 @@
       "expo-secure-store",
       "./plugins/withAndroidHardening.cjs",
       "./plugins/withAndroidMlkitOcr.cjs",
-      "./plugins/withIosVisionOcr.cjs"
+      "./plugins/withIosVisionOcr.cjs",
+      "expo-asset"
     ]
   }
 }

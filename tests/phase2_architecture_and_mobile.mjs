@@ -160,7 +160,8 @@ t('[Config/Hygiene] package.json, app.json, eas.json, public/sw.js & CI workflow
   assert.equal(pkg.version, '1.2.1');
   assert.equal(app.expo.version, '1.2.1');
   assert.ok(pkg.dependencies['expo-secure-store'], 'expo-secure-store must be in package.json dependencies');
-  for (const unused of ['expo-asset', 'expo-localization', 'expo-status-bar']) {
+  assert.ok(pkg.dependencies['expo-asset'], 'expo-asset must be in package.json dependencies (required by @expo/metro-config)');
+  for (const unused of ['expo-localization', 'expo-status-bar']) {
     assert.equal(Object.hasOwn(pkg.dependencies, unused), false, `${unused} should be removed`);
   }
 
